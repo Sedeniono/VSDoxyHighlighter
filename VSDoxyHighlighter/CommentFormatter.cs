@@ -73,22 +73,26 @@ namespace VSDoxyHighlighter
   {
     public CommentFormatter()
     {
+      const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
+
       mNoParamMatchers = new List<Tuple<Regex, FormatTypes>>();
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*\B((?:@|\\)(?:brief|details|see|return|returns|ingroup))\b", RegexOptions.Compiled | RegexOptions.Multiline),
+        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "brief", "details", "see", "return", "returns", "ingroup" }), cOptions),
         FormatTypes.NormalKeyword));
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*\B((?:@|\\)(?:warning))\b", RegexOptions.Compiled | RegexOptions.Multiline),
+        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "warning" }), cOptions),
         FormatTypes.Warning));
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*\B((?:@|\\)(?:note|todo))\b", RegexOptions.Compiled | RegexOptions.Multiline),
+        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "note", "todo" }), cOptions),
         FormatTypes.Note));
 
       mOneParamMatchers = new List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>>();
       mOneParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*\B((?:@|\\)(?:param|tparam|param\[in\]|param\[out\]|throw|throws|exception|p|ref|defgroup))[ \t]+(\w+)",
-          RegexOptions.Compiled | RegexOptions.Multiline),
-        FormatTypes.NormalKeyword, FormatTypes.Parameter));
+           new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] { 
+             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "p", "ref", "defgroup"}
+             ), cOptions), 
+           FormatTypes.NormalKeyword, FormatTypes.Parameter));
+
       mOneParamMatchers.Add(Tuple.Create(
         new Regex(@"\B((?:@|\\)(?:p|c|ref))[ \t]+(\w+)", RegexOptions.Compiled),
         FormatTypes.NormalKeyword, FormatTypes.Parameter));
@@ -96,7 +100,7 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
-    /// Computes the way whole the provided text should be formatted.
+    /// Computes the way the whole provided text should be formatted.
     /// </summary>
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.</returns>
@@ -137,6 +141,21 @@ namespace VSDoxyHighlighter
       return result;
     }
 
+
+    private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords) 
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))\b";
+    }
+
+    private string BuildRegex_KeywordAtLineStart_OneParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w+)";
+    }
+
+
+    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*";
 
     private readonly List<Tuple<Regex, FormatTypes>> mNoParamMatchers;
     private readonly List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>> mOneParamMatchers;
