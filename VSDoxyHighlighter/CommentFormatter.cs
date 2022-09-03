@@ -14,7 +14,9 @@ namespace VSDoxyHighlighter
     NormalKeyword,
     Warning,
     Note,
-    Parameter
+    Parameter,
+    Italic,
+    Bold
   }
 
 
@@ -96,6 +98,21 @@ namespace VSDoxyHighlighter
       mOneParamMatchers.Add(Tuple.Create(
         new Regex(@"\B((?:@|\\)(?:p|c|ref))[ \t]+(\w+)", RegexOptions.Compiled),
         FormatTypes.NormalKeyword, FormatTypes.Parameter));
+
+
+      // TODO:
+      // - Tests
+      // - Problem: Outside of comments...
+      // - Versions with _
+
+      // *Italic*
+      mNoParamMatchers.Add(Tuple.Create(
+        new Regex(@"(?:^|[ |\t])(\*[^\*](?:\S+)[^\*]\*)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.Italic));
+      // **Bold**
+      mNoParamMatchers.Add(Tuple.Create(
+        new Regex(@"(?:^|[ |\t])(\*\*(?:\S+)\*\*)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.Bold));
     }
 
 

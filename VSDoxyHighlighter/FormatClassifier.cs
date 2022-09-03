@@ -15,6 +15,8 @@ namespace VSDoxyHighlighter
     public const string ID_warningKeyword = "DocCom/WarningTEST";
     public const string ID_noteKeyword = "DocCom/NoteTEST";
     public const string ID_parameter = "DocCom/ParameterTEST";
+    public const string ID_italic = "DocCom/ItalicTEST";
+    public const string ID_bold = "DocCom/BoldTEST";
   }
 
 
@@ -38,6 +40,14 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_parameter)]
     private static ClassificationTypeDefinition typeDefinitionForParameter;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_italic)]
+    private static ClassificationTypeDefinition typeDefinitionForItalic;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_bold)]
+    private static ClassificationTypeDefinition typeDefinitionForBold;
 #pragma warning restore 169
   }
 
@@ -75,6 +85,8 @@ namespace VSDoxyHighlighter
       mFormatTypeToClassificationType[(uint)FormatTypes.Warning] = registry.GetClassificationType(IDs.ID_warningKeyword);
       mFormatTypeToClassificationType[(uint)FormatTypes.Note] = registry.GetClassificationType(IDs.ID_noteKeyword);
       mFormatTypeToClassificationType[(uint)FormatTypes.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
+      mFormatTypeToClassificationType[(uint)FormatTypes.Italic] = registry.GetClassificationType(IDs.ID_italic);
+      mFormatTypeToClassificationType[(uint)FormatTypes.Bold] = registry.GetClassificationType(IDs.ID_bold);
 
       foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
         Debug.Assert(classificationType != null);
