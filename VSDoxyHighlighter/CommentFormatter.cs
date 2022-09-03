@@ -155,7 +155,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/)[ \t]*\**[ \t]*";
+    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
     private readonly List<Tuple<Regex, FormatTypes>> mNoParamMatchers;
     private readonly List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>> mOneParamMatchers;

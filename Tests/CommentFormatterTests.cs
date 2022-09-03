@@ -91,7 +91,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(377, 2, FormatTypes.NormalKeyword), // \p
         new FormattedFragment(380, 5, FormatTypes.Parameter), // Param of \p
 
-        //new FormattedFragment(415, 6, FormatTypes.NormalKeyword), // @brief
+        new FormattedFragment(415, 6, FormatTypes.NormalKeyword), // @brief
       };
 
       CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
