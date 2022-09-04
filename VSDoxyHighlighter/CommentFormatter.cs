@@ -110,9 +110,20 @@ namespace VSDoxyHighlighter
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(@"(?:^|[ |\t])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
         FormatTypes.EmphasisMinor));
+
       // **bold**
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(@"(?:^|[ |\t])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.EmphasisMajor));
+
+      // _italic_
+      mNoParamMatchers.Add(Tuple.Create(
+        new Regex(@"(?:^|[ |\t])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t]_)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.EmphasisMinor));
+
+      // __bold__
+      mNoParamMatchers.Add(Tuple.Create(
+        new Regex(@"(?:^|[ |\t])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[ |\t])", cOptions),
         FormatTypes.EmphasisMajor));
     }
 

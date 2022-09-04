@@ -110,36 +110,76 @@ namespace VSDoxyHighlighter.Tests
 
 
     [TestMethod()]
-    public void SimpleMarkdownShouldBeFormatted()
+    public void SingleStarShouldFormatItalic()
     {
       var formatter = new CommentFormatter();
       List<FormattedFragment> actualFagments = formatter.FormatText(
-        Utils.ReadTestInputFromFile("Markdown.cpp"));
+        Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
-      const int cItalicStarStart = 0;
-      const int cBoldStarStart = 241;
-
-      var expectedFragments = new List<FormattedFragment>() {
-        // *italic*
-        new FormattedFragment(cItalicStarStart + 9, 8, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 33, 8, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 52, 13, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 76, 16, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 110, 13, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 140, 8, FormatTypes.EmphasisMinor),
-        new FormattedFragment(cItalicStarStart + 155, 8, FormatTypes.EmphasisMinor),
-
-        // **bold**
-        new FormattedFragment(cBoldStarStart + 9, 8, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 33, 8, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 52, 13, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 76, 18, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 110, 14, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 142, 8, FormatTypes.EmphasisMajor),
-        new FormattedFragment(cBoldStarStart + 157, 8, FormatTypes.EmphasisMajor),
-      };
-
+      var expectedFragments = GetExpectationsForItalic();
       CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
+
+    [TestMethod()]
+    public void SingleUnderscoreShouldFormatItalic()
+    {
+      var formatter = new CommentFormatter();
+      List<FormattedFragment> actualFagments = formatter.FormatText(
+        Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
+
+      var expectedFragments = GetExpectationsForItalic();
+      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
+
+    private List<FormattedFragment> GetExpectationsForItalic() 
+    {
+      return new List<FormattedFragment>() {
+        new FormattedFragment(9, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(33, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(52, 13, FormatTypes.EmphasisMinor),
+        new FormattedFragment(76, 16, FormatTypes.EmphasisMinor),
+        new FormattedFragment(110, 13, FormatTypes.EmphasisMinor),
+        new FormattedFragment(140, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(155, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(178, 10, FormatTypes.EmphasisMinor),
+      };
+    }
+
+
+    [TestMethod()]
+    public void DoubleStarShouldFormatBold()
+    {
+      var formatter = new CommentFormatter();
+      List<FormattedFragment> actualFagments = formatter.FormatText(
+        Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
+
+      var expectedFragments = GetExpectationsForBold();
+      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
+
+    [TestMethod()]
+    public void DoubleUnderscoreShouldFormatBold()
+    {
+      var formatter = new CommentFormatter();
+      List<FormattedFragment> actualFagments = formatter.FormatText(
+        Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
+
+      var expectedFragments = GetExpectationsForBold();
+      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
+
+    private List<FormattedFragment> GetExpectationsForBold()
+    {
+      return new List<FormattedFragment>() {
+        new FormattedFragment(9, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(33, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(52, 13, FormatTypes.EmphasisMajor),
+        new FormattedFragment(76, 18, FormatTypes.EmphasisMajor),
+        new FormattedFragment(110, 14, FormatTypes.EmphasisMajor),
+        new FormattedFragment(142, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(157, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(180, 10, FormatTypes.EmphasisMajor),
+      };
     }
 
   }
