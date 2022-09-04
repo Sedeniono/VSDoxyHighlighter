@@ -108,11 +108,11 @@ namespace VSDoxyHighlighter
 
       // *italic*
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*[^\* \t][^\*]*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
+        new Regex(@"(?:^|[ |\t])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
         FormatTypes.EmphasisMinor));
       // **bold**
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*\*[^\* \t][^\*]*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
+        new Regex(@"(?:^|[ |\t])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
         FormatTypes.EmphasisMajor));
     }
 
