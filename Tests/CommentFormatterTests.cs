@@ -28,7 +28,7 @@ namespace VSDoxyHighlighter.Tests
     public void EmptyStringShouldCauseNoFormatting()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText("");
+      var actualFagments = formatter.FormatText("");
       Assert.IsNotNull(actualFagments);
       Assert.AreEqual(0, actualFagments.Count);
     }
@@ -38,7 +38,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCStyleCommentsShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("BasicCStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -72,7 +72,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCppStyleCommentsShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("BasicCppStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -102,7 +102,7 @@ namespace VSDoxyHighlighter.Tests
     public void CasesWhereNothingShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
 
       Assert.AreEqual(0, actualFagments.Count);
@@ -113,7 +113,7 @@ namespace VSDoxyHighlighter.Tests
     public void SingleStarShouldFormatItalic()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
@@ -124,7 +124,7 @@ namespace VSDoxyHighlighter.Tests
     public void SingleUnderscoreShouldFormatItalic()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
@@ -150,7 +150,7 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleStarShouldFormatBold()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBold();
@@ -161,7 +161,7 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleUnderscoreShouldFormatBold()
     {
       var formatter = new CommentFormatter();
-      List<FormattedFragment> actualFagments = formatter.FormatText(
+      var actualFagments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBold();
@@ -182,5 +182,27 @@ namespace VSDoxyHighlighter.Tests
       };
     }
 
+
+    [TestMethod()]
+    public void InlineCodeShouldBeFormatted()
+    {
+      var formatter = new CommentFormatter();
+      var actualFagments = formatter.FormatText(
+        Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
+
+      var expectedFragments = new List<FormattedFragment>() {
+        new FormattedFragment(4, 13, FormatTypes.InlineCode),
+        new FormattedFragment(30, 8, FormatTypes.InlineCode),
+        new FormattedFragment(48, 13, FormatTypes.InlineCode),
+        new FormattedFragment(72, 6, FormatTypes.InlineCode),
+        new FormattedFragment(94, 2, FormatTypes.InlineCode),
+        new FormattedFragment(114, 7, FormatTypes.InlineCode),
+        new FormattedFragment(121, 7, FormatTypes.InlineCode),
+        new FormattedFragment(134, 26, FormatTypes.InlineCode),
+        new FormattedFragment(167, 45, FormatTypes.InlineCode),
+      };
+
+      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
   }
 }

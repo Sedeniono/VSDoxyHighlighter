@@ -98,4 +98,19 @@ namespace VSDoxyHighlighter
       IsBold  = true;
     }
   }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
+  [Name(IDs.ID_inlineCode)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class InlineCodeFormat : ClassificationFormatDefinition
+  {
+    public InlineCodeFormat()
+    {
+      DisplayName = "DoxyHighlighter - Inline code";
+      ForegroundColor = Color.FromRgb(104, 104, 104);
+      BackgroundColor = Color.FromRgb(235, 235, 235);
+    }
+  }
 }

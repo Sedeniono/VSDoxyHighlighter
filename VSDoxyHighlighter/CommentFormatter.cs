@@ -16,7 +16,8 @@ namespace VSDoxyHighlighter
     Note,
     Parameter,
     EmphasisMinor,
-    EmphasisMajor
+    EmphasisMajor,
+    InlineCode
   }
 
 
@@ -38,6 +39,14 @@ namespace VSDoxyHighlighter
     /// The text fragment should be formatted according to this type.
     /// </summary>
     public FormatTypes Type { get; private set; }
+
+    /// <summary>
+    /// The index of the last formatted character.
+    /// </summary>
+    public int EndIndex
+    {
+      get { return Math.Max(StartIndex + Length - 1, StartIndex); }
+    }
 
     public FormattedFragment(int startIndex, int length, FormatTypes type)
     {
@@ -77,34 +86,31 @@ namespace VSDoxyHighlighter
     {
       const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
+      // NOTE: The order in which the regexes are created and added here matters!
+      // If there is more than one regex matching a certain text fragment, the first one wins.
+
+      //----- Without parameters -------
       mNoParamMatchers = new List<Tuple<Regex, FormatTypes>>();
+
+      // `inline code`
+      // Note: Right at the start to overwrite all others.
+      mNoParamMatchers.Add(Tuple.Create(
+        new Regex(@"(`.*?`)", cOptions), FormatTypes.InlineCode));
+
+      // Ordinary keyword
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "brief", "details", "see", "return", "returns", "ingroup" }), cOptions),
         FormatTypes.NormalKeyword));
+
+      // Warning
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "warning" }), cOptions),
         FormatTypes.Warning));
+
+      // Notes
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "note", "todo" }), cOptions),
         FormatTypes.Note));
-
-      mOneParamMatchers = new List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>>();
-      mOneParamMatchers.Add(Tuple.Create(
-           new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] { 
-             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "p", "ref", "defgroup"}
-             ), cOptions), 
-           FormatTypes.NormalKeyword, FormatTypes.Parameter));
-
-      mOneParamMatchers.Add(Tuple.Create(
-        new Regex(@"\B((?:@|\\)(?:p|c|ref))[ \t]+(\w+)", RegexOptions.Compiled),
-        FormatTypes.NormalKeyword, FormatTypes.Parameter));
-
-
-      // TODO:
-      // - Tests
-      // - Problem: Outside of comments...
-      // - Versions with _
-      // - Interaction between _ and *
 
       // *italic*
       mNoParamMatchers.Add(Tuple.Create(
@@ -125,7 +131,36 @@ namespace VSDoxyHighlighter
       mNoParamMatchers.Add(Tuple.Create(
         new Regex(@"(?:^|[ |\t])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[ |\t])", cOptions),
         FormatTypes.EmphasisMajor));
+
+
+      //----- With one parameter -------
+      mOneParamMatchers = new List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>>();
+      mOneParamMatchers.Add(Tuple.Create(
+           new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] {
+             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "p", "ref", "defgroup"}
+             ), cOptions),
+           FormatTypes.NormalKeyword, FormatTypes.Parameter));
+
+      mOneParamMatchers.Add(Tuple.Create(
+        new Regex(@"\B((?:@|\\)(?:p|c|ref))[ \t]+(\w+)", RegexOptions.Compiled),
+        FormatTypes.NormalKeyword, FormatTypes.Parameter));
     }
+
+
+    private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))\b";
+    }
+
+    private string BuildRegex_KeywordAtLineStart_OneParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w+)";
+    }
+
+
+    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
 
     /// <summary>
@@ -133,9 +168,10 @@ namespace VSDoxyHighlighter
     /// </summary>
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.</returns>
-    public List<FormattedFragment> FormatText(string text)
+    public SortedSet<FormattedFragment> FormatText(string text)
     {
-      var result = new List<FormattedFragment>();
+      // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
+      var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
 
       foreach (var matcher in mNoParamMatchers) {
         Regex regexMatcher = matcher.Item1;
@@ -171,20 +207,28 @@ namespace VSDoxyHighlighter
     }
 
 
-    private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords) 
+    /// <summary>
+    /// Comparer that sorts formatted fragments by their position in the text. 
+    /// Overlapping fragments are treated as equal, so that only one can win in the end.
+    /// </summary>
+    private class NonOverlappingFragmentsComparer : IComparer<FormattedFragment>
     {
-      string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))\b";
+      public int Compare(FormattedFragment lhs, FormattedFragment rhs)
+      {
+        if (lhs.EndIndex < rhs.StartIndex) {
+          return -1;
+        }
+        else if (lhs.StartIndex > rhs.EndIndex) {
+          return 1;
+        }
+        else {
+          // Fragments overlap, treat them as equal.
+          return 0;
+        }
+      }
     }
 
-    private string BuildRegex_KeywordAtLineStart_OneParam(string[] keywords)
-    {
-      string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w+)";
-    }
 
-
-    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
     private readonly List<Tuple<Regex, FormatTypes>> mNoParamMatchers;
     private readonly List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>> mOneParamMatchers;

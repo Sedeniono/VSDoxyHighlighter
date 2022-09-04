@@ -17,6 +17,7 @@ namespace VSDoxyHighlighter
     public const string ID_parameter = "Doxy/Parameter";
     public const string ID_emphasisMinor = "Doxy/EmphasisMinor";
     public const string ID_emphasisMajor = "Doxy/EmphasisMajor";
+    public const string ID_inlineCode = "Doxy/InlineCode";
   }
 
 
@@ -48,6 +49,10 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_emphasisMajor)]
     private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_inlineCode)]
+    private static ClassificationTypeDefinition typeDefinitionForInlineCode;
 #pragma warning restore 169
   }
 
@@ -87,6 +92,7 @@ namespace VSDoxyHighlighter
       mFormatTypeToClassificationType[(uint)FormatTypes.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
       mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMinor] = registry.GetClassificationType(IDs.ID_emphasisMinor);
       mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMajor] = registry.GetClassificationType(IDs.ID_emphasisMajor);
+      mFormatTypeToClassificationType[(uint)FormatTypes.InlineCode] = registry.GetClassificationType(IDs.ID_inlineCode);
 
       foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
         Debug.Assert(classificationType != null);
@@ -104,7 +110,7 @@ namespace VSDoxyHighlighter
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan spanToCheck)
     {      
       string codeText = spanToCheck.GetText();
-      List<FormattedFragment> fragmentsToFormat = mFormater.FormatText(codeText);
+      var fragmentsToFormat = mFormater.FormatText(codeText);
 
       var result = new List<ClassificationSpan>();
       foreach (FormattedFragment fragment in fragmentsToFormat) {
