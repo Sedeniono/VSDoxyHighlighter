@@ -11,12 +11,12 @@ namespace VSDoxyHighlighter
 {
   public static class IDs
   {
-    public const string ID_normalKeyword = "DocCom/NormalTEST";
-    public const string ID_warningKeyword = "DocCom/WarningTEST";
-    public const string ID_noteKeyword = "DocCom/NoteTEST";
-    public const string ID_parameter = "DocCom/ParameterTEST";
-    public const string ID_italic = "DocCom/ItalicTEST";
-    public const string ID_bold = "DocCom/BoldTEST";
+    public const string ID_normalKeyword = "Doxy/Normal";
+    public const string ID_warningKeyword = "Doxy/Warning";
+    public const string ID_noteKeyword = "Doxy/Note";
+    public const string ID_parameter = "Doxy/Parameter";
+    public const string ID_emphasisMinor = "Doxy/EmphasisMinor";
+    public const string ID_emphasisMajor = "Doxy/EmphasisMajor";
   }
 
 
@@ -42,12 +42,12 @@ namespace VSDoxyHighlighter
     private static ClassificationTypeDefinition typeDefinitionForParameter;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_italic)]
-    private static ClassificationTypeDefinition typeDefinitionForItalic;
+    [Name(IDs.ID_emphasisMinor)]
+    private static ClassificationTypeDefinition typeDefinitionForEmphasisMinor;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_bold)]
-    private static ClassificationTypeDefinition typeDefinitionForBold;
+    [Name(IDs.ID_emphasisMajor)]
+    private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
 #pragma warning restore 169
   }
 
@@ -85,8 +85,8 @@ namespace VSDoxyHighlighter
       mFormatTypeToClassificationType[(uint)FormatTypes.Warning] = registry.GetClassificationType(IDs.ID_warningKeyword);
       mFormatTypeToClassificationType[(uint)FormatTypes.Note] = registry.GetClassificationType(IDs.ID_noteKeyword);
       mFormatTypeToClassificationType[(uint)FormatTypes.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
-      mFormatTypeToClassificationType[(uint)FormatTypes.Italic] = registry.GetClassificationType(IDs.ID_italic);
-      mFormatTypeToClassificationType[(uint)FormatTypes.Bold] = registry.GetClassificationType(IDs.ID_bold);
+      mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMinor] = registry.GetClassificationType(IDs.ID_emphasisMinor);
+      mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMajor] = registry.GetClassificationType(IDs.ID_emphasisMajor);
 
       foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
         Debug.Assert(classificationType != null);

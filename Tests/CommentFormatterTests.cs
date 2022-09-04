@@ -107,5 +107,36 @@ namespace VSDoxyHighlighter.Tests
 
       Assert.AreEqual(0, actualFagments.Count);
     }
+
+
+    [TestMethod()]
+    public void SimpleMarkdownShouldBeFormatted()
+    {
+      var formatter = new CommentFormatter();
+      List<FormattedFragment> actualFagments = formatter.FormatText(
+        Utils.ReadTestInputFromFile("Markdown.cpp"));
+
+      const int cItalicStarStart = 0;
+      const int cBoldStarStart = 187;
+
+      var expectedFragments = new List<FormattedFragment>() {
+        // *italic*
+        new FormattedFragment(cItalicStarStart + 9, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(cItalicStarStart + 33, 13, FormatTypes.EmphasisMinor),
+        new FormattedFragment(cItalicStarStart + 57, 11, FormatTypes.EmphasisMinor),
+        new FormattedFragment(cItalicStarStart + 86, 8, FormatTypes.EmphasisMinor),
+        new FormattedFragment(cItalicStarStart + 101, 8, FormatTypes.EmphasisMinor),
+
+        // **bold**
+        new FormattedFragment(cBoldStarStart + 9, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(cBoldStarStart + 33, 13, FormatTypes.EmphasisMajor),
+        new FormattedFragment(cBoldStarStart + 57, 13, FormatTypes.EmphasisMajor),
+        new FormattedFragment(cBoldStarStart + 86, 8, FormatTypes.EmphasisMajor),
+        new FormattedFragment(cBoldStarStart + 101, 8, FormatTypes.EmphasisMajor),
+      };
+
+      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+    }
+
   }
 }

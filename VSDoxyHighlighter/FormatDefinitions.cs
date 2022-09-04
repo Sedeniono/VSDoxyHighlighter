@@ -70,30 +70,30 @@ namespace VSDoxyHighlighter
   }
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_italic)]
-  [Name(IDs.ID_italic)]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMinor)]
+  [Name(IDs.ID_emphasisMinor)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class ItalicFormat : ClassificationFormatDefinition
+  internal sealed class EmphasisMinorFormat : ClassificationFormatDefinition
   {
-    public ItalicFormat()
+    public EmphasisMinorFormat()
     {
-      DisplayName = "DoxyHighlighter - Italic text";
+      DisplayName = "DoxyHighlighter - Emphasis (minor)";
       ForegroundColor = Color.FromRgb(87, 166, 74);
       IsItalic = true;
     }
   }
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_bold)]
-  [Name(IDs.ID_bold)]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMajor)]
+  [Name(IDs.ID_emphasisMajor)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class BoldFormat : ClassificationFormatDefinition
+  internal sealed class EmphasisMajorFormat : ClassificationFormatDefinition
   {
-    public BoldFormat()
+    public EmphasisMajorFormat()
     {
-      DisplayName = "DoxyHighlighter - Bold text";
+      DisplayName = "DoxyHighlighter - Emphasis (major)";
       ForegroundColor = Color.FromRgb(0, 75, 0);
       IsBold  = true;
     }

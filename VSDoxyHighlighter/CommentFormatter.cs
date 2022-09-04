@@ -15,8 +15,8 @@ namespace VSDoxyHighlighter
     Warning,
     Note,
     Parameter,
-    Italic,
-    Bold
+    EmphasisMinor,
+    EmphasisMajor
   }
 
 
@@ -104,15 +104,16 @@ namespace VSDoxyHighlighter
       // - Tests
       // - Problem: Outside of comments...
       // - Versions with _
+      // - Interaction between _ and *
 
-      // *Italic*
+      // *italic*
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*[^\*](?:\S+)[^\*]\*)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.Italic));
-      // **Bold**
+        new Regex(@"(?:^|[ |\t])(\*[^\* \t][^\*]*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.EmphasisMinor));
+      // **bold**
       mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*\*(?:\S+)\*\*)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.Bold));
+        new Regex(@"(?:^|[ |\t])(\*\*[^\* \t][^\*]*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
+        FormatTypes.EmphasisMajor));
     }
 
 

@@ -13,3 +13,13 @@
 // @brief Nothing to format because starting with any ordinary '//'.
 
 /// @Brief Nothing to format because of capital B
+
+
+/***************** Nothing bold or italic
+*
+**
+***
+****
+*****
+******
+*/
