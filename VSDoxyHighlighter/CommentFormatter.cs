@@ -144,7 +144,7 @@ namespace VSDoxyHighlighter
       mOneParamMatchers.Add(Tuple.Create(
         new Regex(BuildRegex_KeywordSomewhereInLine_OneParam(new string[] { 
             "p", "c", "ref" }
-        ), RegexOptions.Compiled),
+        ), cOptions),
         FormatTypes.NormalKeyword, FormatTypes.Parameter));
     }
 
