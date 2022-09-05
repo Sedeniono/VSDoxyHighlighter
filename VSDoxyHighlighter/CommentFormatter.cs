@@ -142,7 +142,9 @@ namespace VSDoxyHighlighter
            FormatTypes.NormalKeyword, FormatTypes.Parameter));
 
       mOneParamMatchers.Add(Tuple.Create(
-        new Regex(@"\B((?:@|\\)(?:p|c|ref))[ \t]+(\w+)", RegexOptions.Compiled),
+        new Regex(BuildRegex_KeywordSomewhereInLine_OneParam(new string[] { 
+            "p", "c", "ref" }
+        ), RegexOptions.Compiled),
         FormatTypes.NormalKeyword, FormatTypes.Parameter));
     }
 
@@ -159,8 +161,13 @@ namespace VSDoxyHighlighter
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t]*)";
     }
 
-
     private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
+
+    private string BuildRegex_KeywordSomewhereInLine_OneParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t]*)";
+    }
 
 
     /// <summary>

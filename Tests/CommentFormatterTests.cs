@@ -138,8 +138,10 @@ namespace VSDoxyHighlighter.Tests
       var actualFragments = new CommentFormatter().FormatText(input);
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
-        new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword), // @throws
-        new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter), // std::runtime_error
+        new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("@ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("someFunc()", FormatTypes.Parameter),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

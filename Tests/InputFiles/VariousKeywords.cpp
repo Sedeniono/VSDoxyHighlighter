@@ -1,3 +1,3 @@
 /**
-@throws  std::runtime_error  Function can throw
+@throws  std::runtime_error  Function @ref someFunc() can throw
 */
