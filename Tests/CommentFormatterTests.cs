@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-
+using System.Diagnostics;
 
 namespace VSDoxyHighlighter.Tests
 {
@@ -18,6 +18,39 @@ namespace VSDoxyHighlighter.Tests
       }
       return fileContent;
     }
+
+
+    /// <summary>
+    /// Used for tests where we do not check the position.
+    /// </summary>
+    public struct FormattedFragmentText
+    {
+      public string Text { get; private set; }
+
+      public FormatTypes Type { get; private set; }
+
+      public FormattedFragmentText(string text, FormatTypes type)
+      {
+        Debug.Assert(text.Length > 0);
+        Text = text;
+        Type = type;
+      }
+    }
+
+
+    public static List<FormattedFragmentText> ConvertToTextFragments(string text, ICollection<FormattedFragment> fragments)
+    {
+      var result = new List<FormattedFragmentText>();
+      foreach (FormattedFragment fragment in fragments)
+      {
+        Assert.IsTrue(fragment.Length > 0);
+        Assert.IsTrue(fragment.EndIndex < text.Length);
+        string str = text.Substring(fragment.StartIndex, fragment.Length);
+        result.Add(new FormattedFragmentText(str, fragment.Type));
+      }
+      return result;
+    }
+
   }
 
 
@@ -28,9 +61,9 @@ namespace VSDoxyHighlighter.Tests
     public void EmptyStringShouldCauseNoFormatting()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText("");
-      Assert.IsNotNull(actualFagments);
-      Assert.AreEqual(0, actualFagments.Count);
+      var actualFragments = formatter.FormatText("");
+      Assert.IsNotNull(actualFragments);
+      Assert.AreEqual(0, actualFragments.Count);
     }
 
 
@@ -38,7 +71,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCStyleCommentsShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("BasicCStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -64,7 +97,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(577, 5, FormatTypes.Parameter), // Param of \p
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
 
 
@@ -72,7 +105,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCppStyleCommentsShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("BasicCppStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -94,7 +127,23 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(415, 6, FormatTypes.NormalKeyword), // @brief
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+    }
+
+
+    [TestMethod()]
+    public void VariousKeywordsShouldBeFormatted()
+    {
+      var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
+      var actualFragments = new CommentFormatter().FormatText(input);
+
+      var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
+        new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword), // @throws
+        new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter), // std::runtime_error
+      };
+
+      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
     }
 
 
@@ -102,10 +151,10 @@ namespace VSDoxyHighlighter.Tests
     public void CasesWhereNothingShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
 
-      Assert.AreEqual(0, actualFagments.Count);
+      Assert.AreEqual(0, actualFragments.Count);
     }
 
 
@@ -113,23 +162,25 @@ namespace VSDoxyHighlighter.Tests
     public void SingleStarShouldFormatItalic()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
+
 
     [TestMethod()]
     public void SingleUnderscoreShouldFormatItalic()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
+
 
     private List<FormattedFragment> GetExpectationsForItalic() 
     {
@@ -150,23 +201,25 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleStarShouldFormatBold()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBold();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
+
 
     [TestMethod()]
     public void DoubleUnderscoreShouldFormatBold()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBold();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
+
 
     private List<FormattedFragment> GetExpectationsForBold()
     {
@@ -187,7 +240,7 @@ namespace VSDoxyHighlighter.Tests
     public void InlineCodeShouldBeFormatted()
     {
       var formatter = new CommentFormatter();
-      var actualFagments = formatter.FormatText(
+      var actualFragments = formatter.FormatText(
         Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -202,7 +255,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(167, 45, FormatTypes.InlineCode),
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFagments);
+      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
   }
 }

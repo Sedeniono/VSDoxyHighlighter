@@ -156,7 +156,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_OneParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w+)";
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t]*)";
     }
 
 
