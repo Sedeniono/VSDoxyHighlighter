@@ -86,66 +86,70 @@ namespace VSDoxyHighlighter
     {
       const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
+      mMatchers = new List<FragmentMatcher>();
+
       // NOTE: The order in which the regexes are created and added here matters!
       // If there is more than one regex matching a certain text fragment, the first one wins.
 
       //----- Without parameters -------
-      mNoParamMatchers = new List<Tuple<Regex, FormatTypes>>();
 
       // `inline code`
       // Note: Right at the start to overwrite all others.
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(`.*?`)", cOptions), FormatTypes.InlineCode));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(@"(`.*?`)", cOptions),
+          types = Tuple.Create(FormatTypes.InlineCode)});
 
       // Ordinary keyword
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "brief", "details", "see", "return", "returns", "ingroup" }), cOptions),
-        FormatTypes.NormalKeyword));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "brief", "details", "see", "return", "returns", "ingroup" }), cOptions),
+          types = Tuple.Create(FormatTypes.NormalKeyword)});
 
       // Warning
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "warning" }), cOptions),
-        FormatTypes.Warning));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "warning" }), cOptions),
+          types = Tuple.Create(FormatTypes.Warning)});
 
       // Notes
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "note", "todo" }), cOptions),
-        FormatTypes.Note));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "note", "todo" }), cOptions),
+          types = Tuple.Create(FormatTypes.Note)});
 
       // *italic*
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.EmphasisMinor));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(@"(?:^|[ |\t])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
+          types = Tuple.Create(FormatTypes.EmphasisMinor)});
 
       // **bold**
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.EmphasisMajor));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(@"(?:^|[ |\t])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
+          types = Tuple.Create(FormatTypes.EmphasisMajor)});
 
       // _italic_
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t]_)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.EmphasisMinor));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(@"(?:^|[ |\t])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t]_)(?:\r?$|[ |\t])", cOptions),
+          types = Tuple.Create(FormatTypes.EmphasisMinor)});
 
       // __bold__
-      mNoParamMatchers.Add(Tuple.Create(
-        new Regex(@"(?:^|[ |\t])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[ |\t])", cOptions),
-        FormatTypes.EmphasisMajor));
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(@"(?:^|[ |\t])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[ |\t])", cOptions),
+          types = Tuple.Create(FormatTypes.EmphasisMajor)});
 
 
       //----- With one parameter -------
-      mOneParamMatchers = new List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>>();
-      mOneParamMatchers.Add(Tuple.Create(
-           new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] {
+
+      // Stuff that can be at the start of lines.
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] {
              "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "p", "ref", "defgroup"}
              ), cOptions),
-           FormatTypes.NormalKeyword, FormatTypes.Parameter));
+          types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)});
 
-      mOneParamMatchers.Add(Tuple.Create(
-        new Regex(BuildRegex_KeywordSomewhereInLine_OneParam(new string[] { 
+      // Stuff that can be in the middle of lines.
+      mMatchers.Add(new FragmentMatcher {
+          re = new Regex(BuildRegex_KeywordSomewhereInLine_OneParam(new string[] {
             "p", "c", "ref" }
-        ), cOptions),
-        FormatTypes.NormalKeyword, FormatTypes.Parameter));
+            ), cOptions),
+          types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)});
     }
 
 
@@ -180,32 +184,15 @@ namespace VSDoxyHighlighter
       // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
       var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
 
-      foreach (var matcher in mNoParamMatchers) {
-        Regex regexMatcher = matcher.Item1;
-        FormatTypes formatType = matcher.Item2;
-
-        var foundMatches = regexMatcher.Matches(text);
+      foreach (var matcher in mMatchers) {
+        var foundMatches = matcher.re.Matches(text);
         foreach (Match m in foundMatches) {
-          if (m.Groups.Count == 2) {
-            Group group = m.Groups[1];
-            result.Add(new FormattedFragment(group.Index, group.Length, formatType));
-          }
-        }
-      }
-
-      foreach (var matcher in mOneParamMatchers) {
-        Regex regexMatcher = matcher.Item1;
-        FormatTypes keywordType = matcher.Item2;
-        FormatTypes paramType = matcher.Item3;
-
-        var foundMatches = regexMatcher.Matches(text);
-        foreach (Match m in foundMatches) {
-          if (m.Groups.Count == 3) {
-            Group keywordGroup = m.Groups[1];
-            Group paramGroup = m.Groups[2];
-
-            result.Add(new FormattedFragment(keywordGroup.Index, keywordGroup.Length, keywordType));
-            result.Add(new FormattedFragment(paramGroup.Index, paramGroup.Length, paramType));
+          if (m.Groups.Count == matcher.types.Length + 1) {
+            for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
+              Group group = m.Groups[idx + 1];
+              FormatTypes formatType = (FormatTypes)matcher.types[idx];
+              result.Add(new FormattedFragment(group.Index, group.Length, formatType));
+            }
           }
         }
       }
@@ -236,8 +223,14 @@ namespace VSDoxyHighlighter
     }
 
 
+    struct FragmentMatcher
+    {
+      public Regex re { get; set; }
 
-    private readonly List<Tuple<Regex, FormatTypes>> mNoParamMatchers;
-    private readonly List<Tuple<Regex, FormatTypes /*keyword*/, FormatTypes /*param*/>> mOneParamMatchers;
+      // One FormatTypes for each capturing group in the regex.
+      public System.Runtime.CompilerServices.ITuple types { get; set; }
+    };
+
+    private readonly List<FragmentMatcher> mMatchers;
   }
 }
