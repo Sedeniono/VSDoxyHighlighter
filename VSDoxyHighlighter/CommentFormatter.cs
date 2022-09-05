@@ -140,7 +140,7 @@ namespace VSDoxyHighlighter
       // Stuff that can be at the start of lines.
       mMatchers.Add(new FragmentMatcher {
           re = new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] {
-             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "p", "ref", "defgroup"}
+             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "defgroup"}
              ), cOptions),
           types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)});
 
