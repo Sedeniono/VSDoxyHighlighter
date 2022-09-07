@@ -15,3 +15,10 @@
 
 someCode /** @brief Keyword should be formatted */
 someCode2 /** The following @ref SomeRef and \p Param should be highlighted */
+
+
+/*! @brief Some text
+*/
+
+/** @brief Some text
+*/

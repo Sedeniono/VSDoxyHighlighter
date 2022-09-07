@@ -203,7 +203,7 @@ namespace VSDoxyHighlighter
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t\r\n]*)(?:[ \t]+([^\n\r]*))?";
     }
 
-    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
+    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
     private string BuildRegex_KeywordSomewhereInLine_OneParam(string[] keywords)
     {
