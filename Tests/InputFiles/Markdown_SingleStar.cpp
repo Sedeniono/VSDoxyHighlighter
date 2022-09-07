@@ -7,7 +7,7 @@
 *italic*
 */
 /// Some *__more__* italic
+/// Some (*italic ( text*[ with ,*some more*.
 
 /// Not*italic* text
 /// Not *italic*text
-/// Not @*italic* text

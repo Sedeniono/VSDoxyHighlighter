@@ -7,8 +7,8 @@
 __bold__
 */
 /// Some __*more*__ bold
+/// Some (__bold ( text__[ with ,__some more__.
 
 /// Not ___bold text___
 /// Not__bold__ text
 /// Not __bold__text
-/// Not @__bold__ text

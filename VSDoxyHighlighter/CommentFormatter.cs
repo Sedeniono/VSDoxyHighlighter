@@ -126,28 +126,28 @@ namespace VSDoxyHighlighter
       // *italic*
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ |\t])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[ |\t])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ |\t])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[ |\t])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t]\*\*)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ |\t])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t]_)(?:\r?$|[ |\t])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t]_)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ |\t])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[ |\t])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t]__)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 

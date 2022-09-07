@@ -7,7 +7,7 @@
 _italic_
 */
 /// Some _**more**_ italic
+/// Some (_italic ( text_[ with ,_some more_.
 
 /// Not_italic_ text
 /// Not _italic_text
-/// Not @_italic_ text

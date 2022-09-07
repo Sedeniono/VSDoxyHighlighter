@@ -7,8 +7,8 @@
 **bold**
 */
 /// Some **_more_** bold
+/// Some (**bold ( text**[ with ,**some more**.
 
 /// Not ***bold text***
 /// Not**bold** text
 /// Not **bold**text
-/// Not @**bold** text
