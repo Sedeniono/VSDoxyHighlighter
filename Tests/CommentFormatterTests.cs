@@ -140,9 +140,17 @@ namespace VSDoxyHighlighter.Tests
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter),
+
         new Utils.FormattedFragmentText("@ref", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText("someFunc()", FormatTypes.Parameter),
-      };
+
+        new Utils.FormattedFragmentText(@"\addtogroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("groupNameWithTitle", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("Some group title", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\addtogroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("groupNameWithoutTitle", FormatTypes.Parameter),
+     };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);

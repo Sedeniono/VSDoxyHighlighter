@@ -113,4 +113,19 @@ namespace VSDoxyHighlighter
       BackgroundColor = Color.FromRgb(235, 235, 235);
     }
   }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
+  [Name(IDs.ID_title)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class TitleFormat : ClassificationFormatDefinition
+  {
+    public TitleFormat()
+    {
+      DisplayName = "DoxyHighlighter - Title";
+      ForegroundColor = Color.FromRgb(90, 90, 90);
+      IsBold = true;
+    }
+  }
 }
