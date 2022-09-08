@@ -105,7 +105,11 @@ namespace VSDoxyHighlighter
       // Ordinary keyword
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "brief", "details", "see", "return", "returns", "ingroup" }), cOptions),
+        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
+          "brief", "details", "see", "return", "returns", "ingroup", "callgraph",
+          "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
+          "showrefs", "hiderefs",
+        }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -158,7 +162,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneParam(new string[] {
-             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws", "exception", "defgroup"}
+             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws",
+              "exception", "concept", "def", "enum"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -178,10 +183,15 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneRequiredAndOneOptionalTitle(new string[] {
-          "addtogroup" }
+          "addtogroup", "defgroup" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
+
+      //----- With up to two parameters -------
+      
+      // TODO: category, class
+      // TODO: dir
     }
 
 
@@ -194,7 +204,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_OneParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t]*)";
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t\n\r]*)";
     }
 
     private string BuildRegex_KeywordAtLineStart_OneRequiredAndOneOptionalTitle(string[] keywords)

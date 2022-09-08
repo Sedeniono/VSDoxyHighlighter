@@ -23,6 +23,7 @@ namespace VSDoxyHighlighter.Tests
     /// <summary>
     /// Used for tests where we do not check the position.
     /// </summary>
+    [DebuggerDisplay("Text={Text}, Type={Type}")]
     public struct FormattedFragmentText
     {
       public string Text { get; private set; }
@@ -153,6 +154,28 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\addtogroup", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText("groupNameWithoutTitle", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\callgraph", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\hidecallgraph", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"@callergraph", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\hidecallergraph", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\showrefby", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\hiderefby", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\showrefs", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\hiderefs", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\concept", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"concept_name", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\def", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"MAX(x,y)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\defgroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"IntVariables", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"Global integer variables", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\enum", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Enum_Test::TEnum", FormatTypes.Parameter),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
