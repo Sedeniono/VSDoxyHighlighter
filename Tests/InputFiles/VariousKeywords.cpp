@@ -10,6 +10,10 @@
 \hiderefby
 \showrefs
 \hiderefs
+\category Test1 class.h inc/class.h
+\class Test1 class.h "inc dir/class.h"
+\class Test2 class.h
+\class Test3
 \concept concept_name
 \def MAX(x,y)
 \defgroup IntVariables Global integer variables
@@ -41,6 +45,7 @@
 \implements ISomeInterface_
 \ingroup Group1
 \ingroup Group1 Group2 Group3
+\interface  Test1 class.h inc/class.h
 \internal
 \mainpage My Personal Index Page
 \memberof _some_name
@@ -55,6 +60,7 @@
 \property   const char *Fn_Test::member(char c,int n)
 \protected  
 \protectedsection  
+\protocol ProtocolName Header.h inc/Header.h
 \public
 \publicsection
 \pure
@@ -65,6 +71,8 @@
 \showinitializer
 \static  
 \typedef unsigned long ulong
+\struct Test1 class.h "inc dir/class.h"
+\union Test1 class.h "inc dir/class.h"
 \var unsigned long variable
 \weakgroup groupNameWithTitle Some group title
 */

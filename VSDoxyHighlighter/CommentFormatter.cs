@@ -208,15 +208,21 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_OneRequiredParamAndOneOptionalTitle(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParam_1OptionalParam(new string[] {
           "addtogroup", "defgroup", "headerfile", "page", "weakgroup" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
-      //----- TODO -------
+      //----- With up to three parameters -------
 
-      // TODO: category, class, interface, protocol, struct, union 
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParam_2OptionalParams(new string[] {
+          "category", "class", "interface", "protocol", "struct", "union" }
+          ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
+      });
     }
 
 
@@ -239,10 +245,16 @@ namespace VSDoxyHighlighter
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^\n\r]*)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_OneRequiredParamAndOneOptionalTitle(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredParam_1OptionalParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^\n\r]*))?";
+    }
+
+    private string BuildRegex_KeywordAtLineStart_1RequiredParam_2OptionalParams(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
     }
 
     private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";

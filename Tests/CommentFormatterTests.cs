@@ -164,6 +164,21 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\showrefs", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\hiderefs", FormatTypes.NormalKeyword),
 
+        new Utils.FormattedFragmentText(@"\category", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("inc/class.h", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\class", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"inc dir/class.h\"", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\class", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test2", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\class", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test3", FormatTypes.Parameter),
+
         new Utils.FormattedFragmentText(@"\concept", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"concept_name", FormatTypes.Parameter),
 
@@ -241,6 +256,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\ingroup", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"Group1 Group2 Group3", FormatTypes.Parameter),
 
+        new Utils.FormattedFragmentText(@"\interface", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("inc/class.h", FormatTypes.Title),
+
         new Utils.FormattedFragmentText(@"\internal", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\mainpage", FormatTypes.NormalKeyword),
@@ -273,6 +293,12 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\protected", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\protectedsection", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\protocol", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"ProtocolName", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"Header.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("inc/Header.h", FormatTypes.Title),
+
         new Utils.FormattedFragmentText(@"\public", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\publicsection", FormatTypes.NormalKeyword),
         
@@ -292,6 +318,17 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\typedef", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"unsigned long ulong", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\struct", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"inc dir/class.h\"", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\union", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"inc dir/class.h\"", FormatTypes.Title),
+
         new Utils.FormattedFragmentText(@"\var", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"unsigned long variable", FormatTypes.Parameter),
 
