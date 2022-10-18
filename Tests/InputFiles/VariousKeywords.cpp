@@ -1,5 +1,8 @@
 /**
 @throws  std::runtime_error  Function @ref someFunc() can throw
+
+--- Structural indicators --- 
+
 \addtogroup  groupNameWithTitle	Some group title
 \addtogroup groupNameWithoutTitle
 \callgraph
@@ -71,8 +74,18 @@
 \showinitializer
 \static  
 \typedef unsigned long ulong
-\struct Test1 class.h "inc dir/class.h"
+@struct Test1 class.h "inc dir/class.h"
 \union Test1 class.h "inc dir/class.h"
 \var unsigned long variable
 \weakgroup groupNameWithTitle Some group title
+
+--- Section indicators ---
+\attention some text
+\author authors
+\authors authors
+\bug some bug description
+\cond   
+\cond (!LABEL1 && LABEL2)
+\copyright Some copyright
+\date 1990-2011
 */

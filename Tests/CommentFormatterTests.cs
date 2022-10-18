@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using static System.Collections.Specialized.BitVector32;
 
 namespace VSDoxyHighlighter.Tests
 {
@@ -142,6 +143,7 @@ namespace VSDoxyHighlighter.Tests
       var actualFragments = new CommentFormatter().FormatText(input);
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
+        // --- Structural indicators --- 
         new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter),
 
@@ -319,7 +321,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\typedef", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"unsigned long ulong", FormatTypes.Parameter),
 
-        new Utils.FormattedFragmentText(@"\struct", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"@struct", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"Test1", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"class.h", FormatTypes.Parameter),
         new Utils.FormattedFragmentText("\"inc dir/class.h\"", FormatTypes.Title),
@@ -336,6 +338,18 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText("groupNameWithTitle", FormatTypes.Parameter),
         new Utils.FormattedFragmentText("Some group title", FormatTypes.Title),
 
+        // --- Section indicators ---
+        new Utils.FormattedFragmentText(@"\attention", FormatTypes.Note),
+        new Utils.FormattedFragmentText(@"\author", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\authors", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\bug", FormatTypes.Note),
+
+        new Utils.FormattedFragmentText(@"\cond", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\cond", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"(!LABEL1 && LABEL2)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\copyright", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\date", FormatTypes.NormalKeyword),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

@@ -106,7 +106,9 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
-          "brief", "details", "see", "return", "returns", "ingroup", "callgraph",
+          "brief", "details", "see", "return", "author", "authors", "copyright",
+          "date",
+          "returns", "ingroup", "callgraph",
           "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
           "showrefs", "hiderefs", "endinternal",
           @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
@@ -128,7 +130,9 @@ namespace VSDoxyHighlighter
       // Notes
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "note", "todo" }), cOptions),
+        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
+          "note", "todo", "attention", "bug"
+        }), cOptions),
         types = Tuple.Create(FormatTypes.Note)
       });
 
@@ -180,7 +184,16 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(new string[] {
              "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
-             "property", "typedef", "var"}
+             "property", "typedef", "var", "cond"}
+             ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
+      });
+
+      // Keywords with optional parameter that can be at the start of lines, parameter stretches till the end of the line.
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAtLineStart_OneOptionalParamTillEndOfLine(new string[] {
+             "cond"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -243,6 +256,12 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^\n\r]*)";
+    }
+
+    private string BuildRegex_KeywordAtLineStart_OneOptionalParamTillEndOfLine(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))(?:[ \t]+([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParam_1OptionalParam(string[] keywords)
