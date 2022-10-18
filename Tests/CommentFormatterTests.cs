@@ -174,8 +174,60 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"IntVariables", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"Global integer variables", FormatTypes.Title),
 
+        new Utils.FormattedFragmentText(@"\dir", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", FormatTypes.Parameter),
+
         new Utils.FormattedFragmentText(@"\enum", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"Enum_Test::TEnum", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\example", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"example_test.cpp", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\example{lineno}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\endinternal", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\extends", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Object", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\file", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\fileinfo{file}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\fileinfo{extension}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\fileinfo{filename}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\fileinfo{directory}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\fileinfo{full}", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\lineinfo", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\fn", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"const char *Fn_Test::member(char c,int n)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"test.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"some name\"", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("\"test.h\"", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("some name", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"test.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"\"", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"test.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("\"test.h\"", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("\"\"", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"test.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"<test.h>", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"test.h", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"<>", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"<>", FormatTypes.Parameter),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

@@ -6,6 +6,7 @@
  @param@warning Nothing should be formatted because keywords are not separate
  @param
 	 ^^ Nothing should be formatted because missing parameter
+ \briefs Incorrect keyword
 */
 
 /// T \note Nothing should be formatted because keyword is not at the start
@@ -35,3 +36,11 @@ _____
 ______
 _______
 */
+
+/** Nothing italic
+char *Fn_Test
+*/
+
+/** Nothing bold
+char *Fn_Test
+**/
