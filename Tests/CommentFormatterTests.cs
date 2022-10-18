@@ -228,6 +228,77 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"<>", FormatTypes.Title),
         new Utils.FormattedFragmentText(@"\headerfile", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"<>", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\hideinitializer", FormatTypes.NormalKeyword),
+        
+        new Utils.FormattedFragmentText(@"\idlexcept", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"exception", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\implements", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"ISomeInterface_", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\ingroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Group1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\ingroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Group1 Group2 Group3", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\internal", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\mainpage", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"My Personal Index Page", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\memberof", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"_some_name", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\name", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"group_", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\namespace", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"nested::space", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\nosubgrouping", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\overload", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"void Overload_Test::drawRect(const Rect &r)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\package", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"PackageName", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\page", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("page1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("A documentation page", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\private", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\privatesection", FormatTypes.NormalKeyword),
+        
+        new Utils.FormattedFragmentText(@"\property", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"const char *Fn_Test::member(char c,int n)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\protected", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\protectedsection", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\public", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\publicsection", FormatTypes.NormalKeyword),
+        
+        new Utils.FormattedFragmentText(@"\pure", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\relates", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"String", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\related", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"String", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\relatesalso", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"String", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\relatedalso", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"String", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\showinitializer", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\static", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\typedef", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"unsigned long ulong", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\var", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"unsigned long variable", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\weakgroup", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("groupNameWithTitle", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("Some group title", FormatTypes.Title),
+
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

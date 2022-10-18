@@ -102,7 +102,7 @@ namespace VSDoxyHighlighter
         types = Tuple.Create(FormatTypes.InlineCode)
       });
 
-      // Ordinary keyword
+      // Ordinary keyword without highlighted parameter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
@@ -111,7 +111,9 @@ namespace VSDoxyHighlighter
           "showrefs", "hiderefs", "endinternal",
           @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
           @"fileinfo\{directory\}", @"fileinfo\{full\}",
-          "lineinfo"
+          "lineinfo", "hideinitializer", "internal", "nosubgrouping", "private",
+          "privatesection", "protected", "protectedsection", "public", "publicsection",
+          "pure", "showinitializer", "static"
         }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -161,23 +163,35 @@ namespace VSDoxyHighlighter
 
       //----- With one parameter -------
 
-      // Stuff that can be at the start of lines, parameter terminated by whitespace.
+      // Keywords with parameter that can be at the start of lines, parameter terminated by whitespace.
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneParamAsWord(new string[] {
              "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws",
-              "exception", "concept", "def", "enum", "extends"}
+              "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
+              "memberof", "name", "namespace", "package", "relates", "related",
+              "relatesalso", "relatedalso"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
-      // Stuff that can be at the start of lines, parameter stretches till the end of the line.
+      // Keywords with parameter that can be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(new string[] {
-             "dir", "example", @"example\{lineno\}", "file", "fn"}
+             "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
+             "property", "typedef", "var"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
+      });
+
+      // Keyword with title
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(new string[] {
+             "mainpage"}
+             ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
       // Stuff that can be in the middle of lines.
@@ -195,14 +209,14 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_OneRequiredParamAndOneOptionalTitle(new string[] {
-          "addtogroup", "defgroup", "headerfile" }
+          "addtogroup", "defgroup", "headerfile", "page", "weakgroup" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
       //----- TODO -------
-      
-      // TODO: category, class
+
+      // TODO: category, class, interface, protocol, struct, union 
     }
 
 
