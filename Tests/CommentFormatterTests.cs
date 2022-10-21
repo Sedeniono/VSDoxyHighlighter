@@ -338,6 +338,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText("groupNameWithTitle", FormatTypes.Parameter),
         new Utils.FormattedFragmentText("Some group title", FormatTypes.Title),
 
+
         // --- Section indicators ---
         new Utils.FormattedFragmentText(@"\attention", FormatTypes.Note),
         new Utils.FormattedFragmentText(@"\author", FormatTypes.NormalKeyword),
@@ -434,6 +435,21 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\todo", FormatTypes.Note),
         new Utils.FormattedFragmentText(@"\version", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\warning", FormatTypes.Warning),
+
+
+        // --- Commands to create links ---
+
+        new Utils.FormattedFragmentText(@"\addindex", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\anchor", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"some_word", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\cite", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"some_label", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\link", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"link_obj", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\endlink", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endlink", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

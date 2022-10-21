@@ -135,4 +135,11 @@
 \todo need to do something
 \version v1.2
 \warning some warning
+
+--- Commands to create links ---
+\addindex some text
+\anchor some_word
+\cite  some_label
+\link link_obj some text \endlink
+\endlink more text
 */

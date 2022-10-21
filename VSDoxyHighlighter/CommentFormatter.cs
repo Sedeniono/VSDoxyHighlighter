@@ -105,7 +105,7 @@ namespace VSDoxyHighlighter
         types = Tuple.Create(FormatTypes.InlineCode)
       });
 
-      // Ordinary keyword without highlighted parameter
+      // Ordinary keyword without highlighted parameter at line start
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
@@ -120,7 +120,16 @@ namespace VSDoxyHighlighter
           @"fileinfo\{directory\}", @"fileinfo\{full\}",
           "lineinfo", "hideinitializer", "internal", "nosubgrouping", "private",
           "privatesection", "protected", "protectedsection", "public", "publicsection",
-          "pure", "showinitializer", "static"
+          "pure", "showinitializer", "static",
+          "addindex"
+        }), cOptions),
+        types = Tuple.Create(FormatTypes.NormalKeyword)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
+          "endlink"
         }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -181,7 +190,8 @@ namespace VSDoxyHighlighter
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
-              "relatesalso", "relatedalso", "retval"}
+              "relatesalso", "relatedalso", "retval",
+              "anchor", "cite", "link"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -266,6 +276,12 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t\n\r]";
+    }
+
+    private string BuildRegex_KeywordSomewhereInLine_NoParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return @"\B((?:@|\\)(?:" + concatKeywords + @"))\b";
     }
 
     // Parameter terminated by whitespace.
