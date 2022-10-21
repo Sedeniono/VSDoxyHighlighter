@@ -472,6 +472,29 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\refitem", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"some_name", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\secreflist", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endsecreflist", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\subpage", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"intro", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\subpage", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"advanced", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""Advanced usage""", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\tableofcontents", FormatTypes.NormalKeyword),
+        
+        new Utils.FormattedFragmentText(@"\section", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"sec", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"An example section", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\subsection", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"sec_2", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\subsubsection", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"sec", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"An example section", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\paragraph", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"sec", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"An example section", FormatTypes.Title),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

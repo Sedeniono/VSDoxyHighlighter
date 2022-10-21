@@ -119,7 +119,7 @@ namespace VSDoxyHighlighter
           "hideinitializer", "internal", "nosubgrouping", "private",
           "privatesection", "protected", "protectedsection", "public", "publicsection",
           "pure", "showinitializer", "static",
-          "addindex"
+          "addindex", "secreflist", "endsecreflist", "tableofcontents"
         }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -246,7 +246,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(new string[] {
-          "addtogroup", "defgroup", "headerfile", "page", "weakgroup" }
+          "addtogroup", "defgroup", "headerfile", "page", "weakgroup", 
+          "section", "subsection", "subsubsection", "paragraph" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
@@ -262,7 +263,7 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(new string[] {
-          "ref" }
+          "ref", "subpage" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });

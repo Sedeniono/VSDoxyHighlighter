@@ -150,4 +150,13 @@ See \ref link_text "some text" and more. See \ref someFunc() "some text 2" and m
 \ref anotherFunc()
 \ref link_text5 not formatted because not quotes
 Some text \refitem some_name more text
+\secreflist
+\endsecreflist
+- \subpage intro
+- \subpage advanced "Advanced usage"
+\tableofcontents
+\section sec An example section
+\subsection sec_2
+\subsubsection sec An example section
+\paragraph sec An example section
 */
