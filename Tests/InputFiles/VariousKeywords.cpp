@@ -88,4 +88,6 @@
 \cond (!LABEL1 && LABEL2)
 \copyright Some copyright
 \date 1990-2011
+\showdate "%A %d-%m-%Y %H:%M:%S"  2015-3-14 03:04:15
+\showdate  "%A %d-%m-%Y %H:%M:%S"
 */

@@ -227,6 +227,14 @@ namespace VSDoxyHighlighter
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParam(new string[] {
+          "showdate" }
+          ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
+      });
+
       //----- With up to three parameters -------
 
       mMatchers.Add(new FragmentMatcher
@@ -268,6 +276,12 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^\n\r]*))?";
+    }
+
+    private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(""[^\r\n]*"")(?:[ \t]+([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParam_2OptionalParams(string[] keywords)

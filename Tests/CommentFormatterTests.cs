@@ -350,6 +350,12 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\copyright", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\date", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\showdate", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""%A %d-%m-%Y %H:%M:%S""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"2015-3-14 03:04:15", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\showdate", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""%A %d-%m-%Y %H:%M:%S""", FormatTypes.Parameter),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
