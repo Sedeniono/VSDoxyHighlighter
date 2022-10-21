@@ -342,6 +342,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\attention", FormatTypes.Note),
         new Utils.FormattedFragmentText(@"\author", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\authors", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\brief", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\bug", FormatTypes.Note),
 
         new Utils.FormattedFragmentText(@"\cond", FormatTypes.NormalKeyword),
@@ -356,7 +357,52 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"2015-3-14 03:04:15", FormatTypes.Title),
         new Utils.FormattedFragmentText(@"\showdate", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"""%A %d-%m-%Y %H:%M:%S""", FormatTypes.Parameter),
-     };
+
+        new Utils.FormattedFragmentText(@"\deprecated", FormatTypes.Note),
+        new Utils.FormattedFragmentText(@"\details", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\noop", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\raisewarning", FormatTypes.Warning),
+        new Utils.FormattedFragmentText(@"\else", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\elseif", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"(!LABEL1 && LABEL2)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\endcond", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endif", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\exception", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"std::out_of_range", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\if", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"(!LABEL1 && LABEL2)", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\if", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"Cond1", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\ifnot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"(!LABEL1 && LABEL2)", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\invariant", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\note", FormatTypes.Note),
+
+        new Utils.FormattedFragmentText(@"\par", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"User defined paragraph:", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\par", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\par", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@":  some title", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText(@"\param[out]", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"dest", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param[in]", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"src", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param[in]", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"n", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param[in,out]", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"p", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"p", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x,y,z", FormatTypes.Parameter),
+      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);

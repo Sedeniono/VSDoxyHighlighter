@@ -83,6 +83,7 @@
 \attention some text
 \author authors
 \authors authors
+\brief Some description
 \bug some bug description
 \cond   
 \cond (!LABEL1 && LABEL2)
@@ -90,4 +91,27 @@
 \date 1990-2011
 \showdate "%A %d-%m-%Y %H:%M:%S"  2015-3-14 03:04:15
 \showdate  "%A %d-%m-%Y %H:%M:%S"
+\deprecated Some deprecated stuff
+\details Some details
+\noop some stuff
+\raisewarning My specific warning
+\else
+\elseif (!LABEL1 && LABEL2)
+\endcond
+\endif
+\exception std::out_of_range parameter is out of range.
+\if (!LABEL1 && LABEL2)
+\if Cond1
+\ifnot  (!LABEL1 && LABEL2)
+\invariant Some text
+\note Some note
+\par User defined paragraph:
+\par
+\par:  some title
+\param[out] dest The memory area to copy to.
+\param[in]  src  The memory area to copy from.
+\param[in]  n    The number of bytes to copy
+\param[in,out] p In and out param
+\param p some param
+\param x,y,z Coordinates of the position in 3D space.
 */

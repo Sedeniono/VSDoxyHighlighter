@@ -107,7 +107,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
           "brief", "details", "see", "return", "author", "authors", "copyright",
-          "date",
+          "date", "noop", "else", "endcond", "endif", "invariant",
           "returns", "ingroup", "callgraph",
           "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
           "showrefs", "hiderefs", "endinternal",
@@ -123,7 +123,9 @@ namespace VSDoxyHighlighter
       // Warning
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { "warning" }), cOptions),
+        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
+          "warning", "raisewarning"
+        }), cOptions),
         types = Tuple.Create(FormatTypes.Warning)
       });
 
@@ -131,7 +133,7 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
-          "note", "todo", "attention", "bug"
+          "note", "todo", "attention", "bug", "deprecated"
         }), cOptions),
         types = Tuple.Create(FormatTypes.Note)
       });
@@ -170,8 +172,8 @@ namespace VSDoxyHighlighter
       // Keywords with parameter that can be at the start of lines, parameter terminated by whitespace.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_OneParamAsWord(new string[] {
-             "param", "tparam", @"param\[in\]", @"param\[out\]", "throw", "throws",
+        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamAsWord(new string[] {
+             "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
               "relatesalso", "relatedalso"}
@@ -182,9 +184,10 @@ namespace VSDoxyHighlighter
       // Keywords with parameter that can be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
              "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
-             "property", "typedef", "var", "cond"}
+             "property", "typedef", "var", "cond",
+             "elseif", "if", "ifnot"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -192,16 +195,23 @@ namespace VSDoxyHighlighter
       // Keywords with optional parameter that can be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_OneOptionalParamTillEndOfLine(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "cond"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
+      });
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
+             "par"}
+             ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
       // Keyword with title
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
              "mainpage"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
@@ -221,7 +231,7 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParam_1OptionalParam(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(new string[] {
           "addtogroup", "defgroup", "headerfile", "page", "weakgroup" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
@@ -229,7 +239,7 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParam(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
           "showdate" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
@@ -239,7 +249,7 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParam_2OptionalParams(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
           "category", "class", "interface", "protocol", "struct", "union" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
@@ -254,37 +264,37 @@ namespace VSDoxyHighlighter
     }
 
     // Parameter terminated by whitespace.
-    private string BuildRegex_KeywordAtLineStart_OneParamAsWord(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1ParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t\n\r]*)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_OneParamTillEndOfLine(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1ParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^\n\r]*)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_OneOptionalParamTillEndOfLine(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))(?:[ \t]+([^\n\r]*))?";
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))\b(?:[ \t]*([^\n\r]*))?";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParam_1OptionalParam(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^\n\r]*))?";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParam(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(""[^\r\n]*"")(?:[ \t]+([^\n\r]*))?";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParam_2OptionalParams(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
