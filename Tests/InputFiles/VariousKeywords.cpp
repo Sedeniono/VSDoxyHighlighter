@@ -114,4 +114,25 @@
 \param[in,out] p In and out param
 \param p some param
 \param x,y,z Coordinates of the position in 3D space.
+\parblock  
+\endparblock
+\tparam some_param Description of template
+\post some description
+\pre some description
+\remark some remark
+\remarks some remarks
+\result Some result
+\return Some return value
+\returns Some return value
+\retval some_value Some return value
+\sa cls::ref, someFunc()
+\see cls::ref, someFunc()
+\short Some description
+\since some date
+\test Description of test
+\throw std::out_of_range parameter is out of range.
+\throws someException desc
+\todo need to do something
+\version v1.2
+\warning some warning
 */

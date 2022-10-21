@@ -402,6 +402,38 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"p", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"x,y,z", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\parblock", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endparblock", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\tparam", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"some_param", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\post", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\pre", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\remark", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\remarks", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\result", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\return", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\returns", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\retval", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"some_value", FormatTypes.Parameter),
+        
+        new Utils.FormattedFragmentText(@"\sa", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\see", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\short", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\since", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\test", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\throw", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"std::out_of_range", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\throws", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"someException", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\todo", FormatTypes.Note),
+        new Utils.FormattedFragmentText(@"\version", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\warning", FormatTypes.Warning),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

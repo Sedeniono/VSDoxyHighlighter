@@ -91,6 +91,9 @@ namespace VSDoxyHighlighter
 
       // NOTE: The order in which the regexes are created and added here matters!
       // If there is more than one regex matching a certain text fragment, the first one wins.
+      //
+      // Based on doxygen 1.9.5 (26th August 2022).
+
 
       //----- Without parameters -------
 
@@ -106,9 +109,11 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
-          "brief", "details", "see", "return", "author", "authors", "copyright",
-          "date", "noop", "else", "endcond", "endif", "invariant",
-          "returns", "ingroup", "callgraph",
+          "brief", "short", "details", "sa", "see", "result", "return", "returns", 
+          "author", "authors", "copyright", "date", "noop", "else", "endcond", "endif", 
+          "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
+          "since", "test", "version",
+          "ingroup", "callgraph",
           "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
           "showrefs", "hiderefs", "endinternal",
           @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
@@ -176,7 +181,7 @@ namespace VSDoxyHighlighter
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
-              "relatesalso", "relatedalso"}
+              "relatesalso", "relatedalso", "retval"}
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
