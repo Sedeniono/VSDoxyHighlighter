@@ -116,9 +116,7 @@ namespace VSDoxyHighlighter
           "ingroup", "callgraph",
           "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
           "showrefs", "hiderefs", "endinternal",
-          @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
-          @"fileinfo\{directory\}", @"fileinfo\{full\}",
-          "lineinfo", "hideinitializer", "internal", "nosubgrouping", "private",
+          "hideinitializer", "internal", "nosubgrouping", "private",
           "privatesection", "protected", "protectedsection", "public", "publicsection",
           "pure", "showinitializer", "static",
           "addindex"
@@ -129,7 +127,9 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
-          "endlink"
+          @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
+          @"fileinfo\{directory\}", @"fileinfo\{full\}", 
+          "lineinfo", "endlink"
         }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -190,8 +190,7 @@ namespace VSDoxyHighlighter
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
-              "relatesalso", "relatedalso", "retval",
-              "anchor", "cite", "link"}
+              "relatesalso", "relatedalso", "retval" }
              ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -236,7 +235,7 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
-            "p", "c" }
+            "p", "c", "anchor", "cite", "link", "refitem" }
             ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -289,7 +288,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordSomewhereInLine_NoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return @"\B((?:@|\\)(?:" + concatKeywords + @"))\b";
+      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t\n\r]";
     }
 
     // Parameter terminated by whitespace.

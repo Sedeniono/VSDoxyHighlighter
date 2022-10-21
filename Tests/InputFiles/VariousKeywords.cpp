@@ -25,12 +25,12 @@
 \endinternal
 \extends Object
 \file path with spaces\example_test.cpp
-\fileinfo{file}
-\fileinfo{extension}
-\fileinfo{filename}
+Some text \fileinfo{file} more text
+Some text \fileinfo{extension}
+\fileinfo{filename} more text
 \fileinfo{directory}
 \fileinfo{full}
-\lineinfo
+Some text \lineinfo more text
 \fn const char *Fn_Test::member(char c,int n)
 \headerfile test.h "some name"
 \headerfile "test.h" some name
@@ -140,13 +140,14 @@
 
 --- Commands to create links ---
 \addindex some text
-\anchor some_word
+Some text \anchor some_word
 \cite  some_label
-\link link_obj some text \endlink
+Some text \link link_obj some text \endlink
 \endlink more text
 This page contains \ref subsection1 and \ref subsection2.
 See \ref link_text "some text" and more. See \ref someFunc() "some text 2" and more.
 \ref link_text3 "some"
 \ref anotherFunc()
 \ref link_text5 not formatted because not quotes
+Some text \refitem some_name more text
 */

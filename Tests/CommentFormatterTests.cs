@@ -469,6 +469,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"anotherFunc()", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"link_text5", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\refitem", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"some_name", FormatTypes.Parameter),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
