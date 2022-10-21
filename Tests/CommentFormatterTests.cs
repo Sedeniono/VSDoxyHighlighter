@@ -144,12 +144,6 @@ namespace VSDoxyHighlighter.Tests
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         // --- Structural indicators --- 
-        new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword),
-        new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter),
-
-        new Utils.FormattedFragmentText("@ref", FormatTypes.NormalKeyword),
-        new Utils.FormattedFragmentText("someFunc()", FormatTypes.Parameter),
-
         new Utils.FormattedFragmentText(@"\addtogroup", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText("groupNameWithTitle", FormatTypes.Parameter),
         new Utils.FormattedFragmentText("Some group title", FormatTypes.Title),
@@ -358,6 +352,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"2015-3-14 03:04:15", FormatTypes.Title),
         new Utils.FormattedFragmentText(@"\showdate", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"""%A %d-%m-%Y %H:%M:%S""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""2015-3-14 03:04:15""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\showdate", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""%A %d-%m-%Y %H:%M:%S""", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\deprecated", FormatTypes.Note),
         new Utils.FormattedFragmentText(@"\details", FormatTypes.NormalKeyword),
@@ -431,6 +428,10 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"std::out_of_range", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\throws", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"someException", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("@throws", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("std::runtime_error", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("@ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("someFunc()", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\todo", FormatTypes.Note),
         new Utils.FormattedFragmentText(@"\version", FormatTypes.NormalKeyword),
@@ -450,6 +451,24 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"link_obj", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\endlink", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\endlink", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"subsection1", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"subsection2", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"link_text", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""some text""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"someFunc()", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""some text 2""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"link_text3", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""some""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"anotherFunc()", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\ref", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"link_text5", FormatTypes.Parameter),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

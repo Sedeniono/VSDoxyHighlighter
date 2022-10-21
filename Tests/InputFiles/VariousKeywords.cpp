@@ -1,6 +1,4 @@
 /**
-@throws  std::runtime_error  Function @ref someFunc() can throw
-
 --- Structural indicators --- 
 
 \addtogroup  groupNameWithTitle	Some group title
@@ -79,6 +77,7 @@
 \var unsigned long variable
 \weakgroup groupNameWithTitle Some group title
 
+
 --- Section indicators ---
 \attention some text
 \author authors
@@ -90,6 +89,7 @@
 \copyright Some copyright
 \date 1990-2011
 \showdate "%A %d-%m-%Y %H:%M:%S"  2015-3-14 03:04:15
+\showdate "%A %d-%m-%Y %H:%M:%S"  "2015-3-14 03:04:15"
 \showdate  "%A %d-%m-%Y %H:%M:%S"
 \deprecated Some deprecated stuff
 \details Some details
@@ -132,9 +132,11 @@
 \test Description of test
 \throw std::out_of_range parameter is out of range.
 \throws someException desc
+@throws  std::runtime_error  Function @ref someFunc() can throw
 \todo need to do something
 \version v1.2
 \warning some warning
+
 
 --- Commands to create links ---
 \addindex some text
@@ -142,4 +144,9 @@
 \cite  some_label
 \link link_obj some text \endlink
 \endlink more text
+This page contains \ref subsection1 and \ref subsection2.
+See \ref link_text "some text" and more. See \ref someFunc() "some text 2" and more.
+\ref link_text3 "some"
+\ref anotherFunc()
+\ref link_text5 not formatted because not quotes
 */

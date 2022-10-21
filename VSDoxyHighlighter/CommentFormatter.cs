@@ -235,8 +235,8 @@ namespace VSDoxyHighlighter
       // Stuff that can be in the middle of lines.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_OneParamAsWord(new string[] {
-            "p", "c", "ref" }
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
+            "p", "c" }
             ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
@@ -256,6 +256,14 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
           "showdate" }
+          ), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(new string[] {
+          "ref" }
           ), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
@@ -312,7 +320,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(""[^\r\n]*"")(?:[ \t]+([^\n\r]*))?";
+      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(""[^\r\n]*?"")(?:[ \t]+([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
@@ -323,12 +331,17 @@ namespace VSDoxyHighlighter
 
     private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
-    private string BuildRegex_KeywordSomewhereInLine_OneParamAsWord(string[] keywords)
+    private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\n\r]+)";
     }
 
+    private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(string[] keywords)
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
+    }
 
     /// <summary>
     /// Computes the way the whole provided text should be formatted.

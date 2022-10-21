@@ -7,6 +7,8 @@
  @param
 	 ^^ Nothing should be formatted because missing parameter
  \briefs Incorrect keyword
+ 
+ \ref "some bla"  No formatting because quotes directly after ref
 */
 
 /// T \note Nothing should be formatted because keyword is not at the start
