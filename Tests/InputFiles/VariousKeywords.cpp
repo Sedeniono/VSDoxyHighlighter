@@ -186,4 +186,11 @@ Some text \refitem some_name more text
 \maninclude some dir\man.cpp
 \docbookinclude some dir\doc.cpp
 \xmlinclude some dir\xml.cpp
+
+
+--- Commands for visual enhancements ---
+the \a x and @a y::p coordinates are used to
+the \b x and @b y::p coordinates are used to
+the \c x and @c y::p coordinates are used to
+\arg AlignLeft left alignment.
 */

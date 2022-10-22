@@ -556,6 +556,26 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"some dir\doc.cpp", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\xmlinclude", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"some dir\xml.cpp", FormatTypes.Parameter),
+
+
+        // --- Commands for visual enhancements ---
+
+        new Utils.FormattedFragmentText(@"\a", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x", FormatTypes.EmphasisMinor),
+        new Utils.FormattedFragmentText(@"@a", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"y::p", FormatTypes.EmphasisMinor),
+
+        new Utils.FormattedFragmentText(@"\b", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x", FormatTypes.EmphasisMajor),
+        new Utils.FormattedFragmentText(@"@b", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"y::p", FormatTypes.EmphasisMajor),
+
+        new Utils.FormattedFragmentText(@"\c", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"@c", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\arg", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
