@@ -120,7 +120,7 @@ namespace VSDoxyHighlighter
             "privatesection", "protected", "protectedsection", "public", "publicsection",
             "pure", "showinitializer", "static",
             "addindex", "secreflist", "endsecreflist", "tableofcontents",
-            "arg"
+            "arg", "docbookonly"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -247,7 +247,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
-            "p", "c", "anchor", "cite", "link", "refitem"
+            "p", "c", "anchor", "cite", "link", "refitem", 
+            "copydoc", "copybrief", "copydetails"
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });

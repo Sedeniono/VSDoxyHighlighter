@@ -585,7 +585,21 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\code", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
-      };
+
+        new Utils.FormattedFragmentText(@"@copydoc", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"MyClass::myfunction(type1,type2)", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"@copydoc", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"MyClass::myfunction()", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\brief", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\copybrief", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"foo()", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\details", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\copydetails", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"foo()", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\docbookonly", FormatTypes.NormalKeyword),
+     };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);

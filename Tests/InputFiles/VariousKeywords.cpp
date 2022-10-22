@@ -203,4 +203,9 @@ Show this as-is please
 \code
 Some code
 \endcode
+@copydoc MyClass::myfunction(type1,type2)
+Some text @copydoc MyClass::myfunction() more text.
+\brief \copybrief foo()
+\details \copydetails foo()
+\docbookonly
 */
