@@ -599,6 +599,26 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"foo()", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\docbookonly", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"width=2\textwidth", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""foo""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"height=\textwidth", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\enddot", FormatTypes.NormalKeyword),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

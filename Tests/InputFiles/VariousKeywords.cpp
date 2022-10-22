@@ -208,4 +208,12 @@ Some text @copydoc MyClass::myfunction() more text.
 \brief \copybrief foo()
 \details \copydetails foo()
 \docbookonly
+\dot "foo test" width=200cm height=1cm
+\dot width=2\textwidth   height=1cm
+\dot  "foo"  width=200cm
+\dot "foo test" height=\textwidth shouldNotMatch
+bla \dot "foo test"
+\dot
+\dot shouldNotMatch width=200cm height=1cm
+\enddot
 */

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using static Nerdbank.Streams.MultiplexingStream;
 
 
 namespace VSDoxyHighlighter
@@ -85,8 +86,6 @@ namespace VSDoxyHighlighter
   {
     public CommentFormatter()
     {
-      const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
-
       mMatchers = new List<FragmentMatcher>();
 
       // NOTE: The order in which the regexes are created and added here matters!
@@ -136,7 +135,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-            "lineinfo", "endlink", "endcode"
+            "lineinfo", "endlink", "endcode", "enddot"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -306,6 +305,10 @@ namespace VSDoxyHighlighter
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
       });
+
+
+      //----- Special stuff -------
+      mMatchers.Add(BuildRegex_dotCommand());
     }
 
 
@@ -379,6 +382,22 @@ namespace VSDoxyHighlighter
       return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
+    private FragmentMatcher BuildRegex_dotCommand() 
+    {
+      return new FragmentMatcher
+      {
+        re = new Regex(
+          // Example: \dot "foo test"  width=2\textwidth   height=1cm
+          //
+          //               | Optional quoted caption| Optional width              | Optional height             |
+          //               |________________________|_____________________________|_____________________________| 
+          @"((?:@|\\)dot)\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?",
+          cOptions),
+        types = Tuple.Create(FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
+      };
+    }
+
+
     /// <summary>
     /// Computes the way the whole provided text should be formatted.
     /// </summary>
@@ -439,5 +458,6 @@ namespace VSDoxyHighlighter
     };
 
     private readonly List<FragmentMatcher> mMatchers;
+    private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
   }
 }
