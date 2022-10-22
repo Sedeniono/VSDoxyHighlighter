@@ -193,4 +193,14 @@ the \a x and @a y::p coordinates are used to
 the \b x and @b y::p coordinates are used to
 the \c x and @c y::p coordinates are used to
 \arg AlignLeft left alignment.
+\code{.py} \endcode
+\code{.cpp}
+class Cpp {};
+\endcode
+\code{.unparsed}
+Show this as-is please
+\endcode
+\code
+Some code
+\endcode
 */

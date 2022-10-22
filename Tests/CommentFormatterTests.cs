@@ -576,6 +576,15 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\arg", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\code{.py}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\code{.cpp}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\code{.unparsed}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\code", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
