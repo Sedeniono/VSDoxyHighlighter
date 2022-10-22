@@ -216,4 +216,5 @@ bla \dot "foo test"
 \dot
 \dot shouldNotMatch width=200cm height=1cm
 \enddot
+Some text \emoji :smile: more text \emoji left_luggage
 */

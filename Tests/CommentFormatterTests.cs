@@ -619,6 +619,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\enddot", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\emoji", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@":smile:", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\emoji", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"left_luggage", FormatTypes.Parameter),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

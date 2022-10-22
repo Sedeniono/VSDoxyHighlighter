@@ -189,7 +189,7 @@ namespace VSDoxyHighlighter
 
       //----- With one parameter -------
 
-      // Keywords with parameter that can be at the start of lines, parameter terminated by whitespace.
+      // Keywords with parameter that must be at the start of lines, parameter terminated by whitespace.
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1ParamAsWord(new string[] {
@@ -201,7 +201,7 @@ namespace VSDoxyHighlighter
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
-      // Keywords with parameter that can be at the start of lines, parameter stretches till the end of the line.
+      // Keywords with parameter that must be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
@@ -217,7 +217,7 @@ namespace VSDoxyHighlighter
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
-      // Keywords with optional parameter that can be at the start of lines, parameter stretches till the end of the line.
+      // Keywords with optional parameter that must be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
@@ -247,7 +247,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
             "p", "c", "anchor", "cite", "link", "refitem", 
-            "copydoc", "copybrief", "copydetails"
+            "copydoc", "copybrief", "copydetails", "emoji"
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
