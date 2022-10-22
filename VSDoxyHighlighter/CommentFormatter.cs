@@ -135,7 +135,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-            "lineinfo", "endlink", "endcode", "enddot"
+            "lineinfo", "endlink", "endcode", "enddot", "endmsc"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -308,7 +308,14 @@ namespace VSDoxyHighlighter
 
 
       //----- Special stuff -------
-      mMatchers.Add(BuildRegex_dotCommand());
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_1OptionalCaption_OptionalSizeIndication(new string[] {
+          "dot", "msc"
+          }), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
+      });
     }
 
 
@@ -382,19 +389,14 @@ namespace VSDoxyHighlighter
       return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
-    private FragmentMatcher BuildRegex_dotCommand() 
+    private string BuildRegex_1OptionalCaption_OptionalSizeIndication(string[] keywords) 
     {
-      return new FragmentMatcher
-      {
-        re = new Regex(
-          // Example: \dot "foo test"  width=2\textwidth   height=1cm
-          //
-          //               | Optional quoted caption| Optional width              | Optional height             |
-          //               |________________________|_____________________________|_____________________________| 
-          @"((?:@|\\)dot)\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?",
-          cOptions),
-        types = Tuple.Create(FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
-      };
+      string concatKeywords = String.Join("|", keywords);
+      // Example: \dot "foo test"  width=2\textwidth   height=1cm
+      //
+      //                                          | Optional quoted caption| Optional width              | Optional height              |
+      //                                          |________________________|_____________________________|______________________________| 
+      return @"((?:@|\\)(?:" + concatKeywords + @"))\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
     }
 
 

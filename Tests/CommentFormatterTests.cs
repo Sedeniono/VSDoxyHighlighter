@@ -624,6 +624,14 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@":smile:", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\emoji", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"left_luggage", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"@msc", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\msc", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\endmsc", FormatTypes.NormalKeyword),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

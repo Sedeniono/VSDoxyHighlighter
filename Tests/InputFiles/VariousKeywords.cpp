@@ -217,4 +217,7 @@ bla \dot "foo test"
 \dot shouldNotMatch width=200cm height=1cm
 \enddot
 Some text \emoji :smile: more text \emoji left_luggage
+@msc "foo test" width=200cm height=1cm
+\msc
+\endmsc
 */
