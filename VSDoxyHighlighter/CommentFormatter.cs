@@ -109,28 +109,28 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
-          "brief", "short", "details", "sa", "see", "result", "return", "returns", 
-          "author", "authors", "copyright", "date", "noop", "else", "endcond", "endif", 
-          "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
-          "since", "test", "version",
-          "ingroup", "callgraph",
-          "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
-          "showrefs", "hiderefs", "endinternal",
-          "hideinitializer", "internal", "nosubgrouping", "private",
-          "privatesection", "protected", "protectedsection", "public", "publicsection",
-          "pure", "showinitializer", "static",
-          "addindex", "secreflist", "endsecreflist", "tableofcontents"
-        }), cOptions),
+            "brief", "short", "details", "sa", "see", "result", "return", "returns", 
+            "author", "authors", "copyright", "date", "noop", "else", "endcond", "endif", 
+            "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
+            "since", "test", "version",
+            "ingroup", "callgraph",
+            "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
+            "showrefs", "hiderefs", "endinternal",
+            "hideinitializer", "internal", "nosubgrouping", "private",
+            "privatesection", "protected", "protectedsection", "public", "publicsection",
+            "pure", "showinitializer", "static",
+            "addindex", "secreflist", "endsecreflist", "tableofcontents"
+          }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
-          @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
-          @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-          "lineinfo", "endlink"
-        }), cOptions),
+            @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
+            @"fileinfo\{directory\}", @"fileinfo\{full\}", 
+            "lineinfo", "endlink"
+          }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -190,8 +190,8 @@ namespace VSDoxyHighlighter
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
-              "relatesalso", "relatedalso", "retval" }
-             ), cOptions),
+              "relatesalso", "relatedalso", "retval"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
@@ -201,8 +201,13 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
              "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
              "property", "typedef", "var", "cond",
-             "elseif", "if", "ifnot"}
-             ), cOptions),
+             "elseif", "if", "ifnot",
+             "dontinclude", "dontinclude{lineno}", 
+             "include", "include{lineno}", "include{doc}", "includelineno", "includedoc",
+             "line", "skip", "skipline", "until",
+             "verbinclude", "htmlinclude", @"htmlinclude\[block\]", "latexinclude",
+             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
@@ -210,15 +215,15 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
-             "cond"}
-             ), cOptions),
+             "cond"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
-             "par"}
-             ), cOptions),
+             "par"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
@@ -226,8 +231,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
-             "mainpage"}
-             ), cOptions),
+             "mainpage"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
@@ -235,8 +240,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
-            "p", "c", "anchor", "cite", "link", "refitem" }
-            ), cOptions),
+            "p", "c", "anchor", "cite", "link", "refitem"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
@@ -246,25 +251,26 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(new string[] {
-          "addtogroup", "defgroup", "headerfile", "page", "weakgroup", 
-          "section", "subsection", "subsubsection", "paragraph" }
-          ), cOptions),
+          "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
+          "section", "subsection", "subsubsection", "paragraph",
+          "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
-          "showdate" }
-          ), cOptions),
+          "showdate"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(new string[] {
-          "ref", "subpage" }
-          ), cOptions),
+          "ref", "subpage"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
@@ -273,8 +279,8 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
-          "category", "class", "interface", "protocol", "struct", "union" }
-          ), cOptions),
+          "category", "class", "interface", "protocol", "struct", "union"
+          }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
       });
     }

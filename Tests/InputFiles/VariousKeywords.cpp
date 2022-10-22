@@ -159,4 +159,31 @@ Some text \refitem some_name more text
 \subsection sec_2
 \subsubsection sec An example section
 \paragraph sec An example section
+
+
+--- Commands for displaying examples ---
+\dontinclude include_test.cpp
+\dontinclude{lineno} some dir\include_test.cpp
+\include include_test.cpp
+\include{lineno} some dir\include_test.cpp
+\include{doc} "some dir\include_test.cpp"
+\includelineno  include_test.cpp
+\includedoc   include_test.cpp
+\line example();
+\skip main
+\skipline Include_Test t;
+\until {
+\snippet snippets/example.cpp Adding a resource
+\snippet{lineno} snippets/example.cpp resource
+\snippet{doc} example.cpp resource
+\snippetlineno  snippets/example.cpp resource
+\snippetdoc  example.cpp resource
+\verbinclude some dir\include_test.cpp
+\htmlinclude some dir\html.cpp
+\htmlinclude[block]  html.cpp
+\latexinclude  some dir\tex.cpp
+\rtfinclude	some dir\rtf.cpp
+\maninclude some dir\man.cpp
+\docbookinclude some dir\doc.cpp
+\xmlinclude some dir\xml.cpp
 */
