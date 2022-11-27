@@ -161,28 +161,49 @@ namespace VSDoxyHighlighter
       // *italic*
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
+        // (1)  Stuff allowed to precede the first "*"
+        //      Note the "^" in the "[^...]": All of these characters may NOT come before.
+        //      We roughly say "only whitespace and punctuation characters" may come before. This ensures that we
+        //      do not match "*" in the middle of a string, such as "some*string".
+        //      Also, we forbid "/" to rule out matching the comment start "/*".
+        // (2a) Match the actual starting "*"
+        // (2b) After the "*", some characters are forbidden. Another "*" is forbidden, so that we can detect **bold** text.
+        //      Space and tab are forbidden to reduce the number of false positives, especially until we implement reliable
+        //      classification of code vs comment (in "* str*" the "str" is not formatted because of the space).
+        //      We also forbid a ")" to rule out constructs in the code such as: int * (*)(const char*)
+        // (2c) Match any character multiple times, but not those which are preceded by whitesapce or "*".
+        // (2d) Before the terminating "*", some characters must NOT appear.
+        //      The "*" is ruled out so that we can detect **bold** text with the other regex below.
+        //      "/*" is forbidden since it is a comment start.
+        //      Also, similar to (2b), we forbid whitespace before ("*str *" is not formatted).
+        // (2e) Match the actual terminating "*"
+        // (3)  After the terminating "*", not everything is allowed. Similar to (1), we mostly allow only whitespace and
+        //      punctuation characters. We also forbid "<" and ">" to rule out some false positives in C++ templates.
+        // 
+        //                        1              2a   2b          2c                2d       2e            3
+        //                _____________________  _ _________  _________________ ____________  _ ___________________________
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r\/]_)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(_[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]_)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r\/]__)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(__[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]__)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 

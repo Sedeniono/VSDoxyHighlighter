@@ -58,3 +58,14 @@ std::pair<double /**name**/, int> p;
 std::pair<double /** name**/, int> p;
 std::pair<double /**name **/, int> p;
 std::pair<double /** name **/, int> p;
+
+return *(static_cast<T*>(t));
+auto ptr = int * (*)(const char*);
+(double*)(void*)p;
+(double*)(void* )p;
+(double *)(void*)p;
+(double *)(void* )p;
+(double * )(void* )p;
+(double * )(void * )p;
+(double *)(void * )p;
+
