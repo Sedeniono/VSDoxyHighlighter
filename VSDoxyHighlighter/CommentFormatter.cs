@@ -319,74 +319,86 @@ namespace VSDoxyHighlighter
     }
 
 
+    // Regex to match where a command that should only appear at the start of a comment line is allowed to start.
+    // It is allowed to start after "/*", "/*!", "///", "//!" and also at the start of the string (i.e. the
+    // start of the line, since we get always whole lines). Moreover, we skip any "*" that come after these
+    // starting markers.
+    // Note: Of course, this is insufficient to really detect whether some text is code or
+    // comment. For this we need to scan the whole file to find e.g. matching "/*" and "*/".
+    // But till this is implemented, this is a first approximation.
+    //                             string start| /* | /*! | ///  | //!         v Skip any "*" at the start of the comment.
+    private const string cCommentStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
+
+    // Most of the commands start with a "@" or "\". This is the regex to match the beginning.
+    private const string cCmdPrefix = @"(?:@|\\)";
+
+
     private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t\n\r]";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t\n\r]";
     }
 
     private string BuildRegex_CodeCommand()
     {
       // https://www.doxygen.nl/manual/starting.html#step1
       string validFileExtensions = @"unparsed|dox|doc|c|cc|cxx|cpp|c\+\+|ii|ixx|ipp|i\+\+|inl|h|H|hh|HH|hxx|hpp|h\+\+|mm|txt|idl|ddl|odl|java|cs|d|php|php4|php5|inc|phtml|m|M|py|pyw|f|for|f90|f95|f03|f08|f18|vhd|vhdl|ucf|qsf|l|md|markdown|ice";
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)code(?:\{\.(?:" + validFileExtensions +  @")\})?)[ \t\n\r]";
+      return $@"{cCommentStart}({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?)[ \t\n\r]";
     }
 
     private string BuildRegex_KeywordSomewhereInLine_NoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t\n\r]";
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t\n\r]";
     }
 
     // Parameter terminated by whitespace.
     private string BuildRegex_KeywordAtLineStart_1ParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(\w[^ \t\n\r]*)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+(\w[^ \t\n\r]*)";
     }
 
     private string BuildRegex_KeywordAtLineStart_1ParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^\n\r]*)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^\n\r]*)";
     }
 
     private string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))\b(?:[ \t]*([^\n\r]*))?";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]*([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^\n\r]*))?";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+(""[^\r\n]*?"")(?:[ \t]+([^\n\r]*))?";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+(""[^\r\n]*?"")(?:[ \t]+([^\n\r]*))?";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return cRegexForKeywordAtLineStart + @"((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
     }
-
-    private const string cRegexForKeywordAtLineStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
 
     private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([^ \t\n\r]+)";
+      return $@"\B((?:@|\\)(?:{concatKeywords}))[ \t]+([^ \t\n\r]+)";
     }
 
     private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return @"\B((?:@|\\)(?:" + concatKeywords + @"))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
+      return $@"\B((?:@|\\)(?:{concatKeywords}))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
     private string BuildRegex_1OptionalCaption_OptionalSizeIndication(string[] keywords) 
@@ -396,7 +408,7 @@ namespace VSDoxyHighlighter
       //
       //                                          | Optional quoted caption| Optional width              | Optional height              |
       //                                          |________________________|_____________________________|______________________________| 
-      return @"((?:@|\\)(?:" + concatKeywords + @"))\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
+      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
     }
 
 
