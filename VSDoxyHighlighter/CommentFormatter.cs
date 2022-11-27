@@ -161,28 +161,28 @@ namespace VSDoxyHighlighter
       // *italic*
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r]\*)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r]\*\*)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*\*[^\* \t](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r]_)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(_[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r\/]_)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r]__)(?:\r?$|[^a-zA-Z0-9_\*])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(__[^_ \t](?:.(?![ \t]_))*?[^_ \t\n\r\/]__)(?:\r?$|[^a-zA-Z0-9_\*\/])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 

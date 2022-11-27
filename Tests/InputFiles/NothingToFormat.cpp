@@ -46,3 +46,15 @@ char *Fn_Test
 /** Nothing bold
 char *Fn_Test
 **/
+
+
+a *= b;  /* 0.6, originally 0.7 */
+if (/* ??? */(false)/* ??? */) {}
+std::pair<double /*name*/, int> p;
+std::pair<double /* name*/, int> p;
+std::pair<double /*name */, int> p;
+std::pair<double /* name */, int> p;
+std::pair<double /**name**/, int> p;
+std::pair<double /** name**/, int> p;
+std::pair<double /**name **/, int> p;
+std::pair<double /** name **/, int> p;
