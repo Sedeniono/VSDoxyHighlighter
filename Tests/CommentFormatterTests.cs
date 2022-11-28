@@ -707,6 +707,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\f)", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\f[", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\f]", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\f{eqnarray*}{", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\f}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\f{eqnarray*}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\f}", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

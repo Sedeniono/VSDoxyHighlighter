@@ -146,8 +146,14 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
-            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]"
+            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}"
           }), cOptions),
+        types = Tuple.Create(FormatTypes.NormalKeyword)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -403,6 +409,11 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = String.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))";
+    }
+
+    private string BuildRegex_FormulaEnvironmentStart() 
+    {
+      return $@"({cCmdPrefix}f\{{.*\}}\{{?)";
     }
 
     // Parameter terminated by whitespace.
