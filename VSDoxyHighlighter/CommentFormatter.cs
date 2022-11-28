@@ -478,13 +478,25 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return $@"\B((?:@|\\)(?:{concatKeywords}))[ \t]+([^ \t\n\r]+)";
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\n\r]+)";
     }
 
     private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(string[] keywords)
     {
+      // Examples:
+      //   \ref Class::Func()
+      //   Text \ref Class.Func() some text
+      //   Text \ref subsection1. The point is not part of the parameter.
       string concatKeywords = String.Join("|", keywords);
-      return $@"\B((?:@|\\)(?:{concatKeywords}))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
+      
+      // Match either: (1a) Match any word character, or "(", or ")".
+      //           or: (1b) Match ":", "." and "," but only if afterwards a whitespace comes. So "\ref sec." should not match the terminating point.
+      //                    The comma is there for e.g. "See \ref func(double,int), or ..."
+      // (1c): Do (1a) or (1b) multiple times.
+      // (2): Match everything between successive quotes.
+      //                                                          1a               1b             1c                2
+      //                                                      __________  ________________________  _           _____________
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+((?:[\w|\(|\)]|(?:[:|\.|,](?=[^ \t\n\r])))+)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
     private const string cRegex_1OptionalCaption_1OptionalSizeIndication =

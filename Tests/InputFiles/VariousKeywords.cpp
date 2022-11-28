@@ -144,11 +144,14 @@ Some text \anchor some_word
 \cite  some_label
 Some text \link link_obj some text \endlink
 \endlink more text
-This page contains \ref subsection1 and \ref subsection2.
+This page contains \ref subsection1 and \ref subsection2: Some more \ref subsection3.
 See \ref link_text "some text" and more. See \ref someFunc() "some text 2" and more.
 \ref link_text3 "some"
-\ref anotherFunc()
-\ref link_text5 not formatted because not quotes
+\ref Class::Func()
+Some \ref Class::cls::func() text
+Text \ref Class.Func() more text
+See \ref Class::Func(double,int), and also...
+\ref link_text5 not formatted because no quotes
 Some text \refitem some_name more text
 \secreflist
 \endsecreflist
