@@ -193,6 +193,7 @@ the \a x and @a y::p coordinates are used to
 the \b x and @b y::p coordinates are used to
 the \c x and @c y::p coordinates are used to
 \arg AlignLeft left alignment.
+\li
 \code{.py} \endcode
 \code{.cpp}
 class Cpp {};
@@ -269,4 +270,8 @@ The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is
 \image docbook "file name.eps" width=200cm height=1cm
 \image{inline,anchor:id} rtf "path with space/name.rtf"
 \image{inline} xml file.xml height=1cm
+New line\n
+New line \n
+\n  
+\n
 */

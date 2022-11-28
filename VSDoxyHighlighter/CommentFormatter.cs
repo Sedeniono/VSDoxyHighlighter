@@ -119,7 +119,7 @@ namespace VSDoxyHighlighter
             "privatesection", "protected", "protectedsection", "public", "publicsection",
             "pure", "showinitializer", "static",
             "addindex", "secreflist", "endsecreflist", "tableofcontents",
-            "arg", "docbookonly", "htmlonly", @"htmlonly\[block\]", "latexonly", "manonly",
+            "arg", "li", "docbookonly", "htmlonly", @"htmlonly\[block\]", "latexonly", "manonly",
             "rtfonly", "verbatim", "xmlonly"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
@@ -138,7 +138,7 @@ namespace VSDoxyHighlighter
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
-            "endverbatim", "endxmlonly"
+            "endverbatim", "endxmlonly", "n"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -389,11 +389,15 @@ namespace VSDoxyHighlighter
     // Most of the commands start with a "@" or "\". This is the regex to match the beginning.
     private const string cCmdPrefix = @"(?:@|\\)";
 
+    // Regex to ensure that whitespace or a new line or the end of the string follows after some command.
+    // Using "\b" is insufficient.
+    private const string cWhitespaceAfterwards = @"(?:$|[ \t\n\r])";
+
 
     private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t\n\r]";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
     private string BuildRegex_CodeCommand()
@@ -401,13 +405,13 @@ namespace VSDoxyHighlighter
       // Command \code, \code{cpp}, ...
       // https://www.doxygen.nl/manual/starting.html#step1
       string validFileExtensions = @"unparsed|dox|doc|c|cc|cxx|cpp|c\+\+|ii|ixx|ipp|i\+\+|inl|h|H|hh|HH|hxx|hpp|h\+\+|mm|txt|idl|ddl|odl|java|cs|d|php|php4|php5|inc|phtml|m|M|py|pyw|f|for|f90|f95|f03|f08|f18|vhd|vhdl|ucf|qsf|l|md|markdown|ice";
-      return $@"{cCommentStart}({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?)[ \t\n\r]";
+      return $@"{cCommentStart}({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
     }
 
     private string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t\n\r]";
+      return $@"({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
     private string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(string[] keywords) 

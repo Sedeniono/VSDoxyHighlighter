@@ -576,6 +576,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\arg", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\li", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\code{.py}", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\endcode", FormatTypes.NormalKeyword),
@@ -735,6 +736,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"xml", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"file.xml", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
