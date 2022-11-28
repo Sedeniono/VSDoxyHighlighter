@@ -643,7 +643,38 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"@startuml{json}", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"@enduml", FormatTypes.NormalKeyword),
-     };
+
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"filename", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""file name""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""foo  test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"filename", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""file name""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""file name""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"filename", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\dotfile", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\mscfile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"file_name.msc", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"""test""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\diafile", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""path\with space\file_name.dia""", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);

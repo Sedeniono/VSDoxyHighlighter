@@ -226,4 +226,13 @@ Some text \emoji :smile: more text \emoji left_luggage
 @startuml{json, myimage.png} "Image Caption"
 @startuml{json}
 @enduml
+\dotfile filename "foo test" width=200cm height=1cm
+\dotfile "file name" "foo  test" width=200cm height=1cm
+\dotfile filename
+\dotfile "file name"
+\dotfile "file name" "foo test" 
+\dotfile filename "foo test" 
+\dotfile
+\mscfile file_name.msc "test" width=200cm
+\diafile "path\with space\file_name.dia" width=200cm
 */
