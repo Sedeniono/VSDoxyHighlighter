@@ -344,19 +344,18 @@ namespace VSDoxyHighlighter
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
       });
 
-
-      //----- More parameters -------
-
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
+
+      //----- More parameters -------
+
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dot", "msc",
-          "startuml" // Note for startuml: The braces arguments are handled via BuildRegex_StartUmlCommandWithBracesOptions().
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
@@ -485,8 +484,7 @@ namespace VSDoxyHighlighter
 
     private string BuildRegex_StartUmlCommandWithBracesOptions() 
     {
-      // Note: The version of startuml without braces is handled via BuildRegex_1OptionalCaption_1OptionalSizeIndication().
-      return $@"({cCmdPrefix}startuml{{.*?}}){cRegex_1OptionalCaption_1OptionalSizeIndication}";
+      return $@"({cCmdPrefix}startuml(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     private const string cRegexForOptionalFileWithOptionalQuotes =
