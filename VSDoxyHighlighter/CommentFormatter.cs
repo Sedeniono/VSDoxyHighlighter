@@ -133,12 +133,20 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
+        re = new Regex(BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly"
+          }), cOptions),
+        types = Tuple.Create(FormatTypes.NormalKeyword)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
+            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -385,10 +393,16 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?)[ \t\n\r]";
     }
 
-    private string BuildRegex_KeywordSomewhereInLine_NoParam(string[] keywords)
+    private string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t\n\r]";
+    }
+
+    private string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(string[] keywords) 
+    {
+      string concatKeywords = String.Join("|", keywords);
+      return $@"({cCmdPrefix}(?:{concatKeywords}))";
     }
 
     // Parameter terminated by whitespace.

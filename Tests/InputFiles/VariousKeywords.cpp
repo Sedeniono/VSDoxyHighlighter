@@ -251,4 +251,8 @@ this is a \em x good example
 \endverbatim
 \xmlonly
 \endxmlonly
+The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is 
+  \f$\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\f$. Another \f$formula\f$
+\f((x^2+y^2)^2\f)
+\f[formula\f]
 */
