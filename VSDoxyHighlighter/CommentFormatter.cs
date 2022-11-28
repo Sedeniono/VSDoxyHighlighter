@@ -18,6 +18,7 @@ namespace VSDoxyHighlighter
     Parameter,
     EmphasisMinor,
     EmphasisMajor,
+    Strikethrough,
     InlineCode,
     Title
   }
@@ -207,31 +208,37 @@ namespace VSDoxyHighlighter
         // 
         //                        1              2a   2b          2c                2d       2e            3
         //                _____________________  _ _________  _________________ ____________  _ ___________________________
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/~])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/~])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\* \t\n\r\/]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(_[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]_)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/~])(_[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/])(__[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]__)(?:\r?$|[^a-zA-Z0-9_\*\/<>])", cOptions),
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/~])(__[^_ \t\)](?:.(?![ \t]_))*?[^_ \t\n\r\/]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
+      // ~~strikethrough~~
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(@"(?:^|[^a-zA-Z0-9_\*\/~])(~~[^~ \t\)](?:.(?![ \t]~))*?[^~ \t\n\r\/]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        types = Tuple.Create(FormatTypes.Strikethrough)
+      });
 
       //----- With one parameter -------
 

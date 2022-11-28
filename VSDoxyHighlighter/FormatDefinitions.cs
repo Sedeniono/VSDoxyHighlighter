@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
+using System.Windows;
 using System.Windows.Media;
 
 namespace VSDoxyHighlighter
@@ -96,6 +97,23 @@ namespace VSDoxyHighlighter
       DisplayName = "DoxyHighlighter - Emphasis (major)";
       ForegroundColor = Color.FromRgb(0, 75, 0);
       IsBold  = true;
+    }
+  }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_strikethrough)]
+  [Name(IDs.ID_strikethrough)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class StrikethroughFormat : ClassificationFormatDefinition
+  {
+    public StrikethroughFormat()
+    {
+      DisplayName = "DoxyHighlighter - Strikethrough";
+
+      TextDecorations = new TextDecorationCollection();
+      TextDecorations.Add(new TextDecoration(
+          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended));
     }
   }
 

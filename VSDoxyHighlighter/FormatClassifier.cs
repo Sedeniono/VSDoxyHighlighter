@@ -17,6 +17,7 @@ namespace VSDoxyHighlighter
     public const string ID_parameter = "Doxy/Parameter";
     public const string ID_emphasisMinor = "Doxy/EmphasisMinor";
     public const string ID_emphasisMajor = "Doxy/EmphasisMajor";
+    public const string ID_strikethrough = "Doxy/Strikethrough";
     public const string ID_inlineCode = "Doxy/InlineCode";
     public const string ID_title = "Doxy/Title";
   }
@@ -50,6 +51,10 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_emphasisMajor)]
     private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_strikethrough)]
+    private static ClassificationTypeDefinition typeDefinitionForStrikethrough;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_inlineCode)]
@@ -97,6 +102,7 @@ namespace VSDoxyHighlighter
       mFormatTypeToClassificationType[(uint)FormatTypes.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
       mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMinor] = registry.GetClassificationType(IDs.ID_emphasisMinor);
       mFormatTypeToClassificationType[(uint)FormatTypes.EmphasisMajor] = registry.GetClassificationType(IDs.ID_emphasisMajor);
+      mFormatTypeToClassificationType[(uint)FormatTypes.Strikethrough] = registry.GetClassificationType(IDs.ID_strikethrough);
       mFormatTypeToClassificationType[(uint)FormatTypes.InlineCode] = registry.GetClassificationType(IDs.ID_inlineCode);
       mFormatTypeToClassificationType[(uint)FormatTypes.Title] = registry.GetClassificationType(IDs.ID_title);
 
