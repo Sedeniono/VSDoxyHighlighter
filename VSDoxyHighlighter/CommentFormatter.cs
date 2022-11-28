@@ -487,16 +487,24 @@ namespace VSDoxyHighlighter
       //   \ref Class::Func()
       //   Text \ref Class.Func() some text
       //   Text \ref subsection1. The point is not part of the parameter.
+      //   \ref func(double, int) should match also match the double and int and also the parantheses.
+      //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
       string concatKeywords = String.Join("|", keywords);
-      
-      // Match either: (1a) Match any word character, or "(", or ")".
-      //           or: (1b) Match ":", "." and "," but only if afterwards a whitespace comes. So "\ref sec." should not match the terminating point.
-      //                    The comma is there for e.g. "See \ref func(double,int), or ..."
-      // (1c): Do (1a) or (1b) multiple times.
-      // (2): Match everything between successive quotes.
-      //                                                          1a               1b             1c                2
-      //                                                      __________  ________________________  _           _____________
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+((?:[\w|\(|\)]|(?:[:|\.|,](?=[^ \t\n\r])))+)(?:[ \t]+(""[^\r\n]*?""))?";
+
+      // https://regex101.com/r/mQrhj8/1
+      // (1) matches the first parameter to \ref.
+      //    First part: Match stuff before potential parantheses
+      //       (1a): Match any word character
+      //       (1b): But also match "::" and ".". However, we only want to do this if afterwards whitespace comes.
+      //             Otherwise, we have an ordinary punctuation character instead of a C++ indirection.
+      //             I.e. match the point in "@ref Class.func" but not in "See some @ref class. More text".
+      //    Second part (1c): Match optionally available parantheses, including everything between.
+      //        To keep things simple, we do not match balanced parantheses; nesting should never happen in this context.
+      //        Thus, we simply take the next ")" after the opening "(".
+      // (2) Match everything between successive quotes.
+      //                                                     1a           1b                        1c                2
+      //                                                  ((____|{__________________________})+____________) __________________________       
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
     private const string cRegex_1OptionalCaption_1OptionalSizeIndication =

@@ -147,11 +147,19 @@ Some text \link link_obj some text \endlink
 This page contains \ref subsection1 and \ref subsection2: Some more \ref subsection3.
 See \ref link_text "some text" and more. See \ref someFunc() "some text 2" and more.
 \ref link_text3 "some"
+\ref link_text5 not formatted because no quotes
 \ref Class::Func()
 Some \ref Class::cls::func() text
-Text \ref Class.Func() more text
-See \ref Class::Func(double,int), and also...
-\ref link_text5 not formatted because no quotes
+Text \ref Class.Func() more text (the point should also work)
+See \ref Class.Func(). The last point should not be matched.
+See \ref Class::Func(double,int), the last comma should not be matched.
+\ref func(double, int), bla. The last comma should not be matched.
+Bla (cf. \ref Class::Func()) bla. The closing ")" should not be matched.
+Bla (cf. \ref Class::Func(int, double, cls::f)) bla
+\ref func()() the second "()" should not be matched.
+\ref Class.:Func Here, only "Class" should be matched because of the incorrect indirection
+\ref Class:.Func Here, only "Class" should be matched because of the incorrect indirection
+\ref Class:Func Here, only "Class" should be matched because of the incorrect indirection
 Some text \refitem some_name more text
 \secreflist
 \endsecreflist
