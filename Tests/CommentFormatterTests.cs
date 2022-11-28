@@ -575,6 +575,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"@c", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
 
+        new Utils.FormattedFragmentText(@"\p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"@p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
+
         new Utils.FormattedFragmentText(@"\arg", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\li", FormatTypes.NormalKeyword),
 
@@ -741,6 +746,29 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\@", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\~", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~english", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~english", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~dutch", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~german", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\~", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\&", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\$", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\#", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\<", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\>", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\%", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\.", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\=", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\::", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\|", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\--", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\---", FormatTypes.NormalKeyword),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

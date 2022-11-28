@@ -192,6 +192,7 @@ Some text \refitem some_name more text
 the \a x and @a y::p coordinates are used to
 the \b x and @b y::p coordinates are used to
 the \c x and @c y::p coordinates are used to
+the \p x and @p y::p coordinates are used to
 \arg AlignLeft left alignment.
 \li
 \code{.py} \endcode
@@ -274,4 +275,21 @@ New line\n
 New line \n
 \n  
 \n
+Some mail\@address.com
+\~
+\~english
+\~ english not formatted due to space
+bla \~english This is English \~dutch Dit is Nederlands \~german Dies ist Deutsch. \~ output for all languages.
+Some thing\&another thing.
+Word \$
+Word \# word
+\< word
+\>
+Some \%  
+Some\.
+5\=3+2
+Some\::thing
+  \|
+Some\--word
+Some\---word
 */

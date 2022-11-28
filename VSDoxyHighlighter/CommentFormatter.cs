@@ -146,7 +146,9 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
-            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}"
+            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}",
+            @"\@", @"\&", @"\$", @"\#", @"\<", @"\>", @"\%", @"\.", @"\=", @"\::", @"\|",
+            @"\---", @"\--"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -154,6 +156,12 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions),
+        types = Tuple.Create(FormatTypes.NormalKeyword)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_Language(), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -423,6 +431,11 @@ namespace VSDoxyHighlighter
     private string BuildRegex_FormulaEnvironmentStart() 
     {
       return $@"({cCmdPrefix}f\{{.*\}}\{{?)";
+    }
+
+    private string BuildRegex_Language() 
+    {
+      return $@"({cCmdPrefix}~(?:[^ \t]\w+)?)";
     }
 
     // Parameter terminated by whitespace.
