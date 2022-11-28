@@ -102,7 +102,7 @@ namespace VSDoxyHighlighter
       // Note: Right at the start to overwrite all others.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(`.*?`)", cOptions),
+        re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.InlineCode)
       });
 
@@ -129,7 +129,7 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_CodeCommand(), cOptions),
+        re = new Regex(BuildRegex_CodeCommand(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -141,7 +141,7 @@ namespace VSDoxyHighlighter
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly", "n"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -151,19 +151,19 @@ namespace VSDoxyHighlighter
             @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}",
             @"\@", @"\&", @"\$", @"\#", @"\<", @"\>", @"\%", @"\.", @"\=", @"\::", @"\|",
             @"\---", @"\--"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions),
+        re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_Language(), cOptions),
+        re = new Regex(BuildRegex_Language(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
 
@@ -172,7 +172,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
           "warning", "raisewarning"
-        }), cOptions),
+        }), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.Warning)
       });
 
@@ -181,7 +181,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
           "note", "todo", "attention", "bug", "deprecated"
-        }), cOptions),
+        }), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.Note)
       });
 
@@ -210,35 +210,35 @@ namespace VSDoxyHighlighter
         // 
         //                        1           2a   2b          2c                      2d               2e            3
         //                __________________  __ ________  _________________ __________________________ __ ____________________________
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.EmphasisMajor)
       });
 
       // ~~strikethrough~~
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~[^~ \t\)](?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~[^~ \t\)](?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatTypes.Strikethrough)
       });
 
@@ -252,7 +252,7 @@ namespace VSDoxyHighlighter
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
               "relatesalso", "relatedalso", "retval"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
@@ -268,7 +268,7 @@ namespace VSDoxyHighlighter
              "line", "skip", "skipline", "until",
              "verbinclude", "htmlinclude", @"htmlinclude\[block\]", "latexinclude",
              "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
 
@@ -277,14 +277,14 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "cond"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "par"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
@@ -293,7 +293,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
              "mainpage"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
       });
 
@@ -303,21 +303,21 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
             "p", "c", "anchor", "cite", "link", "refitem", 
             "copydoc", "copybrief", "copydetails", "emoji"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter)
       });
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
             "a", "e", "em"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.EmphasisMinor)
       });
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
             "b"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.EmphasisMajor)
       });
 
@@ -330,7 +330,7 @@ namespace VSDoxyHighlighter
           "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
           "section", "subsection", "subsubsection", "paragraph",
           "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
@@ -338,7 +338,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
           "showdate"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
@@ -346,7 +346,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(new string[] {
           "ref", "subpage"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
       });
 
@@ -357,13 +357,13 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
           "category", "class", "interface", "protocol", "struct", "union"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions),
+        re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
 
@@ -373,7 +373,7 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dot", "msc",
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
 
@@ -381,13 +381,13 @@ namespace VSDoxyHighlighter
       {
         re = new Regex(BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dotfile", "mscfile", "diafile"
-          }), cOptions),
+          }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_ImageCommand(), cOptions),
+        re = new Regex(BuildRegex_ImageCommand(), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
     }
@@ -617,5 +617,9 @@ namespace VSDoxyHighlighter
 
     private readonly List<FragmentMatcher> mMatchers;
     private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
+
+    // In my tests, each individual regex always used less than 100ms.
+    // The max. time I was able to measure for a VERY long line was ~60ms.
+    private readonly TimeSpan cRegexTimeout = TimeSpan.FromMilliseconds(100.0);
   }
 }
