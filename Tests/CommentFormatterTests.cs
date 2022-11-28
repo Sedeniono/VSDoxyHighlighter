@@ -632,6 +632,17 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\msc", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\endmsc", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"\startuml", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"@startuml{myimage.png}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""Image Caption""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"@startuml{json, myimage.png}", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"""Image Caption""", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"@startuml{json}", FormatTypes.NormalKeyword),
+
+        new Utils.FormattedFragmentText(@"@enduml", FormatTypes.NormalKeyword),
      };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

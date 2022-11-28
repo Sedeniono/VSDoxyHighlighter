@@ -220,4 +220,10 @@ Some text \emoji :smile: more text \emoji left_luggage
 @msc "foo test" width=200cm height=1cm
 \msc
 \endmsc
+\startuml
+@startuml{myimage.png} "Image Caption" width=200cm height=1cm
+  Alice -> Bob : Hello
+@startuml{json, myimage.png} "Image Caption"
+@startuml{json}
+@enduml
 */

@@ -135,7 +135,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-            "lineinfo", "endlink", "endcode", "enddot", "endmsc"
+            "lineinfo", "endlink", "endcode", "enddot", "endmsc", "enduml"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -332,8 +332,14 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_1OptionalCaption_OptionalSizeIndication(new string[] {
-          "dot", "msc"
+        re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
+      });
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
+          "dot", "msc",
+          "startuml" // Note for startuml: The braces arguments are handled via BuildRegex_StartUmlCommandWithBracesOptions().
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
@@ -362,6 +368,7 @@ namespace VSDoxyHighlighter
 
     private string BuildRegex_CodeCommand()
     {
+      // Command \code, \code{cpp}, ...
       // https://www.doxygen.nl/manual/starting.html#step1
       string validFileExtensions = @"unparsed|dox|doc|c|cc|cxx|cpp|c\+\+|ii|ixx|ipp|i\+\+|inl|h|H|hh|HH|hxx|hpp|h\+\+|mm|txt|idl|ddl|odl|java|cs|d|php|php4|php5|inc|phtml|m|M|py|pyw|f|for|f90|f95|f03|f08|f18|vhd|vhdl|ucf|qsf|l|md|markdown|ice";
       return $@"{cCommentStart}({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?)[ \t\n\r]";
@@ -422,16 +429,23 @@ namespace VSDoxyHighlighter
       return $@"\B((?:@|\\)(?:{concatKeywords}))[ \t]+([\w|\(|\)]+)(?:[ \t]+(""[^\r\n]*?""))?";
     }
 
-    private string BuildRegex_1OptionalCaption_OptionalSizeIndication(string[] keywords) 
+    private const string cRegex_1OptionalCaption_1OptionalSizeIndication =
+      //| Optional quoted caption | Optional width              | Optional height             |
+      //|_________________________|_____________________________|_____________________________| 
+      @"(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
+
+    private string BuildRegex_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
     {
       string concatKeywords = String.Join("|", keywords);
       // Example: \dot "foo test"  width=2\textwidth   height=1cm
-      //
-      //                                          | Optional quoted caption| Optional width              | Optional height              |
-      //                                          |________________________|_____________________________|______________________________| 
-      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
+      return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
+    private string BuildRegex_StartUmlCommandWithBracesOptions() 
+    {
+      // Note: The version of startuml without braces is handled via BuildRegex_1OptionalCaption_1OptionalSizeIndication().
+      return $@"({cCmdPrefix}startuml{{.*?}}){cRegex_1OptionalCaption_1OptionalSizeIndication}";
+    }
 
     /// <summary>
     /// Computes the way the whole provided text should be formatted.
