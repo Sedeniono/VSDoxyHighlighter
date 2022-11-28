@@ -674,6 +674,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\diafile", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"""path\with space\file_name.dia""", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"width=200cm", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\e", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"really", FormatTypes.EmphasisMinor),
+        new Utils.FormattedFragmentText(@"\em", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"x", FormatTypes.EmphasisMinor),
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);

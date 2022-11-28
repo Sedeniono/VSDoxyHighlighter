@@ -235,4 +235,6 @@ Some text \emoji :smile: more text \emoji left_luggage
 \dotfile
 \mscfile file_name.msc "test" width=200cm
 \diafile "path\with space\file_name.dia" width=200cm
+this is a \e really good example
+this is a \em x good example
 */

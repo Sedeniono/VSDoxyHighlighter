@@ -275,7 +275,7 @@ namespace VSDoxyHighlighter
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
-            "a"
+            "a", "e", "em"
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.EmphasisMinor)
       });
