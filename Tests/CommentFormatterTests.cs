@@ -926,5 +926,29 @@ namespace VSDoxyHighlighter.Tests
 
       CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
     }
+
+
+    [TestMethod()]
+    public void UnicodeParametersShouldWork()
+    {
+      var input = Utils.ReadTestInputFromFile("UnicodeParametersUTF8.cpp");
+      var actualFragments = new CommentFormatter().FormatText(input);
+
+      var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
+        new Utils.FormattedFragmentText("@param", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText("t\U0001F600t", FormatTypes.Parameter),
+
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"latex", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"file \U0001F600 name.eps\"", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText("\"test\U0001F600\"", FormatTypes.Title),
+
+        new Utils.FormattedFragmentText("**te\U0001F600st**", FormatTypes.EmphasisMajor),
+      };
+
+      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
+    }
+
   }
 }
