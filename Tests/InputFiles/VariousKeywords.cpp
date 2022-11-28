@@ -208,6 +208,7 @@ Some text @copydoc MyClass::myfunction() more text.
 \brief \copybrief foo()
 \details \copydetails foo()
 \docbookonly
+\enddocbookonly
 \dot "foo test" width=200cm height=1cm
 \dot width=2\textwidth   height=1cm
 \dot  "foo"  width=200cm
@@ -237,4 +238,17 @@ Some text \emoji :smile: more text \emoji left_luggage
 \diafile "path\with space\file_name.dia" width=200cm
 this is a \e really good example
 this is a \em x good example
+\htmlonly
+\htmlonly[block]  
+\endhtmlonly
+\latexonly	
+\endlatexonly	
+\manonly
+\endmanonly
+\rtfonly
+\endrtfonly
+\verbatim
+\endverbatim
+\xmlonly
+\endxmlonly
 */

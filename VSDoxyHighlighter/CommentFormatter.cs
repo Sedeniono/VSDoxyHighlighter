@@ -119,7 +119,8 @@ namespace VSDoxyHighlighter
             "privatesection", "protected", "protectedsection", "public", "publicsection",
             "pure", "showinitializer", "static",
             "addindex", "secreflist", "endsecreflist", "tableofcontents",
-            "arg", "docbookonly"
+            "arg", "docbookonly", "htmlonly", @"htmlonly\[block\]", "latexonly", "manonly",
+            "rtfonly", "verbatim", "xmlonly"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });
@@ -135,7 +136,9 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_NoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-            "lineinfo", "endlink", "endcode", "enddot", "endmsc", "enduml"
+            "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
+            "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
+            "endverbatim", "endxmlonly"
           }), cOptions),
         types = Tuple.Create(FormatTypes.NormalKeyword)
       });

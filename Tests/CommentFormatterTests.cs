@@ -599,6 +599,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"foo()", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\docbookonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\enddocbookonly", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\dot", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"""foo test""", FormatTypes.Title),
@@ -679,6 +680,21 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"really", FormatTypes.EmphasisMinor),
         new Utils.FormattedFragmentText(@"\em", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"x", FormatTypes.EmphasisMinor),
+
+        new Utils.FormattedFragmentText(@"\htmlonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\htmlonly[block]", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endhtmlonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\latexonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endlatexonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\manonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endmanonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\rtfonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endrtfonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\verbatim", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endverbatim", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\xmlonly", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\endxmlonly", FormatTypes.NormalKeyword),
+
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
