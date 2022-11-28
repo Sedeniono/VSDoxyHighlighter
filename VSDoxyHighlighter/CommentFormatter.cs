@@ -345,7 +345,7 @@ namespace VSDoxyHighlighter
       });
 
 
-      //----- Special stuff -------
+      //----- More parameters -------
 
       mMatchers.Add(new FragmentMatcher
       {
@@ -367,6 +367,12 @@ namespace VSDoxyHighlighter
           "dotfile", "mscfile", "diafile"
           }), cOptions),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
+      });
+
+      mMatchers.Add(new FragmentMatcher
+      {
+        re = new Regex(BuildRegex_ImageCommand(), cOptions),
+        types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Parameter, FormatTypes.Title, FormatTypes.Parameter, FormatTypes.Parameter)
       });
     }
 
@@ -483,19 +489,27 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}startuml{{.*?}}){cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
+    private const string cRegexForOptionalFileWithOptionalQuotes =
+      // (1) and (2) together match the 
+      // (1) skip whitespace    
+      // (2a) Match quotes, allowing whitespace between the quotes
+      // (2b) OR: Match everything till the next white space (no quotes)
+      //    1          2a                 2b
+      //   _____  _________________|_______________
+      @"(?:[ \t]+((?:""[^\r\n]*?"")|(?:[^ \t\r\n]*)))?";
+
     private string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
     {
       string concatKeywords = String.Join("|", keywords);
       // Examples:
       //   Without quotes: @dotfile filename    "foo test" width=200cm height=1cm
       //      With quotes: @dotfile "file name" "foo test" width=200cm height=1cm
-      // (1) and (2) together match the 
-      // (1) skip whitespace    
-      // (2a) Match quotes, allowing whitespace between the quotes
-      // (2b) OR: Match everything till the next white space (no quotes)
-      //                                                1          2a                 2b
-      //                                               _____  _________________|_______________
-      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]+((?:""[^\r\n]*?"")|(?:[^ \t\r\n]*)))?{cRegex_1OptionalCaption_1OptionalSizeIndication}";
+      return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication}";
+    }
+
+    private string BuildRegex_ImageCommand()
+    {                                          
+      return $@"({cCmdPrefix}image(?:{{.*?}})?)[ \t]+(html|latex|docbook|rtf|xml)\b{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     /// <summary>

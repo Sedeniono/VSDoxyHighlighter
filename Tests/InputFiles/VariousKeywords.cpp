@@ -263,4 +263,10 @@ The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is
    \f}
 \f{eqnarray*}
 \f}
+\image html
+\image html application.jpg	 
+\image latex application.eps "My application" width=10cm
+\image docbook "file name.eps" width=200cm height=1cm
+\image{inline,anchor:id} rtf "path with space/name.rtf"
+\image{inline} xml file.xml height=1cm
 */
