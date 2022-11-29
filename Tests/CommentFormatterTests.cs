@@ -180,6 +180,8 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\def", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"MAX(x,y)", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\def", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\def", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\defgroup", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"IntVariables", FormatTypes.Parameter),
@@ -400,6 +402,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"p", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"x,y,z", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\param", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\parblock", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\endparblock", FormatTypes.NormalKeyword),

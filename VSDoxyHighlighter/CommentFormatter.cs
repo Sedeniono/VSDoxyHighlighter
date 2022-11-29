@@ -247,7 +247,7 @@ namespace VSDoxyHighlighter
       // Keywords with parameter that must be at the start of lines, parameter terminated by whitespace.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamAsWord(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(new string[] {
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
               "memberof", "name", "namespace", "package", "relates", "related",
@@ -447,11 +447,23 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}~(?:[^ \t]\w+)?)";
     }
 
-    // Parameter terminated by whitespace.
-    private string BuildRegex_KeywordAtLineStart_1ParamAsWord(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+(\w[^ \t\n\r]*)";
+
+      // Example: "\param[in] myParameter"
+      // NOTE: Although the parameter "myParameter" is required, we nevertheless want to highlight the "\param[in]"
+      // already before "myParameter" is typed be the user. Thus, although semantically the parameter is required,
+      // we make it optional. See the final "?" in the regex part (1).
+      //
+      // https://regex101.com/r/MKKI71/1
+      // Match one of the following 3:
+      // (1) First some whitespace, then, if existing, the next word
+      // (2) Or: End of line
+      // (3) Or: End of string
+      //                                                                         1               2    3
+      //                                                             _________________________|______|_
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
     private string BuildRegex_KeywordAtLineStart_1ParamTillEnd(string[] keywords)
