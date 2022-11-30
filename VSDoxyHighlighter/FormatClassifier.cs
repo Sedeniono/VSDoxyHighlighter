@@ -119,15 +119,22 @@ namespace VSDoxyHighlighter
 #pragma warning restore 67
 
 
+    /// <summary>
+    /// Called by Visual Studio when the given text span needs to be classified (i.e. formatted).
+    /// Thus, this function searches for words to which apply syntax highlighting, and for each one 
+    /// found returns a ClassificationSpan.
+    /// </summary>
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan spanToCheck)
     {      
       string codeText = spanToCheck.GetText();
+
+      // Scan the given text for keywords and get the proper formatting for it.
       var fragmentsToFormat = mFormater.FormatText(codeText);
 
+      // Convert the list of fragments that should be formatted to Visual Studio types.
       var result = new List<ClassificationSpan>();
       foreach (FormattedFragment fragment in fragmentsToFormat) {
         IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
-
         var spanToFormat = new Span(spanToCheck.Start + fragment.StartIndex, fragment.Length);
         result.Add(new ClassificationSpan(new SnapshotSpan(spanToCheck.Snapshot, spanToFormat), classificationType));
       }
