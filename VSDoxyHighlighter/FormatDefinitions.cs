@@ -8,15 +8,15 @@ using System.Windows.Media;
 namespace VSDoxyHighlighter
 {
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_normalKeyword)]
-  [Name(IDs.ID_normalKeyword)]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_command)]
+  [Name(IDs.ID_command)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class NormalKeywordFormat : ClassificationFormatDefinition
+  internal sealed class CommandFormat : ClassificationFormatDefinition
   {
-    public NormalKeywordFormat()
+    public CommandFormat()
     {
-      DisplayName = "DoxyHighlighter - Normal keyword";
+      DisplayName = "DoxyHighlighter - Command";
       ForegroundColor = Color.FromRgb(0, 75, 0);
       IsBold = true;
     }

@@ -11,7 +11,7 @@ namespace VSDoxyHighlighter
 {
   public static class IDs
   {
-    public const string ID_normalKeyword = "Doxy/Normal";
+    public const string ID_command = "Doxy/Command";
     public const string ID_warningKeyword = "Doxy/Warning";
     public const string ID_noteKeyword = "Doxy/Note";
     public const string ID_parameter = "Doxy/Parameter";
@@ -29,8 +29,8 @@ namespace VSDoxyHighlighter
   {
 #pragma warning disable 169
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_normalKeyword)]
-    private static ClassificationTypeDefinition typeDefinitionForNormalKeyword;
+    [Name(IDs.ID_command)]
+    private static ClassificationTypeDefinition typeDefinitionForCommand;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_warningKeyword)]
@@ -96,15 +96,15 @@ namespace VSDoxyHighlighter
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
       mFormatTypeToClassificationType = new IClassificationType[numFormats];
-      mFormatTypeToClassificationType[(uint)FormatType.NormalKeyword] = registry.GetClassificationType(IDs.ID_normalKeyword);
+      mFormatTypeToClassificationType[(uint)FormatType.Command] = registry.GetClassificationType(IDs.ID_command);
+      mFormatTypeToClassificationType[(uint)FormatType.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
+      mFormatTypeToClassificationType[(uint)FormatType.Title] = registry.GetClassificationType(IDs.ID_title);
       mFormatTypeToClassificationType[(uint)FormatType.Warning] = registry.GetClassificationType(IDs.ID_warningKeyword);
       mFormatTypeToClassificationType[(uint)FormatType.Note] = registry.GetClassificationType(IDs.ID_noteKeyword);
-      mFormatTypeToClassificationType[(uint)FormatType.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
       mFormatTypeToClassificationType[(uint)FormatType.EmphasisMinor] = registry.GetClassificationType(IDs.ID_emphasisMinor);
       mFormatTypeToClassificationType[(uint)FormatType.EmphasisMajor] = registry.GetClassificationType(IDs.ID_emphasisMajor);
       mFormatTypeToClassificationType[(uint)FormatType.Strikethrough] = registry.GetClassificationType(IDs.ID_strikethrough);
       mFormatTypeToClassificationType[(uint)FormatType.InlineCode] = registry.GetClassificationType(IDs.ID_inlineCode);
-      mFormatTypeToClassificationType[(uint)FormatType.Title] = registry.GetClassificationType(IDs.ID_title);
 
       foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
         Debug.Assert(classificationType != null);
