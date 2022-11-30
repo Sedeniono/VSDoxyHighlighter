@@ -498,8 +498,11 @@ namespace VSDoxyHighlighter
 
     private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional.
+      // https://regex101.com/r/8QcyXW/1
       string concatKeywords = String.Join("|", keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+(""[^\r\n]*?"")(?:[ \t]+([^\n\r]*))?";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)

@@ -94,6 +94,11 @@ Some text \lineinfo more text
 \showdate "%A %d-%m-%Y %H:%M:%S"  2015-3-14 03:04:15
 \showdate "%A %d-%m-%Y %H:%M:%S"  "2015-3-14 03:04:15"
 \showdate  "%A %d-%m-%Y %H:%M:%S"
+\showdate "" Format even empty ""
+\showdate Do not format the "Do" because not quoted
+\showdate  
+\showdate
+	Nothing to format on this line
 \deprecated Some deprecated stuff
 \details Some details
 \noop some stuff
