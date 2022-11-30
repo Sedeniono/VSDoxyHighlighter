@@ -616,6 +616,12 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"x", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"@p", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"y::p", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"::thing", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\p", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"thing", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\arg", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\li", FormatTypes.NormalKeyword),

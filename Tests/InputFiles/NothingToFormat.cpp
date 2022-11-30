@@ -5,15 +5,15 @@
  @param@warning Nothing should be formatted because keywords are not separate
  @param: Nothing to format because of the ":", which is not allowed
  \briefs Incorrect keyword
- 
  \ref "some bla"  No formatting because quotes directly after ref
+ Nothing to\p format because no space before command.
 */
 
 /// T \note Nothing should be formatted because keyword is not at the start
 
 // @brief Nothing to format because starting with any ordinary '//'.
 
-/// @Brief Nothing to format because of capital B
+/// @Brief Nothing to format because of capital B. doxygen is case sensitive.
 
 
 /***************** Nothing bold or italic

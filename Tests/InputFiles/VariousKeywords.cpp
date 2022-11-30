@@ -210,6 +210,12 @@ the \a x and @a y::p coordinates are used to
 the \b x and @b y::p coordinates are used to
 the \c x and @c y::p coordinates are used to
 the \p x and @p y::p coordinates are used to
+  \p ::thing
+\p
+  nothing to format on this line
+\p
+nothing to format on this line
+Format (the next)\p thing despite missing space.
 \arg AlignLeft left alignment.
 \li
 \code{.py} \endcode

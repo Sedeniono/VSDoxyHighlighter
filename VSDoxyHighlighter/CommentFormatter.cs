@@ -300,7 +300,7 @@ namespace VSDoxyHighlighter
       // Stuff that can be in the middle of lines.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "p", "c", "anchor", "cite", "link", "refitem", 
             "copydoc", "copybrief", "copydetails", "emoji"
           }), cOptions, cRegexTimeout),
@@ -308,14 +308,14 @@ namespace VSDoxyHighlighter
       });
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "a", "e", "em"
           }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.EmphasisMinor)
       });
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord(new string[] {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "b"
           }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.EmphasisMajor)
@@ -505,10 +505,13 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
     }
 
-    private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord(string[] keywords)
+    private string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(string[] keywords)
     {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional.
+      // https://regex101.com/r/fCM8p7/1
       string concatKeywords = String.Join("|", keywords);
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\n\r]+)";
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
     private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(string[] keywords)
