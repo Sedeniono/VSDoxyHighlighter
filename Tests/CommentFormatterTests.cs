@@ -524,6 +524,8 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\section", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"sec", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"An example section", FormatTypes.Title),
+        new Utils.FormattedFragmentText(@"\section", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\section", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\subsection", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"sec_2", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\subsubsection", FormatTypes.NormalKeyword),

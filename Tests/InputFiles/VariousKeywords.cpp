@@ -173,6 +173,8 @@ Some text \refitem some_name more text
 - \subpage advanced "Advanced usage"
 \tableofcontents
 \section sec An example section
+\section    
+\section
 \subsection sec_2
 \subsubsection sec An example section
 \paragraph sec An example section
