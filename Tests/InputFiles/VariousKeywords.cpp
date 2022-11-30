@@ -168,9 +168,16 @@ See \ref Class::Func(double,int), the last comma should not be matched.
 Bla (cf. \ref Class::Func()) bla. The closing ")" should not be matched.
 Bla (cf. \ref Class::Func(int, double, cls::f)) bla
 \ref func()() the second "()" should not be matched.
-\ref Class.:Func Here, only "Class" should be matched because of the incorrect indirection
-\ref Class:.Func Here, only "Class" should be matched because of the incorrect indirection
-\ref Class:Func Here, only "Class" should be matched because of the incorrect indirection
+\ref Class1.:Func Here, only "Class" should be matched because of the incorrect indirection
+\ref Class2:.Func Here, only "Class" should be matched because of the incorrect indirection
+\ref Class3:Func Here, only "Class" should be matched because of the incorrect indirection
+\ref "foo" Do not match quotation, only keyword
+\ref
+  nothing to match
+\ref match
+  "but do not match this"
+\ref  
+\ref
 Some text \refitem some_name more text
 \secreflist
 \endsecreflist

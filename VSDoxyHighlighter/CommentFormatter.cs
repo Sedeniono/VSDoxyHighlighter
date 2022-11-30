@@ -344,7 +344,7 @@ namespace VSDoxyHighlighter
 
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(new string[] {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(new string[] {
           "ref", "subpage"
           }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Parameter, FormatTypes.Title)
@@ -520,7 +520,7 @@ namespace VSDoxyHighlighter
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordSomewhereInLine_1ParamAsWord_1OptionalQuotedParam(string[] keywords)
+    private string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(string[] keywords)
     {
       // Examples:
       //   \ref Class::Func()
@@ -530,7 +530,10 @@ namespace VSDoxyHighlighter
       //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
       string concatKeywords = String.Join("|", keywords);
 
-      // https://regex101.com/r/mQrhj8/1
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional.
+      //
+      // https://regex101.com/r/EVJaKp/1
       // (1) matches the first parameter to \ref.
       //    First part: Match stuff before potential parantheses
       //       (1a): Match any word character
@@ -540,10 +543,13 @@ namespace VSDoxyHighlighter
       //    Second part (1c): Match optionally available parantheses, including everything between.
       //        To keep things simple, we do not match balanced parantheses; nesting should never happen in this context.
       //        Thus, we simply take the next ")" after the opening "(".
-      // (2) Match everything between successive quotes.
-      //                                                     1a           1b                        1c                2
-      //                                                  ((____|{__________________________})+____________) __________________________       
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)(?:[ \t]+(""[^\r\n]*?""))?";
+      //    (1d) Make the whole previous match (1a+b+c) optional.
+      // (2) Match everything between successive quotes, optionally.
+      // (3) If (1+2) did not match anything, match the newline or the end of the string. This ensures that we nevertheless
+      //     highlight the keyword, even without parameters.
+      //                                                           1a           1b                        1c      1d          2                   3
+      //                                                        ((____|{__________________________})+____________)_ _________________________  ________
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)?(?:[ \t]+(""[^\r\n]*?""))?)|[\n\r]|$)";
     }
 
     private const string cRegex_1OptionalCaption_1OptionalSizeIndication =

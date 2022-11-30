@@ -5,7 +5,8 @@
  @param@warning Nothing should be formatted because keywords are not separate
  @param: Nothing to format because of the ":", which is not allowed
  \briefs Incorrect keyword
- \ref "some bla"  No formatting because quotes directly after ref
+ No format because \refs is unknown
+ Nothing to\ref format because no space before command.
  Nothing to\p format because no space before command.
 */
 
