@@ -80,7 +80,7 @@ namespace VSDoxyHighlighter
     public EmphasisMinorFormat()
     {
       DisplayName = "DoxyHighlighter - Emphasis (minor)";
-      ForegroundColor = Color.FromRgb(87, 166, 74);
+      ForegroundColor = Color.FromRgb(0, 75, 0);
       IsItalic = true;
     }
   }
@@ -127,7 +127,7 @@ namespace VSDoxyHighlighter
     public InlineCodeFormat()
     {
       DisplayName = "DoxyHighlighter - Inline code";
-      ForegroundColor = Color.FromRgb(104, 104, 104);
+      ForegroundColor = Color.FromRgb(85, 85, 85);
       BackgroundColor = Color.FromRgb(235, 235, 235);
     }
   }
@@ -142,7 +142,7 @@ namespace VSDoxyHighlighter
     public TitleFormat()
     {
       DisplayName = "DoxyHighlighter - Title";
-      ForegroundColor = Color.FromRgb(90, 90, 90);
+      ForegroundColor = Color.FromRgb(0, 0, 0);
       IsBold = true;
     }
   }

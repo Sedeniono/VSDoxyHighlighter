@@ -11,15 +11,15 @@ namespace VSDoxyHighlighter
 {
   public static class IDs
   {
-    public const string ID_command = "Doxy/Command";
-    public const string ID_warningKeyword = "Doxy/Warning";
-    public const string ID_noteKeyword = "Doxy/Note";
-    public const string ID_parameter = "Doxy/Parameter";
-    public const string ID_emphasisMinor = "Doxy/EmphasisMinor";
-    public const string ID_emphasisMajor = "Doxy/EmphasisMajor";
-    public const string ID_strikethrough = "Doxy/Strikethrough";
-    public const string ID_inlineCode = "Doxy/InlineCode";
-    public const string ID_title = "Doxy/Title";
+    public const string ID_command = "DoxyTTT/Command";
+    public const string ID_warningKeyword = "DoxyTTT/Warning";
+    public const string ID_noteKeyword = "DoxyTTT/Note";
+    public const string ID_parameter = "DoxyTTT/Parameter";
+    public const string ID_emphasisMinor = "DoxyTTT/EmphasisMinor";
+    public const string ID_emphasisMajor = "DoxyTTT/EmphasisMajor";
+    public const string ID_strikethrough = "DoxyTTT/Strikethrough";
+    public const string ID_inlineCode = "DoxyTTT/InlineCode";
+    public const string ID_title = "DoxyTTT/Title";
   }
 
 
