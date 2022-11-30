@@ -13,8 +13,16 @@
 \hiderefs
 \category Test1 class.h inc/class.h
 \class Test1 class.h "inc dir/class.h"
-\class Test2 class.h
-\class Test3
+\class Test2	class.h
+\class Test3::MemClass
+\class Test4  	 
+\class Test5
+  "NoFormatting"
+\class  
+  No formatting
+\class
+  No formatting
+\class
 \concept concept_name
 \def MAX(x,y)
 \def   

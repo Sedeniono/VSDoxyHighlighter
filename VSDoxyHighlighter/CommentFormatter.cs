@@ -469,7 +469,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional.
+      // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/yCZkWA/1
       string concatKeywords = String.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
@@ -490,7 +490,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional.
+      // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/qaaWBO/1
       string concatKeywords = String.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
@@ -499,7 +499,7 @@ namespace VSDoxyHighlighter
     private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional.
+      // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/8QcyXW/1
       string concatKeywords = String.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
@@ -507,14 +507,24 @@ namespace VSDoxyHighlighter
 
     private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      // https://regex101.com/r/Z7R3xS/1
       string concatKeywords = String.Join("|", keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^ \t\r\n]+)(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?";
+
+      // (1) Match the required word. As noted before, we actually treat it as optional.
+      // (2) Optional word
+      // (3) Optional parameter till the end
+      // (4) In case (1-3) did not match anything, match the end of line or string, so that the keyword is highlighted even without parameters.
+      //                                                                           1                    2                     3                4
+      //                                                            (        ________________ _______________________ ____________________) ________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
     private string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional.
+      // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/fCM8p7/1
       string concatKeywords = String.Join("|", keywords);
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
@@ -531,7 +541,7 @@ namespace VSDoxyHighlighter
       string concatKeywords = String.Join("|", keywords);
 
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional.
+      // actually treated as optional (highlight keyword even without parameters while typing).
       //
       // https://regex101.com/r/EVJaKp/1
       // (1) matches the first parameter to \ref.

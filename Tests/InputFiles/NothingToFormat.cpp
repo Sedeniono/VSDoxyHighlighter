@@ -8,6 +8,7 @@
  No format because \refs is unknown
  Nothing to\ref format because no space before command.
  Nothing to\p format because no space before command.
+ \classs No formatting because of unknown command
 */
 
 /// T \note Nothing should be formatted because keyword is not at the start
