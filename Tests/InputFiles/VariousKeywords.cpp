@@ -318,6 +318,14 @@ The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is
 \image docbook "file name.eps" width=200cm height=1cm
 \image{inline,anchor:id} rtf "path with space/name.rtf"
 \image{inline} xml file.xml height=1cm
+\image latexs is not an allowed document type, no format of latexs
+\image
+  latex should not be formatted since on new line
+\image  
+  latex should not be formatted since on new line
+\image "foo do not match"
+\image foo do not match
+\image
 New line\n
 New line \n
 \n  

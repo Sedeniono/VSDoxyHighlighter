@@ -69,5 +69,3 @@ auto ptr = int * (*)(const char*);
 (double * )(void * )p;
 (double *)(void * )p;
 
-// The "latexs" in the following is unknown, thus, nothing to format:
-/// \image latexs application.eps

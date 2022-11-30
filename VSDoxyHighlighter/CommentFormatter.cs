@@ -598,8 +598,11 @@ namespace VSDoxyHighlighter
     }
 
     private string BuildRegex_ImageCommand()
-    {                                          
-      return $@"({cCmdPrefix}image(?:{{.*?}})?)[ \t]+(html|latex|docbook|rtf|xml)\b{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication}";
+    {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      // https://regex101.com/r/VN43Fy/1
+      return $@"({cCmdPrefix}image(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
     }
 
     /// <summary>

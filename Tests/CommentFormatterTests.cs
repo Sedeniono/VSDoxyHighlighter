@@ -805,6 +805,12 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"xml", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"file.xml", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"height=1cm", FormatTypes.Parameter),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
+        new Utils.FormattedFragmentText(@"\image", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\n", FormatTypes.NormalKeyword),
