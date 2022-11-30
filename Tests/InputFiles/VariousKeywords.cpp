@@ -179,7 +179,9 @@ Some text \refitem some_name more text
 \tableofcontents
 \section sec An example section
 \section    
+	Nothing to format on this line
 \section
+  Nothing to format on this line
 \subsection sec_2
 \subsubsection sec An example section
 \paragraph sec An example section
