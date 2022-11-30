@@ -3,6 +3,7 @@
  * T \brief Nothing should be formatted because keyword is not at the start
  T \note Nothing should be formatted because keyword is not at the start
  @param@warning Nothing should be formatted because keywords are not separate
+ @param: Nothing to format because of the ":", which is not allowed
  \briefs Incorrect keyword
  
  \ref "some bla"  No formatting because quotes directly after ref

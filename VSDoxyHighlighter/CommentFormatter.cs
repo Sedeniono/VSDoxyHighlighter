@@ -259,7 +259,7 @@ namespace VSDoxyHighlighter
       // Keywords with parameter that must be at the start of lines, parameter stretches till the end of the line.
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
              "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
              "property", "typedef", "var", "cond",
              "elseif", "if", "ifnot",
@@ -291,7 +291,7 @@ namespace VSDoxyHighlighter
       // Keyword with title
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1ParamTillEnd(new string[] {
+        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
              "mainpage"
           }), cOptions, cRegexTimeout),
         types = (FormatTypes.NormalKeyword, FormatTypes.Title)
@@ -466,14 +466,23 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1ParamTillEnd(string[] keywords)
+    private string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(string[] keywords)
     {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional.
+      // https://regex101.com/r/yCZkWA/1
       string concatKeywords = String.Join("|", keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]+([^\n\r]*)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
     private string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
     {
+      // BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd() also treats the 1 parameter as optional to provide
+      // early syntax highlighting (if the parameter does not yet exist). Neverthless, we need a different regex
+      // for the optional parameter. Reason:
+      //   \param: MyParameter  --> The ":" is invalid syntax, and nothing should be formatted. Doxygen complains.
+      //   \par: My paragraph  --> The title of the paragraph is ": My paragraph". Probably not what the user intended,
+      //                           but nevertheless doxygen parses it that way.
       string concatKeywords = String.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]*([^\n\r]*))?";
     }

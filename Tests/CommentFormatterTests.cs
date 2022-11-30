@@ -43,8 +43,7 @@ namespace VSDoxyHighlighter.Tests
     public static List<FormattedFragmentText> ConvertToTextFragments(string text, ICollection<FormattedFragment> fragments)
     {
       var result = new List<FormattedFragmentText>();
-      foreach (FormattedFragment fragment in fragments)
-      {
+      foreach (FormattedFragment fragment in fragments) {
         Assert.IsTrue(fragment.Length > 0);
         Assert.IsTrue(fragment.EndIndex < text.Length);
         string str = text.Substring(fragment.StartIndex, fragment.Length);
@@ -53,6 +52,15 @@ namespace VSDoxyHighlighter.Tests
       return result;
     }
 
+
+    public static void WriteFragmentsToFile(string filename, List<FormattedFragmentText> fragments)
+    {
+      using (StreamWriter writer = new StreamWriter(filename)) {
+        foreach (Utils.FormattedFragmentText fragment in fragments) {
+          writer.WriteLine($"Text={fragment.Text}, Type={fragment.Type}");
+        }
+      }
+    }
   }
 
 
@@ -243,7 +251,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"<>", FormatTypes.Parameter),
 
         new Utils.FormattedFragmentText(@"\hideinitializer", FormatTypes.NormalKeyword),
-        
+
         new Utils.FormattedFragmentText(@"\idlexcept", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"exception", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\implements", FormatTypes.NormalKeyword),
@@ -285,7 +293,7 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\private", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\privatesection", FormatTypes.NormalKeyword),
-        
+
         new Utils.FormattedFragmentText(@"\property", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"const char *Fn_Test::member(char c,int n)", FormatTypes.Parameter),
 
@@ -299,7 +307,7 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\public", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\publicsection", FormatTypes.NormalKeyword),
-        
+
         new Utils.FormattedFragmentText(@"\pure", FormatTypes.NormalKeyword),
 
         new Utils.FormattedFragmentText(@"\relates", FormatTypes.NormalKeyword),
@@ -422,7 +430,7 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\retval", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"some_value", FormatTypes.Parameter),
-        
+
         new Utils.FormattedFragmentText(@"\sa", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\see", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"\short", FormatTypes.NormalKeyword),
@@ -512,7 +520,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"""Advanced usage""", FormatTypes.Title),
 
         new Utils.FormattedFragmentText(@"\tableofcontents", FormatTypes.NormalKeyword),
-        
+
         new Utils.FormattedFragmentText(@"\section", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"sec", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"An example section", FormatTypes.Title),
@@ -532,7 +540,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"include_test.cpp", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\dontinclude{lineno}", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"some dir\include_test.cpp", FormatTypes.Parameter),
-        
+
         new Utils.FormattedFragmentText(@"\include", FormatTypes.NormalKeyword),
         new Utils.FormattedFragmentText(@"include_test.cpp", FormatTypes.Parameter),
         new Utils.FormattedFragmentText(@"\include{lineno}", FormatTypes.NormalKeyword),
@@ -801,6 +809,11 @@ namespace VSDoxyHighlighter.Tests
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+
+      // Write fragments to file for easy checking of test failures.
+      Utils.WriteFragmentsToFile("VariousKeywords_Expected.txt", expectedTextFragments);
+      Utils.WriteFragmentsToFile("VariousKeywords_Actual.txt", actualTextFragments);
+
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
     }
 
@@ -840,7 +853,7 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    private List<FormattedFragment> GetExpectationsForItalic() 
+    private List<FormattedFragment> GetExpectationsForItalic()
     {
       return new List<FormattedFragment>() {
         new FormattedFragment(9, 8, FormatTypes.EmphasisMinor),
@@ -954,6 +967,5 @@ namespace VSDoxyHighlighter.Tests
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
     }
-
   }
 }
