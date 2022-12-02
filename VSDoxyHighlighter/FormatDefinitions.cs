@@ -14,10 +14,13 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class CommandFormat : ClassificationFormatDefinition
   {
-    public CommandFormat()
+    [ImportingConstructor]
+    public CommandFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Command";
-      ForegroundColor = Color.FromRgb(0, 75, 0);
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_command];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
       IsBold = true;
     }
   }
@@ -30,10 +33,13 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class WarningKeywordFormat : ClassificationFormatDefinition
   {
-    public WarningKeywordFormat()
+    [ImportingConstructor]
+    public WarningKeywordFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Warnings";
-      ForegroundColor = Color.FromRgb(200, 0, 0);
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
       IsBold = true;
     }
   }
@@ -46,10 +52,13 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class NoteKeywordFormat : ClassificationFormatDefinition
   {
-    public NoteKeywordFormat()
+    [ImportingConstructor]
+    public NoteKeywordFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Notes";
-      ForegroundColor = Color.FromRgb(255, 155, 0);
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
       IsBold = true;
     }
   }
@@ -62,10 +71,13 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class ParameterFormat : ClassificationFormatDefinition
   {
-    public ParameterFormat()
+    [ImportingConstructor]
+    public ParameterFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Parameter";
-      ForegroundColor = Color.FromRgb(0, 80, 218);
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
       IsBold = true;
     }
   }
@@ -77,10 +89,13 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class EmphasisMinorFormat : ClassificationFormatDefinition
   {
-    public EmphasisMinorFormat()
+    [ImportingConstructor]
+    public EmphasisMinorFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Emphasis (minor)";
-      ForegroundColor = Color.FromRgb(0, 75, 0);
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMinor];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
       IsItalic = true;
     }
   }
@@ -92,13 +107,52 @@ namespace VSDoxyHighlighter
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class EmphasisMajorFormat : ClassificationFormatDefinition
   {
-    public EmphasisMajorFormat()
+    [ImportingConstructor]
+    public EmphasisMajorFormat(DefaultColors defaultColors)
     {
       DisplayName = "DoxyHighlighter - Emphasis (major)";
-      ForegroundColor = Color.FromRgb(0, 75, 0);
-      IsBold  = true;
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMajor];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
+      IsBold = true;
     }
   }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
+  [Name(IDs.ID_inlineCode)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class InlineCodeFormat : ClassificationFormatDefinition
+  {
+    [ImportingConstructor]
+    public InlineCodeFormat(DefaultColors defaultColors)
+    {
+      DisplayName = "DoxyHighlighter - Inline code";
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_inlineCode];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
+    }
+  }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
+  [Name(IDs.ID_title)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class TitleFormat : ClassificationFormatDefinition
+  {
+    [ImportingConstructor]
+    public TitleFormat(DefaultColors defaultColors)
+    {
+      DisplayName = "DoxyHighlighter - Title";
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_title];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
+      IsBold = true;
+    }
+  }
+
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_strikethrough)]
@@ -111,39 +165,11 @@ namespace VSDoxyHighlighter
     {
       DisplayName = "DoxyHighlighter - Strikethrough";
 
+      // Note: No need for DefaultColors. We just add the strikethrough, but leave the text color unchanged.
+
       TextDecorations = new TextDecorationCollection();
       TextDecorations.Add(new TextDecoration(
           TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended));
-    }
-  }
-
-  [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
-  [Name(IDs.ID_inlineCode)]
-  [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class InlineCodeFormat : ClassificationFormatDefinition
-  {
-    public InlineCodeFormat()
-    {
-      DisplayName = "DoxyHighlighter - Inline code";
-      ForegroundColor = Color.FromRgb(85, 85, 85);
-      BackgroundColor = Color.FromRgb(235, 235, 235);
-    }
-  }
-
-  [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
-  [Name(IDs.ID_title)]
-  [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class TitleFormat : ClassificationFormatDefinition
-  {
-    public TitleFormat()
-    {
-      DisplayName = "DoxyHighlighter - Title";
-      ForegroundColor = Color.FromRgb(0, 0, 0);
-      IsBold = true;
     }
   }
 }

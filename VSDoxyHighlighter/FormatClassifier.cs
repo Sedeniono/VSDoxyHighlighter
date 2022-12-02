@@ -9,17 +9,19 @@ using System.ComponentModel.Composition;
 
 namespace VSDoxyHighlighter
 {
+  // Identifiers for the classifications. E.g., Visual Studio uses these strings as keys
+  // to store the classification's configuration in the registry.
   public static class IDs
   {
-    public const string ID_command = "DoxyTTT/Command";
-    public const string ID_warningKeyword = "DoxyTTT/Warning";
-    public const string ID_noteKeyword = "DoxyTTT/Note";
-    public const string ID_parameter = "DoxyTTT/Parameter";
-    public const string ID_emphasisMinor = "DoxyTTT/EmphasisMinor";
-    public const string ID_emphasisMajor = "DoxyTTT/EmphasisMajor";
-    public const string ID_strikethrough = "DoxyTTT/Strikethrough";
-    public const string ID_inlineCode = "DoxyTTT/InlineCode";
-    public const string ID_title = "DoxyTTT/Title";
+    public const string ID_command = "DoxyTestCommand";
+    public const string ID_parameter = "DoxyTestParameter";
+    public const string ID_title = "DoxyTestTitle";
+    public const string ID_warningKeyword = "DoxyTestWarning";
+    public const string ID_noteKeyword = "DoxyTestNote";
+    public const string ID_emphasisMinor = "DoxyTestEmphasisMinor";
+    public const string ID_emphasisMajor = "DoxyTestEmphasisMajor";
+    public const string ID_strikethrough = "DoxyTestStrikethrough";
+    public const string ID_inlineCode = "DoxyTestInlineCode";
   }
 
 
