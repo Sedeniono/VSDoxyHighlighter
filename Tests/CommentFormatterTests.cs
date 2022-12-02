@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using static System.Collections.Specialized.BitVector32;
+using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter.Tests
 {
@@ -144,12 +145,8 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    [TestMethod()]
-    public void VariousKeywordsShouldBeFormatted()
+    List<Utils.FormattedFragmentText> GetExpectedTextFragmentsForVariousKeywordsTests()
     {
-      var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
-      var actualFragments = new CommentFormatter().FormatText(input);
-
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         // --- Structural indicators --- 
         new Utils.FormattedFragmentText(@"\addtogroup", FormatType.Command),
@@ -841,11 +838,38 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\---", FormatType.Command),
       };
 
+      return expectedTextFragments;
+    }
+
+
+    [TestMethod()]
+    public void VariousKeywordsShouldBeFormatted_CRLF()
+    {
+      var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
+      Assert.IsTrue(Regex.Matches(input, "\r\n").Count > 10); // Cross-check the input file
+
+      var actualFragments = new CommentFormatter().FormatText(input);
+
+      var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
 
       // Write fragments to file for easy checking of test failures.
       Utils.WriteFragmentsToFile("VariousKeywords_Expected.txt", expectedTextFragments);
       Utils.WriteFragmentsToFile("VariousKeywords_Actual.txt", actualTextFragments);
+
+      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
+    }
+
+
+    [TestMethod()]
+    public void VariousKeywordsShouldBeFormatted_LF()
+    {
+      var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
+      input = input.Replace("\r\n", "\n");
+      Assert.IsTrue(Regex.Matches(input, "\r").Count == 0); // Cross-check
+
+      var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
+      var actualTextFragments = Utils.ConvertToTextFragments(input, new CommentFormatter().FormatText(input));
 
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
     }
