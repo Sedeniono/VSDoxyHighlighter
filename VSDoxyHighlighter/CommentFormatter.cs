@@ -14,7 +14,8 @@ namespace VSDoxyHighlighter
   public enum FormatType : uint
   {
     Command, // The doxygen command itself, e.g. "@param" or "@brief"
-    Parameter, // Parameter to some ordinary doxygen command
+    Parameter1, // Parameter to some ordinary doxygen command
+    Parameter2, // Used for parameters of commands in running text or for some commands with more than one successive parameter
     Title, // Parameter to some ordinary doxygen command that represents a title
     Warning,
     Note,
@@ -253,7 +254,7 @@ namespace VSDoxyHighlighter
               "memberof", "name", "namespace", "package", "relates", "related",
               "relatesalso", "relatedalso", "retval"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Parameter1)
       });
 
       // Keywords with parameter that must be at the start of lines, parameter stretches till the end of the line.
@@ -269,7 +270,7 @@ namespace VSDoxyHighlighter
              "verbinclude", "htmlinclude", @"htmlinclude\[block\]", "latexinclude",
              "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Parameter1)
       });
 
       // Keywords with optional parameter that must be at the start of lines, parameter stretches till the end of the line.
@@ -278,7 +279,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "cond"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Parameter1)
       });
       mMatchers.Add(new FragmentMatcher
       {
@@ -304,7 +305,9 @@ namespace VSDoxyHighlighter
             "p", "c", "anchor", "cite", "link", "refitem", 
             "copydoc", "copybrief", "copydetails", "emoji"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter)
+        // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
+        // since these commands are typically place in running text.
+        types = (FormatType.Command, FormatType.Parameter2)
       });
       mMatchers.Add(new FragmentMatcher
       {
@@ -331,7 +334,7 @@ namespace VSDoxyHighlighter
           "section", "subsection", "subsubsection", "paragraph",
           "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Title)
+        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
@@ -339,7 +342,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
           "showdate"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Title)
+        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
@@ -347,7 +350,9 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(new string[] {
           "ref", "subpage"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Title)
+        // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
+        // since these commands are typically place in running text.
+        types = (FormatType.Command, FormatType.Parameter2, FormatType.Title)
       });
 
 
@@ -358,13 +363,13 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
           "category", "class", "interface", "protocol", "struct", "union"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Parameter, FormatType.Title)
+        types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title, FormatType.Parameter, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
 
       //----- More parameters -------
@@ -374,7 +379,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dot", "msc",
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title, FormatType.Parameter, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
 
       mMatchers.Add(new FragmentMatcher
@@ -382,13 +387,13 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dotfile", "mscfile", "diafile"
           }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Title, FormatType.Parameter, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
 
       mMatchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_ImageCommand(), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter, FormatType.Parameter, FormatType.Title, FormatType.Parameter, FormatType.Parameter)
+        types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
     }
 

@@ -65,22 +65,42 @@ namespace VSDoxyHighlighter
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_parameter)]
-  [Name(IDs.ID_parameter)]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_parameter1)]
+  [Name(IDs.ID_parameter1)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class ParameterFormat : ClassificationFormatDefinition
+  internal sealed class ParameterFormat1 : ClassificationFormatDefinition
   {
     [ImportingConstructor]
-    public ParameterFormat(DefaultColors defaultColors)
+    public ParameterFormat1(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Parameter";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter];
+      DisplayName = "DoxyHighlighter - Parameter 1";
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter1];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
     }
   }
+
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_parameter2)]
+  [Name(IDs.ID_parameter2)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class ParameterFormat2 : ClassificationFormatDefinition
+  {
+    [ImportingConstructor]
+    public ParameterFormat2(DefaultColors defaultColors)
+    {
+      DisplayName = "DoxyHighlighter - Parameter 2";
+      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter2];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
+      IsBold = false;
+    }
+  }
+
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMinor)]

@@ -166,7 +166,8 @@ namespace VSDoxyHighlighter
     // Default colors for light color themes.
     static readonly Dictionary<string, TextColor> cLightColors = new Dictionary<string, TextColor> {
       { IDs.ID_command, new TextColor(Color.FromRgb(0, 75, 0), null) },
-      { IDs.ID_parameter, new TextColor(Color.FromRgb(0, 80, 218), null) },
+      { IDs.ID_parameter1, new TextColor(Color.FromRgb(0, 80, 218), null) },
+      { IDs.ID_parameter2, new TextColor(Color.FromRgb(0, 80, 218), null) },
       { IDs.ID_title, new TextColor(Color.FromRgb(0, 0, 0), null) },
       { IDs.ID_warningKeyword, new TextColor(Color.FromRgb(200, 0, 0), null) },
       { IDs.ID_noteKeyword, new TextColor(Color.FromRgb(255, 155, 0), null) },
@@ -178,7 +179,8 @@ namespace VSDoxyHighlighter
     // Default colors for dark color themes.
     static readonly Dictionary<string, TextColor> cDarkColors = new Dictionary<string, TextColor> {
       { IDs.ID_command, new TextColor(Color.FromRgb(140, 203, 128), null) },
-      { IDs.ID_parameter, new TextColor(Color.FromRgb(86, 156, 214), null) },
+      { IDs.ID_parameter1, new TextColor(Color.FromRgb(86, 156, 214), null) },
+      { IDs.ID_parameter2, new TextColor(Color.FromRgb(86, 156, 214), null) },
       { IDs.ID_title, new TextColor(Color.FromRgb(206, 206, 206), null) },
       { IDs.ID_warningKeyword, new TextColor(Color.FromRgb(255, 36, 23), null) },
       { IDs.ID_noteKeyword, new TextColor(Color.FromRgb(255, 155, 0), null) },

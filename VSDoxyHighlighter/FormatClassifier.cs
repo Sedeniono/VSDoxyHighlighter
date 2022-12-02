@@ -13,15 +13,16 @@ namespace VSDoxyHighlighter
   // to store the classification's configuration in the registry.
   public static class IDs
   {
-    public const string ID_command = "DoxyTestCommand";
-    public const string ID_parameter = "DoxyTestParameter";
-    public const string ID_title = "DoxyTestTitle";
-    public const string ID_warningKeyword = "DoxyTestWarning";
-    public const string ID_noteKeyword = "DoxyTestNote";
-    public const string ID_emphasisMinor = "DoxyTestEmphasisMinor";
-    public const string ID_emphasisMajor = "DoxyTestEmphasisMajor";
-    public const string ID_strikethrough = "DoxyTestStrikethrough";
-    public const string ID_inlineCode = "DoxyTestInlineCode";
+    public const string ID_command = "DoxyTest3Command";
+    public const string ID_parameter1 = "DoxyTest3Parameter1";
+    public const string ID_parameter2 = "DoxyTest3Parameter2";
+    public const string ID_title = "DoxyTest3Title";
+    public const string ID_warningKeyword = "DoxyTest3Warning";
+    public const string ID_noteKeyword = "DoxyTest3Note";
+    public const string ID_emphasisMinor = "DoxyTest3EmphasisMinor";
+    public const string ID_emphasisMajor = "DoxyTest3EmphasisMajor";
+    public const string ID_strikethrough = "DoxyTest3Strikethrough";
+    public const string ID_inlineCode = "DoxyTest3InlineCode";
   }
 
 
@@ -43,8 +44,12 @@ namespace VSDoxyHighlighter
     private static ClassificationTypeDefinition typeDefinitionForNoteKeyword;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_parameter)]
-    private static ClassificationTypeDefinition typeDefinitionForParameter;
+    [Name(IDs.ID_parameter1)]
+    private static ClassificationTypeDefinition typeDefinitionForParameter1;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_parameter2)]
+    private static ClassificationTypeDefinition typeDefinitionForParameter2;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_emphasisMinor)]
@@ -99,7 +104,8 @@ namespace VSDoxyHighlighter
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
       mFormatTypeToClassificationType = new IClassificationType[numFormats];
       mFormatTypeToClassificationType[(uint)FormatType.Command] = registry.GetClassificationType(IDs.ID_command);
-      mFormatTypeToClassificationType[(uint)FormatType.Parameter] = registry.GetClassificationType(IDs.ID_parameter);
+      mFormatTypeToClassificationType[(uint)FormatType.Parameter1] = registry.GetClassificationType(IDs.ID_parameter1);
+      mFormatTypeToClassificationType[(uint)FormatType.Parameter2] = registry.GetClassificationType(IDs.ID_parameter2);
       mFormatTypeToClassificationType[(uint)FormatType.Title] = registry.GetClassificationType(IDs.ID_title);
       mFormatTypeToClassificationType[(uint)FormatType.Warning] = registry.GetClassificationType(IDs.ID_warningKeyword);
       mFormatTypeToClassificationType[(uint)FormatType.Note] = registry.GetClassificationType(IDs.ID_noteKeyword);
