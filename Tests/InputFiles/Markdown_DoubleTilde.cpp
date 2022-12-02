@@ -8,6 +8,7 @@
 */
 /// Some ~~*more*~~ sthr
 /// Some (~~sthr ( text~~[ with ,~~some more~~.
+/// ~~v~~
 
 /// Not ~~~sthr text~~~
 /// Not~~sthr~~ text

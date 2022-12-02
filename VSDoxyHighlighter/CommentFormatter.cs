@@ -189,6 +189,7 @@ namespace VSDoxyHighlighter
       // *italic*
       mMatchers.Add(new FragmentMatcher
       {
+        // https://regex101.com/r/ekhlTW/1
         // (1)  Stuff allowed to precede the first "*". According to the doxygen documentation:
         //      Only the following is allowed: a space, newline, or one the following characters <{([,:;
         // (2a) Match the actual starting "*"
@@ -196,7 +197,7 @@ namespace VSDoxyHighlighter
         //      Space and tab are forbidden to reduce the number of false positives, especially until we implement reliable
         //      classification of code vs comment (in "* str*" the "str" is not formatted because of the space).
         //      We also forbid a ")" to rule out constructs in the code such as: int * (*)(const char*)
-        // (2c) Match any character multiple times, but not those which are preceded by whitesapce or "*".
+        // (2c) Match any character multiple times, but not those which are preceded by whitespace or "*".
         // (2d) Before the terminating "*", some characters must NOT appear.
         //      The "*" is ruled out so that we can detect **bold** text with the other regex below.
         //      "/" is forbidden since "/*" would be a comment start.
@@ -209,37 +210,37 @@ namespace VSDoxyHighlighter
         //      We also forbid "<" and ">" to rule out some false positives in C++ templates (until we implemented detection
         //      of whether we are actually in a comment or in code).
         // 
-        //                        1           2a   2b          2c                      2d               2e            3
-        //                __________________  __ ________  _________________ __________________________ __ ____________________________
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        //                        1           2a     2b               2c                   2d               2e            3
+        //                __________________  __ ____________ _________________ __________________________ __ ____________________________
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMinor)
       });
 
       // **bold**
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*[^\* \t\)](?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMajor)
       });
 
       // _italic_
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMinor)
       });
 
       // __bold__
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__[^_ \t\)](?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMajor)
       });
 
       // ~~strikethrough~~
       mMatchers.Add(new FragmentMatcher
       {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~[^~ \t\)](?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Strikethrough)
       });
 

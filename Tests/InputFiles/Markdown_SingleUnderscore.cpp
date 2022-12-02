@@ -8,6 +8,7 @@ _italic_
 */
 /// Some _**more**_ italic
 /// Some (_italic ( text_[ with ,_some more_.
+/// _v_
 
 /// Not_italic_ text
 /// Not _italic_text

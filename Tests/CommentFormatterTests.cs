@@ -923,6 +923,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(178, 10, FormatType.EmphasisMinor),
         new FormattedFragment(207, 15, FormatType.EmphasisMinor),
         new FormattedFragment(230, 11, FormatType.EmphasisMinor),
+        new FormattedFragment(248, 3, FormatType.EmphasisMinor),
       };
     }
 
@@ -976,6 +977,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(180, 10, expectedFormat),
         new FormattedFragment(207, 15, expectedFormat),
         new FormattedFragment(230, 13, expectedFormat),
+        new FormattedFragment(250, 5, expectedFormat),
       };
     }
 
