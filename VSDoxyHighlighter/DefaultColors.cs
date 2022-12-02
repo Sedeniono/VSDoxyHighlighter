@@ -186,7 +186,7 @@ namespace VSDoxyHighlighter
       { IDs.ID_noteKeyword, new TextColor(Color.FromRgb(255, 155, 0), null) },
       { IDs.ID_emphasisMinor, new TextColor(Color.FromRgb(140, 203, 128), null) },
       { IDs.ID_emphasisMajor, new TextColor(Color.FromRgb(166, 215, 157), null) },
-      { IDs.ID_inlineCode, new TextColor(Color.FromRgb(182, 182, 182), Color.FromRgb(51, 51, 51)) },
+      { IDs.ID_inlineCode, new TextColor(Color.FromRgb(200, 200, 200), Color.FromRgb(51, 51, 51)) },
     };
 
     
