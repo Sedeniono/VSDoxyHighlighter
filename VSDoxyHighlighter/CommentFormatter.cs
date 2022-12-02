@@ -614,7 +614,8 @@ namespace VSDoxyHighlighter
     /// Computes the way the whole provided text should be formatted.
     /// </summary>
     /// <param name="text">This whole text is formatted.</param>
-    /// <returns>A list of fragments that point into the given "text" and which should be formatted.</returns>
+    /// <returns>A list of fragments that point into the given "text" and which should be formatted.
+    /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
     public SortedSet<FormattedFragment> FormatText(string text)
     {
       // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.

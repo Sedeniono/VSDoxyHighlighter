@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
-
+using Microsoft.VisualStudio.Text.Tagging;
 
 namespace VSDoxyHighlighter
 {
@@ -89,7 +89,7 @@ namespace VSDoxyHighlighter
     public IClassifier GetClassifier(ITextBuffer buffer)
     {
       return buffer.Properties.GetOrCreateSingletonProperty<FormatClassifier>(
-        creator: () => new FormatClassifier(this.classificationRegistry));
+        creator: () => new FormatClassifier(this.classificationRegistry, buffer));
     }
   }
 
@@ -97,8 +97,9 @@ namespace VSDoxyHighlighter
 
   internal class FormatClassifier : IClassifier
   {
-    internal FormatClassifier(IClassificationTypeRegistryService registry)
+    internal FormatClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
     {
+      mTextBuffer = textBuffer;
       mFormater = new CommentFormatter();
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
@@ -131,28 +132,118 @@ namespace VSDoxyHighlighter
     /// Called by Visual Studio when the given text span needs to be classified (i.e. formatted).
     /// Thus, this function searches for words to which apply syntax highlighting, and for each one 
     /// found returns a ClassificationSpan.
+    /// 
+    /// The function is typically called with individual lines.
     /// </summary>
-    public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan spanToCheck)
-    {      
-      string codeText = spanToCheck.GetText();
+    public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
+    {
+      ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
-      // Scan the given text for keywords and get the proper formatting for it.
-      var fragmentsToFormat = mFormater.FormatText(codeText);
+      List<Span> commentSpans = DecomposeSpanIntoComments(originalSpanToCheck);
 
-      // Convert the list of fragments that should be formatted to Visual Studio types.
       var result = new List<ClassificationSpan>();
-      foreach (FormattedFragment fragment in fragmentsToFormat) {
-        IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
-        var spanToFormat = new Span(spanToCheck.Start + fragment.StartIndex, fragment.Length);
-        result.Add(new ClassificationSpan(new SnapshotSpan(spanToCheck.Snapshot, spanToFormat), classificationType));
+      foreach (Span spanToCheck in commentSpans) {
+        string codeText = textSnapshot.GetText(spanToCheck);
+
+        // Scan the given text for keywords and get the proper formatting for it.
+        var fragmentsToFormat = mFormater.FormatText(codeText);
+
+        // Convert the list of fragments that should be formatted to Visual Studio types.
+        foreach (FormattedFragment fragment in fragmentsToFormat) {
+          IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
+          var spanToFormat = new Span(spanToCheck.Start + fragment.StartIndex, fragment.Length);
+          result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, spanToFormat), classificationType));
+        }
       }
 
       return result;
     }
 
 
+    /// <summary>
+    /// Decomposes the given snapshot spans such that only a list of spans is returned that are all comments.
+    /// I.e. it filters out all text in the given span that is NOT within a comment, and returns the remaining
+    /// parts as list.
+    /// </summary>
+    List<Span> DecomposeSpanIntoComments(SnapshotSpan spanToCheck)
+    {
+      var result = new List<Span>();
+
+      // The task is to somehow figure out which parts of the given text represents a comment and which does not.
+      // This is something that is absolutely non-trivial in C++:
+      //  - Just looking at single lines is by far not sufficient because of multiline comments (/* ... */) and also
+      //    because of line continuation (i.e. a "\" at the end of e.g. a normal C++ "//"-style comment causes the
+      //    comment to continue in the next line).
+      //  - Even a single line might contain multiple independent comments: /* comment */ code /* comment */ code
+      //  - In case of multiline comments, simply scanning upwards to the next "/*" to find whether some toke is in
+      //    a comment is insufficient because of strings and "//" style comment. Detecting strings by itself is
+      //    also highly non-trivial due to similar reasons (multiline strings, raw strings, line continuation via "\").
+      //  - A "/*" might not start a comment if there is another "/*" before without a corresponding "*/".
+      //    I.e. in "/* foo1 /* foo2 */" the "/*" after "foo1" does not start the comment.
+      //  - The code should be fast. Due to the global character of the multiline comments, some sort of caching needs
+      //    to be applied. The cache needs to be updated whenever some text changes, but the update should be as local
+      //    as possible for performance reasons. Yet, if the user types e.g. "/*", potentially everything afterwards
+      //    needs to be re-classified as comment (or not).
+      //
+      // ==> We do not attempt to implement this. Especially considering that Visual Studio itself must somewhere
+      //     somehow already have solved this task. The "somewhere" is in the tagger named "Microsoft.VisualC.CppColorer".
+      //     Therefore, we get a reference to that tagger, and ask it to decompose the given span for us. We only keep
+      //     those spans that were classified as tokens. This is the idea from https://stackoverflow.com/q/19060596/3740047
+      //     Note that all of this is a hack since the VS tagger is not really exposed via a proper API. 
+      //     An alternative might be to use the IClassifierAggregatorService (https://stackoverflow.com/a/29311144/3740047).
+      //     I have not really tried it, but I fear that calling GetClassifier() calls our code, and thus we might end up with
+      //     an infinite recursion. Of course, there would be ways to bypass this problem (if it really does occur). But
+      //     the approach with the dedicated tagger seems favorable since it limits the request to only that specific tagger,
+      //     and does not involve all the other existing classifiers.
+      //
+      // ==> There are basically two disadvantages with this approach: First, we cannot really write automated tests for it
+      //     because we would need to have a running Visual Studio instance. Second, it is a hack and thus might break without
+      //     warning in a future Visual Studio. But the alternative to re-implement the classification logic seems even more
+      //     ridiculous.
+
+      var defaultTagger = FindDefaultVSCppTagger();
+      if (defaultTagger != null) {
+        var defaultTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+        foreach (var tag in defaultTags) {
+          string classification = tag.Tag.ClassificationType.Classification;
+          // Visual Studio currently knows two different comment types: "comment" and "XML Doc Comment".
+          if (classification.ToUpper() == "COMMENT" || classification.ToUpper() == "XML DOC COMMENT") {
+            result.Add(tag.Span);
+          }
+        }
+      }
+      else {
+        // Mh, no tagger found? Maybe Microsoft changed their tagger name?
+        result.Add(spanToCheck.Span);
+      }
+
+      return result;
+    }
+
+
+    private ITagger<IClassificationTag> FindDefaultVSCppTagger()
+    {
+      if (mDefaultCppTagger == null) {
+        string nameOfDefaultCppTager = "Microsoft.VisualC.CppColorer".ToUpper();
+        foreach (var kvp in mTextBuffer.Properties.PropertyList) {
+          if (kvp.Value is ITagger<IClassificationTag> casted) {
+            if (kvp.Key.ToString().ToUpper() == nameOfDefaultCppTager) {
+              mDefaultCppTagger = casted;
+              break;
+            }
+          }
+        }
+      }
+
+      return mDefaultCppTagger;
+    }
+
+
+    private readonly ITextBuffer mTextBuffer;
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
+
+    private ITagger<IClassificationTag> mDefaultCppTagger = null;
   }
 
 }
