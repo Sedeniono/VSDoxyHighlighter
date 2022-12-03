@@ -3,10 +3,23 @@
     <Metadata>
         <Identity Id="VSDoxyHighlighter.b4227aaa-4a1b-43aa-83ba-df69f7a6118c" Version="1.0" Language="en-US" Publisher="Sedenion" />
         <DisplayName>VSDoxyHighlighter</DisplayName>
-        <Description xml:space="preserve">Extension for Visual Studio to provide syntax highlighting in Visual Studio for doxygen-style C++ comments</Description>
+        <Description xml:space="preserve">Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C++.</Description>
+        <MoreInfo>https://github.com/Sedeniono/VSDoxyHighlighter</MoreInfo>
+        <License>LICENSE.txt</License>
+        <GettingStartedGuide>https://github.com/Sedeniono/VSDoxyHighlighter</GettingStartedGuide>
+        <ReleaseNotes>https://github.com/Sedeniono/VSDoxyHighlighter</ReleaseNotes>
+        <Icon>Icon200x200.png</Icon>
+        <PreviewImage>Icon32x32.png</PreviewImage>
+        <Tags>doxygen;javadoc;C++;highlighting;comments</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Pro">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Enterprise">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
