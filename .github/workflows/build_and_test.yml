@@ -1,0 +1,40 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+
+jobs:
+  build_and_test:
+    runs-on: windows-2022
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1.3
+
+    - name: Setup VSTest
+      uses: darenm/Setup-VSTest@v1.2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.1.1
+
+    - name: Restore dependencies
+      run: nuget restore VSDoxyHighlighter.sln
+
+    - name: Build solution
+      run: msbuild /m /p:Configuration="Release" /p:platform="Any CPU" VSDoxyHighlighter.sln
+
+    - name: Upload VSIX file
+      uses: actions/upload-artifact@v3.1.1
+      with:
+        name: ReleaseVSIX
+        path: VSDoxyHighlighter/bin/Release/*.vsix
+        if-no-files-found: error
+
+    - name: Run tests
+      run: vstest.console.exe .\Tests\bin\Release\Tests.dll
