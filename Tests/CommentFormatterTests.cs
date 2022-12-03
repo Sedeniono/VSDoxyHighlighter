@@ -836,6 +836,10 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\|", FormatType.Command),
         new Utils.FormattedFragmentText(@"\--", FormatType.Command),
         new Utils.FormattedFragmentText(@"\---", FormatType.Command),
+        new Utils.FormattedFragmentText(@"\{", FormatType.Command),
+        new Utils.FormattedFragmentText(@"\}", FormatType.Command),
+        new Utils.FormattedFragmentText(@"@{", FormatType.Command),
+        new Utils.FormattedFragmentText(@"@}", FormatType.Command),
       };
 
       return expectedTextFragments;

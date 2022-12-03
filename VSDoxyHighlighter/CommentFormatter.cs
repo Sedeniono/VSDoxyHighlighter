@@ -151,7 +151,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
             @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}",
             @"\@", @"\&", @"\$", @"\#", @"\<", @"\>", @"\%", @"\.", @"\=", @"\::", @"\|",
-            @"\---", @"\--"
+            @"\---", @"\--", @"\{", @"\}"
           }), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Command)
       });

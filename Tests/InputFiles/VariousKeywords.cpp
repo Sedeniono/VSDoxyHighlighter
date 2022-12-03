@@ -347,4 +347,7 @@ Some\::thing
   \|
 Some\--word
 Some\---word
+\{
+\}
+Foo @{ text @} foo
 */
