@@ -24,7 +24,7 @@ Light             |  Dark
 :--------:|:--------:
 ![Example dark](Pictures/ExampleLight.png) | ![Example dark](Pictures/ExampleDark.png)
 
-To contrast it, here are is the default display without this extension:
+To contrast it, here is the default display without this extension:
 Light             |  Dark 
 :--------:|:--------:
 ![Example dark without highlighting](Pictures/ExampleLight_NoHighlight.png) | ![Example dark without highlighting](Pictures/ExampleDark_NoHighlight.png)
@@ -50,10 +50,12 @@ Only Visual Studio 2022 and above is supported.
 Currently, the highlighting is enabled in **all** C-style comments (i.e. in `/* ... */`, not just in e.g. `/** ... */` or `/*! ... */`). 
 Moreover, the treatment of C++ single line comments (`//`) is somewhat inconsistent: After `///` and `//!`, everything is highlighted, but for ordinary comments (`//`) only keywords that may appear in the middle of text is highlighted. Improving this is planned for the future.
 
+
 ## Supported elements of Doxygen
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported.
 - All [special commands](https://www.doxygen.nl/manual/commands.html) of Doxygen <= 1.9.5.
 - Parts of markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
+
 
 ## Not yet supported and future ideas
 - Differentiate between ordinary multiline comments (`/*`) and special ones (e.g. `/*!`). Also, allow optionally highlighting in ordinary C++ comments (`//`).
@@ -66,10 +68,15 @@ Moreover, the treatment of C++ single line comments (`//`) is somewhat inconsist
 
 ## Configuration
 
+The extension comes with two different color schemes, one for dark and one for light Visual Studio themes.
+The appropriate one is automatically selected.
+To this end, the detection of the theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
+
 The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with "DoxyHighlighter".
+Note that Visual Studio stores the settings per color theme.
 
 
 ## Known problems
 - Handling of keywords in `//` comments is inconsistent, as noted above.
-- The extension comes with two different color schemes, for dark and light color themes. However, changing the color theme of Visual Studio does not properly adapt the colors. In principle, [there is code](https://github.com/Sedeniono/VSDoxyHighlighter/blob/846fb0a16e4a67921672bd6db3a35088b26bd159/VSDoxyHighlighter/DefaultColors.cs#L101) that should take care of it, but for reasons currently unknown to me it does not work well. In this case, a workaround is to uninstall and reinstall the extension.
+- The extension comes with two different color schemes, for dark and light color themes. However, changing the color theme of Visual Studio does not properly adapt the colors. In principle, [there is code](https://github.com/Sedeniono/VSDoxyHighlighter/blob/846fb0a16e4a67921672bd6db3a35088b26bd159/VSDoxyHighlighter/DefaultColors.cs#L101) that should take care of it, but for reasons currently unknown to me it does not work well. In this case, a workaround is to uninstall and reinstall the extension after having switched the theme.
 - The extension does not work in VS 2019 or earlier. There is currently no plan to support versions older than VS 2022.
