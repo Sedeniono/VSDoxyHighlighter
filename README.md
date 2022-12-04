@@ -39,8 +39,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 # Installation
 
 Only Visual Studio 2022 and above is supported.
-
-**TODO**
+The latest release can be found [here](https://github.com/Sedeniono/VSDoxyHighlighter/releases): Download the `*.vsix` file and open it to install the extension.
 
 
 
