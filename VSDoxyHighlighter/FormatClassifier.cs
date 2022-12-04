@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
@@ -176,8 +177,6 @@ namespace VSDoxyHighlighter
     /// </summary>
     private List<Span> DecomposeSpanIntoComments(SnapshotSpan spanToCheck)
     {
-      var result = new List<Span>();
-
       // The task is to somehow figure out which parts of the given text represents a comment and which does not.
       // This is something that is absolutely non-trivial in C++:
       //  - Just looking at single lines is by far not sufficient because of multiline comments (/* ... */) and also
@@ -212,22 +211,37 @@ namespace VSDoxyHighlighter
 
       var defaultTagger = FindDefaultVSCppTagger();
       if (defaultTagger != null) {
-        var defaultTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
-        foreach (var tag in defaultTags) {
-          string classification = tag.Tag.ClassificationType.Classification;
-          // Visual Studio currently knows two different comment types: "comment" and "XML Doc Comment".
-          // Note that the strings are independent of the language configured in Visual Studio.
-          if (classification.ToUpper() == "COMMENT" || classification.ToUpper() == "XML DOC COMMENT") {
-            result.Add(tag.Span);
+        try {
+          var defaultTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+          var result = new List<Span>();
+          foreach (var tag in defaultTags) {
+            string classification = tag.Tag.ClassificationType.Classification;
+            // Visual Studio currently knows two different comment types: "comment" and "XML Doc Comment".
+            // Note that the strings are independent of the language configured in Visual Studio.
+            if (classification.ToUpper() == "COMMENT" || classification.ToUpper() == "XML DOC COMMENT") {
+              result.Add(tag.Span);
+            }
           }
+
+          return result;
+        }
+        catch (System.NullReferenceException ex) {
+          // The "defaultTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
+          // and thus has initially no syntax highlighting to a name with a C++ ending (e.g. .cpp). I guess the "defaultTagger"
+          // is not yet initialized completely. The problem vanishes after re-opening the file.
+          // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
+          ActivityLog.LogWarning(
+            "VSDoxyHighlighter",
+            $"The 'defaultTagger' threw a NullReferenceException. Formatting everything. Exception message: {ex.ToString()}");
+          return new List<Span>() { spanToCheck.Span };
         }
       }
       else {
         // Mh, no tagger found? Maybe Microsoft changed their tagger name?
-        result.Add(spanToCheck.Span);
+        // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
+        ActivityLog.LogWarning("VSDoxyHighlighter", "The 'defaultTagger' is null. Formatting everything.");
+        return new List<Span>() { spanToCheck.Span };
       }
-
-      return result;
     }
 
 
