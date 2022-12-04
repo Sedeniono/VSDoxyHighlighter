@@ -53,7 +53,7 @@ Moreover, the treatment of C++ single line comments (`//`) is somewhat inconsist
 
 ## Supported elements of Doxygen
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported.
-- All [special commands](https://www.doxygen.nl/manual/commands.html) of Doxygen <= 1.9.5.
+- [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.9.5) are supported.
 - Parts of markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
 
 

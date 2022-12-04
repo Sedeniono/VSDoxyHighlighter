@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sedenion")]
 [assembly: AssemblyProduct("VSDoxyHighlighter")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Sedenion")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
