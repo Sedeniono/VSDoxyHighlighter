@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("VSDoxyHighlighter")]
-[assembly: AssemblyDescription("Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C++.")]
+[assembly: AssemblyDescription("Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C/C++.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sedenion")]
 [assembly: AssemblyProduct("VSDoxyHighlighter")]
