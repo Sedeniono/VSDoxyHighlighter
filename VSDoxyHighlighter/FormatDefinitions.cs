@@ -36,7 +36,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public WarningKeywordFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Warnings";
+      DisplayName = "DoxyHighlighter - Warning";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -55,7 +55,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Notes";
+      DisplayName = "DoxyHighlighter - Note";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
