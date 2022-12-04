@@ -9,7 +9,7 @@ using static Nerdbank.Streams.MultiplexingStream;
 namespace VSDoxyHighlighter
 {
   /// <summary>
-  /// Known types of formats. The integer values are used as indices into arrays.
+  /// Known types of formats. The integer values are used as indices into arrays, but the order does not matter.
   /// </summary>
   public enum FormatType : uint
   {
@@ -26,7 +26,9 @@ namespace VSDoxyHighlighter
   }
 
 
-  // Represents the format of a single continuous fragment of text.
+  /// <summary>
+  /// Represents the format of a single continuous fragment of text.
+  /// </summary>
   [DebuggerDisplay("StartIndex={StartIndex}, Length={Length}, Type={Type}")]
   public struct FormattedFragment
   {
@@ -84,12 +86,54 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Provides facilities to format the doxygen comments in a piece of source code.
+  /// This implements the main logic to find the fragments that should be formatted. It
+  /// is independent of Visual Studio services, and thus can be easily unit tested.
   /// </summary>
   public class CommentFormatter
   {
     public CommentFormatter()
     {
-      mMatchers = new List<FragmentMatcher>();
+      mMatchers = BuildMatchers();
+    }
+
+    /// <summary>
+    /// Given some code in "text", returns a list of fragments that specifies how the comments
+    /// in the "text" should be formatted.
+    /// NOTE: The logic includes only rudimentary and incomplete checks whether some piece is a 
+    /// comment or not. Therefore, the input "text" should consist of comments. This is true
+    /// when called in Visual Studio, because there we filter out non-comments before calling this
+    /// function. In the automated tests, however, this does not happen; cf. DecomposeSpanIntoComments().
+    /// </summary>
+    /// <param name="text">This whole text is formatted.</param>
+    /// <returns>A list of fragments that point into the given "text" and which should be formatted.
+    /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
+    public SortedSet<FormattedFragment> FormatText(string text)
+    {
+      // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
+      var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
+
+      foreach (var matcher in mMatchers) {
+        var foundMatches = matcher.re.Matches(text);
+        foreach (Match m in foundMatches) {
+          if (1 < m.Groups.Count && m.Groups.Count <= matcher.types.Length + 1) {
+            for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
+              Group group = m.Groups[idx + 1];
+              if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
+                FormatType formatType = (FormatType)matcher.types[idx];
+                result.Add(new FormattedFragment(group.Index, group.Length, formatType));
+              }
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+
+    private List<FragmentMatcher> BuildMatchers()
+    {
+      var matchers = new List<FragmentMatcher>();
 
       // NOTE: The order in which the regexes are created and added here matters!
       // If there is more than one regex matching a certain text fragment, the first one wins.
@@ -101,14 +145,14 @@ namespace VSDoxyHighlighter
 
       // `inline code`
       // Note: Right at the start to overwrite all others.
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.InlineCode)
       });
 
       // Ordinary keyword without highlighted parameter at line start
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
             "brief", "short", "details", "sa", "see", "result", "return", "returns", 
@@ -128,13 +172,13 @@ namespace VSDoxyHighlighter
         types = Tuple.Create(FormatType.Command)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_CodeCommand(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Command)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(new string[] {
             @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
@@ -146,7 +190,7 @@ namespace VSDoxyHighlighter
         types = Tuple.Create(FormatType.Command)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
             @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}",
@@ -156,20 +200,20 @@ namespace VSDoxyHighlighter
         types = Tuple.Create(FormatType.Command)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Command)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_Language(), cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Command)
       });
 
       // Warning
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
           "warning", "raisewarning"
@@ -178,7 +222,7 @@ namespace VSDoxyHighlighter
       });
 
       // Notes
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
           "note", "todo", "attention", "bug", "deprecated"
@@ -187,7 +231,7 @@ namespace VSDoxyHighlighter
       });
 
       // *italic*
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         // https://regex101.com/r/ekhlTW/1
         // (1)  Stuff allowed to precede the first "*". According to the doxygen documentation:
@@ -217,28 +261,28 @@ namespace VSDoxyHighlighter
       });
 
       // **bold**
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMajor)
       });
 
       // _italic_
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMinor)
       });
 
       // __bold__
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.EmphasisMajor)
       });
 
       // ~~strikethrough~~
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         types = Tuple.Create(FormatType.Strikethrough)
@@ -247,7 +291,7 @@ namespace VSDoxyHighlighter
       //----- With one parameter -------
 
       // Keywords with parameter that must be at the start of lines, parameter terminated by whitespace.
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(new string[] {
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
@@ -259,7 +303,7 @@ namespace VSDoxyHighlighter
       });
 
       // Keywords with parameter that must be at the start of lines, parameter stretches till the end of the line.
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
              "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
@@ -275,14 +319,14 @@ namespace VSDoxyHighlighter
       });
 
       // Keywords with optional parameter that must be at the start of lines, parameter stretches till the end of the line.
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "cond"
           }), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.Parameter1)
       });
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
              "par"
@@ -291,7 +335,7 @@ namespace VSDoxyHighlighter
       });
 
       // Keyword with title
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
              "mainpage"
@@ -300,7 +344,7 @@ namespace VSDoxyHighlighter
       });
 
       // Stuff that can be in the middle of lines.
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "p", "c", "anchor", "cite", "link", "refitem", 
@@ -310,14 +354,14 @@ namespace VSDoxyHighlighter
         // since these commands are typically place in running text.
         types = (FormatType.Command, FormatType.Parameter2)
       });
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "a", "e", "em"
           }), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.EmphasisMinor)
       });
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
             "b"
@@ -328,7 +372,7 @@ namespace VSDoxyHighlighter
 
       //----- With up to two parameters -------
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(new string[] {
           "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
@@ -338,7 +382,7 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
           "showdate"
@@ -346,7 +390,7 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(new string[] {
           "ref", "subpage"
@@ -359,7 +403,7 @@ namespace VSDoxyHighlighter
 
       //----- With up to three parameters -------
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
           "category", "class", "interface", "protocol", "struct", "union"
@@ -367,7 +411,7 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
@@ -375,7 +419,7 @@ namespace VSDoxyHighlighter
 
       //----- More parameters -------
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dot", "msc",
@@ -383,7 +427,7 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(new string[] {
           "dotfile", "mscfile", "diafile"
@@ -391,11 +435,13 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.Parameter1, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
 
-      mMatchers.Add(new FragmentMatcher
+      matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_ImageCommand(), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
       });
+
+      return matchers;
     }
 
 
@@ -611,35 +657,6 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}image(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
     }
 
-    /// <summary>
-    /// Computes the way the whole provided text should be formatted.
-    /// </summary>
-    /// <param name="text">This whole text is formatted.</param>
-    /// <returns>A list of fragments that point into the given "text" and which should be formatted.
-    /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
-    public SortedSet<FormattedFragment> FormatText(string text)
-    {
-      // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
-      var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
-
-      foreach (var matcher in mMatchers) {
-        var foundMatches = matcher.re.Matches(text);
-        foreach (Match m in foundMatches) {
-          if (1 < m.Groups.Count && m.Groups.Count <= matcher.types.Length + 1) {
-            for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
-              Group group = m.Groups[idx + 1];
-              if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
-                FormatType formatType = (FormatType)matcher.types[idx];
-                result.Add(new FormattedFragment(group.Index, group.Length, formatType));
-              }
-            }
-          }
-        }
-      }
-
-      return result;
-    }
-
 
     /// <summary>
     /// Comparer that sorts formatted fragments by their position in the text. 
@@ -663,6 +680,10 @@ namespace VSDoxyHighlighter
     }
 
 
+    /// <summary>
+    /// Represents one regex that is used to detect a certain type of doxygen command, together
+    /// with the appropriate formatting (FormatType) for reach captured group in the regex.
+    /// </summary>
     struct FragmentMatcher
     {
       public Regex re { get; set; }

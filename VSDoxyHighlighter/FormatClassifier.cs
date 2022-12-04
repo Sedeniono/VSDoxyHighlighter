@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace VSDoxyHighlighter
 {
-  // Identifiers for the classifications. E.g., Visual Studio uses these strings as keys
+  // Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
   // to store the classification's configuration in the registry.
   public static class IDs
   {
@@ -27,7 +27,9 @@ namespace VSDoxyHighlighter
 
 
 
-
+  /// <summary>
+  /// Tells Visual Studio via MEF about the classifications provided by the extension.
+  /// </summary>
   internal static class TestClassifierClassificationDefinition
   {
 #pragma warning disable 169
@@ -76,10 +78,12 @@ namespace VSDoxyHighlighter
 
 
 
-
+  /// <summary>
+  /// Factory for CommentClassifier. Automatically created and used by MEF.
+  /// </summary>
   [Export(typeof(IClassifierProvider))]
   [ContentType("C/C++")]
-  internal class FormClassifierProvider : IClassifierProvider
+  internal class CommentClassifierProvider : IClassifierProvider
   {
 #pragma warning disable 649
     [Import]
@@ -88,16 +92,21 @@ namespace VSDoxyHighlighter
 
     public IClassifier GetClassifier(ITextBuffer buffer)
     {
-      return buffer.Properties.GetOrCreateSingletonProperty<FormatClassifier>(
-        creator: () => new FormatClassifier(this.classificationRegistry, buffer));
+      return buffer.Properties.GetOrCreateSingletonProperty<CommentClassifier>(
+        creator: () => new CommentClassifier(this.classificationRegistry, buffer));
     }
   }
 
 
-
-  internal class FormatClassifier : IClassifier
+  /// <summary>
+  /// Main "entry" point that is used by Visual Studio to get the format (i.e. classification)
+  /// of some code span. An instance of this class is created by Visual Studio per text buffer
+  /// via CommentClassifierProvider. Visual Studio then calls GetClassificationSpans() to get
+  /// the classification.
+  /// </summary>
+  internal class CommentClassifier : IClassifier
   {
-    internal FormatClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
+    internal CommentClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
     {
       mTextBuffer = textBuffer;
       mFormater = new CommentFormatter();
@@ -165,7 +174,7 @@ namespace VSDoxyHighlighter
     /// I.e. it filters out all text in the given span that is NOT within a comment, and returns the remaining
     /// parts as list.
     /// </summary>
-    List<Span> DecomposeSpanIntoComments(SnapshotSpan spanToCheck)
+    private List<Span> DecomposeSpanIntoComments(SnapshotSpan spanToCheck)
     {
       var result = new List<Span>();
 
@@ -207,6 +216,7 @@ namespace VSDoxyHighlighter
         foreach (var tag in defaultTags) {
           string classification = tag.Tag.ClassificationType.Classification;
           // Visual Studio currently knows two different comment types: "comment" and "XML Doc Comment".
+          // Note that the strings are independent of the language configured in Visual Studio.
           if (classification.ToUpper() == "COMMENT" || classification.ToUpper() == "XML DOC COMMENT") {
             result.Add(tag.Span);
           }
