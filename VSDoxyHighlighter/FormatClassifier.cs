@@ -180,20 +180,22 @@ namespace VSDoxyHighlighter
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
       List<CommentSpan> commentSpans = DecomposeSpanIntoComments(originalSpanToCheck);
-
+      
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
-        string codeText = textSnapshot.GetText(commentSpan.span);
+        if (ApplyHighlightingToCommentType(commentSpan.commentType)) {
+          string codeText = textSnapshot.GetText(commentSpan.span);
 
-        // Scan the given text for keywords and get the proper formatting for it.
-        var fragmentsToFormat = mFormater.FormatText(codeText);
+          // Scan the given text for keywords and get the proper formatting for it.
+          var fragmentsToFormat = mFormater.FormatText(codeText);
 
-        // Convert the list of fragments that should be formatted to Visual Studio types.
-        foreach (FormattedFragment fragment in fragmentsToFormat) {
-          IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
-          var spanToFormat = new Span(commentSpan.span.Start + fragment.StartIndex, fragment.Length);
-          result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, spanToFormat), classificationType));
+          // Convert the list of fragments that should be formatted to Visual Studio types.
+          foreach (FormattedFragment fragment in fragmentsToFormat) {
+            IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
+            var spanToFormat = new Span(commentSpan.span.Start + fragment.StartIndex, fragment.Length);
+            result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, spanToFormat), classificationType));
+          }
         }
 #else
         IClassificationType classificationType = mFormatTypeToClassificationType[(uint)cCommentTypeDebugFormats[commentSpan.commentType]];
@@ -202,6 +204,20 @@ namespace VSDoxyHighlighter
       }
 
       return result;
+    }
+
+
+    private bool ApplyHighlightingToCommentType(CommentType type) 
+    {
+      switch (type) {
+        case CommentType.SlashStarStar:
+        case CommentType.SlashStarExclamation:
+        case CommentType.TripleSlash:
+        case CommentType.DoubleSlashExclamation:
+          return true;
+        default:
+          return false;
+      }
     }
 
 
