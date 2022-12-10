@@ -1,7 +1,7 @@
 ﻿// If this is enabled, we disable the doxygen highlighting and instead highlight
 // the various comment types ("//", "///", "/*", etc.). This allows easier debugging
 // of the logic to detect the comment types.
-//#define ENABLE_COMMENT_TYPE_DEBUGGING
+#define ENABLE_COMMENT_TYPE_DEBUGGING
 
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
@@ -184,6 +184,7 @@ namespace VSDoxyHighlighter
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
+        Debug.Assert(commentSpan.commentType != CommentType.Unknown);
         if (ApplyHighlightingToCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
 
@@ -337,7 +338,7 @@ namespace VSDoxyHighlighter
         IEnumerable<ITagSpan<IClassificationTag>> tags,
         int indexOfCommentTagToIdentify)
     {
-      int commentStartIndexInSnapshot = FindCommentStart(tags, indexOfCommentTagToIdentify);
+      int commentStartIndexInSnapshot = FindCommentStart_NonRecursive(tags, indexOfCommentTagToIdentify);
       return IdentifyTypeOfCommentStartingAt(textSnapshot, commentStartIndexInSnapshot);
     }
 
@@ -369,7 +370,6 @@ namespace VSDoxyHighlighter
         return CommentType.SlashStar;
       }
       else {
-        Debug.Assert(false);
         return CommentType.Unknown;
       }
     }
@@ -498,6 +498,130 @@ namespace VSDoxyHighlighter
       }
         
       return earlierCommentStartCharIdx;
+    }
+
+
+    struct LineInfo 
+    {
+      public int currentCommentStartCharIdx;
+      public IEnumerable<ITagSpan<IClassificationTag>> currentTags;
+      public int currentIndexOfComment;
+
+      public LineInfo(int currentCommentStartCharIdx_) 
+      {
+        currentCommentStartCharIdx = currentCommentStartCharIdx_;
+        currentTags = null;
+        currentIndexOfComment = -1;
+      }
+
+      public LineInfo(int currentCommentStartCharIdx_, IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
+      {
+        currentCommentStartCharIdx = currentCommentStartCharIdx_;
+        currentTags = currentTags_;
+        currentIndexOfComment = currentIndexOfComment_;
+      }
+    }
+
+
+    private int FindCommentStart_NonRecursive(
+        IEnumerable<ITagSpan<IClassificationTag>> inputTags,
+        int indexOfComment)
+    {
+      var inputCommentTag = inputTags.ElementAt(indexOfComment);
+      Debug.Assert(IsVSComment(inputCommentTag));
+
+      var textSnapshot = inputCommentTag.Span.Snapshot;
+
+      // From first to last elements, we go BACKWARD in the text buffer.
+      Stack<LineInfo> linesInReverseOrder = new Stack<LineInfo>();
+
+      // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
+      while (true) {
+        (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
+          = FindCommentStart_HandleCurrentLine(inputTags, indexOfComment);
+        linesInReverseOrder.Push(new LineInfo(commentStartCharIdx, inputTags, indexOfComment));
+        if (foundStart) {
+          break;
+        }
+
+        inputTags = nextTags;
+        indexOfComment = nextIndexOfComment;
+      }
+
+      // Now loop forward again through the lines that we considered, and check whether 
+      LineInfo curLine = linesInReverseOrder.Pop();
+      int earlierCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+      while (linesInReverseOrder.Count() > 0) {
+        CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
+        string curLineText = curLine.currentTags.ElementAt(curLine.currentIndexOfComment).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
+        if (IsCCommentType(earlierCommentStartType) && curLineText.EndsWith("*/")) {
+          earlierCommentStartCharIdx = linesInReverseOrder.Peek().currentCommentStartCharIdx;
+        }
+        else if (IsCppCommentType(earlierCommentStartType) && !curLineText.EndsWith("\\")) {
+          earlierCommentStartCharIdx = linesInReverseOrder.Peek().currentCommentStartCharIdx;
+        }
+
+        curLine = linesInReverseOrder.Pop();
+      }
+
+      Debug.Assert(earlierCommentStartCharIdx >= 0);
+      return earlierCommentStartCharIdx;
+    }
+
+
+    private (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
+      FindCommentStart_HandleCurrentLine(
+        IEnumerable<ITagSpan<IClassificationTag>> inputTags,
+        int indexOfComment)
+    {
+      var inputCommentTag = inputTags.ElementAt(indexOfComment);
+      Debug.Assert(IsVSComment(inputCommentTag));
+
+      var textSnapshot = inputCommentTag.Span.Snapshot;
+
+      // Backtrack: Find previous character that is not a newline.
+      (int charIdxBeforeComment, int numSkippedNewlines) = FindRelevantCharacterIndexBefore(textSnapshot, inputCommentTag.Span.Start);
+      if (charIdxBeforeComment < 0) {
+        // Reached the start of the document without finding a non-newline character
+        // --> The input comment is "complete", i.e. the comment starts at its beginning.
+        return (true, inputCommentTag.Span.Start, null, -1);
+      }
+
+      // charIdxBeforeComment now points to a non-newline character before the start of the comment.
+      // Classify it. Note that the vsCppTagger seems to always return the classifications for the whole line, even if
+      // given just a single character. But to be on the safe side, and because we need to classification of the whole
+      // line further down, we give it the whole line right here.
+      var defaultTagger = FindDefaultVSCppTagger();
+      ITextSnapshotLine wholeLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
+      var lineTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, wholeLine.Extent.Span));
+      if (lineTags.Count() <= 0) {
+        // The default tagger e.g. does not return any tags if a line contains only whitespace that is outside of a comment.
+        return (true, inputCommentTag.Span.Start, null, -1);
+      }
+
+      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingIndex(lineTags, charIdxBeforeComment);
+      if (indexOfPreviousCommentTag < 0) {
+        // The relevant character before the input comment is not a comment
+        // --> The input comment is "complete", i.e. the comment starts at its beginning.
+        return (true, inputCommentTag.Span.Start, null, -1);
+      }
+
+      if (charIdxBeforeComment >= 1 && textSnapshot.GetText(charIdxBeforeComment - 1, 2) == "*/") {
+        // For example: "/*foo1*//*foo2*/"
+        // The default tagger already produces separate tags for the two C-style comments. Assume we started
+        // with "/*foo2*/", and charIdxBeforeComment now points to the second "/" in the string (which closes the first comment).
+        // So if [charIdxBeforeComment-1,charIdxBeforeComment] == "*/", then the input comment is "complete".
+        return (true, inputCommentTag.Span.Start, null, -1);
+      }
+
+      // The only way how we came that far, should have been if we backtracked to a previous line.
+      // If we didn't, something is fishy. Give up to prevent infinite recursion.
+      if (numSkippedNewlines == 0) {
+        Debug.Assert(false);
+        return (true, inputCommentTag.Span.Start, null, -1);
+      }
+
+      return (false, inputCommentTag.Span.Start, lineTags, indexOfPreviousCommentTag);
     }
 
 
