@@ -74,6 +74,10 @@ To this end, the detection of the theme is not coupled to the name of the theme.
 The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with "DoxyHighlighter".
 Note that Visual Studio stores the settings per color theme.
 
+One thing that you might realize is that the color of ordinary text in "`///`"-comments is different to the color in other comments.
+This has nothing to do with the extension. Visual Studio classifies "`///`"-comments as "XML Doc Comment" and formats them differently by default.
+You can change the color in the "Fonts and Colors" settings.
+
 
 ## Known problems
 - Handling of keywords in `//` comments is inconsistent, as noted above.
