@@ -1,4 +1,9 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿// If this is enabled, we disable the doxygen highlighting and instead highlight
+// the various comment types ("//", "///", "/*", etc.). This allows easier debugging
+// of the logic to detect the comment types.
+//#define ENABLE_COMMENT_TYPE_DEBUGGING
+
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using System;
 using System.Collections.Generic;
@@ -108,6 +113,30 @@ namespace VSDoxyHighlighter
   /// </summary>
   internal class CommentClassifier : IClassifier
   {
+    private struct CommentSpan
+    {
+      public Span span;
+      public CommentType commentType;
+
+      public CommentSpan(Span span_, CommentType commentType_)
+      {
+        span = span_;
+        commentType = commentType_;
+      }
+    }
+
+    private enum CommentType
+    {
+      TripleSlash, // "///"
+      DoubleSlashExclamation, // "//!"
+      DoubleSlash, // "//", followed by anything except "/" or "!"
+      SlashStarStar, // "/**"
+      SlashStarExclamation, // "/*!"
+      SlashStar, // "/*", followed by anything except "*" or "!"
+      Unknown // Something went wrong
+    }
+
+
     internal CommentClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
     {
       mTextBuffer = textBuffer;
@@ -154,11 +183,7 @@ namespace VSDoxyHighlighter
 
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
-        if (!originalSpanToCheck.Span.OverlapsWith(commentSpan.span)) {
-          continue;
-        }
-
-#if true
+#if !ENABLE_COMMENT_TYPE_DEBUGGING
         string codeText = textSnapshot.GetText(commentSpan.span);
 
         // Scan the given text for keywords and get the proper formatting for it.
@@ -179,28 +204,6 @@ namespace VSDoxyHighlighter
       return result;
     }
 
-
-    static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {
-      { CommentType.TripleSlash, FormatType.Command },
-      { CommentType.DoubleSlashExclamation, FormatType.Parameter1 },
-      { CommentType.DoubleSlash, FormatType.Title },
-      { CommentType.SlashStarStar, FormatType.EmphasisMinor },
-      { CommentType.SlashStarExclamation, FormatType.Note },
-      { CommentType.SlashStar, FormatType.InlineCode },
-      { CommentType.Unknown, FormatType.Warning },
-    };
-
-    struct CommentSpan
-    {
-      public Span span;
-      public CommentType commentType;
-
-      public CommentSpan(Span span_, CommentType commentType_) 
-      {
-        span = span_;
-        commentType = commentType_;
-      }
-    }
 
     /// <summary>
     /// Decomposes the given snapshot spans such that only a list of spans is returned that are all comments.
@@ -241,37 +244,39 @@ namespace VSDoxyHighlighter
       //     warning in a future Visual Studio. But the alternative to re-implement the classification logic seems even more
       //     ridiculous.
 
-      var defaultTagger = FindDefaultVSCppTagger();
-      if (defaultTagger != null) {
-        IEnumerable<ITagSpan<IClassificationTag>> defaultTags = null;
+      var vsCppTagger = FindDefaultVSCppTagger();
+      if (vsCppTagger != null) {
+        IEnumerable<ITagSpan<IClassificationTag>> vsCppTags = null;
         try {
-          defaultTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+          vsCppTags = vsCppTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
         }
         catch (System.NullReferenceException ex) {
-          // The "defaultTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
-          // and thus has initially no syntax highlighting to a name with a C++ ending (e.g. .cpp). I guess the "defaultTagger"
+          // The "vsCppTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
+          // (and thus has initially no syntax highlighting) to a name with a C++ ending (e.g. .cpp). I guess the "vsCppTagger"
           // is not yet initialized completely. The problem vanishes after re-opening the file.
           // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
           ActivityLog.LogWarning(
             "VSDoxyHighlighter",
-            $"The 'defaultTagger' threw a NullReferenceException. Formatting everything. Exception message: {ex.ToString()}");
+            $"The 'vsCppTagger' threw a NullReferenceException. Exception message: {ex.ToString()}");
           return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
         }
 
         //System.Diagnostics.Debug.WriteLine("For: " + spanToCheck.GetText().Replace("\r\n", "\\n"));
         var result = new List<CommentSpan>();
-        int tagCount = defaultTags.Count();
+        int tagCount = vsCppTags.Count();
         for (int tagIndex = 0; tagIndex < tagCount; ++tagIndex) {
-          var tag = defaultTags.ElementAt(tagIndex);
-          if (IsComment(tag)) {
-            CommentType type = IdentifyCommentType(spanToCheck.Snapshot, defaultTagger, defaultTags, tagIndex);
-            result.Add(new CommentSpan(tag.Span, type));
-            //System.Diagnostics.Debug.WriteLine(
-            //  "\t'" + tag.Span.GetText().Replace("\r\n", "\\n") 
-            //  + "' ==> " + tag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
+          var vsTag = vsCppTags.ElementAt(tagIndex);
+          if (!spanToCheck.Span.OverlapsWith(vsTag.Span)) {
+            continue;
+          }
+
+          if (IsVSComment(vsTag)) {
+            CommentType type = IdentifyCommentType(spanToCheck.Snapshot, vsCppTags, tagIndex);
+            result.Add(new CommentSpan(vsTag.Span, type));
+            //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
           }
           //else {
-          //  System.Diagnostics.Debug.WriteLine("\t'" + tag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + tag.Tag.ClassificationType.Classification);
+          //  System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification);
           //}
         }
 
@@ -280,15 +285,18 @@ namespace VSDoxyHighlighter
       else {
         // Mh, no tagger found? Maybe Microsoft changed their tagger name?
         // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
-        ActivityLog.LogWarning("VSDoxyHighlighter", "The 'defaultTagger' is null. Formatting everything.");
+        ActivityLog.LogWarning("VSDoxyHighlighter", "The 'vsCppTagger' is null.");
         return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
       }
     }
 
 
-    private bool IsComment(ITagSpan<IClassificationTag> tag)
+    /// <summary>
+    /// Returns true if the given vsTag corresponds to one of the tags used by Visual Studio for comments.
+    /// </summary>
+    private bool IsVSComment(ITagSpan<IClassificationTag> vsTag)
     {
-      string classification = tag.Tag.ClassificationType.Classification;
+      string classification = vsTag.Tag.ClassificationType.Classification;
       // Visual Studio currently knows two different comment types: "comment" and "XML Doc Comment".
       // Note that the strings are independent of the language configured in Visual Studio.
       if (classification.ToUpper() == "COMMENT" || classification.ToUpper() == "XML DOC COMMENT") {
@@ -299,26 +307,24 @@ namespace VSDoxyHighlighter
       }
     }
 
-    enum CommentType
-    {
-      TripleSlash, // "///"
-      DoubleSlashExclamation, // "//!"
-      DoubleSlash, // "//", followed by anything except "/" or "!"
-      SlashStarStar, // "/**"
-      SlashStarExclamation, // "/*!"
-      SlashStar, // "/*", followed by anything except "*" or "!"
-      Unknown // Something went wrong
-    }
 
+    /// <summary>
+    /// Given a specific tag that corresponds to a comment as classified by Visual Studio, returns the 
+    /// type of that comment ("//", "///", "/*", etc).
+    /// The tag that gets identified is in `tags.ElementAt(indexOfCommentTagToIdentify)`.
+    /// The remaining elements in <paramref name="tags"/> needs to be the tags for the remaining part
+    /// of the line; these are expected since the caller of this function actually nows them already,
+    /// so getting them again is unecessary.
+    /// </summary>
     private CommentType IdentifyCommentType(
         ITextSnapshot textSnapshot,
-        ITagger<IClassificationTag> defaultTagger,
         IEnumerable<ITagSpan<IClassificationTag>> tags,
         int indexOfCommentTagToIdentify)
     {
-      int commentStartIndexInSnapshot = FindCommentStart(defaultTagger, tags, indexOfCommentTagToIdentify);
+      int commentStartIndexInSnapshot = FindCommentStart(tags, indexOfCommentTagToIdentify);
       return IdentifyTypeOfCommentStartingAt(textSnapshot, commentStartIndexInSnapshot);
     }
+
 
     private CommentType IdentifyTypeOfCommentStartingAt(ITextSnapshot textSnapshot, int startOfCommentCharIndex) 
     {
@@ -366,6 +372,7 @@ namespace VSDoxyHighlighter
       }
     }
 
+
     private bool IsCCommentType(CommentType type)
     {
       switch (type) {
@@ -380,59 +387,17 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Given the tags from the Visual Studio tagger, returns the index of that tag which covers the given
-    // character index and which represents a comment. Returns -1 if charIdxBeforeComment does not point to a comment.
-    // A value of charIdxBeforeComment=0 means the start of the text document.
-    private int TryFindIndexOfCommentTagContainingIndex(IEnumerable<ITagSpan<IClassificationTag>> tags, int charIdx) 
-    {
-      // We loop backward since comments tend to be at the end of lines after code (if there is any code).
-      // 
-      // There might be several tags associated with the charIdxBeforeComment. For example, for XML comments, there is one tag for the whole
-      // comment and then individual parts for the special highlights of e.g. XML parameters. IsComment() ignores all those
-      // special highlights.
-
-      int indexOfCommentTagInLine = tags.Count() - 1;
-      while (indexOfCommentTagInLine >= 0) {
-        var curElem = tags.ElementAt(indexOfCommentTagInLine);
-        if (curElem.Span.Contains(charIdx) && IsComment(curElem)) {
-          return indexOfCommentTagInLine;
-        }
-        --indexOfCommentTagInLine;
-      }
-
-      return -1;
-    }
-
-    // Starting at startIndex-1, goes backward through the text until a non-newline character is found.
-    // Returns the index of that character. Returns -1 if there is none.
-    private (int charIdx, int numSkippedNewlines) FindRelevantCharacterIndexBefore(ITextSnapshot textSnapshot, int startIndex)
-    {
-      int charIdx = startIndex - 1;
-      int numSkippedNewlines = 0;
-      while (charIdx >= 0) {
-        string curChar = textSnapshot.GetText(charIdx, 1);
-        if (curChar != "\n" && curChar != "\r") {
-          break;
-        }
-        if (curChar == "\n") {
-          ++numSkippedNewlines;
-        }
-        --charIdx;
-      }
-
-      return (charIdx, numSkippedNewlines);
-    }
-
-    // Given the tags "inputTags" of some line and the index to a comment tag in this "inputTags",
-    // returns the character index where the comment actually starts in the text snapshot.
-    // A return value of 0 means the beginning of the file.
+    /// <summary>
+    /// Given the tags "inputTags" of some line and the index to a comment in this "inputTags",
+    /// returns the character index where the comment actually starts in the text snapshot.
+    /// A return value of 0 means the beginning of the file.
+    /// </summary>
     private int FindCommentStart(
-        ITagger<IClassificationTag> defaultTagger,
         IEnumerable<ITagSpan<IClassificationTag>> inputTags,
         int indexOfComment)
     {
       var inputCommentTag = inputTags.ElementAt(indexOfComment);
-      Debug.Assert(IsComment(inputCommentTag));
+      Debug.Assert(IsVSComment(inputCommentTag));
 
       var textSnapshot = inputCommentTag.Span.Snapshot;
 
@@ -445,9 +410,10 @@ namespace VSDoxyHighlighter
       }
 
       // charIdxBeforeComment now points to a non-newline character before the start of the comment.
-      // Classify it. Note that the defaultTagger seems to always return the classifications for the whole line, even if
+      // Classify it. Note that the vsCppTagger seems to always return the classifications for the whole line, even if
       // given just a single character. But to be on the safe side, and because we need to classification of the whole
       // line further down, we give it the whole line right here.
+      var defaultTagger = FindDefaultVSCppTagger();
       ITextSnapshotLine wholeLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
       var lineTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, wholeLine.Extent.Span));
       if (lineTags.Count() <= 0) {
@@ -480,7 +446,7 @@ namespace VSDoxyHighlighter
 
       // We did not detect the comment for sure so far. There are only newline characters between the inputCommentTag and the previous comment.
       // Thus, since numSkippedNewlines>0 at this point here, we are looking at the previous lines now.
-      int earlierCommentStartCharIdx = FindCommentStart(defaultTagger, lineTags, indexOfPreviousCommentTag);
+      int earlierCommentStartCharIdx = FindCommentStart(lineTags, indexOfPreviousCommentTag);
       CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
       string earlierCommentText = lineTags.ElementAt(indexOfPreviousCommentTag).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
       
@@ -519,6 +485,53 @@ namespace VSDoxyHighlighter
     }
 
 
+    // Given the tags from the Visual Studio tagger, returns the index of that tag which contains the given
+    // character index and which represents a comment. Returns -1 if charIdxBeforeComment does not point to a comment.
+    // A value of charIdxBeforeComment=0 means the start of the text document.
+    private int TryFindIndexOfCommentTagContainingIndex(IEnumerable<ITagSpan<IClassificationTag>> tags, int charIdx)
+    {
+      // We loop backward since comments tend to be at the end of lines after code (if there is any code).
+      // 
+      // There might be several tags associated with the charIdxBeforeComment. For example, for XML comments, there is one tag for the whole
+      // comment and then individual parts for the special highlights of e.g. XML parameters. IsVSComment() ignores all those
+      // special highlights.
+
+      int indexOfCommentTagInLine = tags.Count() - 1;
+      while (indexOfCommentTagInLine >= 0) {
+        var curElem = tags.ElementAt(indexOfCommentTagInLine);
+        if (curElem.Span.Contains(charIdx) && IsVSComment(curElem)) {
+          return indexOfCommentTagInLine;
+        }
+        --indexOfCommentTagInLine;
+      }
+
+      return -1;
+    }
+
+
+    // Starting at startIndex-1, goes backward through the text until a non-newline character is found.
+    // Returns the index of that character. Returns -1 if there is none.
+    private (int charIdx, int numSkippedNewlines) FindRelevantCharacterIndexBefore(ITextSnapshot textSnapshot, int startIndex)
+    {
+      int charIdx = startIndex - 1;
+      int numSkippedNewlines = 0;
+      while (charIdx >= 0) {
+        string curChar = textSnapshot.GetText(charIdx, 1);
+        if (curChar != "\n" && curChar != "\r") {
+          break;
+        }
+        if (curChar == "\n") {
+          ++numSkippedNewlines;
+        }
+        --charIdx;
+      }
+
+      return (charIdx, numSkippedNewlines);
+    }
+
+
+    // Retrives the tagger of Visual Studio that is responsible for classifying C++ code.
+    // See comment in DecomposeSpanIntoComments().
     private ITagger<IClassificationTag> FindDefaultVSCppTagger()
     {
       if (mDefaultCppTagger == null) {
@@ -542,6 +555,18 @@ namespace VSDoxyHighlighter
     private readonly IClassificationType[] mFormatTypeToClassificationType;
 
     private ITagger<IClassificationTag> mDefaultCppTagger = null;
+
+#if ENABLE_COMMENT_TYPE_DEBUGGING
+    static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {
+      { CommentType.TripleSlash, FormatType.Command },
+      { CommentType.DoubleSlashExclamation, FormatType.Parameter1 },
+      { CommentType.DoubleSlash, FormatType.Title },
+      { CommentType.SlashStarStar, FormatType.EmphasisMinor },
+      { CommentType.SlashStarExclamation, FormatType.Note },
+      { CommentType.SlashStar, FormatType.InlineCode },
+      { CommentType.Unknown, FormatType.Warning },
+    };
+#endif
   }
 
 }
