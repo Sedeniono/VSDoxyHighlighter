@@ -168,6 +168,8 @@ namespace VSDoxyHighlighter
 #pragma warning restore 67
 
 
+    int counter = 0;
+
     /// <summary>
     /// Called by Visual Studio when the given text span needs to be classified (i.e. formatted).
     /// Thus, this function searches for words to which apply syntax highlighting, and for each one 
@@ -178,6 +180,9 @@ namespace VSDoxyHighlighter
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
     {
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
+
+      counter++;
+      System.Diagnostics.Debug.WriteLine($"Version={textSnapshot.Version.VersionNumber}, Line={textSnapshot.GetLineNumberFromPosition(originalSpanToCheck.Span.Start)}, counter={counter}");
 
       List<CommentSpan> commentSpans = DecomposeSpanIntoComments(originalSpanToCheck);
       
@@ -548,17 +553,24 @@ namespace VSDoxyHighlighter
         indexOfComment = nextIndexOfComment;
       }
 
-      // Now loop forward again through the lines that we considered, and check whether 
+      // Now loop forward again through the lines that we considered, and check whether we actually missed the
+      // end of comment. Figuring this out depends on the top-most comment style.
       LineInfo curLine = linesInReverseOrder.Pop();
       int earlierCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+      CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
+
       while (linesInReverseOrder.Count() > 0) {
-        CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
-        string curLineText = curLine.currentTags.ElementAt(curLine.currentIndexOfComment).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
-        if (IsCCommentType(earlierCommentStartType) && curLineText.EndsWith("*/")) {
-          earlierCommentStartCharIdx = linesInReverseOrder.Peek().currentCommentStartCharIdx;
+        bool moveEarlierCommentStart = false;
+        if (IsCCommentType(earlierCommentStartType) && GetTextOfCommentInLine(curLine).EndsWith("*/")) {
+          moveEarlierCommentStart = true;
         }
-        else if (IsCppCommentType(earlierCommentStartType) && !curLineText.EndsWith("\\")) {
+        else if (IsCppCommentType(earlierCommentStartType) && !GetTextOfCommentInLine(curLine).EndsWith("\\")) {
+          moveEarlierCommentStart = true;
+        }
+
+        if (moveEarlierCommentStart) {
           earlierCommentStartCharIdx = linesInReverseOrder.Peek().currentCommentStartCharIdx;
+          earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
         }
 
         curLine = linesInReverseOrder.Pop();
@@ -568,6 +580,11 @@ namespace VSDoxyHighlighter
       return earlierCommentStartCharIdx;
     }
 
+
+    private string GetTextOfCommentInLine(LineInfo info)
+    {
+      return info.currentTags.ElementAt(info.currentIndexOfComment).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
+    }
 
     private (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
       FindCommentStart_HandleCurrentLine(
