@@ -1,7 +1,7 @@
 ﻿// If this is enabled, we disable the doxygen highlighting and instead highlight
 // the various comment types ("//", "///", "/*", etc.). This allows easier debugging
 // of the logic to detect the comment types.
-#define ENABLE_COMMENT_TYPE_DEBUGGING
+//#define ENABLE_COMMENT_TYPE_DEBUGGING
 
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
