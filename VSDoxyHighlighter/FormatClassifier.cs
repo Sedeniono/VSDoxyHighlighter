@@ -274,12 +274,13 @@ namespace VSDoxyHighlighter
         }
         catch (System.NullReferenceException ex) {
           // The "vsCppTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
-          // (and thus has initially no syntax highlighting) to a name with a C++ ending (e.g. .cpp). I guess the "vsCppTagger"
-          // is not yet initialized completely. The problem vanishes after re-opening the file.
-          // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
+          // (and thus has initially no syntax highlighting) to a name with a C++ ending (e.g. .cpp). I think the tagger that
+          // we find for the very first classification is the wrong one, or something like that. The problem vanishes when we
+          // search the default tagger again when a re-classification gets triggered a bit later.
           ActivityLog.LogWarning(
             "VSDoxyHighlighter",
             $"The 'vsCppTagger' threw a NullReferenceException. Exception message: {ex.ToString()}");
+          mDefaultVSCppTagger = null;
           return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
         }
 
@@ -306,7 +307,6 @@ namespace VSDoxyHighlighter
       }
       else {
         // Mh, no tagger found? Maybe Microsoft changed their tagger name?
-        // Simply return the whole span to format; it might lead to some false positives, but as far as I know not too many.
         ActivityLog.LogWarning("VSDoxyHighlighter", "The 'vsCppTagger' is null.");
         return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
       }
