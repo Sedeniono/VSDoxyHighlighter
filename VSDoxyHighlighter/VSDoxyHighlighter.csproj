@@ -54,6 +54,7 @@
     <Compile Include="FormatClassifier.cs" />
     <Compile Include="FormatDefinitions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpanSplitter.cs" />
     <Compile Include="VSDoxyHighlighterPackage.cs" />
   </ItemGroup>
   <ItemGroup>
