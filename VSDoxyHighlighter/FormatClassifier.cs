@@ -511,24 +511,10 @@ namespace VSDoxyHighlighter
     private struct CommentFragmentInLine 
     {
       // The character index (0 means start of file) of the comment's start.
-      public int fragmentStartCharIdx;
+      public int fragmentStartCharIdx { get { return currentTags.ElementAt(tagIndex).Span.Start; } }
 
-      // The tags associated with the whole line, as classified by the Visual Studio default tagger.
-      public IEnumerable<ITagSpan<IClassificationTag>> currentTags;
-
-      // The index into "currentTags" that contains the considered comment.
-      public int tagIndex;
-
-      public CommentFragmentInLine(int currentCommentStartCharIdx_) 
+      public CommentFragmentInLine(IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
       {
-        fragmentStartCharIdx = currentCommentStartCharIdx_;
-        currentTags = null;
-        tagIndex = -1;
-      }
-
-      public CommentFragmentInLine(int currentCommentStartCharIdx_, IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
-      {
-        fragmentStartCharIdx = currentCommentStartCharIdx_;
         currentTags = currentTags_;
         tagIndex = currentIndexOfComment_;
       }
@@ -537,6 +523,12 @@ namespace VSDoxyHighlighter
       {
         return currentTags.ElementAt(tagIndex).Span.GetText().TrimEnd(cNewlineChars);
       }
+
+      // The tags associated with the whole line, as classified by the Visual Studio default tagger.
+      private IEnumerable<ITagSpan<IClassificationTag>> currentTags;
+
+      // The index into "currentTags" that contains the considered comment.
+      private int tagIndex;
 
       private static readonly char[] cNewlineChars = new char[] { '\n', '\r' };
     }
@@ -563,9 +555,10 @@ namespace VSDoxyHighlighter
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
       while (true) {
+        // TODO: Don't return commentStartCharIdx; that is not necessary.
         (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
           = FindCommentStart_HandleCurrentLine(inputTags, indexOfComment);
-        fragmentsInReverseOrder.Push(new CommentFragmentInLine(commentStartCharIdx, inputTags, indexOfComment));
+        fragmentsInReverseOrder.Push(new CommentFragmentInLine(inputTags, indexOfComment));
         if (foundStart) {
           // TODO: Optimize for the case that we have not looped. Can return immediately.
           break;
