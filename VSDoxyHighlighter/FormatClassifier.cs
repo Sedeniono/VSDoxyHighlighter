@@ -508,28 +508,37 @@ namespace VSDoxyHighlighter
     }
 
 
-    struct LineInfo 
+    private struct CommentFragmentInLine 
     {
-      public int currentCommentStartCharIdx;
+      // The character index (0 means start of file) of the comment's start.
+      public int fragmentStartCharIdx;
 
       // The tags associated with the whole line, as classified by the Visual Studio default tagger.
       public IEnumerable<ITagSpan<IClassificationTag>> currentTags;
 
-      public int currentIndexOfComment;
+      // The index into "currentTags" that contains the considered comment.
+      public int tagIndex;
 
-      public LineInfo(int currentCommentStartCharIdx_) 
+      public CommentFragmentInLine(int currentCommentStartCharIdx_) 
       {
-        currentCommentStartCharIdx = currentCommentStartCharIdx_;
+        fragmentStartCharIdx = currentCommentStartCharIdx_;
         currentTags = null;
-        currentIndexOfComment = -1;
+        tagIndex = -1;
       }
 
-      public LineInfo(int currentCommentStartCharIdx_, IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
+      public CommentFragmentInLine(int currentCommentStartCharIdx_, IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
       {
-        currentCommentStartCharIdx = currentCommentStartCharIdx_;
+        fragmentStartCharIdx = currentCommentStartCharIdx_;
         currentTags = currentTags_;
-        currentIndexOfComment = currentIndexOfComment_;
+        tagIndex = currentIndexOfComment_;
       }
+
+      public string GetTextTrimmed()
+      {
+        return currentTags.ElementAt(tagIndex).Span.GetText().TrimEnd(cNewlineChars);
+      }
+
+      private static readonly char[] cNewlineChars = new char[] { '\n', '\r' };
     }
 
 
@@ -549,14 +558,14 @@ namespace VSDoxyHighlighter
       }
 
       // From first to last elements, we go BACKWARD in the text buffer.
-      Stack<LineInfo> linesInReverseOrder = new Stack<LineInfo>();
+      Stack<CommentFragmentInLine> fragmentsInReverseOrder = new Stack<CommentFragmentInLine>();
       CommentType foundCacheElement = CommentType.Unknown;
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
       while (true) {
         (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
           = FindCommentStart_HandleCurrentLine(inputTags, indexOfComment);
-        linesInReverseOrder.Push(new LineInfo(commentStartCharIdx, inputTags, indexOfComment));
+        fragmentsInReverseOrder.Push(new CommentFragmentInLine(commentStartCharIdx, inputTags, indexOfComment));
         if (foundStart) {
           // TODO: Optimize for the case that we have not looped. Can return immediately.
           break;
@@ -575,45 +584,44 @@ namespace VSDoxyHighlighter
 
       // Now loop forward again through the lines that we considered, and check whether we actually missed the
       // end of comment. Figuring this out depends on the top-most comment style.
-      LineInfo curLine = linesInReverseOrder.Pop();
-      int curCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+      CommentFragmentInLine curFragment = fragmentsInReverseOrder.Pop();
+      int curCommentStartCharIdx = curFragment.fragmentStartCharIdx;
       CommentType curCommentType =
         (foundCacheElement == CommentType.Unknown) 
         ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
         : foundCacheElement;
       Debug.Assert(curCommentType != CommentType.Unknown);
 
-      while (linesInReverseOrder.Count() > 0) {
+      while (fragmentsInReverseOrder.Count() > 0) {
         Debug.Assert(curCommentType != CommentType.Unknown);
-        mCommentTypeCache[curLine.currentCommentStartCharIdx] = curCommentType;
+        mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
 
-        bool curCommentTerminates = IsCommentEndingInLine(curCommentType, curLine);
-        curLine = linesInReverseOrder.Pop(); // Go to the next line
+        bool curCommentTerminates = IsCommentFragmentTerminated(curCommentType, curFragment);
+        curFragment = fragmentsInReverseOrder.Pop(); // Go to the next line
 
         if (curCommentTerminates) {
-          curCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+          curCommentStartCharIdx = curFragment.fragmentStartCharIdx;
           curCommentType = IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx);
         }
       }
 
       Debug.Assert(curCommentType != CommentType.Unknown);
-      mCommentTypeCache[curLine.currentCommentStartCharIdx] = curCommentType;
+      mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
 
       Debug.Assert(curCommentStartCharIdx >= 0);
-      //return curCommentStartCharIdx;
       return curCommentType;
     }
 
 
-    // Assumes that the given comment fragment in "line" is of the comment type "type".
-    // Then returns true when the comment fragment ends, and false if the comment continues in the next line.
-    private bool IsCommentEndingInLine(CommentType type, LineInfo line) 
+    // Assumes that the given comment fragment in "fragment" is of the comment type "type".
+    // Then returns true if the comment fragment ends, and false if the comment continues in the next line.
+    private bool IsCommentFragmentTerminated(CommentType type, CommentFragmentInLine fragment) 
     {
       // For example:
       //     /**/
       //     // foo
       // Assume that the inputCommentTag is the "//". Because there is only an newline between the two lines,
-      // the backtracked to "/*". Assume we are in the first iteration, i.e. curLine is the "/*". Here we need to detect that
+      // the backtracked to "/*". Assume we are in the first iteration, i.e. curFragment is the "/*". Here we need to detect that
       // the "/*" gets terminated by "*/". Therefore, we need to adapt the comment start for "//".
       // On the other hand, consider
       //     /*
@@ -621,7 +629,7 @@ namespace VSDoxyHighlighter
       //     */
       // If the inputCommentTag is the "//" again, then we do want to return "/*" as comment start. I.e. the line with "//"
       // is actually a "/*" comment.
-      if (IsCCommentType(type) && GetTextOfCommentInLine(line).EndsWith("*/")) {
+      if (IsCCommentType(type) && fragment.GetTextTrimmed().EndsWith("*/")) {
         return true;
       }
       // For example:
@@ -633,17 +641,13 @@ namespace VSDoxyHighlighter
       //     // fooX \
       //     /**/
       // The backslash forces a line continuation. In this case the "/**/" is actually a "//" comment.
-      else if (IsCppCommentType(type) && !GetTextOfCommentInLine(line).EndsWith("\\")) {
+      else if (IsCppCommentType(type) && !fragment.GetTextTrimmed().EndsWith("\\")) {
         return true;
       }
 
       return false;
     }
 
-    private string GetTextOfCommentInLine(LineInfo info)
-    {
-      return info.currentTags.ElementAt(info.currentIndexOfComment).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
-    }
 
 
     private (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
