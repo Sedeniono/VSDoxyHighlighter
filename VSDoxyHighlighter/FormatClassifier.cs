@@ -190,7 +190,6 @@ namespace VSDoxyHighlighter
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
-        Debug.Assert(commentSpan.commentType != CommentType.Unknown);
         if (ApplyHighlightingToCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
 
@@ -294,7 +293,7 @@ namespace VSDoxyHighlighter
           }
 
           if (IsVSComment(vsTag)) {
-            CommentType type = IdentifyCommentType(spanToCheck.Snapshot, vsCppTags, tagIndex);
+            CommentType type = IdentifyCommentType(spanToCheck.Snapshot, new VSCommentFragment(vsCppTags, tagIndex));
             result.Add(new CommentSpan(vsTag.Span, type));
             //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
           }
@@ -315,7 +314,7 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
-    /// Returns true if the given vsTag corresponds to one of the tags used by Visual Studio for comments.
+    /// Returns true if the given tag corresponds to one of the tags used by Visual Studio for comments.
     /// </summary>
     private bool IsVSComment(ITagSpan<IClassificationTag> vsTag)
     {
@@ -392,21 +391,27 @@ namespace VSDoxyHighlighter
     }
 
 
-    private struct CommentFragmentInLine 
+    /// <summary>
+    /// Represents a fragment of a comment as identified by the Visual Studio default tagger.
+    /// </summary>
+    private struct VSCommentFragment 
     {
-      // The character index (0 means start of file) of the comment's start.
-      public int fragmentStartCharIdx { get { return currentTags.ElementAt(tagIndex).Span.Start; } }
-
-      public CommentFragmentInLine(IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
+      public VSCommentFragment(IEnumerable<ITagSpan<IClassificationTag>> currentTags_, int currentIndexOfComment_)
       {
         currentTags = currentTags_;
         tagIndex = currentIndexOfComment_;
       }
 
+      // The character index (0 means start of file) of the comment's start.
+      public int fragmentStartCharIdx { get { return fragmentTag.Span.Start; } }
+
+      public ITagSpan<IClassificationTag> fragmentTag { get { return currentTags.ElementAt(tagIndex); } }
+
       public string GetTextTrimmed()
       {
-        return currentTags.ElementAt(tagIndex).Span.GetText().TrimEnd(cNewlineChars);
+        return fragmentTag.Span.GetText().TrimEnd(cNewlineChars);
       }
+
 
       // The tags associated with the whole line, as classified by the Visual Studio default tagger.
       private IEnumerable<ITagSpan<IClassificationTag>> currentTags;
@@ -420,17 +425,10 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
-    /// Given a specific fragment of a comment (as identified by the Visual Studio's default tagger)
-    /// in `lineTags.ElementAt(indexOfCommentFragment)`, returns the type of that comment ("//", "///", "/*", etc).
-    /// 
-    /// Note: The remaining elements in "lineTags" need to be the tags for the remaining part
-    /// of the line; these are expected since the caller of this function actually nows them already,
-    /// so getting them again is unecessary.
+    /// Given a specific fragment of a comment (as identified by the Visual Studio's default tagger),
+    /// returns the type of that comment ("//", "///", "/*", etc).
     /// </summary>
-    private CommentType IdentifyCommentType(
-        ITextSnapshot textSnapshot,
-        IEnumerable<ITagSpan<IClassificationTag>> lineTags,
-        int indexOfCommentFragment)
+    private CommentType IdentifyCommentType(ITextSnapshot textSnapshot, VSCommentFragment inputFragment)
     {
       if (textSnapshot.Version.VersionNumber != mFileVersionOfCache) {
         // File was edited, reset cache.
@@ -439,43 +437,39 @@ namespace VSDoxyHighlighter
       }
 
       // From first to last elements, we go BACKWARD in the text buffer.
-      Stack<CommentFragmentInLine> fragmentsInReverseOrder = new Stack<CommentFragmentInLine>();
-      CommentType foundCacheElement = CommentType.Unknown;
+      Stack<VSCommentFragment> fragmentsInReverseOrder = new Stack<VSCommentFragment>();
+      CommentType typeOfFragmentWhereStopped = CommentType.Unknown;
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment (where
       // we are 100% sure that it is a start), or we hit the file start, or we hit a line where we
       // cached the comment type.
-      IEnumerable<ITagSpan<IClassificationTag>> curLineTags = lineTags;
-      int curIndexOfCommentFragment = indexOfCommentFragment;
+      VSCommentFragment curFragment = inputFragment;
       while (true) {
-        (bool foundStart, var previousLineTags, int indexOfLastCommentIndexInPreviousLine) 
-          = FragmentContainsCommentStartAssuredly(curLineTags.ElementAt(curIndexOfCommentFragment));
-        var newFragment = new CommentFragmentInLine(curLineTags, curIndexOfCommentFragment);
-        fragmentsInReverseOrder.Push(newFragment);
+        (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine) = FragmentContainsCommentStartAssuredly(curFragment.fragmentTag);
+        fragmentsInReverseOrder.Push(curFragment);
         if (foundStart) {
           // TODO: Optimize for the case that we have not looped. Can return immediately.
           break;
         }
 
         // If we hit a line where we already know the comment type from a previous call, we can stop.
-        CommentType cachedElement;
-        if (mCommentTypeCache.TryGetValue(newFragment.fragmentStartCharIdx, out cachedElement)) {
-          foundCacheElement = cachedElement;
+        CommentType cachedType;
+        if (mCommentTypeCache.TryGetValue(curFragment.fragmentStartCharIdx, out cachedType)) {
+          typeOfFragmentWhereStopped = cachedType;
           break;
         }
 
-        curLineTags = previousLineTags;
-        curIndexOfCommentFragment = indexOfLastCommentIndexInPreviousLine;
+        curFragment = lastFragmentInPreviousLine.Value;
       }
 
       // Now loop forward again through the lines that we considered, and check whether we actually missed the
       // end of comment. Figuring this out depends on the top-most comment style.
-      CommentFragmentInLine curFragment = fragmentsInReverseOrder.Pop();
+      curFragment = fragmentsInReverseOrder.Pop();
       int curCommentStartCharIdx = curFragment.fragmentStartCharIdx;
       CommentType curCommentType =
-        (foundCacheElement == CommentType.Unknown) 
+        (typeOfFragmentWhereStopped == CommentType.Unknown) 
         ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
-        : foundCacheElement;
+        : typeOfFragmentWhereStopped;
       Debug.Assert(curCommentType != CommentType.Unknown);
 
       while (fragmentsInReverseOrder.Count() > 0) {
@@ -499,9 +493,14 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Assumes that the given comment fragment in "fragment" is of the comment type "type".
-    // Then returns true if the comment fragment ends, and false if the comment continues in the next line.
-    private bool IsCommentFragmentTerminated(CommentType type, CommentFragmentInLine fragment) 
+    /// <summary>
+    /// Assumes that the given comment fragment in "fragment" is of the comment type "type". 
+    /// Then returns true if the comment fragment ends, and false if the comment continues in the next line.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="fragment"></param>
+    /// <returns></returns>
+    private bool IsCommentFragmentTerminated(CommentType type, VSCommentFragment fragment) 
     {
       // For example:
       //     /**/
@@ -543,7 +542,7 @@ namespace VSDoxyHighlighter
     /// If false is returned, the function already needed to retrieve the tags from the Visual Studio's default tagger 
     /// for a previous line. For performance reasons, the function returns the result in this case.
     /// </summary>
-    private (bool foundStart, IEnumerable<ITagSpan<IClassificationTag>> previousLineTags, int indexOfLastCommentIndexInPreviousLine) 
+    private (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine) 
       FragmentContainsCommentStartAssuredly(ITagSpan<IClassificationTag> commentFragment)
     {
       Debug.Assert(IsVSComment(commentFragment));
@@ -555,7 +554,7 @@ namespace VSDoxyHighlighter
       if (charIdxBeforeComment < 0) {
         // Reached the start of the document without finding a non-newline character
         // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return (true, null, -1);
+        return (true, null);
       }
 
       // charIdxBeforeComment now points to a non-newline character before the start of the comment.
@@ -567,15 +566,15 @@ namespace VSDoxyHighlighter
       var tagsOfPreviousLine = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, previousLine.Extent.Span));
       if (tagsOfPreviousLine.Count() <= 0) {
         // The default tagger e.g. does not return any tags if a line contains only whitespace that is *outside* of a comment.
-        return (true, null, -1);
+        return (true, null);
       }
 
-      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingIndex(tagsOfPreviousLine, charIdxBeforeComment);
+      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingCharIndex(tagsOfPreviousLine, charIdxBeforeComment);
       bool charIdxBeforeInputCommentIsInAComment = indexOfPreviousCommentTag >= 0;
       if (!charIdxBeforeInputCommentIsInAComment) {
         // The relevant character before the input comment is not a comment
         // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return (true, null, -1);
+        return (true, null);
       }
 
       if (charIdxBeforeComment >= 1 && textSnapshot.GetText(charIdxBeforeComment - 1, 2) == "*/") {
@@ -583,24 +582,26 @@ namespace VSDoxyHighlighter
         // The default tagger already produces separate tags for the two C-style comments. Assume we started
         // with "/*foo2*/", and charIdxBeforeComment now points to the second "/" in the string (which closes the first comment).
         // So if [charIdxBeforeComment-1,charIdxBeforeComment] == "*/", then the input comment is "complete".
-        return (true, null, -1);
+        return (true, null);
       }
 
       // The only way how we came that far, should have been if we backtracked to a previous line.
       // If we didn't, something is fishy. Give up to prevent infinite recursion.
       if (numSkippedNewlines == 0) {
         Debug.Assert(false);
-        return (true, null, -1);
+        return (true, null);
       }
 
-      return (false, tagsOfPreviousLine, indexOfPreviousCommentTag);
+      return (false, new VSCommentFragment(tagsOfPreviousLine, indexOfPreviousCommentTag));
     }
 
 
-    // Given the tags from the Visual Studio tagger, returns the index of that tag which contains the given
-    // character index and which represents a comment. Returns -1 if charIdxBeforeComment does not point to a comment.
-    // A value of charIdxBeforeComment=0 means the start of the text document.
-    private int TryFindIndexOfCommentTagContainingIndex(IEnumerable<ITagSpan<IClassificationTag>> tags, int charIdx)
+    /// <summary>
+    /// Given the tags from the Visual Studio tagger, returns the index of that tag which contains the given 
+    /// character index and which represents a comment. Returns -1 if charIdxBeforeComment does not point to a comment.
+    /// A value of charIdx=0 means the start of the text document.
+    /// </summary>
+    private int TryFindIndexOfCommentTagContainingCharIndex(IEnumerable<ITagSpan<IClassificationTag>> vsTags, int charIdx)
     {
       // We loop backward since comments tend to be at the end of lines after code (if there is any code).
       // 
@@ -608,9 +609,9 @@ namespace VSDoxyHighlighter
       // comment and then individual parts for the special highlights of e.g. XML parameters. IsVSComment() ignores all those
       // special highlights.
 
-      int indexOfCommentTagInLine = tags.Count() - 1;
+      int indexOfCommentTagInLine = vsTags.Count() - 1;
       while (indexOfCommentTagInLine >= 0) {
-        var curElem = tags.ElementAt(indexOfCommentTagInLine);
+        var curElem = vsTags.ElementAt(indexOfCommentTagInLine);
         if (curElem.Span.Contains(charIdx) && IsVSComment(curElem)) {
           return indexOfCommentTagInLine;
         }
@@ -621,8 +622,11 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Starting at startIndex-1, goes backward through the text until a non-newline character is found.
-    // Returns the index of that character. Returns -1 if there is none.
+    /// <summary>
+    /// Starting at startIndex-1, goes backward through the text until a non-newline character is found. 
+    /// Returns the index of that character and the number of lines that the function went back. 
+    /// Returns -1 as character index if there is no such character.
+    /// </summary>
     private (int charIdx, int numSkippedNewlines) FindNonNewlineCharacterIndexBefore(ITextSnapshot textSnapshot, int startIndex)
     {
       int charIdx = startIndex - 1;
@@ -642,23 +646,26 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Retrives the tagger of Visual Studio that is responsible for classifying C++ code.
-    // See comment in DecomposeSpanIntoComments().
+    /// <summary>
+    /// Retrives the tagger of Visual Studio that is responsible for classifying C++ code. 
+    /// See comment in DecomposeSpanIntoComments().
+    /// </summary>
+    /// <returns></returns>
     private ITagger<IClassificationTag> FindDefaultVSCppTagger()
     {
-      if (mDefaultCppTagger == null) {
+      if (mDefaultVSCppTagger == null) {
         string nameOfDefaultCppTager = "Microsoft.VisualC.CppColorer".ToUpper();
         foreach (var kvp in mTextBuffer.Properties.PropertyList) {
           if (kvp.Value is ITagger<IClassificationTag> casted) {
             if (kvp.Key.ToString().ToUpper() == nameOfDefaultCppTager) {
-              mDefaultCppTagger = casted;
+              mDefaultVSCppTagger = casted;
               break;
             }
           }
         }
       }
 
-      return mDefaultCppTagger;
+      return mDefaultVSCppTagger;
     }
 
 
@@ -666,7 +673,8 @@ namespace VSDoxyHighlighter
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
 
-    private ITagger<IClassificationTag> mDefaultCppTagger = null;
+    // Cached tagger that is used by Visual Studio to classify C/C++ code.
+    private ITagger<IClassificationTag> mDefaultVSCppTagger = null;
 
     // For every start index of some comment fragment (index in terms of the character index in the file), we cache
     // the resulting comment type for performance reasons. The cache gets reset after every edit.
