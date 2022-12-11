@@ -169,8 +169,6 @@ namespace VSDoxyHighlighter
 #pragma warning restore 67
 
 
-    int counter = 0;
-
     /// <summary>
     /// Called by Visual Studio when the given text span needs to be classified (i.e. formatted).
     /// Thus, this function searches for words to which apply syntax highlighting, and for each one 
@@ -181,9 +179,6 @@ namespace VSDoxyHighlighter
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
     {
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
-
-      counter++;
-      System.Diagnostics.Debug.WriteLine($"Version={textSnapshot.Version.VersionNumber}, Line={textSnapshot.GetLineNumberFromPosition(originalSpanToCheck.Span.Start)}, counter={counter}");
 
       List<CommentSpan> commentSpans = DecomposeSpanIntoComments(originalSpanToCheck);
       
