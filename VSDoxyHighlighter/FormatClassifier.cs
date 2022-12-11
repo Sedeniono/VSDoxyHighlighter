@@ -534,36 +534,23 @@ namespace VSDoxyHighlighter
 
 
 
-    private struct CommentCacheElement 
-    {
-      public CommentType commentType;
-
-      public CommentCacheElement(CommentType commentType_) 
-      {
-        commentType = commentType_;
-      }
-    }
-
-    private int mFileVersionOfCache = -1;
-    private Dictionary<int /*commentStartCharIdx*/, CommentCacheElement> mCommentCache = new Dictionary<int, CommentCacheElement>();
-
-
     private CommentType IdentifyCommentType_NonRecursive(
         IEnumerable<ITagSpan<IClassificationTag>> inputTags,
         int indexOfComment)
     {
       var inputCommentTag = inputTags.ElementAt(indexOfComment);
       Debug.Assert(IsVSComment(inputCommentTag));
-
       var textSnapshot = inputCommentTag.Span.Snapshot;
+
       if (textSnapshot.Version.VersionNumber != mFileVersionOfCache) {
-        mCommentCache.Clear();
+        // File was edited, reset cache.
+        mCommentTypeCache.Clear();
         mFileVersionOfCache = textSnapshot.Version.VersionNumber;
       }
 
       // From first to last elements, we go BACKWARD in the text buffer.
       Stack<LineInfo> linesInReverseOrder = new Stack<LineInfo>();
-      CommentCacheElement foundCacheElement = new CommentCacheElement(CommentType.Unknown);
+      CommentType foundCacheElement = CommentType.Unknown;
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
       while (true) {
@@ -575,9 +562,9 @@ namespace VSDoxyHighlighter
           break;
         }
 
-        // If we found a 
-        CommentCacheElement cachedElement;
-        if (mCommentCache.TryGetValue(commentStartCharIdx, out cachedElement)) {
+        // If we hit a line where we already know the comment type from a previous call, we can stop.
+        CommentType cachedElement;
+        if (mCommentTypeCache.TryGetValue(commentStartCharIdx, out cachedElement)) {
           foundCacheElement = cachedElement;
           break;
         }
@@ -591,14 +578,14 @@ namespace VSDoxyHighlighter
       LineInfo curLine = linesInReverseOrder.Pop();
       int curCommentStartCharIdx = curLine.currentCommentStartCharIdx;
       CommentType curCommentType =
-        (foundCacheElement.commentType == CommentType.Unknown) 
+        (foundCacheElement == CommentType.Unknown) 
         ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
-        : foundCacheElement.commentType;
+        : foundCacheElement;
       Debug.Assert(curCommentType != CommentType.Unknown);
 
       while (linesInReverseOrder.Count() > 0) {
         Debug.Assert(curCommentType != CommentType.Unknown);
-        mCommentCache[curLine.currentCommentStartCharIdx] = new CommentCacheElement(curCommentType);
+        mCommentTypeCache[curLine.currentCommentStartCharIdx] = curCommentType;
 
         bool curCommentTerminates = IsCommentEndingInLine(curCommentType, curLine);
         curLine = linesInReverseOrder.Pop(); // Go to the next line
@@ -610,7 +597,7 @@ namespace VSDoxyHighlighter
       }
 
       Debug.Assert(curCommentType != CommentType.Unknown);
-      mCommentCache[curLine.currentCommentStartCharIdx] = new CommentCacheElement(curCommentType);
+      mCommentTypeCache[curLine.currentCommentStartCharIdx] = curCommentType;
 
       Debug.Assert(curCommentStartCharIdx >= 0);
       //return curCommentStartCharIdx;
@@ -657,6 +644,7 @@ namespace VSDoxyHighlighter
     {
       return info.currentTags.ElementAt(info.currentIndexOfComment).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
     }
+
 
     private (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
       FindCommentStart_HandleCurrentLine(
@@ -784,6 +772,12 @@ namespace VSDoxyHighlighter
     private readonly IClassificationType[] mFormatTypeToClassificationType;
 
     private ITagger<IClassificationTag> mDefaultCppTagger = null;
+
+    // For every start index of some comment (in terms of the character index in the file), we cache
+    // the resulting comment type for performance reasons. The cache gets reset after every edit.
+    private int mFileVersionOfCache = -1;
+    private Dictionary<int /*commentStartCharIdx*/, CommentType> mCommentTypeCache = new Dictionary<int, CommentType>();
+
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
     static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {
