@@ -436,40 +436,50 @@ namespace VSDoxyHighlighter
         mFileVersionOfCache = textSnapshot.Version.VersionNumber;
       }
 
-      // From first to last elements, we go BACKWARD in the text buffer.
-      Stack<VSCommentFragment> fragmentsInReverseOrder = new Stack<VSCommentFragment>();
-      CommentType typeOfFragmentWhereStopped = CommentType.Unknown;
+      // Stack: We go BACKWARD through the lines. So the top element of the stack represents
+      // a line earlier in the text file.
+      Stack<VSCommentFragment> fragmentsInReverseOrder = null;
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment (where
       // we are 100% sure that it is a start), or we hit the file start, or we hit a line where we
       // cached the comment type.
       VSCommentFragment curFragment = inputFragment;
+      CommentType cachedTypeOfFragmentWhereStopped = CommentType.Unknown;
       while (true) {
         (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine) = FragmentContainsCommentStartAssuredly(curFragment.fragmentTag);
+
+        // Performance optimization: If we could immediately identify the start of the comment to be at the start
+        // of the original input fragment, no need to do all the more complicated logic and allocations. Return directly.
+        if (fragmentsInReverseOrder == null) {
+          if (foundStart) {
+            return IdentifyTypeOfCommentStartingAt(textSnapshot, curFragment.fragmentStartCharIdx);
+          }
+          fragmentsInReverseOrder = new Stack<VSCommentFragment>();
+        }
+
         fragmentsInReverseOrder.Push(curFragment);
         if (foundStart) {
-          // TODO: Optimize for the case that we have not looped. Can return immediately.
           break;
         }
 
         // If we hit a line where we already know the comment type from a previous call, we can stop.
         CommentType cachedType;
         if (mCommentTypeCache.TryGetValue(curFragment.fragmentStartCharIdx, out cachedType)) {
-          typeOfFragmentWhereStopped = cachedType;
+          cachedTypeOfFragmentWhereStopped = cachedType;
           break;
         }
 
         curFragment = lastFragmentInPreviousLine.Value;
       }
 
-      // Now loop forward again through the lines that we considered, and check whether we actually missed the
+      // Now loop forward again through the lines (forward) that we considered, and check whether we actually missed the
       // end of comment. Figuring this out depends on the top-most comment style.
       curFragment = fragmentsInReverseOrder.Pop();
       int curCommentStartCharIdx = curFragment.fragmentStartCharIdx;
       CommentType curCommentType =
-        (typeOfFragmentWhereStopped == CommentType.Unknown) 
-        ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
-        : typeOfFragmentWhereStopped;
+        (cachedTypeOfFragmentWhereStopped == CommentType.Unknown) 
+          ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
+          : cachedTypeOfFragmentWhereStopped;
       Debug.Assert(curCommentType != CommentType.Unknown);
 
       while (fragmentsInReverseOrder.Count() > 0) {
@@ -497,9 +507,6 @@ namespace VSDoxyHighlighter
     /// Assumes that the given comment fragment in "fragment" is of the comment type "type". 
     /// Then returns true if the comment fragment ends, and false if the comment continues in the next line.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="fragment"></param>
-    /// <returns></returns>
     private bool IsCommentFragmentTerminated(CommentType type, VSCommentFragment fragment) 
     {
       // For example:
@@ -650,7 +657,6 @@ namespace VSDoxyHighlighter
     /// Retrives the tagger of Visual Studio that is responsible for classifying C++ code. 
     /// See comment in DecomposeSpanIntoComments().
     /// </summary>
-    /// <returns></returns>
     private ITagger<IClassificationTag> FindDefaultVSCppTagger()
     {
       if (mDefaultVSCppTagger == null) {
