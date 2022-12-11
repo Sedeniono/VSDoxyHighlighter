@@ -6,7 +6,6 @@
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [About the extension's functionality](#about-the-extensions-functionality)
-  - [Highlighted locations](#highlighted-locations)
   - [Supported elements of Doxygen](#supported-elements-of-doxygen)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
   - [Configuration](#configuration)
@@ -45,24 +44,23 @@ The latest release can be found [here](https://github.com/Sedeniono/VSDoxyHighli
 
 # About the extension's functionality
 
-## Highlighted locations
-Currently, the highlighting is enabled in **all** C-style comments (i.e. in `/* ... */`, not just in e.g. `/** ... */` or `/*! ... */`). 
-Moreover, the treatment of C++ single line comments (`//`) is somewhat inconsistent: After `///` and `//!`, everything is highlighted, but for ordinary comments (`//`) only keywords that may appear in the middle of text is highlighted. Improving this is planned for the future.
-
-
 ## Supported elements of Doxygen
-- Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported.
+For an introduction of Doxygen, please see [its webpage](https://www.doxygen.nl/index.html).
+
+- The syntax highlighting is enabled in comments starting with `/**`, `/*!`, `///` or `//!`.
+- Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported. For example, both `\brief` and `@brief` are highlighted.
 - [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.9.5) are supported.
 - Parts of markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
 
 
 ## Not yet supported and future ideas
-- Differentiate between ordinary multiline comments (`/*`) and special ones (e.g. `/*!`). Also, allow optionally highlighting in ordinary C++ comments (`//`).
+- Optionally allow highlighting in ordinary C++ comments (`//`) and C comments (`/*`).
 - Special highlighting of text in "environments" such as `\code` or `\f$`. Note that rendering of latex formulas is not planned, especially since there are already extensions available (e.g. ["TeX Comments"](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1305558.VsTeXCommentsExtension2022) or ["InteractiveComments"](https://marketplace.visualstudio.com/items?itemName=ArchitectSoft.InteractiveCommentsVS2022)).
 - Support for [HTML commands](https://www.doxygen.nl/manual/htmlcmds.html) is missing.
 - Support for [XML commands](https://www.doxygen.nl/manual/xmlcmds.html) is missing.
 - More [markdown support](https://www.doxygen.nl/manual/markdown.html).
 - Some form of simple autocomplete of commands ("IntelliSense") while typing. However, generating a whole comment block is not planned, since there are already extensions that support this (e.g. ["DoxygenComments"](https://marketplace.visualstudio.com/items?itemName=NickKhrapov.DoxygenComments2022) or ["Doxygen Comments"](https://marketplace.visualstudio.com/items?itemName=FinnGegenmantel.doxygenComments)).
+
 
 
 ## Configuration
@@ -80,6 +78,5 @@ You can change the color in the "Fonts and Colors" settings.
 
 
 ## Known problems
-- Handling of keywords in `//` comments is inconsistent, as noted above.
 - The extension comes with two different color schemes, for dark and light color themes. However, changing the color theme of Visual Studio does not properly adapt the colors. In principle, [there is code](https://github.com/Sedeniono/VSDoxyHighlighter/blob/846fb0a16e4a67921672bd6db3a35088b26bd159/VSDoxyHighlighter/DefaultColors.cs#L101) that should take care of it, but for reasons currently unknown to me it does not work well. In this case, a workaround is to uninstall and reinstall the extension after having switched the theme.
 - The extension does not work in VS 2019 or earlier. There is currently no plan to support versions older than VS 2022.
