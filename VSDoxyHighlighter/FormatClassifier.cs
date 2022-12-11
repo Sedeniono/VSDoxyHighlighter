@@ -1,6 +1,7 @@
 ﻿// If this is enabled, we disable the doxygen highlighting and instead highlight
 // the various comment types ("//", "///", "/*", etc.). This allows easier debugging
 // of the logic to detect the comment types.
+// Also see the file "ManualTests_SplittingIntoComments.cpp."
 //#define ENABLE_COMMENT_TYPE_DEBUGGING
 
 using Microsoft.VisualStudio.Text;
@@ -10,10 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Shell;
-using System.Linq;
-using Microsoft.VisualStudio.Language.CodeCleanUp;
 
 namespace VSDoxyHighlighter
 {
