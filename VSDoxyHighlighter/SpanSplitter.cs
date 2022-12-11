@@ -97,9 +97,30 @@ namespace VSDoxyHighlighter
 
       var vsCppTagger = FindDefaultVSCppTagger();
       if (vsCppTagger != null) {
-        IEnumerable<ITagSpan<IClassificationTag>> vsCppTags = null;
         try {
-          vsCppTags = vsCppTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+          IEnumerable<ITagSpan<IClassificationTag>> vsCppTags 
+            = vsCppTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+
+          //System.Diagnostics.Debug.WriteLine("For: " + spanToCheck.GetText().Replace("\r\n", "\\n"));
+          var result = new List<CommentSpan>();
+          int tagCount = vsCppTags.Count();
+          for (int tagIndex = 0; tagIndex < tagCount; ++tagIndex) {
+            var vsTag = vsCppTags.ElementAt(tagIndex);
+            if (!spanToCheck.Span.OverlapsWith(vsTag.Span)) {
+              continue;
+            }
+
+            if (IsVSComment(vsTag)) {
+              CommentType type = IdentifyCommentType(spanToCheck.Snapshot, new VSCommentFragment(vsCppTags, tagIndex));
+              result.Add(new CommentSpan(vsTag.Span, type));
+              //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
+            }
+            //else {
+            //  System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification);
+            //}
+          }
+
+          return result;
         }
         catch (System.NullReferenceException ex) {
           // The "vsCppTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
@@ -108,31 +129,10 @@ namespace VSDoxyHighlighter
           // search the default tagger again when a re-classification gets triggered a bit later.
           ActivityLog.LogWarning(
             "VSDoxyHighlighter",
-            $"The 'vsCppTagger' threw a NullReferenceException. Exception message: {ex.ToString()}");
+            $"Probably the 'vsCppTagger' threw a NullReferenceException. Exception message: {ex.ToString()}");
           mDefaultVSCppTagger = null;
           return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
         }
-
-        //System.Diagnostics.Debug.WriteLine("For: " + spanToCheck.GetText().Replace("\r\n", "\\n"));
-        var result = new List<CommentSpan>();
-        int tagCount = vsCppTags.Count();
-        for (int tagIndex = 0; tagIndex < tagCount; ++tagIndex) {
-          var vsTag = vsCppTags.ElementAt(tagIndex);
-          if (!spanToCheck.Span.OverlapsWith(vsTag.Span)) {
-            continue;
-          }
-
-          if (IsVSComment(vsTag)) {
-            CommentType type = IdentifyCommentType(spanToCheck.Snapshot, new VSCommentFragment(vsCppTags, tagIndex));
-            result.Add(new CommentSpan(vsTag.Span, type));
-            //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
-          }
-          //else {
-          //  System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification);
-          //}
-        }
-
-        return result;
       }
       else {
         // Mh, no tagger found? Maybe Microsoft changed their tagger name?
