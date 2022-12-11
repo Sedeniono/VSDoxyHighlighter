@@ -13,6 +13,7 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Shell;
 using System.Linq;
+using Microsoft.VisualStudio.Language.CodeCleanUp;
 
 namespace VSDoxyHighlighter
 {
@@ -343,8 +344,9 @@ namespace VSDoxyHighlighter
         IEnumerable<ITagSpan<IClassificationTag>> tags,
         int indexOfCommentTagToIdentify)
     {
-      int commentStartIndexInSnapshot = FindCommentStart_NonRecursive(tags, indexOfCommentTagToIdentify);
-      return IdentifyTypeOfCommentStartingAt(textSnapshot, commentStartIndexInSnapshot);
+      //int commentStartIndexInSnapshot = IdentifyCommentType_NonRecursive(tags, indexOfCommentTagToIdentify);
+      //return IdentifyTypeOfCommentStartingAt(textSnapshot, commentStartIndexInSnapshot);
+      return IdentifyCommentType_NonRecursive(tags, indexOfCommentTagToIdentify);
     }
 
 
@@ -509,7 +511,10 @@ namespace VSDoxyHighlighter
     struct LineInfo 
     {
       public int currentCommentStartCharIdx;
+
+      // The tags associated with the whole line, as classified by the Visual Studio default tagger.
       public IEnumerable<ITagSpan<IClassificationTag>> currentTags;
+
       public int currentIndexOfComment;
 
       public LineInfo(int currentCommentStartCharIdx_) 
@@ -528,7 +533,22 @@ namespace VSDoxyHighlighter
     }
 
 
-    private int FindCommentStart_NonRecursive(
+
+    private struct CommentCacheElement 
+    {
+      public CommentType commentType;
+
+      public CommentCacheElement(CommentType commentType_) 
+      {
+        commentType = commentType_;
+      }
+    }
+
+    private int mFileVersionOfCache = -1;
+    private Dictionary<int /*commentStartCharIdx*/, CommentCacheElement> mCommentCache = new Dictionary<int, CommentCacheElement>();
+
+
+    private CommentType IdentifyCommentType_NonRecursive(
         IEnumerable<ITagSpan<IClassificationTag>> inputTags,
         int indexOfComment)
     {
@@ -536,9 +556,14 @@ namespace VSDoxyHighlighter
       Debug.Assert(IsVSComment(inputCommentTag));
 
       var textSnapshot = inputCommentTag.Span.Snapshot;
+      if (textSnapshot.Version.VersionNumber != mFileVersionOfCache) {
+        mCommentCache.Clear();
+        mFileVersionOfCache = textSnapshot.Version.VersionNumber;
+      }
 
       // From first to last elements, we go BACKWARD in the text buffer.
       Stack<LineInfo> linesInReverseOrder = new Stack<LineInfo>();
+      CommentCacheElement foundCacheElement = new CommentCacheElement(CommentType.Unknown);
 
       // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
       while (true) {
@@ -546,6 +571,14 @@ namespace VSDoxyHighlighter
           = FindCommentStart_HandleCurrentLine(inputTags, indexOfComment);
         linesInReverseOrder.Push(new LineInfo(commentStartCharIdx, inputTags, indexOfComment));
         if (foundStart) {
+          // TODO: Optimize for the case that we have not looped. Can return immediately.
+          break;
+        }
+
+        // If we found a 
+        CommentCacheElement cachedElement;
+        if (mCommentCache.TryGetValue(commentStartCharIdx, out cachedElement)) {
+          foundCacheElement = cachedElement;
           break;
         }
 
@@ -556,30 +589,69 @@ namespace VSDoxyHighlighter
       // Now loop forward again through the lines that we considered, and check whether we actually missed the
       // end of comment. Figuring this out depends on the top-most comment style.
       LineInfo curLine = linesInReverseOrder.Pop();
-      int earlierCommentStartCharIdx = curLine.currentCommentStartCharIdx;
-      CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
+      int curCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+      CommentType curCommentType =
+        (foundCacheElement.commentType == CommentType.Unknown) 
+        ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx) 
+        : foundCacheElement.commentType;
+      Debug.Assert(curCommentType != CommentType.Unknown);
 
       while (linesInReverseOrder.Count() > 0) {
-        bool moveEarlierCommentStart = false;
-        if (IsCCommentType(earlierCommentStartType) && GetTextOfCommentInLine(curLine).EndsWith("*/")) {
-          moveEarlierCommentStart = true;
-        }
-        else if (IsCppCommentType(earlierCommentStartType) && !GetTextOfCommentInLine(curLine).EndsWith("\\")) {
-          moveEarlierCommentStart = true;
-        }
+        Debug.Assert(curCommentType != CommentType.Unknown);
+        mCommentCache[curLine.currentCommentStartCharIdx] = new CommentCacheElement(curCommentType);
 
-        if (moveEarlierCommentStart) {
-          earlierCommentStartCharIdx = linesInReverseOrder.Peek().currentCommentStartCharIdx;
-          earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
-        }
+        bool curCommentTerminates = IsCommentEndingInLine(curCommentType, curLine);
+        curLine = linesInReverseOrder.Pop(); // Go to the next line
 
-        curLine = linesInReverseOrder.Pop();
+        if (curCommentTerminates) {
+          curCommentStartCharIdx = curLine.currentCommentStartCharIdx;
+          curCommentType = IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx);
+        }
       }
 
-      Debug.Assert(earlierCommentStartCharIdx >= 0);
-      return earlierCommentStartCharIdx;
+      Debug.Assert(curCommentType != CommentType.Unknown);
+      mCommentCache[curLine.currentCommentStartCharIdx] = new CommentCacheElement(curCommentType);
+
+      Debug.Assert(curCommentStartCharIdx >= 0);
+      //return curCommentStartCharIdx;
+      return curCommentType;
     }
 
+
+    // Assumes that the given comment fragment in "line" is of the comment type "type".
+    // Then returns true when the comment fragment ends, and false if the comment continues in the next line.
+    private bool IsCommentEndingInLine(CommentType type, LineInfo line) 
+    {
+      // For example:
+      //     /**/
+      //     // foo
+      // Assume that the inputCommentTag is the "//". Because there is only an newline between the two lines,
+      // the backtracked to "/*". Assume we are in the first iteration, i.e. curLine is the "/*". Here we need to detect that
+      // the "/*" gets terminated by "*/". Therefore, we need to adapt the comment start for "//".
+      // On the other hand, consider
+      //     /*
+      //     // foo
+      //     */
+      // If the inputCommentTag is the "//" again, then we do want to return "/*" as comment start. I.e. the line with "//"
+      // is actually a "/*" comment.
+      if (IsCCommentType(type) && GetTextOfCommentInLine(line).EndsWith("*/")) {
+        return true;
+      }
+      // For example:
+      //     // fooX
+      //     /**/
+      // Assume that the inputCommentTag is the "/**/" and that we backtracked to "//". In this case we need to recognized
+      // that the "//" comment ends, so that we eventually return "/**/".
+      // However, assume the following: 
+      //     // fooX \
+      //     /**/
+      // The backslash forces a line continuation. In this case the "/**/" is actually a "//" comment.
+      else if (IsCppCommentType(type) && !GetTextOfCommentInLine(line).EndsWith("\\")) {
+        return true;
+      }
+
+      return false;
+    }
 
     private string GetTextOfCommentInLine(LineInfo info)
     {
