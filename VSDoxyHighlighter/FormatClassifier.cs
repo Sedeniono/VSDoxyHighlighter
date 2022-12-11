@@ -331,24 +331,6 @@ namespace VSDoxyHighlighter
     }
 
 
-    /// <summary>
-    /// Given a specific tag that corresponds to a comment as classified by Visual Studio, returns the 
-    /// type of that comment ("//", "///", "/*", etc).
-    /// The tag that gets identified is in `tags.ElementAt(indexOfCommentTagToIdentify)`.
-    /// The remaining elements in <paramref name="tags"/> needs to be the tags for the remaining part
-    /// of the line; these are expected since the caller of this function actually nows them already,
-    /// so getting them again is unecessary.
-    /// </summary>
-    private CommentType IdentifyCommentType(
-        ITextSnapshot textSnapshot,
-        IEnumerable<ITagSpan<IClassificationTag>> tags,
-        int indexOfCommentTagToIdentify)
-    {
-      //int commentStartIndexInSnapshot = IdentifyCommentType_NonRecursive(tags, indexOfCommentTagToIdentify);
-      //return IdentifyTypeOfCommentStartingAt(textSnapshot, commentStartIndexInSnapshot);
-      return IdentifyCommentType_NonRecursive(tags, indexOfCommentTagToIdentify);
-    }
-
 
     private CommentType IdentifyTypeOfCommentStartingAt(ITextSnapshot textSnapshot, int startOfCommentCharIndex) 
     {
@@ -410,104 +392,6 @@ namespace VSDoxyHighlighter
     }
 
 
-    /// <summary>
-    /// Given the tags "inputTags" of some line and the index to a comment in this "inputTags",
-    /// returns the character index where the comment actually starts in the text snapshot.
-    /// A return value of 0 means the beginning of the file.
-    /// </summary>
-    private int FindCommentStart(
-        IEnumerable<ITagSpan<IClassificationTag>> inputTags,
-        int indexOfComment)
-    {
-      var inputCommentTag = inputTags.ElementAt(indexOfComment);
-      Debug.Assert(IsVSComment(inputCommentTag));
-
-      var textSnapshot = inputCommentTag.Span.Snapshot;
-
-      // Backtrack: Find previous character that is not a newline.
-      (int charIdxBeforeComment, int numSkippedNewlines) = FindRelevantCharacterIndexBefore(textSnapshot, inputCommentTag.Span.Start);
-      if (charIdxBeforeComment < 0) {
-        // Reached the start of the document without finding a non-newline character
-        // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return inputCommentTag.Span.Start;
-      }
-
-      // charIdxBeforeComment now points to a non-newline character before the start of the comment.
-      // Classify it. Note that the vsCppTagger seems to always return the classifications for the whole line, even if
-      // given just a single character. But to be on the safe side, and because we need to classification of the whole
-      // line further down, we give it the whole line right here.
-      var defaultTagger = FindDefaultVSCppTagger();
-      ITextSnapshotLine wholeLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
-      var lineTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, wholeLine.Extent.Span));
-      if (lineTags.Count() <= 0) {
-        // The default tagger e.g. does not return any tags if a line contains only whitespace that is outside of a comment.
-        return inputCommentTag.Span.Start;
-      }
-
-      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingIndex(lineTags, charIdxBeforeComment);
-      if (indexOfPreviousCommentTag < 0) {
-        // The relevant character before the input comment is not a comment
-        // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return inputCommentTag.Span.Start;
-      }
-
-      if (charIdxBeforeComment >= 1 && textSnapshot.GetText(charIdxBeforeComment - 1, 2) == "*/") {
-        // For example: "/*foo1*//*foo2*/"
-        // The default tagger already produces separate tags for the two C-style comments. Assume we started
-        // with "/*foo2*/", and charIdxBeforeComment now points to the second "/" in the string (which closes the first comment).
-        // So if [charIdxBeforeComment-1,charIdxBeforeComment] == "*/", then the input comment is "complete".
-        return inputCommentTag.Span.Start;
-      }
-
-      // The only way how we came that far, should have been if we backtracked to a previous line.
-      // If we didn't, something is fishy. Give up to prevent infinite recursion.
-      if (numSkippedNewlines == 0) {
-        Debug.Assert(false);
-        return inputCommentTag.Span.Start;
-      }
-
-
-      // We did not detect the comment for sure so far. There are only newline characters between the inputCommentTag and the previous comment.
-      // Thus, since numSkippedNewlines>0 at this point here, we are looking at the previous lines now.
-      int earlierCommentStartCharIdx = FindCommentStart(lineTags, indexOfPreviousCommentTag);
-      CommentType earlierCommentStartType = IdentifyTypeOfCommentStartingAt(textSnapshot, earlierCommentStartCharIdx);
-      string earlierCommentText = lineTags.ElementAt(indexOfPreviousCommentTag).Span.GetText().TrimEnd(new char[] { '\n', '\r' });
-      
-      // For example:
-      //     /**/
-      //     // foo
-      // Assume that the inputCommentTag is the "//". Then the above FindCommentStart() returns the "/*".
-      // However, the "/*" gets terminated by "*/" in the previous line, too. Therefore, we need to return the start of "//".
-      // On the other hand, consider
-      //     /*
-      //     // foo
-      //     */
-      // If the inputCommentTag is the "//" again, then we do want to return "/*" as returned by FindCommentStart().
-      if (IsCCommentType(earlierCommentStartType)) {
-        if (earlierCommentText.EndsWith("*/")) {
-          return inputCommentTag.Span.Start;
-        }
-      }
-      // For example:
-      //     // fooX
-      //     /**/
-      // Assume that the inputCommentTag is the "/**/". Then the above FindCommentStart() returns the "//".
-      // In this case we do NOT want to return the result found by FindCommentStart(), since the "//" comment ends
-      // at the end of the previous line. Instead, we want to return the start of "/**/".
-      // However, assume the following: 
-      //     // fooX \
-      //     /**/
-      // The backslash forces a line continuation. In this case we do want to return the start of "//" as the comment start.
-      else if (IsCppCommentType(earlierCommentStartType)) {
-        if (!earlierCommentText.EndsWith("\\")) {
-          return inputCommentTag.Span.Start;
-        }
-      }
-        
-      return earlierCommentStartCharIdx;
-    }
-
-
     private struct CommentFragmentInLine 
     {
       // The character index (0 means start of file) of the comment's start.
@@ -535,14 +419,19 @@ namespace VSDoxyHighlighter
 
 
 
-    private CommentType IdentifyCommentType_NonRecursive(
-        IEnumerable<ITagSpan<IClassificationTag>> inputTags,
-        int indexOfComment)
+    /// <summary>
+    /// Given a specific fragment of a comment (as identified by the Visual Studio's default tagger)
+    /// in `lineTags.ElementAt(indexOfCommentFragment)`, returns the type of that comment ("//", "///", "/*", etc).
+    /// 
+    /// Note: The remaining elements in "lineTags" need to be the tags for the remaining part
+    /// of the line; these are expected since the caller of this function actually nows them already,
+    /// so getting them again is unecessary.
+    /// </summary>
+    private CommentType IdentifyCommentType(
+        ITextSnapshot textSnapshot,
+        IEnumerable<ITagSpan<IClassificationTag>> lineTags,
+        int indexOfCommentFragment)
     {
-      var inputCommentTag = inputTags.ElementAt(indexOfComment);
-      Debug.Assert(IsVSComment(inputCommentTag));
-      var textSnapshot = inputCommentTag.Span.Snapshot;
-
       if (textSnapshot.Version.VersionNumber != mFileVersionOfCache) {
         // File was edited, reset cache.
         mCommentTypeCache.Clear();
@@ -553,12 +442,16 @@ namespace VSDoxyHighlighter
       Stack<CommentFragmentInLine> fragmentsInReverseOrder = new Stack<CommentFragmentInLine>();
       CommentType foundCacheElement = CommentType.Unknown;
 
-      // Loop backward through the lines in the text buffer, until we hit the start of a comment or the file.
+      // Loop backward through the lines in the text buffer, until we hit the start of a comment (where
+      // we are 100% sure that it is a start), or we hit the file start, or we hit a line where we
+      // cached the comment type.
+      IEnumerable<ITagSpan<IClassificationTag>> curLineTags = lineTags;
+      int curIndexOfCommentFragment = indexOfCommentFragment;
       while (true) {
-        // TODO: Don't return commentStartCharIdx; that is not necessary.
-        (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
-          = FindCommentStart_HandleCurrentLine(inputTags, indexOfComment);
-        fragmentsInReverseOrder.Push(new CommentFragmentInLine(inputTags, indexOfComment));
+        (bool foundStart, var previousLineTags, int indexOfLastCommentIndexInPreviousLine) 
+          = FragmentContainsCommentStartAssuredly(curLineTags.ElementAt(curIndexOfCommentFragment));
+        var newFragment = new CommentFragmentInLine(curLineTags, curIndexOfCommentFragment);
+        fragmentsInReverseOrder.Push(newFragment);
         if (foundStart) {
           // TODO: Optimize for the case that we have not looped. Can return immediately.
           break;
@@ -566,13 +459,13 @@ namespace VSDoxyHighlighter
 
         // If we hit a line where we already know the comment type from a previous call, we can stop.
         CommentType cachedElement;
-        if (mCommentTypeCache.TryGetValue(commentStartCharIdx, out cachedElement)) {
+        if (mCommentTypeCache.TryGetValue(newFragment.fragmentStartCharIdx, out cachedElement)) {
           foundCacheElement = cachedElement;
           break;
         }
 
-        inputTags = nextTags;
-        indexOfComment = nextIndexOfComment;
+        curLineTags = previousLineTags;
+        curIndexOfCommentFragment = indexOfLastCommentIndexInPreviousLine;
       }
 
       // Now loop forward again through the lines that we considered, and check whether we actually missed the
@@ -642,23 +535,27 @@ namespace VSDoxyHighlighter
     }
 
 
-
-    private (bool foundStart, int commentStartCharIdx, IEnumerable<ITagSpan<IClassificationTag>> nextTags, int nextIndexOfComment) 
-      FindCommentStart_HandleCurrentLine(
-        IEnumerable<ITagSpan<IClassificationTag>> inputTags,
-        int indexOfComment)
+    /// <summary>
+    /// Returns true if the start of the comment fragment is also the start of the whole comment, and this is 100% assured.
+    /// Returns false if the comment might or might not start at the fragment start (i.e. more work needs to be done
+    /// to identify this).
+    /// 
+    /// If false is returned, the function already needed to retrieve the tags from the Visual Studio's default tagger 
+    /// for a previous line. For performance reasons, the function returns the result in this case.
+    /// </summary>
+    private (bool foundStart, IEnumerable<ITagSpan<IClassificationTag>> previousLineTags, int indexOfLastCommentIndexInPreviousLine) 
+      FragmentContainsCommentStartAssuredly(ITagSpan<IClassificationTag> commentFragment)
     {
-      var inputCommentTag = inputTags.ElementAt(indexOfComment);
-      Debug.Assert(IsVSComment(inputCommentTag));
+      Debug.Assert(IsVSComment(commentFragment));
 
-      var textSnapshot = inputCommentTag.Span.Snapshot;
+      var textSnapshot = commentFragment.Span.Snapshot;
 
       // Backtrack: Find previous character that is not a newline.
-      (int charIdxBeforeComment, int numSkippedNewlines) = FindRelevantCharacterIndexBefore(textSnapshot, inputCommentTag.Span.Start);
+      (int charIdxBeforeComment, int numSkippedNewlines) = FindNonNewlineCharacterIndexBefore(textSnapshot, commentFragment.Span.Start);
       if (charIdxBeforeComment < 0) {
         // Reached the start of the document without finding a non-newline character
         // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return (true, inputCommentTag.Span.Start, null, -1);
+        return (true, null, -1);
       }
 
       // charIdxBeforeComment now points to a non-newline character before the start of the comment.
@@ -666,18 +563,19 @@ namespace VSDoxyHighlighter
       // given just a single character. But to be on the safe side, and because we need to classification of the whole
       // line further down, we give it the whole line right here.
       var defaultTagger = FindDefaultVSCppTagger();
-      ITextSnapshotLine wholeLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
-      var lineTags = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, wholeLine.Extent.Span));
-      if (lineTags.Count() <= 0) {
-        // The default tagger e.g. does not return any tags if a line contains only whitespace that is outside of a comment.
-        return (true, inputCommentTag.Span.Start, null, -1);
+      ITextSnapshotLine previousLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
+      var tagsOfPreviousLine = defaultTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, previousLine.Extent.Span));
+      if (tagsOfPreviousLine.Count() <= 0) {
+        // The default tagger e.g. does not return any tags if a line contains only whitespace that is *outside* of a comment.
+        return (true, null, -1);
       }
 
-      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingIndex(lineTags, charIdxBeforeComment);
-      if (indexOfPreviousCommentTag < 0) {
+      int indexOfPreviousCommentTag = TryFindIndexOfCommentTagContainingIndex(tagsOfPreviousLine, charIdxBeforeComment);
+      bool charIdxBeforeInputCommentIsInAComment = indexOfPreviousCommentTag >= 0;
+      if (!charIdxBeforeInputCommentIsInAComment) {
         // The relevant character before the input comment is not a comment
         // --> The input comment is "complete", i.e. the comment starts at its beginning.
-        return (true, inputCommentTag.Span.Start, null, -1);
+        return (true, null, -1);
       }
 
       if (charIdxBeforeComment >= 1 && textSnapshot.GetText(charIdxBeforeComment - 1, 2) == "*/") {
@@ -685,17 +583,17 @@ namespace VSDoxyHighlighter
         // The default tagger already produces separate tags for the two C-style comments. Assume we started
         // with "/*foo2*/", and charIdxBeforeComment now points to the second "/" in the string (which closes the first comment).
         // So if [charIdxBeforeComment-1,charIdxBeforeComment] == "*/", then the input comment is "complete".
-        return (true, inputCommentTag.Span.Start, null, -1);
+        return (true, null, -1);
       }
 
       // The only way how we came that far, should have been if we backtracked to a previous line.
       // If we didn't, something is fishy. Give up to prevent infinite recursion.
       if (numSkippedNewlines == 0) {
         Debug.Assert(false);
-        return (true, inputCommentTag.Span.Start, null, -1);
+        return (true, null, -1);
       }
 
-      return (false, inputCommentTag.Span.Start, lineTags, indexOfPreviousCommentTag);
+      return (false, tagsOfPreviousLine, indexOfPreviousCommentTag);
     }
 
 
@@ -725,7 +623,7 @@ namespace VSDoxyHighlighter
 
     // Starting at startIndex-1, goes backward through the text until a non-newline character is found.
     // Returns the index of that character. Returns -1 if there is none.
-    private (int charIdx, int numSkippedNewlines) FindRelevantCharacterIndexBefore(ITextSnapshot textSnapshot, int startIndex)
+    private (int charIdx, int numSkippedNewlines) FindNonNewlineCharacterIndexBefore(ITextSnapshot textSnapshot, int startIndex)
     {
       int charIdx = startIndex - 1;
       int numSkippedNewlines = 0;
@@ -770,10 +668,10 @@ namespace VSDoxyHighlighter
 
     private ITagger<IClassificationTag> mDefaultCppTagger = null;
 
-    // For every start index of some comment (in terms of the character index in the file), we cache
+    // For every start index of some comment fragment (index in terms of the character index in the file), we cache
     // the resulting comment type for performance reasons. The cache gets reset after every edit.
     private int mFileVersionOfCache = -1;
-    private Dictionary<int /*commentStartCharIdx*/, CommentType> mCommentTypeCache = new Dictionary<int, CommentType>();
+    private Dictionary<int /*commentFragmentStartCharIdx*/, CommentType> mCommentTypeCache = new Dictionary<int, CommentType>();
 
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
