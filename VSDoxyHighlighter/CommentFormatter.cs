@@ -102,7 +102,7 @@ namespace VSDoxyHighlighter
     /// NOTE: The logic includes only rudimentary and incomplete checks whether some piece is a 
     /// comment or not. Therefore, the input "text" should consist of comments. This is true
     /// when called in Visual Studio, because there we filter out non-comments before calling this
-    /// function. In the automated tests, however, this does not happen; cf. DecomposeSpanIntoComments().
+    /// function. In the automated tests, however, this does not happen; cf. SpanSplitter().
     /// </summary>
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.
