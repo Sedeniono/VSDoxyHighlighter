@@ -243,6 +243,7 @@ Format (the next)\p thing despite missing space.
 \arg AlignLeft left alignment.
 \li
 \code{.py} \endcode
+Text \code{.c} someCode \endcode
 \code{.cpp}
 class Cpp {};
 \endcode
@@ -351,3 +352,5 @@ Some\---word
 \}
 Foo @{ text @} foo
 */
+
+
