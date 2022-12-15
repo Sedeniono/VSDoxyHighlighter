@@ -354,3 +354,5 @@ Foo @{ text @} foo
 */
 
 
+// In the following, the closing "*/" should not be formatted:
+/** \ingroup foo  */  

@@ -109,6 +109,15 @@ namespace VSDoxyHighlighter
     /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
     public SortedSet<FormattedFragment> FormatText(string text)
     {
+      text = text.TrimEnd();
+      if (text.EndsWith("*/")) {
+        // Strip terminating "*/" so that it is not highlighted in commands such as
+        //     /** @ingroup foo */
+        // I.e. in commands whose parameter stretches till the end of the line.
+        // Removing it beforehand is easier than adapting the regex.
+        text = text.Substring(0, text.Length - 2);
+      }
+
       // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
       var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
 
@@ -158,8 +167,7 @@ namespace VSDoxyHighlighter
             "brief", "short", "details", "sa", "see", "result", "return", "returns", 
             "author", "authors", "copyright", "date", "noop", "else", "endcond", "endif", 
             "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
-            "since", "test", "version",
-            "ingroup", "callgraph",
+            "since", "test", "version", "callgraph",
             "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
             "showrefs", "hiderefs", "endinternal",
             "hideinitializer", "internal", "nosubgrouping", "private",
