@@ -454,14 +454,11 @@ namespace VSDoxyHighlighter
 
 
     // Regex to match where a command that should only appear at the start of a comment line is allowed to start.
-    // It is allowed to start after "/*", "/*!", "///", "//!" and also at the start of the string (i.e. the
+    // It is allowed to start after "/*", "/*!", "/**", "//", "///", "//!" and also at the start of the string (i.e. the
     // start of the line, since we get always whole lines). Moreover, we skip any "*" that come after these
     // starting markers.
-    // Note: Of course, this is insufficient to really detect whether some text is code or
-    // comment. For this we need to scan the whole file to find e.g. matching "/*" and "*/".
-    // But till this is implemented, this is a first approximation.
-    //                             string start| /* | /*! | ///  | //!         v Skip any "*" at the start of the comment.
-    private const string cCommentStart = @"(?:^|\/\*|\/\*!|\/\/\/|\/\/!)[ \t]*\**[ \t]*";
+    //                             string start| ///  | //! | // | /* | /*! | /**          v Skip any "*" at the start of the comment.
+    private const string cCommentStart = @"(?:^|\/\/\/|\/\/!|\/\/|\/\*|\/\*!|\/\*\*)[ \t]*\**[ \t]*";
 
     // Most of the commands start with a "@" or "\". This is the regex to match the beginning.
     private const string cCmdPrefix = @"(?:@|\\)";

@@ -53,6 +53,9 @@
     <Compile Include="DefaultColors.cs" />
     <Compile Include="FormatClassifier.cs" />
     <Compile Include="FormatDefinitions.cs" />
+    <Compile Include="GeneralOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanSplitter.cs" />
     <Compile Include="VSDoxyHighlighterPackage.cs" />

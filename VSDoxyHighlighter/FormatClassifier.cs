@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
@@ -132,6 +133,9 @@ namespace VSDoxyHighlighter
       foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
         Debug.Assert(classificationType != null);
       }
+
+      ThreadHelper.ThrowIfNotOnUIThread();
+      mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
     }
 
 #pragma warning disable 67
@@ -186,11 +190,18 @@ namespace VSDoxyHighlighter
     private bool ApplyHighlightingToCommentType(CommentType type) 
     {
       switch (type) {
-        case CommentType.SlashStarStar:
-        case CommentType.SlashStarExclamation:
         case CommentType.TripleSlash:
+          return mGeneralOptions.EnableInTripleSlash;
         case CommentType.DoubleSlashExclamation:
-          return true;
+          return mGeneralOptions.EnableInDoubleSlashExclamation;
+        case CommentType.DoubleSlash:
+          return mGeneralOptions.EnableInDoubleSlash;
+        case CommentType.SlashStarStar:
+          return mGeneralOptions.EnableInSlashStarStar;
+        case CommentType.SlashStarExclamation:
+          return mGeneralOptions.EnableInSlashStarExclamation;
+        case CommentType.SlashStar:
+          return mGeneralOptions.EnableInSlashStar;
         default:
           return false;
       }
@@ -200,6 +211,7 @@ namespace VSDoxyHighlighter
     private readonly SpanSplitter mSpanSplitter;
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
+    private readonly GeneralOptionsPage mGeneralOptions;
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
     static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {

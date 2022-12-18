@@ -9,6 +9,8 @@
   - [Supported elements of Doxygen](#supported-elements-of-doxygen)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
   - [Configuration](#configuration)
+    - [Fonts and colors](#fonts-and-colors)
+    - [Configuring the comment types](#configuring-the-comment-types)
   - [Known problems](#known-problems)
 
 
@@ -47,14 +49,13 @@ The latest release can be found [here](https://github.com/Sedeniono/VSDoxyHighli
 ## Supported elements of Doxygen
 For an introduction of Doxygen, please see [its webpage](https://www.doxygen.nl/index.html).
 
-- The syntax highlighting is enabled in comments starting with `/**`, `/*!`, `///` or `//!`.
+- The syntax highlighting can be enabled in comments starting with `/*`, `/**`, `/*!`, `//`, `///` or `//!`. The enabled comment types can be configured in the Visual Studio options under the VSDoxyHighlighter node. By default, syntax highlighting is not applied to `//` and `/*` comments because Doxygen does not parse those.
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported. For example, both `\brief` and `@brief` are highlighted.
 - [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.9.5) are supported.
 - Parts of markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
 
 
 ## Not yet supported and future ideas
-- Optionally allow highlighting in ordinary C++ comments (`//`) and C comments (`/*`).
 - Special highlighting of text in "environments" such as `\code` or `\f$`. Note that rendering of latex formulas is not planned, especially since there are already extensions available (e.g. ["TeX Comments"](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1305558.VsTeXCommentsExtension2022) or ["InteractiveComments"](https://marketplace.visualstudio.com/items?itemName=ArchitectSoft.InteractiveCommentsVS2022)).
 - Support for [HTML commands](https://www.doxygen.nl/manual/htmlcmds.html) is missing.
 - Support for [XML commands](https://www.doxygen.nl/manual/xmlcmds.html) is missing.
@@ -65,16 +66,23 @@ For an introduction of Doxygen, please see [its webpage](https://www.doxygen.nl/
 
 ## Configuration
 
+### Fonts and colors
 The extension comes with two different color schemes, one for dark and one for light Visual Studio themes.
-The appropriate one is automatically selected.
-To this end, the detection of the theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
+The appropriate default scheme is selected automatically.
+To this end, the detection of the active Visual Studio theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
 
 The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with "DoxyHighlighter".
 Note that Visual Studio stores the settings per color theme.
 
-One thing that you might realize is that the color of ordinary text in "`///`"-comments is different to the color in other comments.
+One thing that you might realize is that the color of ordinary text in "`///`"-comments might be different to the color in other comments.
 This has nothing to do with the extension. Visual Studio classifies "`///`"-comments as "XML Doc Comment" and formats them differently by default.
 You can change the color in the "Fonts and Colors" settings.
+
+
+### Configuring the comment types
+You can configure separately whether the extension should perform highlighting in `/*`, `/**`, `/*!`, `//`, `///` and `//!` comments.
+In the Visual Studio options, see the settings under the "VSDoxyHighlighter" node.
+By default, syntax highlighting is not applied to `//` and `/*` comments because Doxygen does not parse those.
 
 
 ## Known problems
