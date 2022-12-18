@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 
+
 namespace VSDoxyHighlighter
 {
   // Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
@@ -104,16 +105,18 @@ namespace VSDoxyHighlighter
   }
 
 
+
   /// <summary>
   /// Main "entry" point that is used by Visual Studio to get the format (i.e. classification)
   /// of some code span. An instance of this class is created by Visual Studio per text buffer
   /// via CommentClassifierProvider. Visual Studio then calls GetClassificationSpans() to get
   /// the classification.
   /// </summary>
-  internal class CommentClassifier : IClassifier
+  internal class CommentClassifier : IClassifier, IDisposable
   {
     internal CommentClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
     {
+      mTextBuffer = textBuffer;
       mSpanSplitter = new SpanSplitter(textBuffer);
       mFormater = new CommentFormatter();
 
@@ -136,12 +139,18 @@ namespace VSDoxyHighlighter
 
       ThreadHelper.ThrowIfNotOnUIThread();
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
+      mGeneralOptions.SettingsChanged += OnSettingsChanged;
     }
 
+
 #pragma warning disable 67
-    // TODO: We need to call this with a certain span S if we decide that span S should be re-classified.
-    // E.g. might need to call this from listening to TextEditor-Changed events, and somewhere the opening of
-    // a comment is inserted, and thus all following lines need to be re-classified.
+    // We can call this event ourselves to tell Visual Studio that a certain span should be re-classified.
+    // E.g. if we figured out that somewhere the opening of a comment is inserted by the user, and thus
+    // all the following lines need to be re-classified.
+    // However, in the moment we do not really do this. Instead we rely on the default Visual Studio tagger
+    // to do the same thing. After all, if a user types e.g. a "/*", also the Visual Studio tagger needs
+    // to re-classify everything to apply the proper comment color. This will also cause our
+    // GetClassificationSpans() to be called again.
     public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 #pragma warning restore 67
 
@@ -208,6 +217,25 @@ namespace VSDoxyHighlighter
     }
 
 
+    void IDisposable.Dispose()
+    {
+      if (mGeneralOptions != null) {
+        mGeneralOptions.SettingsChanged -= OnSettingsChanged;
+      }
+    }
+
+
+    private void OnSettingsChanged(object sender, EventArgs e)
+    {
+      // We this function is called, the user clicked on "OK" in the options.
+      // Some or our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
+      // This ensures that any possible changes become visible immediately.
+      ClassificationChanged?.Invoke(this, new ClassificationChangedEventArgs(
+        new SnapshotSpan(mTextBuffer.CurrentSnapshot, new Span(0, mTextBuffer.CurrentSnapshot.Length))));
+    }
+
+
+    private readonly ITextBuffer mTextBuffer;
     private readonly SpanSplitter mSpanSplitter;
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;

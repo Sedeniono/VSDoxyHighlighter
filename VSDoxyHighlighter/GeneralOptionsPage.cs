@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
+using System;
 using System.ComponentModel;
+
 
 namespace VSDoxyHighlighter
 {
@@ -13,6 +15,23 @@ namespace VSDoxyHighlighter
     // The string that appears in the tools -> options dialog when expanding the main node
     // for the VSDoxyHighlighter entry.
     public const string PageCategory = "General";
+
+    /// <summary>
+    /// Called by Visual Studio when the user clicked on the "OK" button in the options dialog.
+    /// It is always called, regardless whether an own option or any option at all was changed.
+    /// </summary>
+    public override void SaveSettingsToStorage()
+    {
+      base.SaveSettingsToStorage();
+      SettingsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Event that gets called when the user clicked on the "OK" button in the options dialog.
+    /// It is always called, regardless whether an own option or any option at all was changed.
+    /// </summary>
+    public event EventHandler SettingsChanged;
+
 
     //----------------
     // Comment types
