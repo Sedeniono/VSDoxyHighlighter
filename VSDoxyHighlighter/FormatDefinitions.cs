@@ -17,7 +17,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public CommandFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Command";
+      DisplayName = "VSDoxyHighlighter - Command";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_command];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -36,7 +36,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public WarningKeywordFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Warning";
+      DisplayName = "VSDoxyHighlighter - Warning";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -55,7 +55,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Note";
+      DisplayName = "VSDoxyHighlighter - Note";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -74,7 +74,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public ParameterFormat1(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Parameter 1";
+      DisplayName = "VSDoxyHighlighter - Parameter 1";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter1];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -93,7 +93,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public ParameterFormat2(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Parameter 2";
+      DisplayName = "VSDoxyHighlighter - Parameter 2";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter2];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -112,7 +112,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public EmphasisMinorFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Emphasis (minor)";
+      DisplayName = "VSDoxyHighlighter - Emphasis (minor)";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMinor];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -130,7 +130,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public EmphasisMajorFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Emphasis (major)";
+      DisplayName = "VSDoxyHighlighter - Emphasis (major)";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMajor];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -148,7 +148,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public InlineCodeFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Inline code";
+      DisplayName = "VSDoxyHighlighter - Inline code";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_inlineCode];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -165,7 +165,7 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public TitleFormat(DefaultColors defaultColors)
     {
-      DisplayName = "DoxyHighlighter - Title";
+      DisplayName = "VSDoxyHighlighter - Title";
       TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_title];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
@@ -183,13 +183,14 @@ namespace VSDoxyHighlighter
   {
     public StrikethroughFormat()
     {
-      DisplayName = "DoxyHighlighter - Strikethrough";
+      DisplayName = "VSDoxyHighlighter - Strikethrough";
 
       // Note: No need for DefaultColors. We just add the strikethrough, but leave the text color unchanged.
 
-      TextDecorations = new TextDecorationCollection();
-      TextDecorations.Add(new TextDecoration(
-          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended));
+      TextDecorations = new TextDecorationCollection {
+        new TextDecoration(
+          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+      };
     }
   }
 }

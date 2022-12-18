@@ -71,7 +71,7 @@ The extension comes with two different color schemes, one for dark and one for l
 The appropriate default scheme is selected automatically.
 To this end, the detection of the active Visual Studio theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
 
-The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with "DoxyHighlighter".
+The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with **"VSDoxyHighlighter"**.
 Note that Visual Studio stores the settings per color theme.
 
 One thing that you might realize is that the color of ordinary text in "`///`"-comments might be different to the color in other comments.
@@ -80,7 +80,7 @@ You can change the color in the "Fonts and Colors" settings.
 
 
 ### Configuring the comment types
-You can configure separately whether the extension should perform highlighting in `/*`, `/**`, `/*!`, `//`, `///` and `//!` comments.
+You can configure separately whether the extension should perform highlighting in `/*`, `/**`, `/*!`, `//`, `///` or `//!` comments.
 In the Visual Studio options, see the settings under the "VSDoxyHighlighter" node.
 By default, syntax highlighting is not applied to `//` and `/*` comments because Doxygen does not parse those.
 
