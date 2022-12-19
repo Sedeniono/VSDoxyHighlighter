@@ -166,6 +166,15 @@ namespace VSDoxyHighlighter
     {
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
+      // The cache gets reset after every text edit. Hence, the cache optimizes scrolling through a file.
+      if (mCachedVersion != textSnapshot.Version.VersionNumber) {
+        mCache.Clear();
+        mCachedVersion = textSnapshot.Version.VersionNumber;
+      }
+      else if (mCache.TryGetValue(originalSpanToCheck.Span, out var cachedClassifications)) {
+        return cachedClassifications;
+      }
+
       // First step: Identify the comment sections in the given span.
       List<CommentSpan> commentSpans = mSpanSplitter.SplitIntoComments(originalSpanToCheck);
       
@@ -192,6 +201,7 @@ namespace VSDoxyHighlighter
 #endif
       }
 
+      mCache[originalSpanToCheck.Span] = result;
       return result;
     }
 
@@ -227,6 +237,9 @@ namespace VSDoxyHighlighter
 
     private void OnSettingsChanged(object sender, EventArgs e)
     {
+      mCache.Clear();
+      mCachedVersion = -1;
+
       // We this function is called, the user clicked on "OK" in the options.
       // Some or our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
       // This ensures that any possible changes become visible immediately.
@@ -240,6 +253,10 @@ namespace VSDoxyHighlighter
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
     private readonly GeneralOptionsPage mGeneralOptions;
+
+    private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
+    private int mCachedVersion = -1;
+
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
     static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {
