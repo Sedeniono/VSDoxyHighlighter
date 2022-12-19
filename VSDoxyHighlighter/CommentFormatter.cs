@@ -91,10 +91,11 @@ namespace VSDoxyHighlighter
   /// </summary>
   public class CommentFormatter
   {
-    public CommentFormatter()
+    static CommentFormatter()
     {
       mMatchers = BuildMatchers();
     }
+
 
     /// <summary>
     /// Given some code in "text", returns a list of fragments that specifies how the comments
@@ -140,7 +141,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private List<FragmentMatcher> BuildMatchers()
+    private static List<FragmentMatcher> BuildMatchers()
     {
       var matchers = new List<FragmentMatcher>();
 
@@ -468,13 +469,13 @@ namespace VSDoxyHighlighter
     private const string cWhitespaceAfterwards = @"(?:$|[ \t\n\r])";
 
 
-    private string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
-    private string BuildRegex_CodeCommand()
+    private static string BuildRegex_CodeCommand()
     {
       // Command \code, \code{cpp}, ...
       // https://www.doxygen.nl/manual/starting.html#step1
@@ -482,29 +483,29 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
     }
 
-    private string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(string[] keywords)
+    private static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
-    private string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(string[] keywords) 
+    private static string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(string[] keywords) 
     {
       string concatKeywords = String.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))";
     }
 
-    private string BuildRegex_FormulaEnvironmentStart() 
+    private static string BuildRegex_FormulaEnvironmentStart() 
     {
       return $@"({cCmdPrefix}f\{{.*\}}\{{?)";
     }
 
-    private string BuildRegex_Language() 
+    private static string BuildRegex_Language() 
     {
       return $@"({cCmdPrefix}~(?:[^ \t]\w+)?)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(string[] keywords)
     {
       string concatKeywords = String.Join("|", keywords);
 
@@ -523,7 +524,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -532,7 +533,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
     {
       // BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd() also treats the 1 parameter as optional to provide
       // early syntax highlighting (if the parameter does not yet exist). Neverthless, we need a different regex
@@ -544,7 +545,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]*([^\n\r]*))?";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -553,7 +554,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -562,7 +563,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
+    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -578,7 +579,7 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(string[] keywords)
+    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(string[] keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -587,7 +588,7 @@ namespace VSDoxyHighlighter
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(string[] keywords)
+    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(string[] keywords)
     {
       // Examples:
       //   \ref Class::Func()
@@ -624,14 +625,14 @@ namespace VSDoxyHighlighter
       //|_________________________|_____________________________|_____________________________| 
       @"(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
 
-    private string BuildRegex_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
+    private static string BuildRegex_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
     {
       string concatKeywords = String.Join("|", keywords);
       // Example: \dot "foo test"  width=2\textwidth   height=1cm
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
-    private string BuildRegex_StartUmlCommandWithBracesOptions() 
+    private static string BuildRegex_StartUmlCommandWithBracesOptions() 
     {
       return $@"({cCmdPrefix}startuml(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
@@ -645,7 +646,7 @@ namespace VSDoxyHighlighter
       //   _____  _________________|_______________
       @"(?:[ \t]+((?:""[^\r\n]*?"")|(?:[^ \t\r\n]*)))?";
 
-    private string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
+    private static string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
     {
       string concatKeywords = String.Join("|", keywords);
       // Examples:
@@ -654,7 +655,7 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
-    private string BuildRegex_ImageCommand()
+    private static string BuildRegex_ImageCommand()
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -697,11 +698,11 @@ namespace VSDoxyHighlighter
       public System.Runtime.CompilerServices.ITuple types { get; set; }
     };
 
-    private readonly List<FragmentMatcher> mMatchers;
+    private static readonly List<FragmentMatcher> mMatchers;
     private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
     // In my tests, each individual regex always used less than 100ms.
     // The max. time I was able to measure for a VERY long line was ~60ms.
-    private readonly TimeSpan cRegexTimeout = TimeSpan.FromMilliseconds(100.0);
+    private static readonly TimeSpan cRegexTimeout = TimeSpan.FromMilliseconds(100.0);
   }
 }
