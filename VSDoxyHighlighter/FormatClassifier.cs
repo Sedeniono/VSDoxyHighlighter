@@ -240,8 +240,8 @@ namespace VSDoxyHighlighter
       mCache.Clear();
       mCachedVersion = -1;
 
-      // We this function is called, the user clicked on "OK" in the options.
-      // Some or our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
+      // When this function is called, the user clicked on "OK" in the options.
+      // Some of our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
       // This ensures that any possible changes become visible immediately.
       ClassificationChanged?.Invoke(this, new ClassificationChangedEventArgs(
         new SnapshotSpan(mTextBuffer.CurrentSnapshot, new Span(0, mTextBuffer.CurrentSnapshot.Length))));
