@@ -313,10 +313,14 @@ namespace VSDoxyHighlighter
         (cachedTypeOfFragmentWhereStopped == CommentType.Unknown)
           ? IdentifyTypeOfCommentStartingAt(textSnapshot, curCommentStartCharIdx)
           : cachedTypeOfFragmentWhereStopped;
-      Debug.Assert(curCommentType != CommentType.Unknown);
 
       while (fragmentsInReverseOrder.Count() > 0) {
-        Debug.Assert(curCommentType != CommentType.Unknown);
+        if (curCommentType == CommentType.Unknown) {
+          // Sometimes, the VS default tagger is (temporarily) confused. For example, while pasting text I have seen
+          // it thinking that in " :/**" the whole string is a comment. Apparently, the tagger had not fully parsed
+          // the text yet.
+          return CommentType.Unknown;
+        }
         mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
 
         bool curCommentTerminates = IsCommentFragmentTerminated(curCommentType, curFragment);
@@ -328,8 +332,9 @@ namespace VSDoxyHighlighter
         }
       }
 
-      Debug.Assert(curCommentType != CommentType.Unknown);
-      mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
+      if (curCommentType != CommentType.Unknown) {
+        mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
+      }
 
       Debug.Assert(curCommentStartCharIdx >= 0);
       return curCommentType;
