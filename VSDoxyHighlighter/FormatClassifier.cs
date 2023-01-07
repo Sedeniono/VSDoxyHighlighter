@@ -117,7 +117,11 @@ namespace VSDoxyHighlighter
     internal CommentClassifier(IClassificationTypeRegistryService registry, ITextBuffer textBuffer)
     {
       mTextBuffer = textBuffer;
-      mSpanSplitter = new SpanSplitter(textBuffer);
+
+      mVSCppColorer = new DefaultVSCppColorerImpl(textBuffer);
+      mVSCppColorer.CppColorerReclassifiedSpan += OnVSCppColorerReclassifiedSpan;
+
+      mSpanSplitter = new SpanSplitter(mVSCppColorer);
       mFormater = new CommentFormatter();
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
@@ -164,11 +168,22 @@ namespace VSDoxyHighlighter
     /// </summary>
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
     {
+      mVSCppColorer.InitializeLazily(); // Ensure the events are set up properly.
+
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
-      // The cache gets reset after every text edit. Hence, the cache optimizes scrolling through a file.
+      // Performance optimization: GetClassificationSpans() gets called several times after every edit.
+      // 1) Once by VS itself.
+      // 2) Then the Visual Studio cpp colorer triggers a reclassification a short time later, after it updated its internal
+      //    view of the document (where a comment starts, etc.). Actually, we do want to reclassify the text again in this case
+      //    since we rely on the VS cpp colorer. See OnVSCppColorerReclassifiedSpan() for this.
+      // 3) Afterwards, several calls due to the outlining feature of Visual Studio.
+      // 4) Extensions such as Viasfora create aggregators via IClassifierAggregatorService, IBufferTagAggregatorFactoryService, etc,
+      //    and when they request the classifications from these aggregators, our code gets triggered again.
+      // 5) Scrolling in the text documents also constantly triggers GetClassificationSpans() calls.
+      // ==> We optimize (3), (4) and (5) via a cache. This reduces the CPU load very notably.
       if (mCachedVersion != textSnapshot.Version.VersionNumber) {
-        mCache.Clear();
+        InvalidateCache();
         mCachedVersion = textSnapshot.Version.VersionNumber;
       }
       else if (mCache.TryGetValue(originalSpanToCheck.Span, out var cachedClassifications)) {
@@ -227,20 +242,46 @@ namespace VSDoxyHighlighter
     }
 
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
+      // TODO: This is currently dead code.
+      // Visual Studio does not call the Dispose() function. It does get called for ITagger, but not for IClassifier.
+      // This looks like a bug: The reasons is probably that the Dispose() method of ClassifierTagger (which owns the
+      // IClassifiers) does not call Dispose() on its IClassifiers:
+      // https://github.com/microsoft/vs-editor-api/blob/0209a13c58194d4f2a7d03a2615ef03e857547e7/src/Editor/Text/Impl/ClassificationAggregator/ClassifierTagger.cs#L74
+      //
+      // We could implement our classifier also as ITagger<ClassificationTag>. Then Dispose() works. However, cutting
+      // out some text while "rich text editing" is enabled first gets (indirectly) the tagger from the text buffer to
+      // format the text in the clipboard, and then ends up calling our Dispose(). Especially, it is called on the instance
+      // that is associated with the ordinary text buffer, and which remains valid and is still in use. Thus, from this
+      // point forward, our classifier no longer listens to the events that we unsubscribe from here. That looks like
+      // another Visual Studio bug.
+      //
+      // So both ways of doing it is broken due to Visual Studio bugs (VS 17.4.2). Having Dispose() not being called seems
+      // like the lesser evil. Especially considering that I failed to trigger a garbage collection that frees the associated
+      // ITextBuffer, even when closing the whole Visual Studio solution (but not Visual Studio itself). So Visual Studio
+      // appears to not clean up the memory there, too.
+
+      if (mDisposed) {
+        return;
+      }
+      mDisposed = true;
+
       if (mGeneralOptions != null) {
         mGeneralOptions.SettingsChanged -= OnSettingsChanged;
+      }
+      if (mVSCppColorer != null) {
+        mVSCppColorer.CppColorerReclassifiedSpan -= OnVSCppColorerReclassifiedSpan;
+        mVSCppColorer.Dispose();
       }
     }
 
 
+    // When this function is called, the user clicked on "OK" in the options.
     private void OnSettingsChanged(object sender, EventArgs e)
     {
-      mCache.Clear();
-      mCachedVersion = -1;
+      InvalidateCache();
 
-      // When this function is called, the user clicked on "OK" in the options.
       // Some of our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
       // This ensures that any possible changes become visible immediately.
       ClassificationChanged?.Invoke(this, new ClassificationChangedEventArgs(
@@ -248,7 +289,29 @@ namespace VSDoxyHighlighter
     }
 
 
+    // When this is called, the default Visual Studio cpp colorer updated some colors (i.e. some classifications).
+    private void OnVSCppColorerReclassifiedSpan(object sender, SnapshotSpanEventArgs e) 
+    {
+      InvalidateCache();
+
+      // Since our classification logic is based on the VS cpp colorer (due to the cache, but also because of the SpanSplitter),
+      // we need to trigger a reclassification, too. In principle, even without us triggering another reclassification, the one from
+      // the VS cpp colorer might be enough. However, this would depend on the execution order of the listeners of the VS cpp
+      // colorer's TagsChanged event. This is brittle. So we trigger one ourselves.
+      ClassificationChanged?.Invoke(this, new ClassificationChangedEventArgs(e.Span));
+    }
+
+
+    private void InvalidateCache()
+    {
+      mCache.Clear();
+      mCachedVersion = -1;
+      mSpanSplitter.InvalidateCache();
+    }
+
+
     private readonly ITextBuffer mTextBuffer;
+    private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
     private readonly CommentFormatter mFormater;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
@@ -257,6 +320,7 @@ namespace VSDoxyHighlighter
     private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
     private int mCachedVersion = -1;
 
+    private bool mDisposed = false;
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
     static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {

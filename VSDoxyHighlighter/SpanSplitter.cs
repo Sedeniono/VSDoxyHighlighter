@@ -1,11 +1,10 @@
-﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text.Tagging;
+﻿using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
+using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
@@ -83,11 +82,18 @@ namespace VSDoxyHighlighter
   /// </summary>
   internal class SpanSplitter
   {
-    public SpanSplitter(ITextBuffer textBuffer) 
+    public SpanSplitter(IVisualStudioCppColorer vsCppColorer) 
     {
-      mTextBuffer = textBuffer;
-      mCommentTypeIdentification = new CommentTypeIdentification();
+      mVSCppColorer = vsCppColorer;
+      mCommentTypeIdentification = new CommentTypeIdentification(vsCppColorer);
     }
+
+    
+    public void InvalidateCache() 
+    {
+      mCommentTypeIdentification.InvalidateCache();
+    }
+
 
     /// <summary>
     /// Decomposes the given span into comments. The returned list of spans all represent comments.
@@ -136,51 +142,34 @@ namespace VSDoxyHighlighter
       //     does not read "//" and "/*" comments, only "///", "/**", etc. Unfortunately, the VS tagger does not provide
       //     us with that information directly. Thus, the logic becomes again a bit more complicated, see IdentifyCommentType().
 
-      var vsCppTagger = FindDefaultVSCppTagger();
-      if (vsCppTagger != null) {
-        try {
-          IEnumerable<ITagSpan<IClassificationTag>> vsCppTags 
-            = vsCppTagger.GetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
-
-          //System.Diagnostics.Debug.WriteLine("For: " + spanToCheck.GetText().Replace("\r\n", "\\n"));
-          var result = new List<CommentSpan>();
-          int tagCount = vsCppTags.Count();
-          for (int tagIndex = 0; tagIndex < tagCount; ++tagIndex) {
-            var vsTag = vsCppTags.ElementAt(tagIndex);
-            if (!spanToCheck.Span.OverlapsWith(vsTag.Span)) {
-              continue;
-            }
-
-            if (IsVSComment(vsTag)) {
-              CommentType type = mCommentTypeIdentification.IdentifyCommentType(
-                spanToCheck.Snapshot, new VSCommentFragment(vsCppTags, tagIndex), vsCppTagger);
-              result.Add(new CommentSpan(vsTag.Span, type));
-              //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
-            }
-            //else {
-            //  System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification);
-            //}
-          }
-
-          return result;
-        }
-        catch (System.NullReferenceException ex) {
-          // The "vsCppTagger" throws a NullReferenceException if one renames a file that has not a C++ ending (.cpp, .cc, etc.)
-          // (and thus has initially no syntax highlighting) to a name with a C++ ending (e.g. .cpp). I think the tagger that
-          // we find for the very first classification is the wrong one, or something like that. The problem vanishes when we
-          // search the default tagger again when a re-classification gets triggered a bit later.
-          ActivityLog.LogWarning(
-            "VSDoxyHighlighter",
-            $"Probably the 'vsCppTagger' threw a NullReferenceException. Exception message: {ex.ToString()}");
-          mDefaultVSCppTagger = null;
-          return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
-        }
-      }
-      else {
-        // Mh, no tagger found? Maybe Microsoft changed their tagger name?
-        ActivityLog.LogWarning("VSDoxyHighlighter", "The 'vsCppTagger' is null.");
+      IEnumerable<ITagSpan<IClassificationTag>> vsCppTags 
+        = mVSCppColorer.TryGetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
+      if (vsCppTags == null) {
+        ActivityLog.LogWarning("VSDoxyHighlighter", "Failed to get tags from VS cpp colorer.");
         return new List<CommentSpan>() { new CommentSpan(spanToCheck.Span, CommentType.Unknown) };
       }
+
+      //System.Diagnostics.Debug.WriteLine("For: " + spanToCheck.GetText().Replace("\r\n", "\\n"));
+      var result = new List<CommentSpan>();
+      int tagCount = vsCppTags.Count();
+      for (int tagIndex = 0; tagIndex < tagCount; ++tagIndex) {
+        var vsTag = vsCppTags.ElementAt(tagIndex);
+        if (!spanToCheck.Span.OverlapsWith(vsTag.Span)) {
+          continue;
+        }
+
+        if (IsVSComment(vsTag)) {
+          CommentType type = mCommentTypeIdentification.IdentifyCommentType(
+            spanToCheck.Snapshot, new VSCommentFragment(vsCppTags, tagIndex));
+          result.Add(new CommentSpan(vsTag.Span, type));
+          //System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification + " ==> " + type.ToString());
+        }
+        //else {
+        //  System.Diagnostics.Debug.WriteLine("\t'" + vsTag.Span.GetText().Replace("\r\n", "\\n") + "' ==> " + vsTag.Tag.ClassificationType.Classification);
+        //}
+      }
+
+      return result;
     }
 
 
@@ -201,34 +190,8 @@ namespace VSDoxyHighlighter
     }
 
 
-    /// <summary>
-    /// Retrives the tagger of Visual Studio that is responsible for classifying C++ code. 
-    /// See comment in DecomposeSpanIntoComments().
-    /// </summary>
-    private ITagger<IClassificationTag> FindDefaultVSCppTagger()
-    {
-      if (mDefaultVSCppTagger == null) {
-        string nameOfDefaultCppTagger = "Microsoft.VisualC.CppColorer".ToUpper();
-        foreach (var kvp in mTextBuffer.Properties.PropertyList) {
-          if (kvp.Value is ITagger<IClassificationTag> casted) {
-            if (kvp.Key.ToString().ToUpper() == nameOfDefaultCppTagger) {
-              mDefaultVSCppTagger = casted;
-              break;
-            }
-          }
-        }
-      }
-
-      return mDefaultVSCppTagger;
-    }
-
-
-    private readonly ITextBuffer mTextBuffer;
+    private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly CommentTypeIdentification mCommentTypeIdentification;
-
-    // Cached tagger that is used by Visual Studio to classify C/C++ code.
-    private ITagger<IClassificationTag> mDefaultVSCppTagger = null;
-
   }
 
 
@@ -242,29 +205,51 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentTypeIdentification
   {
+    public CommentTypeIdentification(IVisualStudioCppColorer vsCppColorer) 
+    {
+      mVSCppColorer = vsCppColorer;
+    }
+
+    
+    public void InvalidateCache()
+    {
+      // Note: We rely on this being called from CommentClassifier. At first sight, it would be nicer to simply
+      // listen to the IVisualStudioCppColorer.CppColorerReclassifiedSpan event. However, the CommentClassifier
+      // is doing the same thing and triggers a reclassification immediately. Thus, to ensure that our cache gets
+      // cleared before the reclassification gets triggered in CommentClassifier, we cannot use the event
+      // IVisualStudioCppColorer.CppColorerReclassifiedSpan. Otherwise, the result would depend on the order
+      // of the listeners in the event.
+      mFileVersionOfCache = -1;
+      mCommentTypeCache.Clear();
+    }
+
+
     /// <summary>
-    /// Given a specific fragment of a comment (as identified by the Visual Studio's default tagger),
+    /// Given a specific fragment of a comment (as identified by the Visual Studio's default cpp tagger),
     /// returns the type of that comment ("//", "///", "/*", etc).
     /// </summary>
     public CommentType IdentifyCommentType(
       ITextSnapshot textSnapshot, 
-      VSCommentFragment inputFragment,
-      ITagger<IClassificationTag> defaultVSTagger)
+      VSCommentFragment inputFragment)
     {
       // The task is to find the start of the comment which contains the given comment fragment "inputFragment".
       // Looking at the found start, we can check its type.
       // The basic idea is to go to the next character BEFORE the start of the "inputFragment", and ask the
-      // VS tagger whether we are still in a comment or not. If we are not, we know that the fragment also
+      // VS cpp tagger whether we are still in a comment or not. If we are not, we know that the fragment also
       // starts the comment. Otherwise, we need to go further back until we hit a character that is not within
       // a comment.
-      // The VS tagger does decompose multiple comments on a line for us (e.g. "/**//**/" gives two tags).
+      // The VS cpp tagger does decompose multiple comments on a line for us (e.g. "/**//**/" gives two tags).
       // Unfortunately, it does not do this for comments on successive lines with only the newline charcater
       // in-between. Thus, the logic becomes more complicated: After having found a non-comment token, we need
       // to go forward again line by line and check ourselves whether a comment fragment ends the comment.
 
+      // The caching is very important for very long C-style comments. Without caching we end up iterating backwards
+      // in the file until we hit the start of the comment for every single classification request. For example,
+      // if we have a C-style comment with 10000 lines and attempt to scroll near the end of it, Visual Studio
+      // constantly hangs for several seconds without the cache.
       if (textSnapshot.Version.VersionNumber != mFileVersionOfCache) {
         // File was edited, reset cache.
-        mCommentTypeCache.Clear();
+        InvalidateCache();
         mFileVersionOfCache = textSnapshot.Version.VersionNumber;
       }
 
@@ -279,7 +264,7 @@ namespace VSDoxyHighlighter
       CommentType cachedTypeOfFragmentWhereStopped = CommentType.Unknown;
       while (true) {
         (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine) 
-          = FragmentContainsCommentStartAssuredly(curFragment.fragmentTag, defaultVSTagger);
+          = FragmentContainsCommentStartAssuredly(curFragment.fragmentTag);
 
         // Performance optimization: If we could immediately identify the start of the comment to be at the start
         // of the original input fragment, no need to do all the more complicated logic and allocations. Return directly.
@@ -448,7 +433,7 @@ namespace VSDoxyHighlighter
     /// for a previous line. For performance reasons, the function returns the result in this case.
     /// </summary>
     private (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine)
-      FragmentContainsCommentStartAssuredly(ITagSpan<IClassificationTag> commentFragment, ITagger<IClassificationTag> defaultVSTagger)
+      FragmentContainsCommentStartAssuredly(ITagSpan<IClassificationTag> commentFragment)
     {
       Debug.Assert(SpanSplitter.IsVSComment(commentFragment));
 
@@ -467,8 +452,13 @@ namespace VSDoxyHighlighter
       // given just a single character. But to be on the safe side, and because we need to classification of the whole
       // line further down, we give it the whole line right here.
       ITextSnapshotLine previousLine = textSnapshot.GetLineFromPosition(charIdxBeforeComment);
-      var tagsOfPreviousLine = defaultVSTagger.GetTags(new NormalizedSnapshotSpanCollection(textSnapshot, previousLine.Extent.Span));
-      if (tagsOfPreviousLine.Count() <= 0) {
+      var tagsOfPreviousLine = mVSCppColorer.TryGetTags(new NormalizedSnapshotSpanCollection(textSnapshot, previousLine.Extent.Span));
+      if (tagsOfPreviousLine == null) {
+        // Something went wrong. Ensure that we will not work with an outdated cache in the future.
+        InvalidateCache();
+        return (true, null);
+      }
+      else if (tagsOfPreviousLine.Count() <= 0) {
         // The default tagger e.g. does not return any tags if a line contains only whitespace that is *outside* of a comment.
         return (true, null);
       }
@@ -549,6 +539,8 @@ namespace VSDoxyHighlighter
       return (charIdx, numSkippedNewlines);
     }
 
+
+    private readonly IVisualStudioCppColorer mVSCppColorer;
 
     // For every start index of some comment fragment (index in terms of the character index in the file), we cache
     // the resulting comment type for performance reasons. The cache gets reset after every edit.
