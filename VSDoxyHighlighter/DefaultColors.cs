@@ -9,29 +9,34 @@ using Microsoft.VisualStudio.Text.Formatting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Windows;
 using System.Windows.Media;
 
 namespace VSDoxyHighlighter
 {
   /// <summary>
-  /// Simple type to hold both an optional foreground and background color.
+  /// Simple type to formatting information about some text.
   /// </summary>
-  public class TextColor 
+  public class TextProperties 
   {
     public readonly Color? Foreground;
     public readonly Color? Background;
+    public readonly bool IsBold;
+    public readonly bool IsItalic;
 
-    public TextColor(Color? foreground, Color? background)
+    public TextProperties(Color? foreground, Color? background, bool isBold, bool isItalic)
     {
       Foreground = foreground;
       Background = background;
+      IsBold = isBold;
+      IsItalic = isItalic;
     }
   }
 
 
   /// <summary>
-  /// Manages the default colors of our classifications, suitable for the current Visual Studio's color theme.
-  /// Thus, it provides access to the default colors for the current theme, and also updates them if the theme 
+  /// Manages the default colors and formatting of our classifications, suitable for the current Visual Studio's color theme.
+  /// Thus, it provides access to the default formatting for the current theme, and also updates them if the theme 
   /// of Visual Studio is changed by the user.
   /// 
   /// Note that the user settings are stored per theme in the registry.
@@ -47,6 +52,7 @@ namespace VSDoxyHighlighter
       mCurrentTheme = GetCurrentTheme();
     }
 
+
     public void Dispose()
     {
       if (mDisposed) {
@@ -60,9 +66,9 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// Returns the default colors for our extension's classifications, as suitable for the current color theme. 
     /// </summary>
-    public Dictionary<string, TextColor> GetDefaultColorsForCurrentTheme()
+    public Dictionary<string, TextProperties> GetDefaultFormattingForCurrentTheme()
     {
-      return GetColorsForTheme(mCurrentTheme);
+      return GetDefaultFormattingForTheme(mCurrentTheme);
     }
 
 
@@ -78,7 +84,7 @@ namespace VSDoxyHighlighter
       Dark
     }
 
-    static private Dictionary<string, TextColor> GetColorsForTheme(Theme theme)
+    static private Dictionary<string, TextProperties> GetDefaultFormattingForTheme(Theme theme)
     {
       switch (theme) {
         case Theme.Light:
@@ -129,18 +135,24 @@ namespace VSDoxyHighlighter
         formatMap.BeginBatchUpdate();
 
         ColorableItemInfo[] colorInfo = new ColorableItemInfo[1];
-        foreach (var p in GetColorsForTheme(mCurrentTheme)) {
+        foreach (var p in GetDefaultFormattingForTheme(mCurrentTheme)) {
           string classificationTypeId = p.Key;
-          TextColor newColor = p.Value;
+          TextProperties newColor = p.Value;
 
           if (fontAndColorStorage.GetItem(classificationTypeId, colorInfo) != VSConstants.S_OK) { //comment from F# repo: "we don't touch the changes made by the user"
             IClassificationType classificationType = mClassificationTypeRegistryService.GetClassificationType(classificationTypeId);
             var oldProp = formatMap.GetTextProperties(classificationType);
+            var oldTypeface = oldProp.Typeface;
 
             var foregroundBrush = newColor.Foreground == null ? null : new SolidColorBrush(newColor.Foreground.Value);
             var backgroundBrush = newColor.Background == null ? null : new SolidColorBrush(newColor.Background.Value);
 
-            var newProp = TextFormattingRunProperties.CreateTextFormattingRunProperties(foregroundBrush, backgroundBrush, oldProp.Typeface, null, null,
+            var newFontStyle = newColor.IsItalic ? FontStyles.Italic : FontStyles.Normal;
+            var newWeight = newColor.IsBold ? FontWeights.Bold : FontWeights.Normal;
+            var newTypeface = new Typeface(oldTypeface.FontFamily, newFontStyle, newWeight, oldTypeface.Stretch);
+
+            var newProp = TextFormattingRunProperties.CreateTextFormattingRunProperties(
+              foregroundBrush, backgroundBrush, newTypeface, null, null,
               oldProp.TextDecorations, oldProp.TextEffects, oldProp.CultureInfo);
 
             formatMap.SetTextProperties(classificationType, newProp);
@@ -195,29 +207,31 @@ namespace VSDoxyHighlighter
 
 
     // Default colors for light color themes.
-    static readonly Dictionary<string, TextColor> cLightColors = new Dictionary<string, TextColor> {
-      { IDs.ID_command, new TextColor(Color.FromRgb(0, 75, 0), null) },
-      { IDs.ID_parameter1, new TextColor(Color.FromRgb(0, 80, 218), null) },
-      { IDs.ID_parameter2, new TextColor(Color.FromRgb(0, 80, 218), null) },
-      { IDs.ID_title, new TextColor(Color.FromRgb(0, 0, 0), null) },
-      { IDs.ID_warningKeyword, new TextColor(Color.FromRgb(200, 0, 0), null) },
-      { IDs.ID_noteKeyword, new TextColor(Color.FromRgb(255, 155, 0), null) },
-      { IDs.ID_emphasisMinor, new TextColor(Color.FromRgb(0, 75, 0), null) },
-      { IDs.ID_emphasisMajor, new TextColor(Color.FromRgb(0, 75, 0), null) },
-      { IDs.ID_inlineCode, new TextColor(Color.FromRgb(85, 85, 85), Color.FromRgb(235, 235, 235)) },
+    static readonly Dictionary<string, TextProperties> cLightColors = new Dictionary<string, TextProperties> {
+      { IDs.ID_command,        new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),  background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),  background: null, isBold: false, isItalic: false) },
+      { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(0, 0, 0),     background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_warningKeyword, new TextProperties(foreground: Color.FromRgb(200, 0, 0),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_noteKeyword,    new TextProperties(foreground: Color.FromRgb(255, 155, 0), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_emphasisMinor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: false, isItalic: true) },
+      { IDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_strikethrough,  new TextProperties(foreground: null,                       background: null, isBold: false, isItalic: false) },
+      { IDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(85, 85, 85),  background: Color.FromRgb(235, 235, 235), isBold: false, isItalic: false) },
     };
 
     // Default colors for dark color themes.
-    static readonly Dictionary<string, TextColor> cDarkColors = new Dictionary<string, TextColor> {
-      { IDs.ID_command, new TextColor(Color.FromRgb(140, 203, 128), null) },
-      { IDs.ID_parameter1, new TextColor(Color.FromRgb(86, 156, 214), null) },
-      { IDs.ID_parameter2, new TextColor(Color.FromRgb(86, 156, 214), null) },
-      { IDs.ID_title, new TextColor(Color.FromRgb(206, 206, 206), null) },
-      { IDs.ID_warningKeyword, new TextColor(Color.FromRgb(255, 36, 23), null) },
-      { IDs.ID_noteKeyword, new TextColor(Color.FromRgb(255, 155, 0), null) },
-      { IDs.ID_emphasisMinor, new TextColor(Color.FromRgb(140, 203, 128), null) },
-      { IDs.ID_emphasisMajor, new TextColor(Color.FromRgb(166, 215, 157), null) },
-      { IDs.ID_inlineCode, new TextColor(Color.FromRgb(200, 200, 200), Color.FromRgb(51, 51, 51)) },
+    static readonly Dictionary<string, TextProperties> cDarkColors = new Dictionary<string, TextProperties> {
+      { IDs.ID_command,        new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: false, isItalic: false) },
+      { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(206, 206, 206), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_warningKeyword, new TextProperties(foreground: Color.FromRgb(255, 36, 23),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_noteKeyword,    new TextProperties(foreground: Color.FromRgb(255, 155, 0),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_emphasisMinor,  new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: false, isItalic: true) },
+      { IDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(166, 215, 157), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_strikethrough,  new TextProperties(foreground: null,                         background: null, isBold: false, isItalic: false) },
+      { IDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(200, 200, 200), background: Color.FromRgb(51, 51, 51), isBold: false, isItalic: false) },
     };
 
     

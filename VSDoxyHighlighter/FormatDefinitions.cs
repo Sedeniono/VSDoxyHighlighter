@@ -23,20 +23,33 @@ namespace VSDoxyHighlighter
 
   internal abstract class FormatDefinitionBase : ClassificationFormatDefinition, IFormatDefinition
   {
-    public abstract void Reinitialize();
-
-    protected FormatDefinitionBase(DefaultColors defaultColors, string displayName) 
+    protected FormatDefinitionBase(DefaultColors defaultColors, string ID, string displayName) 
     {
       if (defaultColors == null) {
         throw new System.ArgumentNullException("VSDoxyHighlighter: The 'DefaultColors' to a FormatDefinition is null");
       }
+
+      mID = ID;
+
       mDefaultColors = defaultColors;
       mDefaultColors.RegisterFormatDefinition(this);
 
       DisplayName = displayName;
+
+      Reinitialize();
+    }
+
+    public virtual void Reinitialize()
+    {
+      TextProperties color = mDefaultColors.GetDefaultFormattingForCurrentTheme()[mID];
+      ForegroundColor = color.Foreground;
+      BackgroundColor = color.Background;
+      IsBold = color.IsBold;
+      IsItalic = color.IsItalic;
     }
 
     protected readonly DefaultColors mDefaultColors;
+    protected readonly string mID;
   }
 
 
@@ -53,17 +66,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public CommandFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Command")
+      : base(defaultColors, IDs.ID_command, "VSDoxyHighlighter - Command")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_command];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
 
@@ -77,17 +81,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public WarningKeywordFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Warning")
+      : base(defaultColors, IDs.ID_warningKeyword, "VSDoxyHighlighter - Warning")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
 
@@ -101,17 +96,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Note")
+      : base(defaultColors, IDs.ID_noteKeyword, "VSDoxyHighlighter - Note")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
 
@@ -125,17 +111,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public ParameterFormat1(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Parameter 1")
+      : base(defaultColors, IDs.ID_parameter1, "VSDoxyHighlighter - Parameter 1")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter1];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
 
@@ -149,17 +126,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public ParameterFormat2(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Parameter 2")
+      : base(defaultColors, IDs.ID_parameter2, "VSDoxyHighlighter - Parameter 2")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter2];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = false;
     }
   }
 
@@ -173,19 +141,11 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public EmphasisMinorFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Emphasis (minor)")
+      : base(defaultColors, IDs.ID_emphasisMinor, "VSDoxyHighlighter - Emphasis (minor)")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMinor];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsItalic = true;
     }
   }
+
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMajor)]
@@ -196,19 +156,11 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public EmphasisMajorFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Emphasis (major)")
+      : base(defaultColors, IDs.ID_emphasisMajor, "VSDoxyHighlighter - Emphasis (major)")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMajor];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
+
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
@@ -219,18 +171,11 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public InlineCodeFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Inline code")
+      : base(defaultColors, IDs.ID_inlineCode, "VSDoxyHighlighter - Inline code")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_inlineCode];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
     }
   }
+
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
@@ -241,17 +186,8 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public TitleFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Title")
+      : base(defaultColors, IDs.ID_title, "VSDoxyHighlighter - Title")
     {
-      Reinitialize();
-    }
-
-    public override void Reinitialize()
-    {
-      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_title];
-      ForegroundColor = color.Foreground;
-      BackgroundColor = color.Background;
-      IsBold = true;
     }
   }
 
@@ -265,13 +201,14 @@ namespace VSDoxyHighlighter
   {
     [ImportingConstructor]
     public StrikethroughFormat(DefaultColors defaultColors)
-      : base(defaultColors, "VSDoxyHighlighter - Strikethrough")
+      : base(defaultColors, IDs.ID_strikethrough, "VSDoxyHighlighter - Strikethrough")
     {
-      Reinitialize();
     }
 
     public override void Reinitialize()
     {
+      base.Reinitialize();
+
       TextDecorations = new TextDecorationCollection {
         new TextDecoration(
           TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
