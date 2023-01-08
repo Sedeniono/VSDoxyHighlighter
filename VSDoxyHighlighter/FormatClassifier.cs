@@ -16,8 +16,10 @@ using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
-  // Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
-  // to store the classification's configuration in the registry.
+  /// <summary>
+  /// Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
+  /// to store the classification's configuration in the registry.
+  /// </summary>
   public static class IDs
   {
     public const string ID_command = "DoxyTest3Command";
@@ -37,7 +39,7 @@ namespace VSDoxyHighlighter
   /// <summary>
   /// Tells Visual Studio via MEF about the classifications provided by the extension.
   /// </summary>
-  internal static class TestClassifierClassificationDefinition
+  internal static class CommentClassificationDefinitions
   {
 #pragma warning disable 169
     [Export(typeof(ClassificationTypeDefinition))]
@@ -122,7 +124,7 @@ namespace VSDoxyHighlighter
       mVSCppColorer.CppColorerReclassifiedSpan += OnVSCppColorerReclassifiedSpan;
 
       mSpanSplitter = new SpanSplitter(mVSCppColorer);
-      mFormater = new CommentFormatter();
+      mFormatter = new CommentFormatter();
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
       mFormatTypeToClassificationType = new IClassificationType[numFormats];
@@ -197,11 +199,11 @@ namespace VSDoxyHighlighter
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
-        if (ApplyHighlightingToCommentType(commentSpan.commentType)) {
+        if (ShouldApplyHighlightingToCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
 
           // Scan the given text for keywords and get the proper formatting for it.
-          var fragmentsToFormat = mFormater.FormatText(codeText);
+          var fragmentsToFormat = mFormatter.FormatText(codeText);
 
           // Convert the list of fragments that should be formatted to Visual Studio types.
           foreach (FormattedFragment fragment in fragmentsToFormat) {
@@ -221,7 +223,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private bool ApplyHighlightingToCommentType(CommentType type) 
+    private bool ShouldApplyHighlightingToCommentType(CommentType type) 
     {
       switch (type) {
         case CommentType.TripleSlash:
@@ -313,7 +315,7 @@ namespace VSDoxyHighlighter
     private readonly ITextBuffer mTextBuffer;
     private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
-    private readonly CommentFormatter mFormater;
+    private readonly CommentFormatter mFormatter;
     private readonly IClassificationType[] mFormatTypeToClassificationType;
     private readonly GeneralOptionsPage mGeneralOptions;
 

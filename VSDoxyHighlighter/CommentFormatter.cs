@@ -88,6 +88,9 @@ namespace VSDoxyHighlighter
   /// Provides facilities to format the doxygen comments in a piece of source code.
   /// This implements the main logic to find the fragments that should be formatted. It
   /// is independent of Visual Studio services, and thus can be easily unit tested.
+  /// 
+  /// Note that it does NOT identify which pieces of some text are located in comments
+  /// and which lie outside of it. Rather, it expects only the text in comments as input.
   /// </summary>
   public class CommentFormatter
   {
