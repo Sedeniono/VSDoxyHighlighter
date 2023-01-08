@@ -7,18 +7,60 @@ using System.Windows.Media;
 
 namespace VSDoxyHighlighter
 {
+  //===========================================================
+  // IFormatDefinition
+  //===========================================================
+
+  public interface IFormatDefinition 
+  {
+    void Reinitialize();
+  }
+
+
+  //===========================================================
+  // FormatDefinitionBase
+  //===========================================================
+
+  internal abstract class FormatDefinitionBase : ClassificationFormatDefinition, IFormatDefinition
+  {
+    public abstract void Reinitialize();
+
+    protected FormatDefinitionBase(DefaultColors defaultColors, string displayName) 
+    {
+      if (defaultColors == null) {
+        throw new System.ArgumentNullException("VSDoxyHighlighter: The 'DefaultColors' to a FormatDefinition is null");
+      }
+      mDefaultColors = defaultColors;
+      mDefaultColors.RegisterFormatDefinition(this);
+
+      DisplayName = displayName;
+    }
+
+    protected readonly DefaultColors mDefaultColors;
+  }
+
+
+  //===========================================================
+  // Format definitions
+  //===========================================================
+
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_command)]
   [Name(IDs.ID_command)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class CommandFormat : ClassificationFormatDefinition
+  internal sealed class CommandFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public CommandFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Command")
     {
-      DisplayName = "VSDoxyHighlighter - Command";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_command];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_command];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -31,13 +73,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_warningKeyword)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class WarningKeywordFormat : ClassificationFormatDefinition
+  internal sealed class WarningKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public WarningKeywordFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Warning")
     {
-      DisplayName = "VSDoxyHighlighter - Warning";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_warningKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -50,13 +97,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_noteKeyword)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class NoteKeywordFormat : ClassificationFormatDefinition
+  internal sealed class NoteKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Note")
     {
-      DisplayName = "VSDoxyHighlighter - Note";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_noteKeyword];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -69,13 +121,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_parameter1)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class ParameterFormat1 : ClassificationFormatDefinition
+  internal sealed class ParameterFormat1 : FormatDefinitionBase
   {
     [ImportingConstructor]
     public ParameterFormat1(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Parameter 1")
     {
-      DisplayName = "VSDoxyHighlighter - Parameter 1";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter1];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter1];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -88,13 +145,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_parameter2)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class ParameterFormat2 : ClassificationFormatDefinition
+  internal sealed class ParameterFormat2 : FormatDefinitionBase
   {
     [ImportingConstructor]
     public ParameterFormat2(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Parameter 2")
     {
-      DisplayName = "VSDoxyHighlighter - Parameter 2";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter2];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_parameter2];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = false;
@@ -107,13 +169,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_emphasisMinor)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class EmphasisMinorFormat : ClassificationFormatDefinition
+  internal sealed class EmphasisMinorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public EmphasisMinorFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Emphasis (minor)")
     {
-      DisplayName = "VSDoxyHighlighter - Emphasis (minor)";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMinor];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMinor];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsItalic = true;
@@ -125,13 +192,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_emphasisMajor)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class EmphasisMajorFormat : ClassificationFormatDefinition
+  internal sealed class EmphasisMajorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public EmphasisMajorFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Emphasis (major)")
     {
-      DisplayName = "VSDoxyHighlighter - Emphasis (major)";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMajor];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_emphasisMajor];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -143,13 +215,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_inlineCode)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class InlineCodeFormat : ClassificationFormatDefinition
+  internal sealed class InlineCodeFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public InlineCodeFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Inline code")
     {
-      DisplayName = "VSDoxyHighlighter - Inline code";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_inlineCode];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_inlineCode];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
     }
@@ -160,13 +237,18 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_title)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class TitleFormat : ClassificationFormatDefinition
+  internal sealed class TitleFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public TitleFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Title")
     {
-      DisplayName = "VSDoxyHighlighter - Title";
-      TextColor color = defaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_title];
+      Reinitialize();
+    }
+
+    public override void Reinitialize()
+    {
+      TextColor color = mDefaultColors.GetDefaultColorsForCurrentTheme()[IDs.ID_title];
       ForegroundColor = color.Foreground;
       BackgroundColor = color.Background;
       IsBold = true;
@@ -179,14 +261,17 @@ namespace VSDoxyHighlighter
   [Name(IDs.ID_strikethrough)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class StrikethroughFormat : ClassificationFormatDefinition
+  internal sealed class StrikethroughFormat : FormatDefinitionBase
   {
-    public StrikethroughFormat()
+    [ImportingConstructor]
+    public StrikethroughFormat(DefaultColors defaultColors)
+      : base(defaultColors, "VSDoxyHighlighter - Strikethrough")
     {
-      DisplayName = "VSDoxyHighlighter - Strikethrough";
+      Reinitialize();
+    }
 
-      // Note: No need for DefaultColors. We just add the strikethrough, but leave the text color unchanged.
-
+    public override void Reinitialize()
+    {
       TextDecorations = new TextDecorationCollection {
         new TextDecoration(
           TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)

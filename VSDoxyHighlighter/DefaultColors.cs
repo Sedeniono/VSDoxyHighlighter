@@ -41,22 +41,34 @@ namespace VSDoxyHighlighter
   [Export]
   public class DefaultColors : IDisposable
   {
-    // Returns the default colors for our extension's classifications, as suitable for the current color theme.
-    public Dictionary<string, TextColor> GetDefaultColorsForCurrentTheme()
-    {
-      return GetColorsForTheme(mCurrentTheme);
-    }
-
-
     DefaultColors() 
     {
       VSColorTheme.ThemeChanged += VSThemeChanged;
       mCurrentTheme = GetCurrentTheme();
     }
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
+      if (mDisposed) {
+        return;
+      }
+      mDisposed = true;
       VSColorTheme.ThemeChanged -= VSThemeChanged;
+    }
+
+
+    /// <summary>
+    /// Returns the default colors for our extension's classifications, as suitable for the current color theme. 
+    /// </summary>
+    public Dictionary<string, TextColor> GetDefaultColorsForCurrentTheme()
+    {
+      return GetColorsForTheme(mCurrentTheme);
+    }
+
+
+    public void RegisterFormatDefinition(IFormatDefinition f) 
+    {
+      mFormatDefinitions.Add(f);
     }
 
 
@@ -85,8 +97,8 @@ namespace VSDoxyHighlighter
 
       var newTheme = GetCurrentTheme();
       if (newTheme != mCurrentTheme) {
-        mCurrentTheme = newTheme;
-        ThemeChangedImpl(newTheme);
+        mCurrentTheme = newTheme; // Important: We indirectly access mCurrentTheme during the update, so set it before.
+        ThemeChangedImpl();
       }
     }
 
@@ -98,13 +110,13 @@ namespace VSDoxyHighlighter
     // - https://stackoverflow.com/a/48993958/3740047
     // - https://github.com/dotnet/fsharp/blob/main/vsintegration/src/FSharp.Editor/Classification/ClassificationDefinitions.fs#L133
     // - https://github.com/fsprojects-archive/zzarchive-VisualFSharpPowerTools/blob/master/src/FSharpVSPowerTools/Commands/SymbolClassifiersProvider.cs
-    private void ThemeChangedImpl(Theme newTheme)
+    private void ThemeChangedImpl()
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
       var fontAndColorStorage = ServiceProvider.GlobalProvider.GetService<SVsFontAndColorStorage, IVsFontAndColorStorage>();
       var fontAndColorCacheManager = ServiceProvider.GlobalProvider.GetService<SVsFontAndColorCacheManager, IVsFontAndColorCacheManager>();
-      
+
       fontAndColorCacheManager.CheckCache(ref mFontAndColorCategoryGUID, out int _);
 
       if (fontAndColorStorage.OpenCategory(ref mFontAndColorCategoryGUID, (uint)__FCSTORAGEFLAGS.FCSF_READONLY) != VSConstants.S_OK) {
@@ -117,7 +129,7 @@ namespace VSDoxyHighlighter
         formatMap.BeginBatchUpdate();
 
         ColorableItemInfo[] colorInfo = new ColorableItemInfo[1];
-        foreach (var p in GetColorsForTheme(newTheme)) {
+        foreach (var p in GetColorsForTheme(mCurrentTheme)) {
           string classificationTypeId = p.Key;
           TextColor newColor = p.Value;
 
@@ -133,6 +145,25 @@ namespace VSDoxyHighlighter
 
             formatMap.SetTextProperties(classificationType, newProp);
           }
+        }
+
+        // Also update all of our ClassificationFormatDefinition values with the new values.
+        // Without this, changing the theme does not reliably update the colors: Sometimes after restarting VS, we get
+        // the wrong colors. For example, when switching from the dark to the light theme, we often end up with the colors
+        // of the dark theme after a VS restart.
+        // From what I could understand: The call fontAndColorCacheManager.ClearCache() below deletes the registry key
+        //     "Software\Microsoft\VisualStudio\17.0_4d51a943Exp\FontAndColors\Cache\{75A05685-00A8-4DED-BAE5-E7A50BFA929A}\ItemAndFontInfo"
+        // which is the cache of the font and colors. After our function here finishes, some Visual Studio component
+        // sometimes (but not always) immediately updates the font and color cache. I.e. it calls something like
+        //     fontAndColorStorage.OpenCategory(ref mFontAndColorCategoryGUID, (uint)__FCSTORAGEFLAGS.FCSF_READONLY | (uint)__FCSTORAGEFLAGS.FCSF_LOADDEFAULTS).
+        // Note the "FCSF_LOADDEFAULTS". This causes Visual Studio to re-create the registry key. However, apparently
+        // it does not use the colors from the updated formatMap, but instead the colors set on the ClassificationFormatDefinition,
+        // which were not yet updated so far. Thus, changing the theme, changes the displayed colors immediately (because we update
+        // the formatMap), but the registry cache ends up with the wrong colors. After a restart of VS, it uses the cached values
+        // and therefore we get the wrong colors.
+        // By changing the colors also on the ClassificationFormatDefinition, the issue appears to be fixed.
+        foreach (IFormatDefinition f in mFormatDefinitions) {
+          f.Reinitialize();
         }
       }
       finally {
@@ -206,5 +237,9 @@ namespace VSDoxyHighlighter
 
     [Import]
     private IClassificationTypeRegistryService mClassificationTypeRegistryService = null;
+
+    private List<IFormatDefinition> mFormatDefinitions = new List<IFormatDefinition>();
+
+    private bool mDisposed = false;
   }
 }
