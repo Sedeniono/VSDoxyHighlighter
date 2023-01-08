@@ -22,16 +22,16 @@ namespace VSDoxyHighlighter
   /// </summary>
   public static class IDs
   {
-    public const string ID_command = "DoxyTest3Command";
-    public const string ID_parameter1 = "DoxyTest3Parameter1";
-    public const string ID_parameter2 = "DoxyTest3Parameter2";
-    public const string ID_title = "DoxyTest3Title";
-    public const string ID_warningKeyword = "DoxyTest3Warning";
-    public const string ID_noteKeyword = "DoxyTest3Note";
-    public const string ID_emphasisMinor = "DoxyTest3EmphasisMinor";
-    public const string ID_emphasisMajor = "DoxyTest3EmphasisMajor";
-    public const string ID_strikethrough = "DoxyTest3Strikethrough";
-    public const string ID_inlineCode = "DoxyTest3InlineCode";
+    public const string ID_command = "VSDoxyHighlighter_Command";
+    public const string ID_parameter1 = "VSDoxyHighlighter_Parameter1";
+    public const string ID_parameter2 = "VSDoxyHighlighter_Parameter2";
+    public const string ID_title = "VSDoxyHighlighter_Title";
+    public const string ID_warningKeyword = "VSDoxyHighlighter_Warning";
+    public const string ID_noteKeyword = "VSDoxyHighlighter_Note";
+    public const string ID_emphasisMinor = "VSDoxyHighlighter_EmphasisMinor";
+    public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
+    public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
+    public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
   }
 
 
@@ -105,6 +105,7 @@ namespace VSDoxyHighlighter
         creator: () => new CommentClassifier(this.classificationRegistry, buffer));
     }
   }
+
 
 
 
