@@ -35,9 +35,13 @@ std::pair<double /*foo _some */, int /* stuff_ */> p2;
 
 /// Some comment that goes \
 	**continues** on the next line and the next \
-	@details and thus all here is expected to be formatted.
+	@details and thus all here is expected to be formatted. \
+	/* @p TEST */ even this should be formatted if "/*" formatting is disabled
 
-// We expect that formatting does occur, despite the nested style:
+
+// We expect that formatting does occur, despite the nested style 
+// (if "/*" formatting is disabled):
+
 /// Foo /* text @p TEST text */ foo
 
 
