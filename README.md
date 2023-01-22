@@ -17,7 +17,7 @@
 
 # Introduction
 
-VSDoxyHighlighter is an extension for Visual Studio 2022 and above to provide syntax highlighting for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.
+VSDoxyHighlighter is an extension for Visual Studio 2022 to provide syntax highlighting for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.
 Note that Visual Studio Code is **not** supported.
 
 The following two images show the default colors used for light and dark color themes by the extension (they are configurable!):
@@ -39,7 +39,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 
 # Installation
 
-Only Visual Studio 2022 and above is supported.
+Only Visual Studio 2022 is supported.
 You can get the extension from the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter).
 
 All releases can also be found [here on github](https://github.com/Sedeniono/VSDoxyHighlighter/releases): Download the `*.vsix` file and open it to install the extension.
