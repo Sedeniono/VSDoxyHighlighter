@@ -7,7 +7,7 @@
         <MoreInfo>https://github.com/Sedeniono/VSDoxyHighlighter</MoreInfo>
         <License>LICENSE.txt</License>
         <GettingStartedGuide>https://github.com/Sedeniono/VSDoxyHighlighter</GettingStartedGuide>
-        <ReleaseNotes>https://github.com/Sedeniono/VSDoxyHighlighter</ReleaseNotes>
+        <ReleaseNotes>https://github.com/Sedeniono/VSDoxyHighlighter/releases</ReleaseNotes>
         <Icon>Icon200x200.png</Icon>
         <PreviewImage>Icon32x32.png</PreviewImage>
         <Tags>doxygen;javadoc;C++;C;highlighting;comments</Tags>
