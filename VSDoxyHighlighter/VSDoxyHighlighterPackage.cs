@@ -11,7 +11,7 @@ namespace VSDoxyHighlighter
   [InstalledProductRegistration(
     "VSDoxyHighlighter",
     "Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
-    "1.0.1")]
+    "1.0.2")]
   [ProvideOptionPage(typeof(GeneralOptionsPage), VSDoxyHighlighterPackage.MainSettingsCategory, GeneralOptionsPage.PageCategory, 0, 0, true)]
   [ProvideProfile(typeof(GeneralOptionsPage), VSDoxyHighlighterPackage.MainSettingsCategory, GeneralOptionsPage.PageCategory, 0, 0, true)]
   [Guid(VSDoxyHighlighterPackage.PackageGuidString)]
