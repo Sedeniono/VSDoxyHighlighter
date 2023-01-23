@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-
 namespace VSDoxyHighlighter
 {
   /// <summary>
@@ -33,6 +32,31 @@ namespace VSDoxyHighlighter
     /// It is always called, regardless whether an own option or any option at all was changed.
     /// </summary>
     public event EventHandler SettingsChanged;
+
+
+    /// <summary>
+    /// Returns true if the extension is enabled in comments of the specified <paramref name="type"/>.
+    /// </summary>
+    public bool IsEnabledInCommentType(CommentType type)
+    {
+      switch (type) {
+        case CommentType.TripleSlash:
+          return EnableInTripleSlash;
+        case CommentType.DoubleSlashExclamation:
+          return EnableInDoubleSlashExclamation;
+        case CommentType.DoubleSlash:
+          return EnableInDoubleSlash;
+        case CommentType.SlashStarStar:
+          return EnableInSlashStarStar;
+        case CommentType.SlashStarExclamation:
+          return EnableInSlashStarExclamation;
+        case CommentType.SlashStar:
+          return EnableInSlashStar;
+        default:
+          return false;
+      }
+    }
+
 
 
     //----------------

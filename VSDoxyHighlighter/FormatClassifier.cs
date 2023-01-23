@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
+using EnvDTE;
 
 
 namespace VSDoxyHighlighter
@@ -125,6 +126,9 @@ namespace VSDoxyHighlighter
       mVSCppColorer.CppColorerReclassifiedSpan += OnVSCppColorerReclassifiedSpan;
 
       mSpanSplitter = new SpanSplitter(mVSCppColorer);
+      // CommentCommandCompletionSource needs it to check whether some point is inside of a comment.
+      textBuffer.Properties.AddProperty(typeof(SpanSplitter), mSpanSplitter);
+
       mFormatter = new CommentFormatter();
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
@@ -200,7 +204,7 @@ namespace VSDoxyHighlighter
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
-        if (ShouldApplyHighlightingToCommentType(commentSpan.commentType)) {
+        if (mGeneralOptions.IsEnabledInCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
 
           // Scan the given text for keywords and get the proper formatting for it.
@@ -221,27 +225,6 @@ namespace VSDoxyHighlighter
 
       mCache[originalSpanToCheck.Span] = result;
       return result;
-    }
-
-
-    private bool ShouldApplyHighlightingToCommentType(CommentType type) 
-    {
-      switch (type) {
-        case CommentType.TripleSlash:
-          return mGeneralOptions.EnableInTripleSlash;
-        case CommentType.DoubleSlashExclamation:
-          return mGeneralOptions.EnableInDoubleSlashExclamation;
-        case CommentType.DoubleSlash:
-          return mGeneralOptions.EnableInDoubleSlash;
-        case CommentType.SlashStarStar:
-          return mGeneralOptions.EnableInSlashStarStar;
-        case CommentType.SlashStarExclamation:
-          return mGeneralOptions.EnableInSlashStarExclamation;
-        case CommentType.SlashStar:
-          return mGeneralOptions.EnableInSlashStar;
-        default:
-          return false;
-      }
     }
 
 
@@ -277,6 +260,8 @@ namespace VSDoxyHighlighter
         mVSCppColorer.CppColorerReclassifiedSpan -= OnVSCppColorerReclassifiedSpan;
         mVSCppColorer.Dispose();
       }
+      
+      mTextBuffer.Properties.RemoveProperty(typeof(SpanSplitter));
     }
 
 

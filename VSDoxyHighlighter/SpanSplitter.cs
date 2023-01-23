@@ -12,7 +12,7 @@ namespace VSDoxyHighlighter
   // Utilities
   //=======================================================================================
 
-  internal enum CommentType
+  public enum CommentType
   {
     TripleSlash, // "///"
     DoubleSlashExclamation, // "//!"
@@ -20,7 +20,12 @@ namespace VSDoxyHighlighter
     SlashStarStar, // "/**"
     SlashStarExclamation, // "/*!"
     SlashStar, // "/*", followed by anything except "*" or "!"
-    Unknown // Something went wrong
+
+    // Could not really determine whether or not something is in a comment or not.
+    // Sometimes, the VS default tagger is (temporarily) confused. For example, while pasting text I have seen
+    // it thinking that in " :/**" the whole string is a comment. Apparently, the tagger had not fully parsed
+    // the text yet. Fixes itself after a few milliseconds.
+    Unknown
   }
 
 
@@ -174,6 +179,28 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
+    /// If the character at 'point-1' inside a comment, returns the type of the corresponding comment.
+    /// Otherwise, returns null.
+    /// </summary>
+    public CommentType? GetTypeOfCommentBeforeLocation(SnapshotPoint point) 
+    {
+      if (point.Position == 0) {
+        return null;
+      }
+
+      var inputSpan = new SnapshotSpan(point.Snapshot, point.Position - 1, 1);
+      List<CommentSpan> commentTypes = SplitIntoComments(inputSpan);
+      Debug.Assert(commentTypes.Count <= 1);
+      if (commentTypes.Count == 0) {
+        return null;
+      }
+      else {
+        return commentTypes[0].commentType;
+      }
+    }
+
+
+    /// <summary>
     /// Returns true if the given tag corresponds to one of the tags used by Visual Studio for comments.
     /// </summary>
     static public bool IsVSComment(ITagSpan<IClassificationTag> vsTag)
@@ -303,7 +330,7 @@ namespace VSDoxyHighlighter
         if (curCommentType == CommentType.Unknown) {
           // Sometimes, the VS default tagger is (temporarily) confused. For example, while pasting text I have seen
           // it thinking that in " :/**" the whole string is a comment. Apparently, the tagger had not fully parsed
-          // the text yet.
+          // the text yet. Fixes itself after a few milliseconds.
           return CommentType.Unknown;
         }
         mCommentTypeCache[curFragment.fragmentStartCharIdx] = curCommentType;
