@@ -8,12 +8,40 @@ using Task = System.Threading.Tasks.Task;
 namespace VSDoxyHighlighter
 {
   [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+  
+  // InstalledProductRegistration: Causes the extension to show up in the Visual Studio Help->About dialog.
   [InstalledProductRegistration(
     "VSDoxyHighlighter",
     "Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
     "1.0.2")]
-  [ProvideOptionPage(typeof(GeneralOptionsPage), VSDoxyHighlighterPackage.MainSettingsCategory, GeneralOptionsPage.PageCategory, 0, 0, true)]
-  [ProvideProfile(typeof(GeneralOptionsPage), VSDoxyHighlighterPackage.MainSettingsCategory, GeneralOptionsPage.PageCategory, 0, 0, true)]
+  
+  // ProvideOptionPage: Causes VS to show a page in the VS options.
+  // The resource IDs refer to the Resources.resx file.
+  // The categoryName is the name of the main node that appears in the VS options: "VSDoxyHighlighter"
+  // The pageName is the name of the child node of the main node: "General"
+  [ProvideOptionPage(
+    typeof(GeneralOptionsPage), 
+    categoryName: MainSettingsCategory, 
+    pageName: GeneralOptionsPage.PageCategory, 
+    categoryResourceID: 300, 
+    pageNameResourceID: 301, 
+    supportsAutomation: true)]
+
+  // ProvideProfile: Causes VS to show a node in the import & export settings dialog.
+  // The resource IDs refer to the Resources.resx file.
+  // For some reason that I don't understand, the objectName is the name that appears in the import & export settings dialog, so this is set to "VSDoxyHighlighter".
+  // On the other hand, the ProvideProfile.categoryName does not appear in the dialog, only in the vssettings file. I think the ProvideProfile.categoryName is something
+  // entirely different than the ProvideOptionPage.categoryName. So we just use some "arbitrary" sensible string for ProvideProfile.categoryName.
+  // The DescriptionResourceID shows up as description in the import & export settings dialog for the "VSDoxyHighlighter" node.
+  [ProvideProfile(
+    typeof(GeneralOptionsPage), 
+    categoryName: "VSDoxyHighlighterSettings", 
+    objectName: MainSettingsCategory, 
+    categoryResourceID: 303, 
+    objectNameResourceID: 300, 
+    isToolsOptionPage: true, 
+    DescriptionResourceID = 302)]
+  
   [Guid(VSDoxyHighlighterPackage.PackageGuidString)]
   public sealed class VSDoxyHighlighterPackage : AsyncPackage
   {

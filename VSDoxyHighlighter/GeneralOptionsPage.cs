@@ -10,6 +10,7 @@ namespace VSDoxyHighlighter
   /// I.e. contains the settings of the extension that can be configured by the user, besides
   /// the classifier ones that Visual Studio automatically puts into the fonts & colors category.
   /// </summary>
+  // The GUID appears as "Category" in the vssettings file.
   [Guid("c3a8c4bb-8e5a-49a9-b3c3-343ed507f0f9")]
   public class GeneralOptionsPage : DialogPage
   {
