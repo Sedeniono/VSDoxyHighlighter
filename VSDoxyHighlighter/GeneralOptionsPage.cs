@@ -10,7 +10,7 @@ namespace VSDoxyHighlighter
   /// I.e. contains the settings of the extension that can be configured by the user, besides
   /// the classifier ones that Visual Studio automatically puts into the fonts & colors category.
   /// </summary>
-  [Guid("0d3e9cbe-0b36-30a9-bd64-0cee048b7a8b")]
+  [Guid("c3a8c4bb-8e5a-49a9-b3c3-343ed507f0f9")]
   public class GeneralOptionsPage : DialogPage
   {
     // The string that appears in the tools -> options dialog when expanding the main node
