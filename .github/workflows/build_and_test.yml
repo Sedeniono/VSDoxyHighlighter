@@ -2,6 +2,9 @@ name: build and tests
 
 on:
   push:
+    # Trigger workflow for commits only, not for tags.
+    branches:
+      - '**'
   pull_request:
   workflow_dispatch:
 
@@ -9,7 +12,7 @@ on:
 jobs:
   build_and_test:
     runs-on: windows-2022
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
     - uses: actions/checkout@v3.1.0
