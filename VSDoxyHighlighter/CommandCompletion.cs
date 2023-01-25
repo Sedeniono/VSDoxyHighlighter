@@ -63,6 +63,10 @@ namespace VSDoxyHighlighter
     /// That causes VS to jump to the commands starting with "\bri" in the autocomplete box.</returns>
     public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token)
     {
+      if (!mGeneralOptions.EnableAutocomplete) {
+        return CompletionStartData.DoesNotParticipateInCompletion;
+      }
+
       ITextSnapshot snapshot = triggerLocation.Snapshot;
       if (triggerLocation.Position > snapshot.Length) {
         return CompletionStartData.DoesNotParticipateInCompletion;

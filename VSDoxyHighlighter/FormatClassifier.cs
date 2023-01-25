@@ -177,6 +177,10 @@ namespace VSDoxyHighlighter
     {
       mVSCppColorer.InitializeLazily(); // Ensure the events are set up properly.
 
+      if (!mGeneralOptions.EnableHighlighting) {
+        return new List<ClassificationSpan>();
+      }
+
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
       // Performance optimization: GetClassificationSpans() gets called several times after every edit.
