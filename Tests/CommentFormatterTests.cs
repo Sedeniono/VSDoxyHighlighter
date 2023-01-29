@@ -650,6 +650,8 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\endcode", FormatType.Command),
         new Utils.FormattedFragmentText(@"\code{.cpp}", FormatType.Command),
         new Utils.FormattedFragmentText(@"\endcode", FormatType.Command),
+        new Utils.FormattedFragmentText(@"\code{.c++}", FormatType.Command),
+        new Utils.FormattedFragmentText(@"\endcode", FormatType.Command),
         new Utils.FormattedFragmentText(@"\code{.unparsed}", FormatType.Command),
         new Utils.FormattedFragmentText(@"\endcode", FormatType.Command),
         new Utils.FormattedFragmentText(@"\code", FormatType.Command),

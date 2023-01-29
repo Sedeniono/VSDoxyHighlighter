@@ -247,6 +247,9 @@ Text \code{.c} someCode \endcode
 \code{.cpp}
 class Cpp {};
 \endcode
+\code{.c++}
+class Cpp2 {};
+\endcode
 \code{.unparsed}
 Show this as-is please
 \endcode
