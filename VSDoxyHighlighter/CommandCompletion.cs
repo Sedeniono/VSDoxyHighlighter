@@ -114,22 +114,55 @@ namespace VSDoxyHighlighter
       CancellationToken token)
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-      //if (applicableToSpan.Length > 0) {
-      //  char startChar = applicableToSpan.Start.GetChar();
-      //  if (startChar == '\\') {
-      itemsBuilder.Add(new CompletionItem(@"details", this, icon: cCompletionImage));
-      itemsBuilder.Add(new CompletionItem(@"brief", this, icon: cCompletionImage));
-      itemsBuilder.Add(new CompletionItem(@"b", this, icon: cCompletionImage));
-      itemsBuilder.Add(new CompletionItem(@"param[in]", this, icon: cCompletionImage));
-      itemsBuilder.Add(new CompletionItem(@"param[out]", this, icon: cCompletionImage));
-      itemsBuilder.Add(new CompletionItem(@"param", this, icon: cCompletionImage));
-      //}
-      //else if (startChar == '@') {
-      //itemsBuilder.Add(new CompletionItem(@"@details", this, icon: cCompletionImage));
-      //itemsBuilder.Add(new CompletionItem(@"@brief", this, icon: cCompletionImage));
-      //itemsBuilder.Add(new CompletionItem(@"@param[in]", this, icon: cCompletionImage));
-      //  }
-      //}
+      if (applicableToSpan.Start.Position > 0) {
+        char startChar = applicableToSpan.Start.Subtract(1).GetChar();
+        if (startChar == '\\' || startChar == '@') {
+          //itemsBuilder.Add(new CompletionItem(
+          //  displayText: @"details", 
+          //  source: this, 
+          //  icon: cCompletionImage,
+          //  filters: ImmutableArray<CompletionFilter>.Empty,
+          //  suffix: "{ detailed description }",
+          //  insertText: "details",
+          //  sortText: "details",
+          //  filterText: "details",
+          //  automationText: "details",
+          //  attributeIcons: ImmutableArray<ImageElement>.Empty,
+          //  commitCharacters: default,
+          //  applicableToSpan: default,
+          //  isCommittedAsSnippet: false,
+          //  isPreselected: false
+          //  ));
+
+          int numCommands = DoxygenCommandsGeneratedFromHelpPage.cCommands.Length;
+          int curCommandNumber = 1;
+
+          // TODO: Cache the items? There can only be two versions, one with @ and one with "\"?
+          foreach (DoxygenHelpPageCommand cmd in DoxygenCommandsGeneratedFromHelpPage.cCommands) {
+            var item = new CompletionItem(
+              displayText: startChar + cmd.Command,
+              source: this,
+              icon: cCompletionImage,
+              filters: ImmutableArray<CompletionFilter>.Empty,
+              suffix: cmd.Parameters,
+              insertText: cmd.Command,
+              // sortText: Sorting is done using Enumerable.OrderBy, which apparently calls String.CompareTo(),
+              // which is doing a case-sensitive and culture-sensitive comparison using the current culture.
+              // Padding with 0 to the left to get e.g. 11 to be sorted after 1.
+              sortText: curCommandNumber.ToString().PadLeft(numCommands, '0'),
+              filterText: cmd.Command,
+              automationText: cmd.Command,
+              attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+            // Add a reference to the DoxygenHelpPageCommand to the item so that we access it in GetDescriptionAsync().
+            item.Properties.AddProperty(typeof(DoxygenHelpPageCommand), cmd);
+
+            itemsBuilder.Add(item);
+
+            ++curCommandNumber;
+          }
+        }
+      }
 
       return Task.FromResult(new CompletionContext(itemsBuilder.ToImmutable(), null));
     }
@@ -140,8 +173,10 @@ namespace VSDoxyHighlighter
     /// </summary>
     public /*async*/ Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
     {
-      // TODO
-      return Task.FromResult<object>("test string!!");
+      if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
+        return Task.FromResult<object>(cmd.Description);
+      }
+      return Task.FromResult<object>("");
     }
 
 

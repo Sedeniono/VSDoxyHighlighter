@@ -52,6 +52,8 @@
     <Compile Include="CommandCompletion.cs" />
     <Compile Include="CommentFormatter.cs" />
     <Compile Include="DefaultColors.cs" />
+    <Compile Include="DoxygenHelpPageParser\DoxygenCommandsGeneratedFromHelpPage.cs" />
+    <Compile Include="DoxygenHelpPageParser\DoxygenHelpPageCommand.cs" />
     <Compile Include="FormatClassifier.cs" />
     <Compile Include="FormatDefinitions.cs" />
     <Compile Include="GeneralOptionsPage.cs">
