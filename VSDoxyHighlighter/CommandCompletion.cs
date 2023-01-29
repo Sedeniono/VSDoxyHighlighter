@@ -12,6 +12,7 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Imaging;
+using System.Linq;
 
 namespace VSDoxyHighlighter
 {
@@ -142,7 +143,7 @@ namespace VSDoxyHighlighter
           int curCommandNumber = 1;
 
           // TODO: Cache the items? There can only be two versions, one with @ and one with "\"?
-          foreach (DoxygenHelpPageCommand cmd in DoxygenCommandsGeneratedFromHelpPage.cCommands) {
+          foreach (DoxygenHelpPageCommand cmd in cAmendedDoxygenCommands) {
             var item = new CompletionItem(
               displayText: startChar + cmd.Command,
               source: this,
@@ -178,7 +179,8 @@ namespace VSDoxyHighlighter
     public /*async*/ Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
     {
       if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
-        return Task.FromResult<object>(cmd.Description);
+        string paramInfo = (cmd.Parameters == "" ? "No parameters" : cmd.Parameters);
+        return Task.FromResult<object>($"Info for command: \\{cmd.Command}\nCommand parameters: {paramInfo}\n\n{cmd.Description}");
       }
       return Task.FromResult<object>("");
     }
@@ -198,9 +200,74 @@ namespace VSDoxyHighlighter
     }
 
 
+    static CommentCommandCompletionSource()
+    {
+      // We put some commands that are propably used often to the front of the list that appears in the autocomplete box.
+      // The commands will be ordered according to the following list.
+      var speciallyOrderedCommands = new List<string>() {
+        "brief", "details", "note", "warning", "param", "tparam", "returns", "return", 
+        "throws", "throw", "sa", "see", "ref", "p", "c", "a", "ingroup", 
+      };
+      cAmendedDoxygenCommands =
+        DoxygenCommandsGeneratedFromHelpPage.cCommands.OrderBy(cmd => {
+          int idx = speciallyOrderedCommands.IndexOf(cmd.Command);
+          return idx != -1 ? idx : speciallyOrderedCommands.Count;
+        }).ToList();
+
+
+      // We additionally modify the list so that various options directly appears in the autocomplete box.
+      // Note that when inserting multiple additional variations for one command, they must be listed here
+      // in reverse order than how they should appear, since we always insert them directly after the
+      // original command.
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlonly", "[block]");
+
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{full}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{directory}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{filename}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{extension}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{file}");
+      cAmendedDoxygenCommands.RemoveAll(cmd => cmd.Command == "fileinfo");
+     
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in,out]");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[out]");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in]");
+
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "example", "example{lineno}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "dontinclude", "dontinclude{lineno}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{lineno}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{doc}");
+      
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlinclude", "htmlinclude[block]");
+      
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{doc}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{lineno}");
+      
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{anchor:YOUR_ID}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline,anchor:YOUR_ID}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline}");
+
+      foreach (string extension in CommentFormatter.cCodeFileExtensions.Reverse()) {
+        InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
+      }
+    }
+
+
+    private static void InsertCommandVariationAfterOriginal(List<DoxygenHelpPageCommand> commands, string originalCommand, string newCommand) 
+    {
+      int idx = cAmendedDoxygenCommands.FindIndex(x => x.Command == originalCommand);
+      if (idx < 0) {
+        throw new System.ArgumentException($"Command '{originalCommand}' not found in list of Doxygen commands.");
+      }
+      DoxygenHelpPageCommand original = cAmendedDoxygenCommands[idx];
+      commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Description));
+    }
+
+
     // For now, we simply use an existing Visual Studio image to show in the autocomplete box.
     // http://glyphlist.azurewebsites.net/knownmonikers/
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
+
+    private static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
 
     private readonly GeneralOptionsPage mGeneralOptions;
   }

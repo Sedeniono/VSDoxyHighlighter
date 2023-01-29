@@ -478,11 +478,17 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
+    // https://www.doxygen.nl/manual/starting.html#step1
+    public static string[] cCodeFileExtensions = { 
+      "unparsed", "dox", "doc", "c", "cc", "cxx", "cpp", "c++", "ii", "ixx", "ipp", "i++", "inl", "h", "H", "hh", "HH", "hxx", "hpp", "h++", 
+      "mm", "txt", "idl", "ddl", "odl", "java", "cs", "d", "php", "php4", "php5", "inc", "phtml", "m", "M", "py", "pyw", 
+      "f", "for", "f90", "f95", "f03", "f08", "f18", "vhd", "vhdl", "ucf", "qsf", "l", "md", "markdown", "ice" };
+
     private static string BuildRegex_CodeCommand()
     {
       // Command \code, \code{cpp}, ...
-      // https://www.doxygen.nl/manual/starting.html#step1
-      string validFileExtensions = @"unparsed|dox|doc|c|cc|cxx|cpp|c\+\+|ii|ixx|ipp|i\+\+|inl|h|H|hh|HH|hxx|hpp|h\+\+|mm|txt|idl|ddl|odl|java|cs|d|php|php4|php5|inc|phtml|m|M|py|pyw|f|for|f90|f95|f03|f08|f18|vhd|vhdl|ucf|qsf|l|md|markdown|ice";
+      string validFileExtensions = string.Join("|", cCodeFileExtensions);
+      validFileExtensions = validFileExtensions.Replace("+", @"\+");
       return $@"({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
     }
 
