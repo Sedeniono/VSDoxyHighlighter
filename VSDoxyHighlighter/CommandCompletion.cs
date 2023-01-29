@@ -113,6 +113,10 @@ namespace VSDoxyHighlighter
       SnapshotSpan applicableToSpan, 
       CancellationToken token)
     {
+      if (!mGeneralOptions.EnableAutocomplete) {
+        return Task.FromResult(CompletionContext.Empty);
+      }
+
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
       if (applicableToSpan.Start.Position > 0) {
         char startChar = applicableToSpan.Start.Subtract(1).GetChar();
