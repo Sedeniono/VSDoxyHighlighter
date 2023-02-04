@@ -1308,10 +1308,7 @@ Starts a paragraph where the invariant of an entity can be described. The paragr
 Command: note
 Parameters: { text }
 Help text:
-Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \
-ote commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one \
-ote command may mention several notes. The \
-ote command ends when a blank line or some other sectioning command is encountered. See section \par for an example.
+Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \note commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one \note command may mention several notes. The \note command ends when a blank line or some other sectioning command is encountered. See section \par for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1335,8 +1332,7 @@ Example:
     * \par
     * New paragraph under the same heading.
     *
-    * \
-ote
+    * \note
     * This note consists of two paragraphs.
     * This is the first paragraph.
     *
@@ -2852,7 +2848,7 @@ See also: commands \manonly, \rtfonly, \latexonly, \htmlonly, and \docbookonly.
 
 
 ====================================
-Command: \\
+Command: \
 Parameters: 
 Help text:
 This command writes a backslash character (\) to the output. The backslash has to be escaped in some cases because doxygen uses it to detect commands.
@@ -2930,7 +2926,7 @@ This command writes the % character to the output. This character has to be esca
 
 
 ====================================
-Command: \"
+Command: "
 Parameters: 
 Help text:
 This command writes the " character to the output. This character has to be escaped in some cases, because it is used in pairs to indicate an unformatted text fragment.

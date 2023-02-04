@@ -12,15 +12,16 @@ import re
 class ParsedCommand:
     def __init__(self, header: str, help_text: str):
         assert(len(header) > 0)
-        self.raw_header = escape_characters(header)
-        self.help_text = escape_characters(help_text)
+        self.raw_header = header
+        self.help_text = help_text
 
         if header[0] != "\\":
             raise Exception(f"Header does not start with '\\': {header}")
-        
         (self.command, self.parameters) = split_command_header(header)
-        self.command = escape_characters(self.command)
-        self.parameters = escape_characters(self.parameters)
+
+        self.escaped_command = escape_characters(self.command)
+        self.escaped_parameters = escape_characters(self.parameters)
+        self.escaped_help_text = escape_characters(self.help_text)
 
 
 def escape_characters(raw_string: str):
@@ -267,9 +268,9 @@ def generate_text_for_csharp_file(commands: list[ParsedCommand]) -> str:
     s += "    public static readonly DoxygenHelpPageCommand[] cCommands = {\n"
 
     for cmd in commands:
-        command_padding = " " * (max_command_len - len(cmd.command))
-        parameters_padding = " " * (max_parameters_len - len(cmd.parameters))
-        s += f'      new DoxygenHelpPageCommand("{cmd.command}",{command_padding} "{cmd.parameters}",{parameters_padding} "{cmd.help_text}"),\n'
+        command_padding = " " * (max_command_len - len(cmd.escaped_command))
+        parameters_padding = " " * (max_parameters_len - len(cmd.escaped_parameters))
+        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{cmd.escaped_help_text}"),\n'
 
     s += "    };\n"
     s += "  }\n"
@@ -283,10 +284,9 @@ def generate_debug_dump(commands: list[ParsedCommand]) -> str:
     for cmd in commands:
         s += "====================================\n"
         s += f"Command: {cmd.command}\n"
-        s += "Parameters: " + cmd.parameters.replace("\\\\", "\\").replace('\\"', '"') + "\n"
-        s += "Help text:\n"
-        s += cmd.help_text.replace("\\n", "\n").replace("\\\\", "\\").replace('\\"', '"')
-        s += "\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n\n"
+        s += f"Parameters: {cmd.parameters}\n"
+        s += f"Help text:\n{cmd.help_text}\n"
+        s += "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n\n"
     return s
 
 
@@ -294,8 +294,8 @@ def get_max_component_lengths(commands: list[ParsedCommand]):
     command_len = 0
     parameters_len = 0
     for cmd in commands:
-        command_len = max(command_len, len(cmd.command))
-        parameters_len = max(parameters_len, len(cmd.parameters))
+        command_len = max(command_len, len(cmd.escaped_command))
+        parameters_len = max(parameters_len, len(cmd.escaped_parameters))
     return (command_len, parameters_len)
 
 
