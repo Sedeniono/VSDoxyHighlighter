@@ -130,17 +130,8 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> str:
         s += "\n"
         return s
 
-    # elif tag.name == "dl" and ' '.join(tag['class']) == "section warning":
-    #     if len(tag.contents) != 2:
-    #         raise Exception("Expected the 'section warning' to always have exactly 2 children.")
-    #     return "Warning: " + parse_all_children(tag.contents[1:], decorator).strip() + "\n"
-
     elif tag.name == "dl" and ' '.join(tag['class']) == "section user":
         # Either some example code, or some note
-        # if tag.contents[0].name == "dt":
-        #     # Do a line break in case it is an example. Usually, code follows that should be on its own line.
-        #     if "Example" in tag.contents[0].get_text():
-        #         return "Example:\n" + parse_all_children(tag.contents[1:], decorator) + "\n"
         return parse_all_children(tag.children, decorator) + "\n"
 
     elif tag.name == "dt":
