@@ -178,6 +178,21 @@ namespace VSDoxyHighlighter
     /// </summary>
     public /*async*/ Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
     {
+      //ClassifiedTextRun[] runs = { 
+      //  new ClassifiedTextRun(IDs.ID_command, "ID_command\n"),
+      //  new ClassifiedTextRun(IDs.ID_parameter1, "ID_parameter1\n"),
+      //  new ClassifiedTextRun(IDs.ID_parameter2, "ID_parameter2\n"),
+      //  new ClassifiedTextRun(IDs.ID_title, "ID_title\n"),
+      //  new ClassifiedTextRun(IDs.ID_warningKeyword, "ID_warningKeyword\n"),
+      //  new ClassifiedTextRun(IDs.ID_noteKeyword, "ID_noteKeyword\n"),
+      //  new ClassifiedTextRun(IDs.ID_emphasisMinor, "ID_emphasisMinor\n"),
+      //  new ClassifiedTextRun(IDs.ID_emphasisMajor, "ID_emphasisMajor\n"),
+      //  new ClassifiedTextRun(IDs.ID_strikethrough, "ID_strikethrough\n"),
+      //  new ClassifiedTextRun(IDs.ID_inlineCode, "ID_inlineCode\n"),
+      //};
+
+      //return Task.FromResult<object>(new ClassifiedTextElement(runs));
+
       if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
         string paramInfo = (cmd.Parameters == "" ? "No parameters" : cmd.Parameters);
         return Task.FromResult<object>($"Info for command: \\{cmd.Command}\nCommand parameters: {paramInfo}\n\n{cmd.Description}");
@@ -226,7 +241,7 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{filename}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{extension}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{file}");
-      cAmendedDoxygenCommands.RemoveAll(cmd => cmd.Command == "fileinfo");
+      cAmendedDoxygenCommands.RemoveAll(cmd => cmd.Command == "fileinfo"); // There is no \fileinfo without a parameter
      
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in,out]");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[out]");
