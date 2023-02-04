@@ -286,7 +286,7 @@ def generate_debug_dump(commands: list[ParsedCommand]) -> str:
         s += f"Command: {cmd.command}\n"
         s += f"Parameters: {cmd.parameters}\n"
         s += f"Help text:\n{cmd.help_text}\n"
-        s += "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n\n"
+        s += "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n\n"
     return s
 
 
