@@ -172,10 +172,10 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> str:
         return parse_table(tag)
 
     elif tag.name == "img":
-        if "LaTeX" in tag['alt']:
+        if "LaTeX" in tag["alt"]:
             return "LaTeX"
         else:
-            return tag.get_text()
+            raise Exception("Unknown image")
         
     elif tag.name == "center":
         # The "center" tag is only used for the "intermediate" headers like "Commands for displaying examples"
