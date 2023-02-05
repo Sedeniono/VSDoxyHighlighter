@@ -33,6 +33,19 @@ namespace VSDoxyHighlighter
     public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
+
+    public static readonly Dictionary<FormatType, string> ToID = new Dictionary<FormatType, string>(){
+        {FormatType.Command, ID_command},
+        {FormatType.Parameter1, ID_parameter1},
+        {FormatType.Parameter2, ID_parameter2},
+        {FormatType.Title, ID_title},
+        {FormatType.Warning, ID_warningKeyword},
+        {FormatType.Note, ID_noteKeyword},
+        {FormatType.EmphasisMinor, ID_emphasisMinor},
+        {FormatType.EmphasisMajor, ID_emphasisMajor},
+        {FormatType.Strikethrough, ID_strikethrough},
+        {FormatType.InlineCode, ID_inlineCode},
+      };
   }
 
 

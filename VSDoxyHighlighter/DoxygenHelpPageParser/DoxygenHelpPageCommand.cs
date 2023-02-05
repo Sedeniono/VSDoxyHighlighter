@@ -4,7 +4,7 @@
   /// Represents a single Doxygen command, which was extracted by an external script
   /// from https://www.doxygen.nl/manual/commands.html
   /// </summary>
-  public struct DoxygenHelpPageCommand
+  public class DoxygenHelpPageCommand
   {
     /// <summary>
     /// The Doxygen command, without the "\". For example: "param"
@@ -18,12 +18,14 @@
     public readonly string Parameters;
 
     /// <summary>
-    /// The description according of the Doxygen command.
+    /// The description according of the Doxygen command: The string is just the concatenation
+    /// of the individual strings. However, we also have some semantic information. If the FormatType
+    /// is null, then it is ordinary text.
     /// </summary>
-    public readonly string Description;
+    public readonly (FormatType?, string)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, string description)
+    public DoxygenHelpPageCommand(string command, string parameters, (FormatType?, string)[] description)
     {
       Command = command;
       Parameters = parameters;

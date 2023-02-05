@@ -393,3 +393,4 @@ FodyWeavers.xsd
 # Custom ignores
 
 PrivateNotes.txt
+VSDoxyHighlighter/DoxygenHelpPageParser/test*

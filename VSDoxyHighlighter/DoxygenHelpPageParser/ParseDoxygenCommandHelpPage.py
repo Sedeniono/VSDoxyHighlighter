@@ -387,14 +387,32 @@ def generate_text_for_csharp_file(commands: list[ParsedCommand]) -> str:
     for cmd in commands:
         command_padding = " " * (max_command_len - len(cmd.escaped_command))
         parameters_padding = " " * (max_parameters_len - len(cmd.escaped_parameters))
-        help_text = fragment_list_to_string_for_debug(cmd.escaped_help_text)
-        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{help_text}"),\n'
+        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} new (FormatType?, string)[]{{ '
+        for fragment in cmd.escaped_help_text:
+            s += f'({map_fragment_type_to_csharp_type(fragment.type)}, "{fragment.content}"), '
+        s += "}),\n"
 
     s += "    };\n"
     s += "  }\n"
     s += "}\n"
 
     return s
+
+
+def map_fragment_type_to_csharp_type(type: FragmentType) -> str:
+    """Returns the appropriate FormatType enumeration value, where FormatType is the enum in the C# code."""
+    if type == FragmentType.Text:
+        return "null"
+    elif type == FragmentType.Code:
+        return "FormatType.InlineCode"
+    elif type == FragmentType.Emphasis:
+        return "FormatType.EmphasisMinor"
+    elif type == FragmentType.Note:
+        return "FormatType.Note"
+    elif type == FragmentType.Warning:
+        return "FormatType.Warning"
+    else:
+        raise Exception("Unknown FragmentType")
 
 
 def generate_debug_dump(commands: list[ParsedCommand]) -> str:
@@ -408,38 +426,39 @@ def generate_debug_dump(commands: list[ParsedCommand]) -> str:
     return s
 
 
-# def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
-#     s = ""
-#     for f in fragments:
-#         if f.type == FragmentType.Text:
-#             s += f.content
-#         elif f.type == FragmentType.Code:
-#             s += f"```{f.content}```"
-#         elif f.type == FragmentType.Emphasis:
-#             s += f"**{f.content}**"
-#         elif f.type == FragmentType.Note:
-#             s += f"!{f.content}!"
-#         elif f.type == FragmentType.Warning:
-#             s += f"!!!{f.content}!!!"
-#         else:
-#             raise Exception("Unknown FragmentType")
-#     return s
 def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
     s = ""
     for f in fragments:
         if f.type == FragmentType.Text:
             s += f.content
         elif f.type == FragmentType.Code:
-            s += f.content
+            s += f"```{f.content}```"
         elif f.type == FragmentType.Emphasis:
-            s += f"**{f.content}**"
+            s += f"*{f.content}*"
         elif f.type == FragmentType.Note:
-            s += f.content
+            s += f"!{f.content}!"
         elif f.type == FragmentType.Warning:
-            s += f.content
+            s += f"!!!{f.content}!!!"
         else:
             raise Exception("Unknown FragmentType")
     return s
+
+# def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
+#     s = ""
+#     for f in fragments:
+#         if f.type == FragmentType.Text:
+#             s += f.content
+#         elif f.type == FragmentType.Code:
+#             s += f.content
+#         elif f.type == FragmentType.Emphasis:
+#             s += f"*{f.content}*"
+#         elif f.type == FragmentType.Note:
+#             s += f.content
+#         elif f.type == FragmentType.Warning:
+#             s += f.content
+#         else:
+#             raise Exception("Unknown FragmentType")
+#     return s
 
 
 def get_max_component_lengths(commands: list[ParsedCommand]):

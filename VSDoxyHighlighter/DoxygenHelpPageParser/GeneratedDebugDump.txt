@@ -4,9 +4,9 @@ Parameters: <name> [(title)]
 Help text:
 Defines a group just like \defgroup, but in contrast to that command using the same <name> more than once will not result in a warning, but rather one group with a merged documentation and the first title found in any of the commands.
 
-The title is optional, so this command can also be used to add a number of entities to an existing group using @{ and @} like this:
+The title is optional, so this command can also be used to add a number of entities to an existing group using ```@{``` and ```@}``` like this:
 
-     /*! \addtogroup mygrp
+```     /*! \addtogroup mygrp
       *  Additional documentation for group 'mygrp'
       *  @{
       */
@@ -25,7 +25,7 @@ The title is optional, so this command can also be used to add a number of entit
    
      /*! @} */
 
-See also: page Grouping, commands \defgroup, \ingroup, and \weakgroup.
+```See also: page Grouping, commands \defgroup, \ingroup, and \weakgroup.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -33,9 +33,9 @@ See also: page Grouping, commands \defgroup, \ingroup, and \weakgroup.
 Command: callgraph
 Parameters: 
 Help text:
-When this command is put in a comment block of a function or method and HAVE_DOT is set to YES, then doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of CALL_GRAPH.
+When this command is put in a comment block of a function or method and HAVE_DOT is set to ```YES```, then doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of CALL_GRAPH.
 
-Note: The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
 
 See also: command \callergraph, command \hidecallgraph, command \hidecallergraph and option CALL_GRAPH
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -47,7 +47,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function or method and then doxygen will not generate a call graph for that function. The call graph will not be generated regardless of the value of CALL_GRAPH.
 
-Note: The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
 
 See also: command \callergraph, command \callgraph, command \hidecallergraph and option CALL_GRAPH
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -57,9 +57,9 @@ See also: command \callergraph, command \callgraph, command \hidecallergraph and
 Command: callergraph
 Parameters: 
 Help text:
-When this command is put in a comment block of a function or method and HAVE_DOT is set to YES, then doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of CALLER_GRAPH.
+When this command is put in a comment block of a function or method and HAVE_DOT is set to ```YES```, then doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of CALLER_GRAPH.
 
-Note: The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
 
 See also: command \callgraph, command \hidecallgraph, command \hidecallergraph and option CALLER_GRAPH
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -71,7 +71,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function or method and then doxygen will not generate a caller graph for that function. The caller graph will not be generated regardless of the value of CALLER_GRAPH.
 
-Note: The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
 
 See also: command \callergraph, command \callgraph, command \hidecallgraph and option CALLER_GRAPH
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -83,7 +83,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function, method or variable, then doxygen will generate an overview for that function, method, variable of the, documented, functions and methods that call / use it. The overview will be generated regardless of the value of REFERENCED_BY_RELATION.
 
-Note: The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
 See also: command \showrefs, command \hiderefby, command \hiderefs and option REFERENCED_BY_RELATION
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -95,7 +95,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function, method or variable then doxygen will not generate an overview for that function, method or variable of the functions and methods that call / use it. The overview will not be generated regardless of the value of REFERENCED_BY_RELATION.
 
-Note: The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
 See also: command \showrefs, command \showrefby, command \hiderefs and option REFERENCED_BY_RELATION
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -107,7 +107,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function or method, then doxygen will generate an overview for that function or method of the functions and methods that call it. The overview will be generated regardless of the value of REFERENCES_RELATION.
 
-Note: The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
 See also: command \showrefby, command \hiderefby, command \hiderefs and option REFERENCES_RELATION
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -119,7 +119,7 @@ Parameters:
 Help text:
 When this command is put in a comment block of a function or method and then doxygen will not generate an overview for that function or method of the functions and methods that call it. The overview will not be generated regardless of the value of REFERENCES_RELATION.
 
-Note: The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+!Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
 See also: command \showrefs, command \showrefby, command \hiderefby and option REFERENCES_RELATION
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -131,7 +131,7 @@ Parameters: <label> | "(text)"
 Help text:
 With this command it is possible to add custom qualifier labels to members and classes. These labels will be shown in the output in the same way as the automatically generated labels such as "static", "inline", and "final".
 
-For instance to indicate that a function is only meant for testing purposes one could add \qualifier test
+For instance to indicate that a function is only meant for testing purposes one could add ```\qualifier test```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -151,7 +151,7 @@ Parameters: <name> [<header-file>] [<header-name>]
 Help text:
 Indicates that a comment block contains documentation for a class with name <name>. Optionally a header file and a header name can be specified. If the header-file is specified, a link to a verbatim copy of the header will be included in the HTML documentation. The <header-name> argument can be used to overwrite the name of the link that is used in the class documentation to something other than <header-file>. This can be useful if the include name is not located on the default include path (like <X11/X.h>). With the <header-name> argument you can also specify how the include statement should look like, by adding either quotes or sharp brackets around the name. Sharp brackets are used if just the name is given. Note that the last two arguments can also be specified using the \headerfile command.
 
-Example: 
+Example: ```
    /* A dummy class */
     
    class Test
@@ -162,7 +162,7 @@ Example:
     *  \brief This is a test class.
     *
     * Some details about the Test class.
-    */
+    */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -178,9 +178,9 @@ Indicates that a comment block contains documentation for a C++20 concept with n
 Command: def
 Parameters: <name>
 Help text:
-Indicates that a comment block contains documentation for a #define macro.
+Indicates that a comment block contains documentation for a ```#define``` macro.
 
-Example: 
+Example: ```
    /*! \file define.h
        \brief testing defines
     
@@ -200,7 +200,7 @@ Example:
    #define ABS(x) (((x)>0)?(x):-(x))
    #define MAX(x,y) ((x)>(y)?(x):(y))
    #define MIN(x,y) ((x)>(y)?(y):(x)) 
-           /*!< Computes the minimum of \a x and \a y. */
+           /*!< Computes the minimum of \a x and \a y. */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -228,11 +228,11 @@ Indicates that a comment block contains documentation for a directory. The "path
 Command: enum
 Parameters: <name>
 Help text:
-Indicates that a comment block contains documentation for an enumeration, with name <name>. If the enum is a member of a class and the documentation block is located outside the class definition, the scope of the class should be specified as well. If a comment block is located directly in front of an enum declaration, the \enum comment may be omitted.
+Indicates that a comment block contains documentation for an enumeration, with name <name>. If the enum is a member of a class and the documentation block is located outside the class definition, the scope of the class should be specified as well. If a comment block is located directly in front of an enum declaration, the ```\enum``` comment may be omitted.
 
 Note: The type of an anonymous enum cannot be documented, but the values of an anonymous enum can.
 
-Example: 
+Example: ```
    class Enum_Test
    {
     public:
@@ -256,7 +256,7 @@ Example:
     
    /*! \var Enum_Test::TEnum Enum_Test::Val1
     * The description of the first enum value.
-    */
+    */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -264,13 +264,13 @@ Example:
 Command: example
 Parameters: ['{lineno}'] <file-name>
 Help text:
-Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option {lineno} to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option ```{lineno}``` to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
 If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH tag, you can include part of the absolute path to disambiguate it.
 
 If more than one source file is needed for the example, the \include command can be used.
 
-Example: 
+Example: ```
    /** A Example_Test class.
     *  More details about this class.
     */
@@ -291,12 +291,12 @@ Example:
     * More details about this example.
     */
 
- Where the example file example_test.cpp looks as follows: 
+``` Where the example file ```example_test.cpp``` looks as follows: ```
    void main()
    {
      Example_Test t;
      t.example();
-   }
+   }```
 
 See also: command \include.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -306,7 +306,7 @@ See also: command \include.
 Command: endinternal
 Parameters: 
 Help text:
-This command ends a documentation fragment that was started with a \internal command. The text between \internal and \endinternal will only be visible if INTERNAL_DOCS is set to YES.
+This command ends a documentation fragment that was started with a \internal command. The text between \internal and ```\endinternal``` will only be visible if INTERNAL_DOCS is set to ```YES```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -316,7 +316,7 @@ Parameters: <name>
 Help text:
 This command can be used to manually indicate an inheritance relation, when the programming language does not support this concept natively (e.g. C).
 
-The file manual.c in the example directory shows how to use this command.
+The file ```manual.c``` in the example directory shows how to use this command.
 
 
 See also: command \implements and command \memberof
@@ -327,13 +327,13 @@ See also: command \implements and command \memberof
 Command: file
 Parameters: [<name>]
 Help text:
-Indicates that a comment block contains documentation for a source or header file with name <name>. The file name may include (part of) the path if the file-name alone is not unique. If the file name is omitted (i.e. the line after \file is left blank) then the documentation block that contains the \file command will belong to the file it is located in.
+Indicates that a comment block contains documentation for a source or header file with name <name>. The file name may include (part of) the path if the file-name alone is not unique. If the file name is omitted (i.e. the line after ```\file``` is left blank) then the documentation block that contains the ```\file``` command will belong to the file it is located in.
 
 Important: The documentation of 
 global functions, variables, typedefs, and enums will only be included 
-in the output if the file they are in is documented as well or if EXTRACT_ALL is set to YES.
+in the output if the file they are in is documented as well or if EXTRACT_ALL is set to ```YES```.
 
-Example: 
+Example: ```
    /** \file file.h
     * A brief file description.
     * A more elaborated file description.
@@ -343,9 +343,9 @@ Example:
     * A global integer value.
     * More details about this value.
     */
-   extern int globalValue;
+   extern int globalValue;```
 
-Note: In the above example JAVADOC_AUTOBRIEF has been set to YES in the configuration file.
+!Note:! In the above example JAVADOC_AUTOBRIEF has been set to ```YES``` in the configuration file.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -353,16 +353,16 @@ Note: In the above example JAVADOC_AUTOBRIEF has been set to YES in the configur
 Command: fileinfo
 Parameters: ['{'option'}']
 Help text:
-Shows (part) of the file name in which this command is placed. The option can be name, extension, filename, directory or, full, with
-  • name the name of the file without extension
-  • extension the extension of the file
-  • filename the filename i.e. name plus extension
-  • directory the directory of the given file
-  • full the full path and filename of the given file.
+Shows (part) of the file name in which this command is placed. The ```option``` can be ```name```, ```extension```, ```filename```, ```directory``` or, ```full```, with
+  • ```name``` the name of the file without extension
+  • ```extension``` the extension of the file
+  • ```filename``` the filename i.e. ```name``` plus ```extension```
+  • ```directory``` the directory of the given file
+  • ```full``` the full path and filename of the given file.
 
-In case no option is specified the filename is used unless FULL_PATH_NAMES is set to YES in which case full is used.
+In case no option is specified the ```filename``` is used unless FULL_PATH_NAMES is set to ```YES``` in which case ```full``` is used.
 
-Note: the command \fileinfo cannot be used as argument to the \file command
+!Note:! the command \fileinfo cannot be used as argument to the \file command
 
 See also: command \lineinfo
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -382,17 +382,17 @@ See also: command \fileinfo
 Command: fn
 Parameters: (function declaration)
 Help text:
-Indicates that a comment block contains documentation for a function (either global or as a member of a class). This command is **only** needed if a comment block is **not** placed in front (or behind) the function declaration or definition.
+Indicates that a comment block contains documentation for a function (either global or as a member of a class). This command is *only* needed if a comment block is *not* placed in front (or behind) the function declaration or definition.
 
-If your comment block **is** in front of the function declaration or definition this command can (and to avoid redundancy should) be omitted.
+If your comment block *is* in front of the function declaration or definition this command can (and to avoid redundancy should) be omitted.
 
-A full function declaration including arguments should be specified after the \fn command on a **single** line, since the argument ends at the end of the line!
+A full function declaration including arguments should be specified after the ```\fn``` command on a *single* line, since the argument ends at the end of the line!
 
 This command is equivalent to \var, \typedef, and \property.
 
-Warning: Do not use this command if it is not absolutely needed, since it will lead to duplication of information and thus to errors.
+!!!Warning:!!! Do not use this command if it is not absolutely needed, since it will lead to duplication of information and thus to errors.
 
-Example: 
+Example: ```
    class Fn_Test
    {
     public:
@@ -413,7 +413,7 @@ Example:
     *  \param n an integer.
     *  \exception std::out_of_range parameter is out of range.
     *  \return a character pointer.
-    */
+    */```
 
 See also: commands \var, \property, and \typedef.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -427,21 +427,21 @@ Intended to be used for class, struct, or union documentation, where the documen
 
 With the <header-name> argument you can also specify how the include statement should look like, by adding either double quotes or sharp brackets around the name. By default sharp brackets are used if just the name is given.
 
-If a pair of double quotes is given for either the <header-file> or <header-name> argument, the current file (in which the command was found) will be used but with quotes. So for a comment block with a \headerfile command inside a file test.h, the following three commands are equivalent:
-
+If a pair of double quotes is given for either the <header-file> or <header-name> argument, the current file (in which the command was found) will be used but with quotes. So for a comment block with a ```\headerfile``` command inside a file ```test.h```, the following three commands are equivalent:
+```
      \headerfile test.h "test.h"
      \headerfile test.h ""
      \headerfile "" 
 
-To get sharp brackets you do not need to specify anything, but if you want to be explicit you could use any of the following:
-
+```To get sharp brackets you do not need to specify anything, but if you want to be explicit you could use any of the following:
+```
      \headerfile test.h <test.h>
      \headerfile test.h <>
      \headerfile <> 
 
-To globally reverse the default include representation to local includes you can set FORCE_LOCAL_INCLUDES to YES.
+```To globally reverse the default include representation to local includes you can set FORCE_LOCAL_INCLUDES to ```YES```.
 
-To disable the include information altogether set SHOW_HEADERFILE to NO.
+To disable the include information altogether set SHOW_HEADERFILE to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -469,7 +469,7 @@ Parameters: <name>
 Help text:
 This command can be used to manually indicate an inheritance relation, when the programming language does not support this concept natively (e.g. C).
 
-The file manual.c in the example directory shows how to use this command.
+The file ```manual.c``` in the example directory shows how to use this command.
 
 
 See also: command \extends and command \memberof
@@ -480,7 +480,7 @@ See also: command \extends and command \memberof
 Command: ingroup
 Parameters: (<groupname> [<groupname>]*)
 Help text:
-If the \ingroup command is placed in a comment block of a compound entity (like class, file or namespace), then it will be added to the group(s) identified by the <groupname>(s). In case of members (like variable, functions, typedefs and enums) the member will be added only to one group (to avoid ambiguous linking targets in case a member is not documented in the context of its class, namespace or file, but only visible as part of a group).
+If the ```\ingroup``` command is placed in a comment block of a compound entity (like class, file or namespace), then it will be added to the group(s) identified by the ```<groupname>```(s). In case of members (like variable, functions, typedefs and enums) the member will be added only to one group (to avoid ambiguous linking targets in case a member is not documented in the context of its class, namespace or file, but only visible as part of a group).
 
 See also: page Grouping, commands \defgroup, \addtogroup, and \weakgroup
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -502,9 +502,9 @@ Parameters:
 Help text:
 This command starts a documentation fragment that is meant for internal use only. The fragment naturally ends at the end of the comment block. You can also force the internal section to end earlier by using the \endinternal command.
 
-If the \internal command is put inside a section (see for example \section) all subsections after the command are considered to be internal as well. Only a new section at the same level will end the fragment that is considered internal.
+If the ```\internal``` command is put inside a section (see for example \section) all subsections after the command are considered to be internal as well. Only a new section at the same level will end the fragment that is considered internal.
 
-You can use INTERNAL_DOCS in the configuration file to show (YES) or hide (NO) the internal documentation.
+You can use INTERNAL_DOCS in the configuration file to show (```YES```) or hide (```NO```) the internal documentation.
 
 See also: command \endinternal.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -514,12 +514,12 @@ See also: command \endinternal.
 Command: mainpage
 Parameters: [(title)]
 Help text:
-If the \mainpage command is placed in a comment block the block is used to customize the index page (in HTML) or the first chapter (in LaTeX).
+If the ```\mainpage``` command is placed in a comment block the block is used to customize the index page (in HTML) or the first chapter (in LaTeX).
 
-The title argument is optional and replaces the default title that doxygen normally generates. If you do not want any title you can specify notitle as the argument of \mainpage.
+The title argument is optional and replaces the default title that doxygen normally generates. If you do not want any title you can specify ```notitle``` as the argument of ```\mainpage```.
 
 Here is an example:
-
+```
    /*! \mainpage My Personal Index Page
     *
     * \section intro_sec Introduction
@@ -533,7 +533,7 @@ Here is an example:
     * etc...
     */
 
-You can refer to the main page using: \ref index.
+```You can refer to the main page using: ```\ref index```.
 
 See also: command \section, command \subsection, and command \page.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -547,7 +547,7 @@ This command makes a function a member of a class in a similar way as \relates d
 
 It is also possible to use this command together with \public, \protected or \private.
 
-The file manual.c in the example directory shows how to use this command.
+The file ```manual.c``` in the example directory shows how to use this command.
 
 
 See also: commands \extends, \implements, \public, \protected and \private.
@@ -558,7 +558,7 @@ See also: commands \extends, \implements, \public, \protected and \private.
 Command: name
 Parameters: [(header)]
 Help text:
-This command turns a comment block into a header definition of a member group. The comment block should be followed by a @{ ... @} block containing the members of the group.
+This command turns a comment block into a header definition of a member group. The comment block should be followed by a ```@{``` ... ```@}``` block containing the members of the group.
 
 See section Member Groups for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -588,21 +588,21 @@ Parameters: [(function declaration)]
 Help text:
 This command can be used to generate the following standard text for an overloaded member function:
 
-   ‍This is an overloaded member function, provided for convenience. It 
+```   ‍This is an overloaded member function, provided for convenience. It 
    differs from the above function only in what argument(s) it accepts. 
 
-
+```
 If the documentation for the overloaded member function is not located in front of the function declaration or definition, the optional argument should be used to specify the correct function.
 
 Any other documentation that is inside the documentation block will by appended after the generated message.
 
 Note 1: You are responsible that 
 there is indeed an earlier documented member that is overloaded by this 
-one. To prevent that document reorders the documentation you should set SORT_MEMBER_DOCS to NO in this case. 
+one. To prevent that document reorders the documentation you should set SORT_MEMBER_DOCS to ```NO``` in this case. 
 
-Note 2: The \overload command does not work inside a one-line comment. 
+Note 2: The ```\overload``` command does not work inside a one-line comment. 
 
-Example: 
+Example: ```
    class Overload_Test 
    {
     public:
@@ -626,7 +626,7 @@ Example:
     
    /*!
     * \overload void Overload_Test::drawRect(const Rect &r)
-    */
+    */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -644,7 +644,7 @@ Parameters: <name> (title)
 Help text:
 Indicates that a comment block contains a piece of documentation that is not directly related to one specific class, file or member. The HTML generator creates a page containing the documentation. The LaTeX generator starts a new section in the chapter 'Page documentation'.
 
-Example: 
+Example: ```
    /*! \page page1 A documentation page
      \tableofcontents
      Leading text.
@@ -659,12 +659,12 @@ Example:
     
    /*! \page page2 Another page
      Even more info.
-   */
+   */```
 
-Note: The <name> argument consists of a combination of letters and number digits. If you wish to use upper case letters (e.g. MYPAGE1), or mixed case letters (e.g. MyPage1) in the <name> argument, you should set CASE_SENSE_NAMES to YES.
+Note: The <name> argument consists of a combination of letters and number digits. If you wish to use upper case letters (e.g. ```MYPAGE1```), or mixed case letters (e.g. ```MyPage1```) in the <name> argument, you should set CASE_SENSE_NAMES to ```YES```.
  However, this is advisable only if your file system is case sensitive. 
 Otherwise (and for better portability) you should use all lower case 
-letters (e.g. mypage1) for <name> in all references to the page.
+letters (e.g. ```mypage1```) for <name> in all references to the page.
 
 See also: command \section, command \subsection, and command \ref.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -778,7 +778,7 @@ Parameters: <name>
 Help text:
 This command can be used in the documentation of a non-member function <name>. It puts the function inside the 'related function' section of the class documentation. This command is useful for documenting non-friend functions that are nevertheless strongly coupled to a certain class. It prevents the need of having to document a file, but only works for functions.
 
-Example: 
+Example: ```
    /*! 
     * A String class.
     */ 
@@ -801,7 +801,7 @@ Example:
     */
    void stringDebug()
    {
-   }
+   }```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -885,12 +885,12 @@ Parameters: (variable declaration)
 Help text:
 Indicates that a comment block contains documentation for a variable or enum value (either global or as a member of a class). This command is equivalent to \fn, \property, and \typedef.
 
-Note that for PHP one can also specify the type of the variable. The syntax is similar as for the phpDocumentor but the description has to start at the next line, i.e.
-
+Note that for PHP one can also specify the type of the variable. The syntax is similar as for the ```phpDocumentor``` but the description has to start at the next line, i.e.
+```
    @var  datatype $varname
    Description
 
-See also: command \fn, \property, and \typedef.
+```See also: command \fn, \property, and \typedef.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -900,7 +900,7 @@ Parameters: [(title for the flow chart)]
 Help text:
 This is a VHDL specific command, which can be put in the documentation of a process to produce a flow chart of the logic in the process. Optionally a title for the flow chart can be given.
 
-Note: Currently the flow chart will only appear in the HTML output.
+!Note:! Currently the flow chart will only appear in the HTML output.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -918,7 +918,7 @@ See also: page Grouping and command \addtogroup.
 Command: attention
 Parameters: { attention text }
 Help text:
-Starts a paragraph where a message that needs attention may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \attention commands will be joined into a single paragraph. The \attention command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where a message that needs attention may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\attention``` commands will be joined into a single paragraph. The ```\attention``` command ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -926,9 +926,9 @@ Starts a paragraph where a message that needs attention may be entered. The para
 Command: author
 Parameters: { list of authors }
 Help text:
-Starts a paragraph where one or more author names may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \author commands will be joined into a single paragraph. Each author description will start a new line. Alternatively, one \author command may mention several authors. The \author command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where one or more author names may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\author``` commands will be joined into a single paragraph. Each author description will start a new line. Alternatively, one ```\author``` command may mention several authors. The ```\author``` command ends when a blank line or some other sectioning command is encountered.
 
-Example: 
+Example: ```
    /*! 
     *  \brief     Pretty nice class.
     *  \details   This class is used to demonstrate a number of section commands.
@@ -941,7 +941,7 @@ Example:
     *  \warning   Improper use can crash your application
     *  \copyright GNU Public License.
     */
-   class SomeNiceClass {};
+   class SomeNiceClass {};```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -957,7 +957,7 @@ Equivalent to \author.
 Command: brief
 Parameters: { brief description }
 Help text:
-Starts a paragraph that serves as a brief description. For classes and files the brief description will be used in lists and at the start of the documentation page. For class and file members, the brief description will be placed at the declaration of the member and prepended to the detailed description. A brief description may span several lines (although it is advised to keep it brief!). A brief description ends when a blank line or another sectioning command is encountered. If multiple \brief commands are present they will be joined. See section \author for an example.
+Starts a paragraph that serves as a brief description. For classes and files the brief description will be used in lists and at the start of the documentation page. For class and file members, the brief description will be placed at the declaration of the member and prepended to the detailed description. A brief description may span several lines (although it is advised to keep it brief!). A brief description ends when a blank line or another sectioning command is encountered. If multiple ```\brief``` commands are present they will be joined. See section \author for an example.
 
 Synonymous to \short.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -967,11 +967,11 @@ Synonymous to \short.
 Command: bug
 Parameters: { bug description }
 Help text:
-Starts a paragraph where one or more bugs may be reported. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \bug commands will be joined into a single paragraph. Each bug description will start on a new line. Alternatively, one \bug command may mention several bugs. The \bug command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
+Starts a paragraph where one or more bugs may be reported. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\bug``` commands will be joined into a single paragraph. Each bug description will start on a new line. Alternatively, one ```\bug``` command may mention several bugs. The ```\bug``` command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
 
 The description will also add an item to a separate Bug list and the two instances of the description will be cross-referenced. Each item in the Bug list will be preceded by a header that indicates the origin of the item.
 
-The Bug list and the corresponding entries can be disabled by setting the GENERATE_BUGLIST to NO.
+The Bug list and the corresponding entries can be disabled by setting the GENERATE_BUGLIST to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -981,15 +981,15 @@ Parameters: [(section-label)]
 Help text:
 Starts a conditional section that ends with a corresponding \endcond command, which is typically found in another comment block. The main purpose of this pair of commands is to (conditionally) exclude part of a file from processing (in older version of doxygen this could only be achieved using C preprocessor commands).
 
-The section between \cond and \endcond can be included by adding its section label to the ENABLED_SECTIONS configuration option. If the section label is omitted, the section will be excluded from processing unconditionally. The section label can be a logical expression build of section labels, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e \cond (!LABEL1 && LABEL2).
+The section between ```\cond``` and \endcond can be included by adding its section label to the ENABLED_SECTIONS configuration option. If the section label is omitted, the section will be excluded from processing unconditionally. The section label can be a logical expression build of section labels, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ```\cond (!LABEL1 && LABEL2)```.
 
-For conditional sections within a comment block one should use a \if ... \endif block. When using \cond and the condition is not satisfied the current comment block is ended and everything until the matching \endcond is removed and a new command block is started there.
+For conditional sections within a comment block one should use a \if ... \endif block. When using ```\cond``` and the condition is not satisfied the current comment block is ended and everything until the matching \endcond is removed and a new command block is started there.
 
 Conditional sections can be nested. In this case a nested section will only be shown if it and its containing section are included.
 
 Here is an example showing the commands in action:
 
-   /** An interface */
+```   /** An interface */
    class Intf
    {
      public:
@@ -1027,11 +1027,11 @@ Here is an example showing the commands in action:
    
    /// @endcond
 
-The output will be different depending on whether or not ENABLED_SECTIONS contains TEST, or DEV
+```The output will be different depending on whether or not ENABLED_SECTIONS contains ```TEST```, or ```DEV```
 
 See also: commands \if, \ifnot, \else, \elseif, \endif, \endcond, and ENABLED_SECTIONS.
 
-Note: Due to the moment of parsing the \cond and \endcond commands cannot be used in ALIASES.
+!Note:! Due to the moment of parsing the ```\cond``` and \endcond commands cannot be used in ALIASES.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1047,7 +1047,7 @@ Starts a paragraph where the copyright of an entity can be described. This parag
 Command: date
 Parameters: { date description }
 Help text:
-Starts a paragraph where one or more dates may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \date commands will be joined into a single paragraph. Each date description will start on a new line. Alternatively, one \date command may mention several dates. The \date command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
+Starts a paragraph where one or more dates may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\date``` commands will be joined into a single paragraph. Each date description will start on a new line. Alternatively, one ```\date``` command may mention several dates. The ```\date``` command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1086,13 +1086,13 @@ Shows the date and time based on the given <format> and <date_time>. Where the <
 Note that the <format> has to be between double quotes.
 
 In case the <date_time> is specified it has to have the following representation:
-  • optional date where date is:
+  • optional ```date``` where ```date``` is:
     •• 4 digits for the year
     •• a minus sign
     •• one or 2 digits for the month
     •• a minus sign
     •• one or 2 digits for the day
-  • optional time where time is:
+  • optional ```time``` where ```time``` is:
     •• whitespace
     •• one or 2 digits for the hours
     •• a colon sign
@@ -1104,21 +1104,21 @@ In case the <date_time> is specified it has to have the following representation
 in case the <date_time> is not specified the current date and time are used.
 
 Here is an example:
-
+```
    - \showdate "%A %d-%m-%Y" 2015-3-14
    - \showdate "%a %d-%m-%y" 2015-3-14
    - \showdate "%-m.%d%y" 2015-3-14
    - \showdate "%A %d-%m-%Y %H:%M:%S" 2015-3-14 03:04:15
    - \showdate "%A %d-%m-%Y %H:%M" 2015-3-14 03:04
 
-In case OUTPUT_LANGUAGE=english this results in:
+```In case ```OUTPUT_LANGUAGE=english``` this results in:
   • Saturday 14-03-2015
   • Sat 14-03-15
   • 3.1415
   • Saturday 14-03-15 03:04:15
   • Saturday 14-03-15 03:04
 
-In case OUTPUT_LANGUAGE=dutch this results in:
+In case ```OUTPUT_LANGUAGE=dutch``` this results in:
   • zaterdag 14-03-15
   • za 14-03-2015
   • 3.1415
@@ -1131,11 +1131,11 @@ In case OUTPUT_LANGUAGE=dutch this results in:
 Command: deprecated
 Parameters: { description }
 Help text:
-Starts a paragraph indicating that this documentation block belongs to a deprecated entity. Can be used to describe alternatives, expected life span, etc. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \deprecated commands will be joined into a single paragraph. Each deprecation description will start on a new line. The \deprecated command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph indicating that this documentation block belongs to a deprecated entity. Can be used to describe alternatives, expected life span, etc. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\deprecated``` commands will be joined into a single paragraph. Each deprecation description will start on a new line. The ```\deprecated``` command ends when a blank line or some other sectioning command is encountered.
 
 The description will also add an item to a separate Deprecated list and the two instances of the description will be cross-referenced. Each item in the Deprecated list will be preceded by a header that indicates the origin of the item.
 
-The Deprecated list and the corresponding entries can be disabled by setting the GENERATE_DEPRECATEDLIST to NO.
+The Deprecated list and the corresponding entries can be disabled by setting the GENERATE_DEPRECATEDLIST to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1143,7 +1143,7 @@ The Deprecated list and the corresponding entries can be disabled by setting the
 Command: details
 Parameters: { detailed description }
 Help text:
-Just like \brief starts a brief description, \details starts the detailed description. You can also start a new paragraph (blank line) then the \details command is not needed.
+Just like \brief starts a brief description, ```\details``` starts the detailed description. You can also start a new paragraph (blank line) then the ```\details``` command is not needed.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1160,21 +1160,21 @@ Command: raisewarning
 Parameters: ( text to be shown as warning )
 Help text:
 All the text, excluding the command, till the end of the line is literally shown as a documentation warning. The text, including the command, is removed from the output. The command will most commonly be used in combination with ALIASES to show a specific warning.
-Example: 
+Example: ```
    \raisewarning My specific warnning
    
    \warnNoDoc
    
    \warnNoDoc{My specific warnning}
 
- together with: 
+``` together with: ```
    ALIASES  = warnNoDoc="\raisewarning Missing documentation"
    ALIASES += warnNoDoc{1}="\raisewarning Incomplete documentation: \1"
 
- will result in: 
+``` will result in: ```
       ex_1.md:1: warning: My specific warnning
       ex_1.md:3: warning: Missing documentation
-      ex_1.md:5: warning: Incomplete documentation: My specific warnning
+      ex_1.md:5: warning: Incomplete documentation: My specific warnning```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1206,7 +1206,7 @@ Ends a conditional section that was started by \cond.
 
 See also: command \cond.
 
-Note: Due to the moment of parsing the \endcond and \cond commands cannot be used in ALIASES.
+!Note:! Due to the moment of parsing the ```\endcond``` and \cond commands cannot be used in ALIASES.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1224,7 +1224,7 @@ See also: commands \if, \ifnot, \else, \elseif.
 Command: exception
 Parameters: <exception-object> { exception description }
 Help text:
-Starts an exception description for an exception object with name <exception-object>. Followed by a description of the exception. The existence of the exception object is not checked. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \exception commands will be joined into a single paragraph. Each exception description will start on a new line. The \exception description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
+Starts an exception description for an exception object with name <exception-object>. Followed by a description of the exception. The existence of the exception object is not checked. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\exception``` commands will be joined into a single paragraph. Each exception description will start on a new line. The ```\exception``` description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1234,13 +1234,13 @@ Parameters: (section-label)
 Help text:
 Starts a conditional documentation section. The section ends with a matching \endif command. A conditional section is disabled by default. To enable it you must put the section-label after the ENABLED_SECTIONS tag in the configuration file.
 
-The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e \if (!LABEL1 && LABEL2).
+The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ```\if (!LABEL1 && LABEL2)```.
 
 Conditional blocks can be nested. A nested section is only enabled if all enclosing sections are enabled as well.
 
-The \if and corresponding \endif have to be in the same comment block. When a conditional block needs to span more than one comment block one has to use \cond ... \endcond.
+The ```\if``` and corresponding \endif have to be in the same comment block. When a conditional block needs to span more than one comment block one has to use \cond ... \endcond.
 
-Example: 
+Example: ```
      /*! Unconditionally shown documentation.
       *  \if Cond1
       *    Only included if Cond1 is set.
@@ -1255,11 +1255,11 @@ Example:
       *  Unconditional text.
       */
 
-
+```
 
 You can also use conditional commands inside aliases. To document a class in two languages you could for instance use:
 
-Example 2: 
+Example 2: ```
    /*! \english
     *  This is English.
     *  \endenglish
@@ -1271,16 +1271,16 @@ Example 2:
    {
    };
 
-
+```
 
 Where the following aliases are defined in the configuration file:
 
-   ALIASES  = "english=\if english" \
+```   ALIASES  = "english=\if english" \
               "endenglish=\endif" \
               "dutch=\if dutch" \
               "enddutch=\endif"
 
-and ENABLED_SECTIONS can be used to enable either english or dutch.
+```and ENABLED_SECTIONS can be used to enable either ```english``` or ```dutch```.
 
 See also: commands \endif, \ifnot, \else, \elseif, \cond, \endcond, and ENABLED_SECTIONS.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1300,7 +1300,7 @@ See also: commands \endif, \if, \else, and \elseif, \cond, \endcond, and ENABLED
 Command: invariant
 Parameters: { description of invariant }
 Help text:
-Starts a paragraph where the invariant of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \invariant commands will be joined into a single paragraph. Each invariant description will start on a new line. Alternatively, one \invariant command may mention several invariants. The \invariant command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where the invariant of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\invariant``` commands will be joined into a single paragraph. Each invariant description will start on a new line. Alternatively, one ```\invariant``` command may mention several invariants. The ```\invariant``` command ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1308,7 +1308,7 @@ Starts a paragraph where the invariant of an entity can be described. The paragr
 Command: note
 Parameters: { text }
 Help text:
-Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \note commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one \note command may mention several notes. The \note command ends when a blank line or some other sectioning command is encountered. See section \par for an example.
+Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\note``` commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one ```\note``` command may mention several notes. The ```\note``` command ends when a blank line or some other sectioning command is encountered. See section \par for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1320,9 +1320,9 @@ If a paragraph title is given this command starts a paragraph with a user define
 
 If no paragraph title is given this command will start a new paragraph. This will also work inside other paragraph commands (like \param or \warning) without ending that command.
 
-The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. The \par command ends when a blank line or some other sectioning command is encountered.
+The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. The ```\par``` command ends when a blank line or some other sectioning command is encountered.
 
-Example: 
+Example: ```
    /*! \class Par_Test
     * Normal text.
     *
@@ -1342,7 +1342,7 @@ Example:
     * More normal text. 
     */
     
-   class Par_Test {};
+   class Par_Test {};```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1352,8 +1352,8 @@ Parameters: '['dir']' <parameter-name> { parameter description }
 Help text:
 Starts a parameter description for a function parameter with name <parameter-name>, followed by a description of the parameter. The existence of the parameter is checked and a warning is given if the documentation of this (or any other) parameter is missing or not present in the function declaration or definition.
 
-The \param command has an optional attribute, dir, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function memcpy:
-
+The ```\param``` command has an optional attribute, ```dir```, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ```memcpy:```
+```
    /*!
     * Copies bytes from a source memory area to a destination memory area,
     * where both areas may not overlap.
@@ -1363,22 +1363,22 @@ The \param command has an optional attribute, dir, specifying the direction of t
     */
    void memcpy(void *dest, const void *src, size_t n);
 
-The parameter description is a paragraph with no special internal structure. All visual enhancement commands may be used inside the paragraph.
+```The parameter description is a paragraph with no special internal structure. All visual enhancement commands may be used inside the paragraph.
 
-Multiple adjacent \param commands will be joined into a single paragraph. Each parameter description will start on a new line. The \param description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
+Multiple adjacent ```\param``` commands will be joined into a single paragraph. Each parameter description will start on a new line. The ```\param``` description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
 
-Note that you can also document multiple parameters with a single \param command using a comma separated list. Here is an example:
+Note that you can also document multiple parameters with a single ```\param``` command using a comma separated list. Here is an example:
 
-   /** Sets the position.
+```   /** Sets the position.
     *  @param x,y,z Coordinates of the position in 3D space.
     */
    void setPosition(double x,double y,double z,double t)
    {
    }
 
-Note that for PHP one can also specify the type (or types if you separate them with a pipe symbol) which are allowed for a parameter (as this is not part of the definition). The syntax is the same as for the phpDocumentor, i.e.
-
-   @param  datatype1|datatype2 $paramname description
+```Note that for PHP one can also specify the type (or types if you separate them with a pipe symbol) which are allowed for a parameter (as this is not part of the definition). The syntax is the same as for the ```phpDocumentor```, i.e.
+```
+   @param  datatype1|datatype2 $paramname description```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1389,7 +1389,7 @@ Help text:
 For commands that expect a single paragraph as argument (such as \par, \param and \warning), the \parblock command allows to start a description that covers multiple paragraphs, which then ends with \endparblock.
 
 Example:
-
+```
    /** Example of a param command with a description consisting of two paragraphs
     *  \param p
     *  \parblock
@@ -1400,7 +1400,7 @@ Example:
     *  Rest of the comment block continues.
     */
 
-Note that the \parblock command may also appear directly after \param's first argument.
+```Note that the ```\parblock``` command may also appear directly after \param's first argument.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1426,7 +1426,7 @@ Otherwise similar to \param.
 Command: post
 Parameters: { description of the postcondition }
 Help text:
-Starts a paragraph where the postcondition of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \post commands will be joined into a single paragraph. Each postcondition will start on a new line. Alternatively, one \post command may mention several postconditions. The \post command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where the postcondition of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\post``` commands will be joined into a single paragraph. Each postcondition will start on a new line. Alternatively, one ```\post``` command may mention several postconditions. The ```\post``` command ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1434,7 +1434,7 @@ Starts a paragraph where the postcondition of an entity can be described. The pa
 Command: pre
 Parameters: { description of the precondition }
 Help text:
-Starts a paragraph where the precondition of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \pre commands will be joined into a single paragraph. Each precondition will start on a new line. Alternatively, one \pre command may mention several preconditions. The \pre command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where the precondition of an entity can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\pre``` commands will be joined into a single paragraph. Each precondition will start on a new line. Alternatively, one ```\pre``` command may mention several preconditions. The ```\pre``` command ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1442,7 +1442,7 @@ Starts a paragraph where the precondition of an entity can be described. The par
 Command: remark
 Parameters: { remark text }
 Help text:
-Starts a paragraph where one or more remarks may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \remark commands will be joined into a single paragraph. Each remark will start on a new line. Alternatively, one \remark command may mention several remarks. The \remark command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where one or more remarks may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\remark``` commands will be joined into a single paragraph. Each remark will start on a new line. Alternatively, one ```\remark``` command may mention several remarks. The ```\remark``` command ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1466,7 +1466,7 @@ Equivalent to \return.
 Command: return
 Parameters: { description of the return value }
 Help text:
-Starts a return value description for a function. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \return commands will be joined into a single paragraph. The \return description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
+Starts a return value description for a function. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\return``` commands will be joined into a single paragraph. The ```\return``` description ends when a blank line or some other sectioning command is encountered. See section \fn for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1482,7 +1482,7 @@ Equivalent to \return.
 Command: retval
 Parameters: <return value> { description }
 Help text:
-Starts a description for a function's return value with name <return value>, followed by a description of the return value. The text of the paragraph that forms the description has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \retval commands will be joined into a single paragraph. Each return value description will start on a new line. The \retval description ends when a blank line or some other sectioning command is encountered.
+Starts a description for a function's return value with name <return value>, followed by a description of the return value. The text of the paragraph that forms the description has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\retval``` commands will be joined into a single paragraph. Each return value description will start on a new line. The ```\retval``` description ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1490,7 +1490,7 @@ Starts a description for a function's return value with name <return value>, fol
 Command: sa
 Parameters: { references }
 Help text:
-Starts a paragraph where one or more cross-references to classes, functions, methods, variables, files or URL may be specified. Two names joined by either :: or # are understood as referring to a class and one of its members. One of several overloaded methods or constructors may be selected by including a parenthesized list of argument types after the method name.
+Starts a paragraph where one or more cross-references to classes, functions, methods, variables, files or URL may be specified. Two names joined by either ```::``` or ```#``` are understood as referring to a class and one of its members. One of several overloaded methods or constructors may be selected by including a parenthesized list of argument types after the method name.
 
 Synonymous to \see.
 
@@ -1518,7 +1518,7 @@ Equivalent to \brief.
 Command: since
 Parameters: { text }
 Help text:
-This command can be used to specify since when (version or time) an entity is available. The paragraph that follows \since does not have any special internal structure. All visual enhancement commands may be used inside the paragraph. The \since description ends when a blank line or some other sectioning command is encountered.
+This command can be used to specify since when (version or time) an entity is available. The paragraph that follows ```\since``` does not have any special internal structure. All visual enhancement commands may be used inside the paragraph. The ```\since``` description ends when a blank line or some other sectioning command is encountered.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1526,11 +1526,11 @@ This command can be used to specify since when (version or time) an entity is av
 Command: test
 Parameters: { paragraph describing a test case }
 Help text:
-Starts a paragraph where one or more test cases can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \test commands will be joined into a single paragraph. Each test case description will start on a new line. Alternatively, one \test command may mention several test cases. The \test command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where one or more test cases can be described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\test``` commands will be joined into a single paragraph. Each test case description will start on a new line. Alternatively, one ```\test``` command may mention several test cases. The ```\test``` command ends when a blank line or some other sectioning command is encountered.
 
 The description will also add an item to a separate Test list and the two instances of the description will be cross-referenced. Each item in the Test list will be preceded by a header that indicates the origin of the item.
 
-The Test list and the corresponding entries can be disabled by setting the GENERATE_TESTLIST to NO.
+The Test list and the corresponding entries can be disabled by setting the GENERATE_TESTLIST to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1558,11 +1558,11 @@ Equivalent to \throw.
 Command: todo
 Parameters: { paragraph describing what is to be done }
 Help text:
-Starts a paragraph where one or more todo items are described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \todo commands will be joined into a single paragraph. Each todo description will start on a new line. Alternatively, one \todo command may mention several tod descriptioons. The \todo command ends when a blank line or some other sectioning command is encountered.
+Starts a paragraph where one or more todo items are described. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\todo``` commands will be joined into a single paragraph. Each todo description will start on a new line. Alternatively, one ```\todo``` command may mention several tod descriptioons. The ```\todo``` command ends when a blank line or some other sectioning command is encountered.
 
 The description will also add an item to a separate Todo list and the two instances of the description will be cross-referenced. Each item in the Todo list will be preceded by a header that indicates the origin of the item.
 
-The Todo list and the corresponding entries can be disabled by setting the GENERATE_TODOLIST to NO.
+The Todo list and the corresponding entries can be disabled by setting the GENERATE_TODOLIST to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1570,7 +1570,7 @@ The Todo list and the corresponding entries can be disabled by setting the GENER
 Command: version
 Parameters: { version number }
 Help text:
-Starts a paragraph where one or more version strings may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \version commands will be joined into a single paragraph. Each version description will start on a new line. Alternatively, one \version command may mention several version strings. The \version command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
+Starts a paragraph where one or more version strings may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\version``` commands will be joined into a single paragraph. Each version description will start on a new line. Alternatively, one ```\version``` command may mention several version strings. The \version command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1578,7 +1578,7 @@ Starts a paragraph where one or more version strings may be entered. The paragra
 Command: warning
 Parameters: { warning message }
 Help text:
-Starts a paragraph where one or more warning messages may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent \warning commands will be joined into a single paragraph. Each warning description will start on a new line. Alternatively, one \warning command may mention several warnings. The \warning command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
+Starts a paragraph where one or more warning messages may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\warning``` commands will be joined into a single paragraph. Each warning description will start on a new line. Alternatively, one ```\warning``` command may mention several warnings. The ```\warning``` command ends when a blank line or some other sectioning command is encountered. See section \author for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1588,20 +1588,20 @@ Parameters: <key> "heading" "list title" { text }
 Help text:
 This command is a generalization of commands such as \todo and \bug. It can be used to create user-defined text sections which are automatically cross-referenced between the place of occurrence and a related page, which will be generated. On the related page all sections of the same type will be collected.
 
-The first argument <key> is an identifier uniquely representing the type of the section. The second argument is a quoted string representing the heading of the section under which text passed as the fourth argument is put. The third argument (list title) is used as the title for the related page containing all items with the same key. The second and third string argument cannot contain a newline. The keys "todo", "test", "bug" and "deprecated" are predefined.
+The first argument <key> is an identifier uniquely representing the type of the section. The second argument is a quoted string representing the heading of the section under which text passed as the fourth argument is put. The third argument (list title) is used as the title for the related page containing all items with the same key. The second and third string argument cannot contain a newline. The keys ```"todo"```, ```"test"```, ```"bug"``` and ```"deprecated"``` are predefined.
 
-To get an idea on how to use the \xrefitem command and what its effect is, consider the todo list, which (for English output) can be seen an alias for the command
-
+To get an idea on how to use the ```\xrefitem``` command and what its effect is, consider the todo list, which (for English output) can be seen an alias for the command
+```
    \xrefitem todo "Todo" "Todo List" 
 
-Since it is very tedious and error-prone to repeat the first three parameters of the command for each section, the command is meant to be used in combination with the ALIASES option in the configuration file. To define a new command \reminder, for instance, one should add the following line to the configuration file:
-
+```Since it is very tedious and error-prone to repeat the first three parameters of the command for each section, the command is meant to be used in combination with the ALIASES option in the configuration file. To define a new command ```\reminder```, for instance, one should add the following line to the configuration file:
+```
    ALIASES += "reminder=\xrefitem reminders \"Reminder\" \"Reminders\"" 
 
-Note the use of escaped quotes for the second and third argument of the \xrefitem command.
+```Note the use of escaped quotes for the second and third argument of the ```\xrefitem``` command.
 
 In case parameter "(heading)" is the empty string no heading is generated. This can be useful when used in combination with the \page command e.g.
-
+```
    /** @page my_errors My Errors
     *  @brief Errors page
     *
@@ -1616,9 +1616,9 @@ In case parameter "(heading)" is the empty string no heading is generated. This 
        Check about file system read/write access. */
    #define MY_ERR_CANNOT_CLOSE_FILE                  102
 
-with \error defined as
-
-   ALIASES += "error=\xrefitem my_errors \"\" \"\""
+```with ```\error``` defined as
+```
+   ALIASES += "error=\xrefitem my_errors \"\" \"\""```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1644,7 +1644,7 @@ See also: command \ref.
 Command: cite
 Parameters: <label>
 Help text:
-Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in CITE_BIB_FILES. For the LaTeX output the formatting of the reference in the text can be configured with LATEX_BIB_STYLE. For other output formats a fixed representation is used. Note that using this command requires the bibtex tool to be present in the search path.
+Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in CITE_BIB_FILES. For the LaTeX output the formatting of the reference in the text can be configured with LATEX_BIB_STYLE. For other output formats a fixed representation is used. Note that using this command requires the ```bibtex``` tool to be present in the search path.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1664,7 +1664,7 @@ Parameters: <link-object>
 Help text:
 The links that are automatically generated by doxygen always have the name of the object they point to as link-text.
 
-The \link command can be used to create a link to an object (a file, class, or member) with a user specified link-text. The link command should end with an \endlink command. All text between the \link and \endlink commands serves as text for a link to the <link-object> specified as the first argument of \link.
+The ```\link``` command can be used to create a link to an object (a file, class, or member) with a user specified link-text. The link command should end with an \endlink command. All text between the ```\link``` and \endlink commands serves as text for a link to the <link-object> specified as the first argument of ```\link```.
 
 See also: Command autolink for more information on automatically generated links and valid link-objects.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1676,7 +1676,7 @@ Parameters: <name> ["(text)"]
 Help text:
 Creates a reference to a named section, subsection, page or anchor. For HTML documentation the reference command will generate a link to the section. For a section or subsection the title of the section will be used as the text of the link. For an anchor the optional text between quotes will be used or <name> if no text is specified. For LaTeX documentation the reference command will generate a section number for sections or the text followed by a page number if <name> refers to an anchor.
 
-See also: Command \page for an example of the \ref command.
+See also: Command \page for an example of the ```\ref``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1708,7 +1708,7 @@ End an index list started with \secreflist.
 Command: subpage
 Parameters: <name> ["(text)"]
 Help text:
-This command can be used to create a hierarchy of pages. The same structure can be made using the \defgroup and \ingroup commands, but for pages the \subpage command is often more convenient. The main page (see \mainpage) is typically the root of hierarchy.
+This command can be used to create a hierarchy of pages. The same structure can be made using the \defgroup and \ingroup commands, but for pages the ```\subpage``` command is often more convenient. The main page (see \mainpage) is typically the root of hierarchy.
 
 This command behaves similar as \ref in the sense that it creates a reference to a page labeled <name> with the optional link text as specified in the second argument.
 
@@ -1716,12 +1716,12 @@ It differs from the \ref command in that it only works for pages, and creates a 
 
 See the \section and \subsection commands if you want to add structure without creating multiple pages.
 
-Note: Each page can be the sub page 
+!Note:! Each page can be the sub page 
 of only one other page and no cyclic relations are allowed, i.e. the 
 page hierarchy must have a tree structure.
 
 Here is an example:
-
+```
    /*! \mainpage A simple manual
    
    Some general info.
@@ -1743,7 +1743,7 @@ Here is an example:
    /*! \page advanced Advanced Usage
    This page is for advanced users.
    Make sure you have first read \ref intro "the introduction".
-   */
+   */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1751,9 +1751,9 @@ Here is an example:
 Command: tableofcontents
 Parameters: ['{'[option[:level]][,option[:level]]*'}']
 Help text:
-Creates a table of contents at the top of a page, listing all sections and subsections in the page. The option can be HTML or LaTeX or XML or DocBook. When a level is specified this means the maximum nesting level that is shown. The value of level should be in the range 1..5, values outside this range are considered to be 5. In case no level is specified level is set to 5 (show all) In case no option. is specified \tableofcontents acts as if just the option HTML and XML was specified. In case of multiple \tableofcontents commands in a page the option(s) will be used additional to the already specified option(s), but only the last level of an option is valid.
+Creates a table of contents at the top of a page, listing all sections and subsections in the page. The ```option``` can be ```HTML``` or ```LaTeX``` or ```XML``` or ```DocBook```. When a ```level``` is specified this means the maximum nesting level that is shown. The value of ```level``` should be in the range 1..5, values outside this range are considered to be 5. In case no ```level``` is specified ```level``` is set to 5 (show all) In case no ```option```. is specified ```\tableofcontents``` acts as if just the ```option``` ```HTML``` and ```XML``` was specified. In case of multiple ```\tableofcontents``` commands in a page the ```option```(s) will be used additional to the already specified ```option```(s), but only the last ```level``` of an ```option``` is valid.
 
-Warning: This command only works inside related page documentation and **not** in other documentation blocks and only has effect in the specified output!
+!!!Warning:!!! This command only works inside related page documentation and *not* in other documentation blocks and only has effect in the specified output!
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1761,11 +1761,11 @@ Warning: This command only works inside related page documentation and **not** i
 Command: section
 Parameters: <section-name> (section title)
 Help text:
-Creates a section with name <section-name>. The title of the section should be specified as the second argument of the \section command.
+Creates a section with name <section-name>. The title of the section should be specified as the second argument of the ```\section``` command.
 
-Warning: This command only works inside related page documentation and **not** in other documentation blocks!
+!!!Warning:!!! This command only works inside related page documentation and *not* in other documentation blocks!
 
-See also: Command \page for an example of the \section command.
+See also: Command \page for an example of the ```\section``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1773,11 +1773,11 @@ See also: Command \page for an example of the \section command.
 Command: subsection
 Parameters: <subsection-name> (subsection title)
 Help text:
-Creates a subsection with name <subsection-name>. The title of the subsection should be specified as the second argument of the \subsection command.
+Creates a subsection with name <subsection-name>. The title of the subsection should be specified as the second argument of the ```\subsection``` command.
 
-Warning: This command only works inside a section of a related page documentation block and **not** in other documentation blocks!
+!!!Warning:!!! This command only works inside a section of a related page documentation block and *not* in other documentation blocks!
 
-See also: Command \page for an example of the \subsection command.
+See also: Command \page for an example of the ```\subsection``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1785,9 +1785,9 @@ See also: Command \page for an example of the \subsection command.
 Command: subsubsection
 Parameters: <subsubsection-name> (subsubsection title)
 Help text:
-Creates a subsubsection with name <subsubsection-name>. The title of the subsubsection should be specified as the second argument of the \subsubsection command.
+Creates a subsubsection with name <subsubsection-name>. The title of the subsubsection should be specified as the second argument of the ```\subsubsection``` command.
 
-Warning: This command only works inside a subsection of a related page documentation block and **not** in other documentation blocks!
+!!!Warning:!!! This command only works inside a subsection of a related page documentation block and *not* in other documentation blocks!
 
 See also: Command \page for an example of the \section command and \subsection command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1797,9 +1797,9 @@ See also: Command \page for an example of the \section command and \subsection c
 Command: paragraph
 Parameters: <paragraph-name> (paragraph title)
 Help text:
-Creates a named paragraph with name <paragraph-name>. The title of the paragraph should be specified as the second argument of the \paragraph command.
+Creates a named paragraph with name <paragraph-name>. The title of the paragraph should be specified as the second argument of the ```\paragraph``` command.
 
-Warning: This command only works inside a subsubsection of a related page documentation block and **not** in other documentation blocks!
+!!!Warning:!!! This command only works inside a subsubsection of a related page documentation block and *not* in other documentation blocks!
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1809,13 +1809,13 @@ Parameters: ['{lineno}'] <file-name>
 Help text:
 This command can be used to parse a source file without actually verbatim including it in the documentation (as the \include command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
-You can add option {lineno} to enable line numbers for the included code if desired.
+You can add option ```{lineno}``` to enable line numbers for the included code if desired.
 
-The class and member declarations and definitions inside the code fragment are 'remembered' during the parsing of the comment block that contained the \dontinclude command.
+The class and member declarations and definitions inside the code fragment are 'remembered' during the parsing of the comment block that contained the ```\dontinclude``` command.
 
-For line by line descriptions of source files, one or more lines of the example can be displayed using the \line, \skip, \skipline, and \until commands. An internal pointer is used for these commands. The \dontinclude command sets the pointer to the first line of the example.
+For line by line descriptions of source files, one or more lines of the example can be displayed using the \line, \skip, \skipline, and \until commands. An internal pointer is used for these commands. The ```\dontinclude``` command sets the pointer to the first line of the example.
 
-Example: 
+Example: ```
     
    /*! A test class. */
     
@@ -1839,12 +1839,12 @@ Example:
     *  \line }
     */
 
- Where the example file include_test.cpp looks as follows: 
+``` Where the example file ```include_test.cpp``` looks as follows: ```
    void main()
    {
      Include_Test t;
      t.example();
-   }
+   }```
 
 See also: commands \line, \skip, \skipline, \until, and \include.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1858,20 +1858,20 @@ This command can be used to include a source file as a block of code. The comman
 
 If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH tag, you can include part of the absolute path to disambiguate it.
 
-Using the \include command is equivalent to inserting the file into the documentation block and surrounding it with \code and \endcode commands.
+Using the ```\include``` command is equivalent to inserting the file into the documentation block and surrounding it with \code and \endcode commands.
 
-The main purpose of the \include command is to avoid code duplication in case of example blocks that consist of multiple source and header files.
+The main purpose of the ```\include``` command is to avoid code duplication in case of example blocks that consist of multiple source and header files.
 
 For a line by line description of a source files use the \dontinclude command in combination with the \line, \skip, \skipline, and \until commands.
 
 Alternatively, the \snippet command can be used to include only a fragment of a source file. For this to work the fragment has to be marked.
 
-Note: Doxygen's special commands do not work inside blocks of code. It is allowed to nest C-style comments inside a code block though.
+!Note:! Doxygen's special commands do not work inside blocks of code. It is allowed to nest C-style comments inside a code block though.
 
-The option can either be lineno or doc. The option lineno can be used to enable line numbers for the included code if desired. The option doc can be used to treat the file as documentation rather than code.
+The ```option``` can either be ```lineno``` or ```doc```. The ```option``` ```lineno``` can be used to enable line numbers for the included code if desired. The ```option``` ```doc``` can be used to treat the file as documentation rather than code.
 
-Note:
-	When using the {doc} option, some commands like \cond and \if don't work with this command due to the moment of parsing.
+!Note:!
+	When using the ```{doc}``` option, some commands like \cond and \if don't work with this command due to the moment of parsing.
 	The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
 See also: commands \example, \dontinclude, \verbatim, \includedoc, and \snippet.
@@ -1930,14 +1930,14 @@ This command searches line by line through the example that was last included us
 
 The internal pointer that is used to keep track of the current line in the example, is set to the start of the line following the line that is written (or to the end of the example if the pattern could not be found).
 
-Note: The command: 
+Note: The command: ```
    \skipline pattern
 
- is equivalent to: 
+``` is equivalent to: ```
    \skip pattern
    \line pattern
 
-
+```
 
 See section \dontinclude for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1947,15 +1947,15 @@ See section \dontinclude for an example.
 Command: snippet
 Parameters: ['{'option'}'] <file-name> ( block_id )
 Help text:
-Where the \include command can be used to include a complete file as source code, this command can be used to quote only a fragment of a source file. In case this is used as <file-name> the current file is taken as file to take the snippet from.
+Where the \include command can be used to include a complete file as source code, this command can be used to quote only a fragment of a source file. In case ```this``` is used as <file-name> the current file is taken as file to take the snippet from.
 
-For example, the putting the following command in the documentation, references a snippet in file example.cpp residing in a subdirectory which should be pointed to by EXAMPLE_PATH.
+For example, the putting the following command in the documentation, references a snippet in file ```example.cpp``` residing in a subdirectory which should be pointed to by EXAMPLE_PATH.
 
-     \snippet snippets/example.cpp Adding a resource
+```     \snippet snippets/example.cpp Adding a resource
 
-The text following the file name is the unique identifier for the snippet. This is used to delimit the quoted code in the relevant snippet file as shown in the following example that corresponds to the above \snippet command:
+```The text following the file name is the unique identifier for the snippet. This is used to delimit the quoted code in the relevant snippet file as shown in the following example that corresponds to the above ```\snippet``` command:
 
-       QImage image(64, 64, QImage::Format_RGB32);
+```       QImage image(64, 64, QImage::Format_RGB32);
        image.fill(qRgb(255, 160, 128));
     
    //! [Adding a resource]
@@ -1964,17 +1964,17 @@ The text following the file name is the unique identifier for the snippet. This 
    //! [Adding a resource]
        ...
 
-Note that the lines containing the block markers will not be included, so the output will be:
+```Note that the lines containing the block markers will not be included, so the output will be:
 
-   document->addResource(QTextDocument::ImageResource,
+```   document->addResource(QTextDocument::ImageResource,
        QUrl("mydata://image.png"), QVariant(image));
 
-Note also that the [block_id] markers should appear exactly twice in the source file.
+```Note also that the [block_id] markers should appear exactly twice in the source file.
 
-The option can either be lineno or doc. The option lineno can be used to enable line numbers for the included code if desired. The option doc can be used to treat the file as documentation rather than code.
+The ```option``` can either be ```lineno``` or ```doc```. The ```option``` ```lineno``` can be used to enable line numbers for the included code if desired. The ```option``` ```doc``` can be used to treat the file as documentation rather than code.
 
-Note:
-	When using the {doc} option, some commands like \cond and \if don't work with this command due to the moment of parsing.
+!Note:!
+	When using the ```{doc}``` option, some commands like \cond and \if don't work with this command due to the moment of parsing.
 	The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
 see section \dontinclude for an alternative way to include fragments of a source file that does not require markers.
@@ -2027,7 +2027,7 @@ Files or directories that doxygen should look for can be specified using the EXA
 Command: htmlinclude
 Parameters: ["[block]"] <file-name>
 Help text:
-This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with <htmlonly> in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \htmlonly and \endhtmlonly commands around it.
+This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \htmlonly and \endhtmlonly commands around it.
 
 Normally the contents of the file indicated by \htmlinclude is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlinclude[block] to make doxygen end the current paragraph and restart after the file is included.
 
@@ -2041,7 +2041,7 @@ See also: command \htmlonly, \latexinclude, \rtfinclude, \maninclude, \docbookin
 Command: latexinclude
 Parameters: <file-name>
 Help text:
-This command includes the contents of the file <file-name> as is in the LaTeX documentation and tagged with <latexonly> in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \latexonly and \endlatexonly commands around it.
+This command includes the contents of the file <file-name> as is in the LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \latexonly and \endlatexonly commands around it.
 
 Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
@@ -2053,7 +2053,7 @@ See also: command \latexonly, \htmlinclude, \rtfinclude, \maninclude, \docbookin
 Command: rtfinclude
 Parameters: <file-name>
 Help text:
-This command includes the contents of the file <file-name> as is in the RTF documentation and tagged with <rtfonly> in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \rtfonly and \endrtfonly commands around it.
+This command includes the contents of the file <file-name> as is in the RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \rtfonly and \endrtfonly commands around it.
 
 Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
@@ -2065,7 +2065,7 @@ See also: command \rtfonly, \htmlinclude, \latexinclude, \maninclude, \docbookin
 Command: maninclude
 Parameters: <file-name>
 Help text:
-This command includes the contents of the file <file-name> as is in the MAN documentation and tagged with <manonly> in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \manonly and \endmanonly commands around it.
+This command includes the contents of the file <file-name> as is in the MAN documentation and tagged with ```<manonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \manonly and \endmanonly commands around it.
 
 Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
@@ -2077,7 +2077,7 @@ See also: command \manonly, \htmlinclude, \latexinclude, \rtfinclude, \docbookin
 Command: docbookinclude
 Parameters: <file-name>
 Help text:
-This command includes the contents of the file <file-name> as is in the DocBook documentation and tagged with <docbookonly> in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \docbookonly and \enddocbookonly commands around it.
+This command includes the contents of the file <file-name> as is in the DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing \docbookonly and \enddocbookonly commands around it.
 
 Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
 
@@ -2103,12 +2103,12 @@ Parameters: <word>
 Help text:
 Displays the argument <word> in italics. Use this command to emphasize words. Use this command to refer to member arguments in the running text.
 
-Example: 
+Example: ```
      ... the \a x and \a y coordinates are used to ...
 
- This will result in the following text:
+``` This will result in the following text:
 
- ... the **x** and **y** coordinates are used to ...
+ ... the *x* and *y* coordinates are used to ...
 
 Equivalent to \e and \em. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2118,21 +2118,21 @@ Equivalent to \e and \em. To emphasize multiple words use <em>multiple words</em
 Command: arg
 Parameters: { item-description }
 Help text:
-This command has one argument that continues until the first blank line or until another \arg is encountered. The command can be used to generate a simple, not nested list of arguments. Each argument should start with a \arg command.
+This command has one argument that continues until the first blank line or until another ```\arg``` is encountered. The command can be used to generate a simple, not nested list of arguments. Each argument should start with a ```\arg``` command.
 
-Example: Typing: 
+Example: Typing: ```
      \arg \c AlignLeft left alignment.
      \arg \c AlignCenter center alignment.
      \arg \c AlignRight right alignment
    
      No other types of alignment are supported.
 
- will result in the following text:
+``` will result in the following text:
 
 
-  • AlignLeft left alignment. 
-  • AlignCenter center alignment. 
-  • AlignRight right alignment 
+  • ```AlignLeft``` left alignment. 
+  • ```AlignCenter``` center alignment. 
+  • ```AlignRight``` right alignment 
 
 
  No other types of alignment are supported.
@@ -2157,12 +2157,12 @@ Parameters: <word>
 Help text:
 Displays the argument <word> using a typewriter font. Use this to refer to a word of code. Equivalent to <tt>word</tt>.
 
-Example: Typing: 
+Example: Typing: ```
         ... This function returns \c void and not \c int ...
 
- will result in the following text:
+``` will result in the following text:
 
- ... This function returns void and not int ...
+ ... This function returns ```void``` and not ```int``` ...
 
 Equivalent to \p. To have multiple words in typewriter font use <tt>multiple words</tt>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2174,11 +2174,11 @@ Parameters: ['{'<word>'}']
 Help text:
 Starts a block of code. A code block is treated differently from ordinary text. It is interpreted as source code. The names of classes and members and other documented entities are automatically replaced by links to the documentation.
 
-By default the language that is assumed for syntax highlighting is based on the location where the \code block was found. If this part of a Python file for instance, the syntax highlight will be done according to the Python syntax.
+By default the language that is assumed for syntax highlighting is based on the location where the ```\code``` block was found. If this part of a Python file for instance, the syntax highlight will be done according to the Python syntax.
 
-If it is unclear from the context which language is meant (for instance the comment is in a .txt or .markdown file) then you can also explicitly indicate the language, by putting the file extension typically that doxygen associated with the language in curly brackets after the code block. Here is an example:
+If it is unclear from the context which language is meant (for instance the comment is in a ```.txt``` or ```.markdown``` file) then you can also explicitly indicate the language, by putting the file extension typically that doxygen associated with the language in curly brackets after the code block. Here is an example:
 
-     \code{.py}
+```     \code{.py}
      class Python:
         pass
      \endcode
@@ -2187,9 +2187,9 @@ If it is unclear from the context which language is meant (for instance the comm
      class Cpp {};
      \endcode
 
-If the contents of the code block are in a language that doxygen cannot parse, doxygen will just show the output as-is. You can make this explicit using .unparsed, or by giving some other extension that doxygen doesn't support, e.g.
+```If the contents of the code block are in a language that doxygen cannot parse, doxygen will just show the output as-is. You can make this explicit using .unparsed, or by giving some other extension that doxygen doesn't support, e.g.
 
-     \code{.unparsed}
+```     \code{.unparsed}
      Show this as-is please
      \endcode
    
@@ -2197,7 +2197,7 @@ If the contents of the code block are in a language that doxygen cannot parse, d
      echo "This is a shell script"
      \endcode
 
-See also: command \endcode and command \verbatim.
+```See also: command \endcode and command \verbatim.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2211,24 +2211,24 @@ The link object can point to a member (of a class, file or group), a class, a na
 
 To copy the documentation for a member of a class one can, for instance, put the following in the documentation:
 
-     /*! @copydoc MyClass::myfunction()
+```     /*! @copydoc MyClass::myfunction()
       *  More documentation.
       */
 
-if the member is overloaded, you should specify the argument types explicitly (without spaces!), like in the following:
+```if the member is overloaded, you should specify the argument types explicitly (without spaces!), like in the following:
 
-     //! @copydoc MyClass::myfunction(type1,type2)
+```     //! @copydoc MyClass::myfunction(type1,type2)
 
-Qualified names are only needed if the context in which the documentation block is found requires them.
+```Qualified names are only needed if the context in which the documentation block is found requires them.
 
-The \copydoc command can be used recursively, but cycles in the \copydoc relation will be broken and flagged as an error.
+The ```\copydoc``` command can be used recursively, but cycles in the ```\copydoc``` relation will be broken and flagged as an error.
 
-Note that \copydoc foo() is roughly equivalent to doing:
-
+Note that ```\copydoc foo()``` is roughly equivalent to doing:
+```
      \brief \copybrief foo()
      \details \copydetails foo()
 
-See \copybrief and \copydetails for copying only the brief or detailed part of the comment block.
+```See \copybrief and \copydetails for copying only the brief or detailed part of the comment block.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2252,7 +2252,7 @@ Works in a similar way as \copydoc but will only copy the detailed documentation
 Command: docbookonly
 Parameters: 
 Help text:
-Starts a block of text that only will be verbatim included in the generated DocBook documentation and tagged with <docbookonly> in the generated XML output. The block ends with a \enddocbookonly command.
+Starts a block of text that only will be verbatim included in the generated DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The block ends with a \enddocbookonly command.
 
 See also: command \manonly, \latexonly, \rtfonly, \xmlonly, \htmlonly and \docbookinclude.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2270,11 +2270,11 @@ The second argument is also optional and can be used to specify the width or hei
 
 The nodes of a graph can be made clickable by using the URL attribute. By using the command \ref inside the URL value you can conveniently link to an item inside doxygen. Here is an example:
 
-Note:
-	usage of this command requires that HAVE_DOT is set to YES
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to NO.
+!Note:!
+	usage of this command requires that HAVE_DOT is set to ```YES```
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
 
-   /*! class B */
+```   /*! class B */
    class B {};
     
    /*! class C */
@@ -2293,7 +2293,7 @@ Note:
     *  \enddot
     *  Note that the classes in the above graph are clickable
     *  (in the HTML output).
-    */
+    */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2305,7 +2305,7 @@ This command will produce an emoji character given its name.
 
 The supported names are the ones also supported by GitHub and listed here https://gist.github.com/rxaviers/7360908
 
-You can use the name with or without colons, i.e. \emoji smile is the same as writing \emoji :smile:. When an emoji is not supported the name with by places in the text with in between colons, i.e. \emoji unsupported will produce :unsupported: in the output. Doxygen will also give a warning message.
+You can use the name with or without colons, i.e. ```\emoji smile``` is the same as writing ```\emoji :smile:```. When an emoji is not supported the name with by places in the text with in between colons, i.e. ```\emoji unsupported``` will produce ```:unsupported:``` in the output. Doxygen will also give a warning message.
 
 See also the emoji support page for details.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2321,13 +2321,13 @@ The first argument is optional and can be used to specify the caption that is di
 
 The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the \image command.
 
-Note:
-	The text fragment should only include the part of the message sequence chart that is within the msc {...} block (this is different from \mscfile).
+!Note:!
+	The text fragment should only include the part of the message sequence chart that is within the ```msc {...}``` block (this is different from \mscfile).
 	mscgen is now built in into doxygen
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to NO.
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
 
-Here is an example of the use of the \msc command.
-
+Here is an example of the use of the ```\msc``` command.
+```
    /** Sender class. Can be used to send a command to the server.
     *  The receiver will acknowledge the command by calling Ack().
     *  \msc
@@ -2358,7 +2358,7 @@ Here is an example of the use of the \msc command.
     void Command(int commandId);
    };
 
-See also: command \mscfile.
+```See also: command \mscfile.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2368,32 +2368,32 @@ Parameters: ['{'option[,option]'}'] ["caption"] [<sizeindication>=<size>]
 Help text:
 Starts a text fragment which should contain a valid description of a PlantUML diagram. See https://plantuml.com/ for examples. The text fragment ends with \enduml.
 
-Note:
-	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more jar files, for details see the PlantUML documentation. This also is valid for the <engine>s latex and math. The location of the PlantUML file should be specified using PLANTUML_JAR_PATH. The other jar files should also reside in this directory.
-	The use of the <engine> ditaa is not possible in LaTeX as PlantUML only supports the png format and doxygen requires, temporary, eps output.
+!Note:!
+	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ```jar``` files, for details see the PlantUML documentation. This also is valid for the ```<engine>```s ```latex``` and ```math```. The location of the PlantUML file should be specified using PLANTUML_JAR_PATH. The other jar files should also reside in this directory.
+	The use of the ```<engine>``` ```ditaa``` is not possible in LaTeX as PlantUML only supports the ```png``` format and doxygen requires, temporary, ```eps``` output.
 
-Not all diagrams can be created with the PlantUML @startuml command but need another PlantUML @start... command. This will look like @start<engine> where currently supported are the following <engine>s: uml, bpm, wire, dot, ditaa, salt, math, latex, gantt, mindmap, wbs, yaml, creole, json, flow, board and git. By default the <engine> is uml. The <engine> can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one <engine> can be specified and also the filename can only be specified once.
+Not all diagrams can be created with the PlantUML ```@startuml``` command but need another PlantUML ```@start...``` command. This will look like ```@start<engine>``` where currently supported are the following ```<engine>```s: ```uml```, ```bpm```, ```wire```, ```dot```, ```ditaa```, ```salt```, ```math```, ```latex```, ```gantt```, ```mindmap```, ```wbs```, ```yaml```, ```creole```, ```json```, ```flow```, ```board``` and ```git```. By default the ```<engine>``` is ```uml```. The ```<engine>``` can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ```<engine>``` can be specified and also the filename can only be specified once.
 
-The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running doxygen, you can also add the name of the image file after \startuml and inside curly brackets as option, i.e.
-
+The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running doxygen, you can also add the name of the image file after ```\startuml``` and inside curly brackets as option, i.e.
+```
      @startuml{myimage.png} "Image Caption" width=5cm
      Alice -> Bob : Hello
      @enduml
 
-When the name of the image is specified, doxygen will generate an image with that name. Without the name doxygen will choose a name automatically.
+```When the name of the image is specified, doxygen will generate an image with that name. Without the name doxygen will choose a name automatically.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
 The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the \image command.
 
-Note:
-	doxygen does not support the Plantuml commands like @startjson, by design, directly but the support can be accomplished, by the user, by adding to the doxygen settings file: 
+!Note:!
+	doxygen does not support the Plantuml commands like ```@startjson```, by design, directly but the support can be accomplished, by the user, by adding to the doxygen settings file: ```
      ALIASES += startjson=@startuml{json}
-     ALIASES += endjson=@enduml
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to NO.
+     ALIASES += endjson=@enduml```
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
 
-Here is an example of the use of the \startuml command.
-
+Here is an example of the use of the ```\startuml``` command.
+```
    /** Sender class. Can be used to send a command to the server.
     *  The receiver will acknowledge the command by calling Ack().
     *  \startuml
@@ -2420,7 +2420,7 @@ Here is an example of the use of the \startuml command.
     public:
        /** Executable a command on the server */
     void Command(int commandId);
-   };
+   };```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2436,7 +2436,7 @@ The second argument is optional and can be used to specify the caption that is d
 
 The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the \image command.
 
-Note: usage of this command requires that HAVE_DOT is set to YES
+!Note:! usage of this command requires that HAVE_DOT is set to ```YES```
 
 See also: command \dot.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2454,7 +2454,7 @@ The second argument is optional and can be used to specify the caption that is d
 
 The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the \image command.
 
-Note: The text fragment should include the part message of the sequence chart as well as the starting msc { and ending } (this is different from \msc).
+!Note:! The text fragment should include the part message of the sequence chart as well as the starting ```msc {``` and ending ```}``` (this is different from \msc).
 
 See also: command \msc.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2480,12 +2480,12 @@ Parameters: <word>
 Help text:
 Displays the argument <word> in italics. Use this command to emphasize words.
 
-Example: Typing: 
+Example: Typing: ```
      ... this is a \e really good example ...
 
- will result in the following text:
+``` will result in the following text:
 
- ... this is a **really** good example ...
+ ... this is a *really* good example ...
 
 Equivalent to \a and \em. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2497,12 +2497,12 @@ Parameters: <word>
 Help text:
 Displays the argument <word> in italics. Use this command to emphasize words.
 
-Example: Typing: 
+Example: Typing: ```
      ... this is a \em really good example ...
 
- will result in the following text:
+``` will result in the following text:
 
- ... this is a **really** good example ...
+ ... this is a *really* good example ...
 
 Equivalent to \a and \e. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2662,7 +2662,7 @@ Parameters:
 Help text:
 Marks the start of a formula that is in a specific environment.
 
-Note: The second { is optional and is only to help editors (such as Vim) to do proper syntax highlighting by making the number of opening and closing braces the same.
+!Note:! The second ```{``` is optional and is only to help editors (such as ```Vim```) to do proper syntax highlighting by making the number of opening and closing braces the same.
 
 See also: command \f} and command formulas.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2681,13 +2681,13 @@ See also: command \f{ and command formulas.
 Command: htmlonly
 Parameters: ["[block]"]
 Help text:
-Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with <htmlonly> in the generated XML output. The block ends with a \endhtmlonly command.
+Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The block ends with a \endhtmlonly command.
 
 This command can be used to include HTML code that is too complex for doxygen (i.e. applets, java-scripts, and HTML tags that require specific attributes).
 
 Normally the contents between \htmlonly and \endhtmlonly is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlonly[block] to make doxygen end the current paragraph and restart it after \endhtmlonly.
 
-Note: environment variables (like $(HOME) ) are resolved inside a HTML-only block.
+!Note:! environment variables (like $(HOME) ) are resolved inside a HTML-only block.
 
 See also: command \manonly, \latexonly, \rtfonly, \xmlonly, \docbookonly, and \htmlinclude.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2699,33 +2699,33 @@ Parameters: ['{'option[,option]'}'] <format> <file> ["caption"] [<sizeindication
 Help text:
 Inserts an image into the documentation. This command is format specific, so if you want to insert an image for more than one format you'll have to repeat this command for each format.
 
-The first argument specifies the output format in which the image should be embedded. Currently, the following values are supported: html, latex, docbook, rtf and xml.
+The first argument specifies the output format in which the image should be embedded. Currently, the following values are supported: ```html```, ```latex```, ```docbook```, ```rtf``` and ```xml```.
 
 The second argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the IMAGE_PATH tag. If the image is found it will be copied to the correct output directory. If the image name contains spaces you'll have to put quotes ("...") around the name. You can also specify an absolute URL instead of a file name, but then doxygen does not copy the image nor check its existence.
 
 The third argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified on a single line and between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The fourth argument is also optional and can be used to specify the width or height of the image. This can be useful for LaTeX or DocBook output (i.e. format=latex or format=docbook).
-Size indication The sizeindication can specify the width or height to be used (or a combination). The size specifier in LaTeX (for example 10cm or 4in or a symbolic width like \textwidth).
+The fourth argument is also optional and can be used to specify the width or height of the image. This can be useful for LaTeX or DocBook output (i.e. format=```latex``` or format=```docbook```).
+Size indication The ```sizeindication``` can specify the width or height to be used (or a combination). The size specifier in LaTeX (for example ```10cm``` or ```4in``` or a symbolic width like ```\textwidth```).
 
-Currently only the options inline and anchor are supported. In case the option inline is specified the image is placed "in the line", when a caption is present it is shown in HTML as tooltip (ignored for the other formats). For the anchor option the syntax is: anchor:<anchorId>.
+Currently only the options ```inline``` and ```anchor``` are supported. In case the option ```inline``` is specified the image is placed "in the line", when a caption is present it is shown in HTML as tooltip (ignored for the other formats). For the ```anchor``` option the syntax is: ```anchor:<anchorId>```.
 
 Here is example of a comment block:
 
-     /*! Here is a snapshot of my new application:
+```     /*! Here is a snapshot of my new application:
       *  \image html application.jpg
       *  \image latex application.eps "My application" width=10cm
       */
 
-And this is an example of how the relevant part of the configuration file may look:
+```And this is an example of how the relevant part of the configuration file may look:
 
-     IMAGE_PATH     = my_image_dir
+```     IMAGE_PATH     = my_image_dir
 
+```
+!!!Warning:!!! The image format for HTML is limited to what your browser supports.
+For LaTeX, the image format must be supported by the LaTeX ```\includegraphics``` command i.e. Encapsulated PostScript (eps), Portable network graphics (png), Joint photographic experts group (jpg / jpeg). 
 
-Warning: The image format for HTML is limited to what your browser supports.
-For LaTeX, the image format must be supported by the LaTeX \includegraphics command i.e. Encapsulated PostScript (eps), Portable network graphics (png), Joint photographic experts group (jpg / jpeg). 
-
- Doxygen does not check if the image is in the correct format. So **you** have to make sure this is the case!
+ Doxygen does not check if the image is in the correct format. So *you* have to make sure this is the case!
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2733,7 +2733,7 @@ For LaTeX, the image format must be supported by the LaTeX \includegraphics comm
 Command: latexonly
 Parameters: 
 Help text:
-Starts a block of text that only will be verbatim included in the generated LaTeX documentation and tagged with <latexonly> in the generated XML output. The block ends with a \endlatexonly command.
+Starts a block of text that only will be verbatim included in the generated LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The block ends with a \endlatexonly command.
 
 This command can be used to include LaTeX code that is too complex for doxygen (i.e. images, formulas, special characters). You can use the \htmlonly and \endhtmlonly pair to provide a proper HTML alternative.
 
@@ -2747,7 +2747,7 @@ See also: commands \rtfonly, \xmlonly, \manonly, \htmlonly, \docbookonly, and \l
 Command: manonly
 Parameters: 
 Help text:
-Starts a block of text that only will be verbatim included in the generated MAN documentation and tagged with <manonly> in the generated XML output. The block ends with a \endmanonly command.
+Starts a block of text that only will be verbatim included in the generated MAN documentation and tagged with ```<manonly>``` in the generated XML output. The block ends with a \endmanonly command.
 
 This command can be used to include groff code directly into MAN pages. You can use the \htmlonly and \endhtmlonly and \latexonly and \endlatexonly pairs to provide proper HTML and LaTeX alternatives.
 
@@ -2759,21 +2759,21 @@ See also: commands \htmlonly, \xmlonly, \rtfonly, \latexonly, \docbookonly and \
 Command: li
 Parameters: { item-description }
 Help text:
-This command has one argument that continues until the first blank line or until another \li is encountered. The command can be used to generate a simple, not nested list of arguments. Each argument should start with a \li command.
+This command has one argument that continues until the first blank line or until another ```\li``` is encountered. The command can be used to generate a simple, not nested list of arguments. Each argument should start with a ```\li``` command.
 
-Example: Typing: 
+Example: Typing: ```
      \li \c AlignLeft left alignment.
      \li \c AlignCenter center alignment.
      \li \c AlignRight right alignment
    
      No other types of alignment are supported.
 
- will result in the following text:
+``` will result in the following text:
 
 
-  • AlignLeft left alignment. 
-  • AlignCenter center alignment. 
-  • AlignRight right alignment 
+  • ```AlignLeft``` left alignment. 
+  • ```AlignCenter``` center alignment. 
+  • ```AlignRight``` right alignment 
 
 
  No other types of alignment are supported.
@@ -2788,7 +2788,7 @@ Equivalent to \arg
 Command: n
 Parameters: 
 Help text:
-Forces a new line. Equivalent to <br> and inspired by the printf function.
+Forces a new line. Equivalent to <br> and inspired by the ```printf``` function.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2798,12 +2798,12 @@ Parameters: <word>
 Help text:
 Displays the parameter <word> using a typewriter font. You can use this command to refer to member function parameters in the running text.
 
-Example: 
+Example: ```
      ... the \p x and \p y coordinates are used to ...
 
- This will result in the following text:
+``` This will result in the following text:
 
- ... the x and y coordinates are used to ...
+ ... the ```x``` and ```y``` coordinates are used to ...
 
 Equivalent to \c. To have multiple words in typewriter font use <tt>multiple words</tt>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2813,7 +2813,7 @@ Equivalent to \c. To have multiple words in typewriter font use <tt>multiple wor
 Command: rtfonly
 Parameters: 
 Help text:
-Starts a block of text that only will be verbatim included in the generated RTF documentation and tagged with <rtfonly> in the generated XML output. The block ends with a \endrtfonly command.
+Starts a block of text that only will be verbatim included in the generated RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The block ends with a \endrtfonly command.
 
 This command can be used to include RTF code that is too complex for doxygen.
 
@@ -2829,7 +2829,7 @@ Parameters:
 Help text:
 Starts a block of text that will be verbatim included in the documentation. The block should end with a \endverbatim command. All commands are disabled in a verbatim block.
 
-Warning: Make sure you include a \endverbatim command for each \verbatim command or the parser will get confused!
+!!!Warning:!!! Make sure you include a \endverbatim command for each ```\verbatim``` command or the parser will get confused!
 
 See also: commands \code, \endverbatim and \verbinclude.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -2851,7 +2851,7 @@ See also: commands \manonly, \rtfonly, \latexonly, \htmlonly, and \docbookonly.
 Command: \
 Parameters: 
 Help text:
-This command writes a backslash character (\) to the output. The backslash has to be escaped in some cases because doxygen uses it to detect commands.
+This command writes a backslash character (```\```) to the output. The backslash has to be escaped in some cases because doxygen uses it to detect commands.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2859,7 +2859,7 @@ This command writes a backslash character (\) to the output. The backslash has t
 Command: @
 Parameters: 
 Help text:
-This command writes an at-sign (@) to the output. The at-sign has to be escaped in some cases because doxygen uses it to detect Javadoc commands.
+This command writes an at-sign (```@```) to the output. The at-sign has to be escaped in some cases because doxygen uses it to detect Javadoc commands.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2867,13 +2867,13 @@ This command writes an at-sign (@) to the output. The at-sign has to be escaped 
 Command: ~
 Parameters: [LanguageId]
 Help text:
-This command enables/disables a language specific filter. This can be used to put documentation for different language into one comment block and use the OUTPUT_LANGUAGE tag to filter out only a specific language. Use \~language_id to enable output for a specific language only and \~ to enable output for all languages (this is also the default mode).
+This command enables/disables a language specific filter. This can be used to put documentation for different language into one comment block and use the OUTPUT_LANGUAGE tag to filter out only a specific language. Use ```\~language_id``` to enable output for a specific language only and ```\~``` to enable output for all languages (this is also the default mode).
 
 Example:
-
+```
    /*! \~english This is English \~dutch Dit is Nederlands \~german Dies ist
        Deutsch. \~ output for all languages.
-    */
+    */```
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2881,7 +2881,7 @@ Example:
 Command: &
 Parameters: 
 Help text:
-This command writes the & character to the output. This character has to be escaped because it has a special meaning in HTML.
+This command writes the ```&``` character to the output. This character has to be escaped because it has a special meaning in HTML.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2889,7 +2889,7 @@ This command writes the & character to the output. This character has to be esca
 Command: $
 Parameters: 
 Help text:
-This command writes the $ character to the output. This character has to be escaped in some cases, because it is used to expand environment variables.
+This command writes the ```$``` character to the output. This character has to be escaped in some cases, because it is used to expand environment variables.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2897,7 +2897,7 @@ This command writes the $ character to the output. This character has to be esca
 Command: #
 Parameters: 
 Help text:
-This command writes the # character to the output. This character has to be escaped in some cases, because it is used to refer to documented entities.
+This command writes the ```#``` character to the output. This character has to be escaped in some cases, because it is used to refer to documented entities.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2905,7 +2905,7 @@ This command writes the # character to the output. This character has to be esca
 Command: <
 Parameters: 
 Help text:
-This command writes the < character to the output. This character has to be escaped because it has a special meaning in HTML.
+This command writes the ```<``` character to the output. This character has to be escaped because it has a special meaning in HTML.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2913,7 +2913,7 @@ This command writes the < character to the output. This character has to be esca
 Command: >
 Parameters: 
 Help text:
-This command writes the > character to the output. This character has to be escaped because it has a special meaning in HTML.
+This command writes the ```>``` character to the output. This character has to be escaped because it has a special meaning in HTML.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2921,7 +2921,7 @@ This command writes the > character to the output. This character has to be esca
 Command: %
 Parameters: 
 Help text:
-This command writes the % character to the output. This character has to be escaped in some cases, because it is used to prevent auto-linking to a word that is also a documented class or struct.
+This command writes the ```%``` character to the output. This character has to be escaped in some cases, because it is used to prevent auto-linking to a word that is also a documented class or struct.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2929,7 +2929,7 @@ This command writes the % character to the output. This character has to be esca
 Command: "
 Parameters: 
 Help text:
-This command writes the " character to the output. This character has to be escaped in some cases, because it is used in pairs to indicate an unformatted text fragment.
+This command writes the ```"``` character to the output. This character has to be escaped in some cases, because it is used in pairs to indicate an unformatted text fragment.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2937,7 +2937,7 @@ This command writes the " character to the output. This character has to be esca
 Command: .
 Parameters: 
 Help text:
-This command writes a dot (.) to the output. This can be useful to prevent ending a brief description when JAVADOC_AUTOBRIEF is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.
+This command writes a dot (```.```) to the output. This can be useful to prevent ending a brief description when JAVADOC_AUTOBRIEF is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2945,7 +2945,7 @@ This command writes a dot (.) to the output. This can be useful to prevent endin
 Command: =
 Parameters: 
 Help text:
-This command writes an equal sign (=) to the output. This character sequence has to be escaped in some cases, because it is used in Markdown header processing.
+This command writes an equal sign (```=```) to the output. This character sequence has to be escaped in some cases, because it is used in Markdown header processing.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2953,7 +2953,7 @@ This command writes an equal sign (=) to the output. This character sequence has
 Command: ::
 Parameters: 
 Help text:
-This command writes a double colon (::) to the output. This character sequence has to be escaped in some cases, because it is used to reference to documented entities.
+This command writes a double colon (```::```) to the output. This character sequence has to be escaped in some cases, because it is used to reference to documented entities.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
