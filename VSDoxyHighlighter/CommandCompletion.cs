@@ -210,6 +210,9 @@ namespace VSDoxyHighlighter
           return mGeneralOptions.IsEnabledInCommentType(commentType.Value);
         }
       }
+      else {
+        Debug.Assert(false);
+      }
 
       return false;
     }

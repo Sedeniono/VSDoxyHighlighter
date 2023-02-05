@@ -179,7 +179,7 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
-    /// If the character at 'point-1' inside a comment, returns the type of the corresponding comment.
+    /// If the character at 'point-1' is inside a comment, returns the type of the corresponding comment.
     /// Otherwise, returns null.
     /// </summary>
     public CommentType? GetTypeOfCommentBeforeLocation(SnapshotPoint point) 

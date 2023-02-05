@@ -78,7 +78,9 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - Support for [HTML commands](https://www.doxygen.nl/manual/htmlcmds.html) is missing.
 - Support for [XML commands](https://www.doxygen.nl/manual/xmlcmds.html) is missing.
 - More [markdown support](https://www.doxygen.nl/manual/markdown.html).
-- Generating a whole comment block is currently not planned, since there are already extensions that support this (e.g. ["DoxygenComments"](https://marketplace.visualstudio.com/items?itemName=NickKhrapov.DoxygenComments2022) or ["Doxygen Comments"](https://marketplace.visualstudio.com/items?itemName=FinnGegenmantel.doxygenComments)).
+- Generating a whole comment block automatically is currently not planned: 
+  - Visual Studio 16.6 and above support this out-of-the-box, compare [this blog post](https://devblogs.microsoft.com/cppblog/doxygen-and-xml-doc-comment-support/).
+  - There are also extensions available that allow a more fine grained control over the generated comment, e.g. ["Doxygen Comments"](https://marketplace.visualstudio.com/items?itemName=FinnGegenmantel.doxygenComments) or ["DoxygenComments"](https://marketplace.visualstudio.com/items?itemName=NickKhrapov.DoxygenComments2022) (yes, these two extensions have almost the same name).
 - Show a help text while hovering over Doxygen commands.
 
 
