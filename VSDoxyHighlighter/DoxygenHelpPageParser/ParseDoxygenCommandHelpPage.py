@@ -227,15 +227,11 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
         return [Fragment(FragmentType.Code, concat_lines)]
 
     elif tag.name == "li":
-        stars = ""
-        spaces = ""
-        for parent in tag.parents:
-            if parent.name == "ul":
-                stars += "•"
-                spaces += "  "
-        
+        nesting_level = sum(1 for p in tag.parents if p.name == "ul")
+        spaces = "    " * nesting_level
+
         fragments = lstrip_fragments(parse_all_children(tag.children, decorator))
-        fragments.insert(0, Fragment(FragmentType.Text, spaces + stars + " "))
+        fragments.insert(0, Fragment(FragmentType.Text, spaces + "• "))
 
         # Remove successive newlines between list elements. For example in the list in the "\showdate" command.
         if fragments[-1].content[-1] == "\n":
