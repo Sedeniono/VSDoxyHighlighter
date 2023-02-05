@@ -1,7 +1,8 @@
-﻿// If this is enabled, we disable the doxygen highlighting and instead highlight
+﻿// If this #define is enabled, we disable the doxygen highlighting and instead highlight
 // the various comment types ("//", "///", "/*", etc.). This allows easier debugging
 // of the logic to detect the comment types.
 // Also see the file "ManualTests_SplittingIntoComments.cpp."
+//
 //#define ENABLE_COMMENT_TYPE_DEBUGGING
 
 using Microsoft.VisualStudio.Text;
@@ -12,8 +13,6 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
-using EnvDTE;
-
 
 namespace VSDoxyHighlighter
 {
@@ -145,20 +144,13 @@ namespace VSDoxyHighlighter
       mFormatter = new CommentFormatter();
 
       int numFormats = Enum.GetNames(typeof(FormatType)).Length;
-      mFormatTypeToClassificationType = new IClassificationType[numFormats];
-      mFormatTypeToClassificationType[(uint)FormatType.Command] = registry.GetClassificationType(IDs.ID_command);
-      mFormatTypeToClassificationType[(uint)FormatType.Parameter1] = registry.GetClassificationType(IDs.ID_parameter1);
-      mFormatTypeToClassificationType[(uint)FormatType.Parameter2] = registry.GetClassificationType(IDs.ID_parameter2);
-      mFormatTypeToClassificationType[(uint)FormatType.Title] = registry.GetClassificationType(IDs.ID_title);
-      mFormatTypeToClassificationType[(uint)FormatType.Warning] = registry.GetClassificationType(IDs.ID_warningKeyword);
-      mFormatTypeToClassificationType[(uint)FormatType.Note] = registry.GetClassificationType(IDs.ID_noteKeyword);
-      mFormatTypeToClassificationType[(uint)FormatType.EmphasisMinor] = registry.GetClassificationType(IDs.ID_emphasisMinor);
-      mFormatTypeToClassificationType[(uint)FormatType.EmphasisMajor] = registry.GetClassificationType(IDs.ID_emphasisMajor);
-      mFormatTypeToClassificationType[(uint)FormatType.Strikethrough] = registry.GetClassificationType(IDs.ID_strikethrough);
-      mFormatTypeToClassificationType[(uint)FormatType.InlineCode] = registry.GetClassificationType(IDs.ID_inlineCode);
+      Debug.Assert(numFormats == IDs.ToID.Count);
 
-      foreach (IClassificationType classificationType in mFormatTypeToClassificationType) {
+      mFormatTypeToClassificationType = new IClassificationType[numFormats];
+      foreach (var formatTypeAndID in IDs.ToID) {
+        IClassificationType classificationType = registry.GetClassificationType(formatTypeAndID.Value);
         Debug.Assert(classificationType != null);
+        mFormatTypeToClassificationType[(uint)formatTypeAndID.Key] = classificationType;
       }
 
       ThreadHelper.ThrowIfNotOnUIThread();
