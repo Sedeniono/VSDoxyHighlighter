@@ -7,7 +7,7 @@
 - [Installation](#installation)
 - [Features](#features)
   - [Syntax highlighting](#syntax-highlighting)
-  - ["IntelliSense" (autocomplete while typing)](#intellisense-autocomplete-while-typing)
+  - [IntelliSense (autocomplete while typing)](#intellisense-autocomplete-while-typing)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
 - [Configuration](#configuration)
   - [Fonts and colors](#fonts-and-colors)
@@ -49,7 +49,7 @@ Light             |  Dark
 :--------:|:--------:
 ![Example dark without highlighting](Pictures/ExampleLight_NoHighlight.png) | ![Example dark without highlighting](Pictures/ExampleDark_NoHighlight.png)
 
-The aim of the extension is to make reading and writing Doxygen style comments in Visual Studio easier.
+The colors aim to make reading and writing Doxygen style comments in Visual Studio easier.
 The highlighting effectively performs a rough check while writing them whether the commands are correct.
 But even if Doxygen is not used to generate documentation for the source code, I personally have found it convenient to use the commands in order to provide some consistent structure to the documentation.
 Especially, important messages such as warnings or notes are harder to overlook while reading the source code.
@@ -63,7 +63,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - Syntax highlighting can be disabled entirely in the VSDoxyHighlighter options.
 
 
-## "IntelliSense" (autocomplete while typing)
+## IntelliSense (autocomplete while typing)
 ![Example IntelliSense](Pictures/ExampleIntelliSense.gif)
 
 - If you type an `@` or `\` in a comment, an autocomplete box listing all Doxygen commands appears. Pressing tab, enter or space will autocomplete the currently selected command.

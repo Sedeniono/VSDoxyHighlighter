@@ -12,8 +12,8 @@ namespace VSDoxyHighlighter
   // InstalledProductRegistration: Causes the extension to show up in the Visual Studio Help->About dialog.
   [InstalledProductRegistration(
     "VSDoxyHighlighter",
-    "Extension for Visual Studio to provide syntax highlighting for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
-    "1.0.2")]
+    "Provides syntax highlighting and IntelliSense for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
+    "1.1.0")]
   
   // ProvideOptionPage: Causes VS to show a page in the VS options.
   // The resource IDs refer to the Resources.resx file.
