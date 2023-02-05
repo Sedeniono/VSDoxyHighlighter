@@ -69,9 +69,10 @@ namespace VSDoxyHighlighter
     public bool EnableHighlighting { get; set; } = true;
 
     [Category(FeaturesSubCategory)]
-    [DisplayName("Enable autocomplete")]
-    [Description("Enables the autocomplete of commands while typing in comments (\"IntelliSense\"). "
-      + "Note that with the other settings you can define in which comment types the highlighting is enabled.")]
+    [DisplayName("Enable IntelliSense")]
+    [Description("Enables the autocomplete of commands while typing in comments (\"IntelliSense\"): "
+      + "When enabled and you type a \"\\\" or \"@\" in a comment, a list of all Doxygen commands appears. "
+      + "Note that with the other settings you can define in which comment types the autocomplete is enabled.")]
     public bool EnableAutocomplete { get; set; } = true;
 
 
