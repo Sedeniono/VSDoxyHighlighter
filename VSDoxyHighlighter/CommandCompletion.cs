@@ -13,9 +13,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Imaging;
 using System.Linq;
+using System.Diagnostics;
 
 namespace VSDoxyHighlighter
 {
+  //================================================================================
+  // CommentCommandCompletionSource
+  //================================================================================
+
   [Export(typeof(IAsyncCompletionSourceProvider))]
   [Name("VSDoxyHighlighterCommandCompletionSourceProvider")]
   [ContentType("C/C++")]
@@ -122,29 +127,14 @@ namespace VSDoxyHighlighter
       if (applicableToSpan.Start.Position > 0) {
         char startChar = applicableToSpan.Start.Subtract(1).GetChar();
         if (startChar == '\\' || startChar == '@') {
-          //itemsBuilder.Add(new CompletionItem(
-          //  displayText: @"details", 
-          //  source: this, 
-          //  icon: cCompletionImage,
-          //  filters: ImmutableArray<CompletionFilter>.Empty,
-          //  suffix: "{ detailed description }",
-          //  insertText: "details",
-          //  sortText: "details",
-          //  filterText: "details",
-          //  automationText: "details",
-          //  attributeIcons: ImmutableArray<ImageElement>.Empty,
-          //  commitCharacters: default,
-          //  applicableToSpan: default,
-          //  isCommittedAsSnippet: false,
-          //  isPreselected: false
-          //  ));
-
           int numCommands = DoxygenCommandsGeneratedFromHelpPage.cCommands.Length;
           int curCommandNumber = 1;
 
           // TODO: Cache the items? There can only be two versions, one with @ and one with "\"?
           foreach (DoxygenHelpPageCommand cmd in cAmendedDoxygenCommands) {
             var item = new CompletionItem(
+              // Add the "\" or "@" since it is not actually part of the autocompleted command, because
+              // the applicableToSpan does not cover it. See InitializeCompletion() for the reason.
               displayText: startChar + cmd.Command,
               source: this,
               icon: cCompletionImage,
@@ -153,7 +143,8 @@ namespace VSDoxyHighlighter
               insertText: cmd.Command,
               // sortText: Sorting is done using Enumerable.OrderBy, which apparently calls String.CompareTo(),
               // which is doing a case-sensitive and culture-sensitive comparison using the current culture.
-              // Padding with 0 to the left to get e.g. 11 to be sorted after 1.
+              // But we want to keep the sorting of our list of commands. Padding with 0 to the left to get
+              // e.g. 11 to be sorted after 1.
               sortText: curCommandNumber.ToString().PadLeft(numCommands, '0'),
               filterText: cmd.Command,
               automationText: cmd.Command,
@@ -183,6 +174,7 @@ namespace VSDoxyHighlighter
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
         runs.Add(new ClassifiedTextRun(IDs.ToID[FormatType.Command], "\\" + cmd.Command));
+
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
         if (cmd.Parameters == "") {
           runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
@@ -204,6 +196,7 @@ namespace VSDoxyHighlighter
         return Task.FromResult<object>(new ClassifiedTextElement(runs));
       }
 
+      Debug.Assert(false);
       return Task.FromResult<object>("");
     }
 
@@ -296,6 +289,7 @@ namespace VSDoxyHighlighter
 
 
   //================================================================================
+  // CommentCommandCompletionCommitManager
   //================================================================================
 
   [Export(typeof(IAsyncCompletionCommitManagerProvider))]

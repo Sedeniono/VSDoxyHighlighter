@@ -18,8 +18,8 @@
     public readonly string Parameters;
 
     /// <summary>
-    /// The description according of the Doxygen command: The string is just the concatenation
-    /// of the individual strings. However, we also have some semantic information. If the FormatType
+    /// The description of the Doxygen command: The string is just the concatenation of the 
+    /// individual strings. However, we also have some semantic information. If the FormatType
     /// is null, then it is ordinary text.
     /// </summary>
     public readonly (FormatType?, string)[] Description;
