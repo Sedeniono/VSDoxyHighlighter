@@ -16,6 +16,7 @@ class FragmentType(Enum):
     Emphasis = 3
     Note = 4
     Warning = 5
+    Command = 6
 
 
 class Fragment:
@@ -134,7 +135,11 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
         return fragments
 
     elif tag.name == "code":
-        s = parse_all_children_assuming_only_text(tag.children, decorator)
+        fragments = parse_all_children(tag.children, decorator)
+        # In case the text in <code> contains some non-text fragments, we simply ignore that.
+        # For example, the documentation for "\mainpage" contains "\ref index" in <code>, and the "\ref"
+        # is additionally a hyperlink. But this is rare.
+        s = "".join(f.content for f in fragments)
         return [Fragment(FragmentType.Code, s)]
 
     elif tag.name == "em":
@@ -248,7 +253,15 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
             return [Fragment(FragmentType.Text, "LaTeX")]
         else:
             raise Exception("Unknown image")
-        
+
+    elif tag.name == "a":
+        fragments = parse_all_children(tag.children, decorator)
+        # In case the hyperlink points to a Doxygen command, extract it as such.
+        if len(fragments) == 1 and len(fragments[0].content) > 0 and fragments[0].content[0] == "\\":
+            return [Fragment(FragmentType.Command, fragments[0].content)]
+        else:
+            return fragments
+
     elif tag.name == "center":
         # The "center" tag is only used for the "intermediate" headers like "Commands for displaying examples"
         # that separate the different command categories. We don't want them.
@@ -411,6 +424,8 @@ def map_fragment_type_to_csharp_type(type: FragmentType) -> str:
         return "FormatType.Note"
     elif type == FragmentType.Warning:
         return "FormatType.Warning"
+    elif type == FragmentType.Command:
+        return "FormatType.Command"
     else:
         raise Exception("Unknown FragmentType")
 
@@ -439,26 +454,11 @@ def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
             s += f"!{f.content}!"
         elif f.type == FragmentType.Warning:
             s += f"!!!{f.content}!!!"
+        elif f.type == FragmentType.Command:
+            s += f"[{f.content}]"
         else:
             raise Exception("Unknown FragmentType")
     return s
-
-# def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
-#     s = ""
-#     for f in fragments:
-#         if f.type == FragmentType.Text:
-#             s += f.content
-#         elif f.type == FragmentType.Code:
-#             s += f.content
-#         elif f.type == FragmentType.Emphasis:
-#             s += f"*{f.content}*"
-#         elif f.type == FragmentType.Note:
-#             s += f.content
-#         elif f.type == FragmentType.Warning:
-#             s += f.content
-#         else:
-#             raise Exception("Unknown FragmentType")
-#     return s
 
 
 def get_max_component_lengths(commands: list[ParsedCommand]):
