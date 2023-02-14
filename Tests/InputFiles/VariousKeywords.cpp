@@ -11,6 +11,14 @@
 \hiderefby
 \showrefs
 \hiderefs
+text \qualifier quali single word should be matched
+text \qualifier "SOMEQUALI text" quote should be matched
+text\qualifier "Another" quote should be matched
+text\qualifier "yet"more quote should be matched
+text \qualifier"more text" quote should be matched
+\qualifierasdsa should not match
+\qualifier "" quotes should be matched
+\qualifier
 \category Test1 class.h inc/class.h
 \class Test1 class.h "inc dir/class.h"
 \class Test2	class.h

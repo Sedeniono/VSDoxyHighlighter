@@ -151,7 +151,7 @@ namespace VSDoxyHighlighter
       // NOTE: The order in which the regexes are created and added here matters!
       // If there is more than one regex matching a certain text fragment, the first one wins.
       //
-      // Based on doxygen 1.9.5 (26th August 2022).
+      // Based on doxygen 1.9.6
 
 
       //----- Without parameters -------
@@ -381,6 +381,12 @@ namespace VSDoxyHighlighter
         types = (FormatType.Command, FormatType.EmphasisMajor)
       });
 
+      matchers.Add(new FragmentMatcher {
+        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(new string[] {
+            "qualifier"
+          }), cOptions, cRegexTimeout),
+        types = (FormatType.Command, FormatType.Parameter1)
+      });
 
       //----- With up to two parameters -------
 
@@ -595,6 +601,13 @@ namespace VSDoxyHighlighter
       // https://regex101.com/r/fCM8p7/1
       string concatKeywords = String.Join("|", keywords);
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
+    }
+
+    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(string[] keywords)
+    {
+      // https://regex101.com/r/yxbTV1/1
+      string concatKeywords = String.Join("|", keywords);
+      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:(?:[ \t]*((?:""[^""]*"")|(?:(?<=[ \t])[^ \t\n\r]*))?)|[\n\r]|$)";
     }
 
     private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(string[] keywords)
