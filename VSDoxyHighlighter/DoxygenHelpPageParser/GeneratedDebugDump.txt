@@ -2639,8 +2639,8 @@ See also: command [\f(] and command formulas.
 
 
 ====================================
-Command: f
-Parameters: [
+Command: f[
+Parameters: 
 Help text:
 Marks the start of a long formula that is displayed centered on a separate line.
 See also: command [\f]] and command formulas.

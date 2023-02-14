@@ -52,12 +52,16 @@ def split_command_header(header: str):
          \example['{lineno}'] <file-name>   ==> Results in "\example" and "['{lineno}'] <file-name>"
          \file [<name>]                     ==> Results in "\file" and "[<name>]"
     """
+
+    # Often, there is a space after the command that separates the argument.
     space_pos = header.find(" ")
     if space_pos == -1:
         space_pos = len(header)
 
+    # However, in some cases the space is missing. In all of these cases, an opening "["
+    # comes afterwards. Exception: "\f[" should not be separated.
     square_bracket_pos = header.find("[")
-    if square_bracket_pos == -1:
+    if square_bracket_pos == -1 or header == "\\f[":
         square_bracket_pos = len(header)
 
     if square_bracket_pos < space_pos:
