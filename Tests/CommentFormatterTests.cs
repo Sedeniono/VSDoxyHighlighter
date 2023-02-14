@@ -278,8 +278,11 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\memberof", FormatType.Command),
         new Utils.FormattedFragmentText(@"_some_name", FormatType.Parameter1),
+
         new Utils.FormattedFragmentText(@"\name", FormatType.Command),
-        new Utils.FormattedFragmentText(@"group_", FormatType.Parameter1),
+        new Utils.FormattedFragmentText(@"\name", FormatType.Command),
+        new Utils.FormattedFragmentText(@"some group title", FormatType.Title),
+
         new Utils.FormattedFragmentText(@"\namespace", FormatType.Command),
         new Utils.FormattedFragmentText(@"nested::space", FormatType.Parameter1),
 

@@ -308,7 +308,7 @@ namespace VSDoxyHighlighter
         re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(new string[] {
              "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
               "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
-              "memberof", "name", "namespace", "package", "relates", "related",
+              "memberof", "namespace", "package", "relates", "related",
               "relatesalso", "relatedalso", "retval"
           }), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.Parameter1)
@@ -341,7 +341,7 @@ namespace VSDoxyHighlighter
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
-             "par"
+             "par", "name"
           }), cOptions, cRegexTimeout),
         types = (FormatType.Command, FormatType.Title)
       });

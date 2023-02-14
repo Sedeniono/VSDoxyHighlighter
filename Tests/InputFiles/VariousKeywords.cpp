@@ -61,7 +61,8 @@ Some text \lineinfo more text
 \internal
 \mainpage My Personal Index Page
 \memberof _some_name
-\name group_
+\name
+\name some group title
 \namespace nested::space
 \nosubgrouping
 \overload void Overload_Test::drawRect(const Rect &r)
