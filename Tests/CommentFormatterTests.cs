@@ -218,6 +218,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\file", FormatType.Command),
         new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", FormatType.Parameter1),
 
+        new Utils.FormattedFragmentText(@"\fileinfo", FormatType.Command),
         new Utils.FormattedFragmentText(@"\fileinfo{file}", FormatType.Command),
         new Utils.FormattedFragmentText(@"\fileinfo{extension}", FormatType.Command),
         new Utils.FormattedFragmentText(@"\fileinfo{filename}", FormatType.Command),

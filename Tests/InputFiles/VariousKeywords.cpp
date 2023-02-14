@@ -36,6 +36,7 @@
 \endinternal
 \extends Object
 \file path with spaces\example_test.cpp
+Text \fileinfo more text
 Some text \fileinfo{file} more text
 Some text \fileinfo{extension}
 \fileinfo{filename} more text

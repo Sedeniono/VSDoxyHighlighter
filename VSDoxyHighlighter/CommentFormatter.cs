@@ -193,7 +193,7 @@ namespace VSDoxyHighlighter
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(new string[] {
-            @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
+            "fileinfo", @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
             @"fileinfo\{directory\}", @"fileinfo\{full\}", 
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
