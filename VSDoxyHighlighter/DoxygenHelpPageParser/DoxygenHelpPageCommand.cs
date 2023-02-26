@@ -22,10 +22,10 @@
     /// individual strings. However, we also have some semantic information. If the FormatType
     /// is null, then it is ordinary text.
     /// </summary>
-    public readonly (FormatType?, string)[] Description;
+    public readonly (ClassificationEnum?, string)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, (FormatType?, string)[] description)
+    public DoxygenHelpPageCommand(string command, string parameters, (ClassificationEnum?, string)[] description)
     {
       Command = command;
       Parameters = parameters;

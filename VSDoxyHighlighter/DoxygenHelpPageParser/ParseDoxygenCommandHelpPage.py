@@ -400,7 +400,7 @@ def generate_text_for_csharp_file(commands: list[ParsedCommand]) -> str:
     for cmd in commands:
         command_padding = " " * (max_command_len - len(cmd.escaped_command))
         parameters_padding = " " * (max_parameters_len - len(cmd.escaped_parameters))
-        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} new (FormatType?, string)[]{{ '
+        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} new (ClassificationEnum?, string)[]{{ '
         for fragment in cmd.escaped_help_text:
             s += f'({map_fragment_type_to_csharp_type(fragment.type)}, "{fragment.content}"), '
         s += "}),\n"
@@ -417,15 +417,16 @@ def map_fragment_type_to_csharp_type(type: FragmentType) -> str:
     if type == FragmentType.Text:
         return "null"
     elif type == FragmentType.Code:
-        return "FormatType.InlineCode"
+        return "ClassificationEnum.InlineCode"
     elif type == FragmentType.Emphasis:
-        return "FormatType.EmphasisMinor"
+        return "ClassificationEnum.EmphasisMinor"
     elif type == FragmentType.Note:
-        return "FormatType.Note"
+        return "ClassificationEnum.Note"
     elif type == FragmentType.Warning:
-        return "FormatType.Warning"
+        return "ClassificationEnum.Warning"
+    # TODO: Don't use ClassificationEnum directly. Instead, use FragmentType and do a proper mapping in C#.
     elif type == FragmentType.Command:
-        return "FormatType.Command"
+        return "ClassificationEnum.Command1"
     else:
         raise Exception("Unknown FragmentType")
 

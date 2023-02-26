@@ -1,35 +1,18 @@
-﻿using EnvDTE90;
+﻿using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using static Nerdbank.Streams.MultiplexingStream;
 
 
 namespace VSDoxyHighlighter
 {
-  /// <summary>
-  /// Known types of formats. The integer values are used as indices into arrays, but the order does not matter.
-  /// </summary>
-  public enum FormatType : uint
-  {
-    Command, // The doxygen command itself, e.g. "@param" or "@brief"
-    Parameter1, // Parameter to some ordinary doxygen command
-    Parameter2, // Used for parameters of commands in running text or for some commands with more than one successive parameter
-    Title, // Parameter to some ordinary doxygen command that represents a title
-    Warning,
-    Note,
-    EmphasisMinor, // Usually italic
-    EmphasisMajor, // Usually bold
-    Strikethrough,
-    InlineCode // E.g. `inline code`
-  }
 
 
   /// <summary>
-  /// Represents the format of a single continuous fragment of text.
+  /// Represents how a single continuous piece of text should be formatted.
   /// </summary>
-  [DebuggerDisplay("StartIndex={StartIndex}, Length={Length}, Type={Type}")]
+  [DebuggerDisplay("StartIndex={StartIndex}, Length={Length}, Classification={Classification}")]
   public struct FormattedFragment
   {
     /// <summary>
@@ -43,9 +26,9 @@ namespace VSDoxyHighlighter
     public int Length { get; private set; }
 
     /// <summary>
-    /// The text fragment should be formatted according to this type.
+    /// The text fragment should be formatted according to this classification.
     /// </summary>
-    public FormatType Type { get; private set; }
+    public ClassificationEnum Classification { get; private set; }
 
     /// <summary>
     /// The index of the last formatted character.
@@ -55,14 +38,14 @@ namespace VSDoxyHighlighter
       get { return Math.Max(StartIndex + Length - 1, StartIndex); }
     }
 
-    public FormattedFragment(int startIndex, int length, FormatType type)
+    public FormattedFragment(int startIndex, int length, ClassificationEnum classification)
     {
       Debug.Assert(startIndex >= 0);
       Debug.Assert(length >= 0);
 
       StartIndex = startIndex;
       Length = length;
-      Type = type;
+      Classification = classification;
     }
 
     public override bool Equals(object obj)
@@ -74,12 +57,12 @@ namespace VSDoxyHighlighter
       return
         StartIndex == casted.StartIndex
         && Length == casted.Length
-        && Type == casted.Type;
+        && Classification == casted.Classification;
     }
 
     public override int GetHashCode()
     {
-      return Tuple.Create(StartIndex, Length, Type).GetHashCode();
+      return Tuple.Create(StartIndex, Length, Classification).GetHashCode();
     }
   }
 
@@ -94,9 +77,10 @@ namespace VSDoxyHighlighter
   /// </summary>
   public class CommentFormatter
   {
-    static CommentFormatter()
+    public CommentFormatter(List<DoxygenCommandGroup> doxygenCommands) 
     {
-      mMatchers = BuildMatchers();
+      mDoxygenCommandGroups = doxygenCommands;
+      mMatchers = BuildMatchers(doxygenCommands);
     }
 
 
@@ -132,8 +116,12 @@ namespace VSDoxyHighlighter
             for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
               Group group = m.Groups[idx + 1];
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
-                FormatType formatType = (FormatType)matcher.types[idx];
-                result.Add(new FormattedFragment(group.Index, group.Length, formatType));
+                FragmentType fragmentType = (FragmentType)matcher.types[idx];
+                string fragmentText = text.Substring(group.Index, group.Length);
+                ClassificationEnum? classification = FindClassificationEnumForFragment(fragmentType, fragmentText);
+                if (classification != null) {
+                  result.Add(new FormattedFragment(group.Index, group.Length, classification.Value));
+                }
               }
             }
           }
@@ -144,103 +132,81 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static List<FragmentMatcher> BuildMatchers()
+    private ClassificationEnum? FindClassificationEnumForFragment(FragmentType fragmentType, string fragmentText)
+    {
+      switch (fragmentType) {
+        case FragmentType.Command:
+          if (fragmentText.Length > 0) {
+            // Strip the initial "\" or "@".
+            string commandWithoutStart = fragmentText.Substring(1);
+
+            // TODO: SLOW. Use a dictionary???
+            int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
+            if (commandGroupIdx < 0) {
+              // Some commands such as "\code" come with special regex parsers that attach addition parameters directly to the command.
+              // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
+              commandGroupIdx = mDoxygenCommandGroups.FindIndex(
+                group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
+            }
+
+            if (commandGroupIdx >= 0) {
+              switch (mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType) {
+                case DoxygenCommandType.Command1:
+                  return ClassificationEnum.Command1;
+                case DoxygenCommandType.Note:
+                  return ClassificationEnum.Note;
+                case DoxygenCommandType.Warning:
+                  return ClassificationEnum.Warning;
+                default:
+                  throw new Exception("Unknown switch");
+              }
+            }
+          }
+          return null;
+
+        case FragmentType.Parameter1:
+          return ClassificationEnum.Parameter1;
+        case FragmentType.Parameter2:
+          return ClassificationEnum.Parameter2;
+        case FragmentType.Title:
+          return ClassificationEnum.Title;
+        case FragmentType.EmphasisMinor:
+          return ClassificationEnum.EmphasisMinor;
+        case FragmentType.EmphasisMajor:
+          return ClassificationEnum.EmphasisMajor;
+        case FragmentType.Strikethrough: 
+          return ClassificationEnum.Strikethrough;
+        case FragmentType.InlineCode:
+          return ClassificationEnum.InlineCode;
+        default:
+          throw new Exception("Unknown switch");
+      }
+    }
+
+
+    private static List<FragmentMatcher> BuildMatchers(List<DoxygenCommandGroup> doxygenCommands)
     {
       var matchers = new List<FragmentMatcher>();
 
       // NOTE: The order in which the regexes are created and added here matters!
       // If there is more than one regex matching a certain text fragment, the first one wins.
-      //
-      // Based on doxygen 1.9.6
-
-
-      //----- Without parameters -------
 
       // `inline code`
       // Note: Right at the start to overwrite all others.
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.InlineCode)
+        types = Tuple.Create(FragmentType.InlineCode)
       });
 
-      // Ordinary keyword without highlighted parameter at line start
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] {
-            "brief", "short", "details", "sa", "see", "result", "return", "returns", 
-            "author", "authors", "copyright", "date", "noop", "else", "endcond", "endif", 
-            "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
-            "since", "test", "version", "callgraph",
-            "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
-            "showrefs", "hiderefs", "endinternal",
-            "hideinitializer", "internal", "nosubgrouping", "private",
-            "privatesection", "protected", "protectedsection", "public", "publicsection",
-            "pure", "showinitializer", "static",
-            "addindex", "secreflist", "endsecreflist", "tableofcontents",
-            "arg", "li", "docbookonly", "htmlonly", @"htmlonly\[block\]", "latexonly", "manonly",
-            "rtfonly", "verbatim", "xmlonly"
-          }), cOptions),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_CodeCommand(), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(new string[] {
-            "fileinfo", @"fileinfo\{file\}", @"fileinfo\{extension\}", @"fileinfo\{filename\}",
-            @"fileinfo\{directory\}", @"fileinfo\{full\}", 
-            "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc", 
-            "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
-            "endverbatim", "endxmlonly", "n"
-          }), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(new string[] {
-            @"f\$", @"f\(", @"f\)", @"f\[", @"f\]", @"f\}",
-            @"\@", @"\&", @"\$", @"\#", @"\<", @"\>", @"\%", @"\.", @"\=", @"\::", @"\|",
-            @"\---", @"\--", @"\{", @"\}"
-          }), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_FormulaEnvironmentStart(), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_Language(), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Command)
-      });
-
-      // Warning
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
-          "warning", "raisewarning"
-        }), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Warning)
-      });
-
-      // Notes
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_NoParam(new string[] { 
-          "note", "todo", "attention", "bug", "deprecated"
-        }), cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Note)
-      });
+      // Add all Doxygen commands
+      foreach (DoxygenCommandGroup cmdGroup in doxygenCommands) {
+        var escapedCommands = cmdGroup.Commands.ConvertAll(s => Regex.Escape(s));
+        matchers.Add(new FragmentMatcher {
+          re = new Regex(cmdGroup.RegexCreator(escapedCommands), cOptions),
+          types = cmdGroup.FragmentTypes
+        });
+      }
 
       // *italic*
       matchers.Add(new FragmentMatcher
@@ -269,195 +235,37 @@ namespace VSDoxyHighlighter
         //                        1           2a     2b               2c                   2d               2e            3
         //                __________________  __ ____________ _________________ __________________________ __ ____________________________
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.EmphasisMinor)
+        types = Tuple.Create(FragmentType.EmphasisMinor)
       });
 
       // **bold**
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.EmphasisMajor)
+        types = Tuple.Create(FragmentType.EmphasisMajor)
       });
 
       // _italic_
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.EmphasisMinor)
+        types = Tuple.Create(FragmentType.EmphasisMinor)
       });
 
       // __bold__
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.EmphasisMajor)
+        types = Tuple.Create(FragmentType.EmphasisMajor)
       });
 
       // ~~strikethrough~~
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FormatType.Strikethrough)
+        types = Tuple.Create(FragmentType.Strikethrough)
       });
 
-      //----- With one parameter -------
-
-      // Keywords with parameter that must be at the start of lines, parameter terminated by whitespace.
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(new string[] {
-             "param", "tparam", @"param\[in\]", @"param\[out\]", @"param\[in,out\]", "throw", "throws",
-              "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
-              "memberof", "namespace", "package", "relates", "related",
-              "relatesalso", "relatedalso", "retval"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1)
-      });
-
-      // Keywords with parameter that must be at the start of lines, parameter stretches till the end of the line.
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
-             "dir", "example", @"example\{lineno\}", "file", "fn", "ingroup", "overload",
-             "property", "typedef", "var", "cond",
-             "elseif", "if", "ifnot",
-             "dontinclude", "dontinclude{lineno}", 
-             "include", "include{lineno}", "include{doc}", "includelineno", "includedoc",
-             "line", "skip", "skipline", "until",
-             "verbinclude", "htmlinclude", @"htmlinclude\[block\]", "latexinclude",
-             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1)
-      });
-
-      // Keywords with optional parameter that must be at the start of lines, parameter stretches till the end of the line.
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
-             "cond"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1)
-      });
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(new string[] {
-             "par", "name"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title)
-      });
-
-      // Keyword with title
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(new string[] {
-             "mainpage"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title)
-      });
-
-      // Stuff that can be in the middle of lines.
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
-            "p", "c", "anchor", "cite", "link", "refitem", 
-            "copydoc", "copybrief", "copydetails", "emoji"
-          }), cOptions, cRegexTimeout),
-        // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
-        // since these commands are typically place in running text.
-        types = (FormatType.Command, FormatType.Parameter2)
-      });
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
-            "a", "e", "em"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.EmphasisMinor)
-      });
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(new string[] {
-            "b"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.EmphasisMajor)
-      });
-
-      matchers.Add(new FragmentMatcher {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(new string[] {
-            "qualifier"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1)
-      });
-
-      //----- With up to two parameters -------
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(new string[] {
-          "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
-          "section", "subsection", "subsubsection", "paragraph",
-          "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(new string[] {
-          "showdate"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(new string[] {
-          "ref", "subpage"
-          }), cOptions, cRegexTimeout),
-        // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
-        // since these commands are typically place in running text.
-        types = (FormatType.Command, FormatType.Parameter2, FormatType.Title)
-      });
-
-
-      //----- With up to three parameters -------
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(new string[] {
-          "category", "class", "interface", "protocol", "struct", "union"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_StartUmlCommandWithBracesOptions(), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
-      });
-
-      //----- More parameters -------
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_1OptionalCaption_1OptionalSizeIndication(new string[] {
-          "dot", "msc",
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(new string[] {
-          "dotfile", "mscfile", "diafile"
-          }), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
-      });
-
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(BuildRegex_ImageCommand(), cOptions, cRegexTimeout),
-        types = (FormatType.Command, FormatType.Parameter1, FormatType.Parameter2, FormatType.Title, FormatType.Parameter1, FormatType.Parameter1)
-      });
 
       return matchers;
     }
@@ -478,9 +286,9 @@ namespace VSDoxyHighlighter
     private const string cWhitespaceAfterwards = @"(?:$|[ \t\n\r])";
 
 
-    private static string BuildRegex_KeywordAtLineStart_NoParam(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_NoParam(ICollection<string> keywords)
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
@@ -490,39 +298,42 @@ namespace VSDoxyHighlighter
       "mm", "txt", "idl", "ddl", "odl", "java", "cs", "d", "php", "php4", "php5", "inc", "phtml", "m", "M", "py", "pyw", 
       "f", "for", "f90", "f95", "f03", "f08", "f18", "vhd", "vhdl", "ucf", "qsf", "l", "md", "markdown", "ice" };
 
-    private static string BuildRegex_CodeCommand()
+    public static string BuildRegex_CodeCommand(ICollection<string> keywords)
     {
       // Command \code, \code{cpp}, ...
+      string concatKeywords = string.Join("|", keywords);
       string validFileExtensions = string.Join("|", cCodeFileExtensions);
       validFileExtensions = validFileExtensions.Replace("+", @"\+");
-      return $@"({cCmdPrefix}code(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
+      return $@"({cCmdPrefix}{concatKeywords}(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
     }
 
-    private static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(string[] keywords)
+    public static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(ICollection<string> keywords)
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
-    private static string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(string[] keywords) 
+    public static string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(ICollection<string> keywords) 
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))";
     }
 
-    private static string BuildRegex_FormulaEnvironmentStart() 
+    public static string BuildRegex_FormulaEnvironmentStart(ICollection<string> keywords) 
     {
-      return $@"({cCmdPrefix}f\{{.*\}}\{{?)";
+      string concatKeywords = string.Join("|", keywords);
+      return $@"({cCmdPrefix}{concatKeywords}\{{.*\}}\{{?)";
     }
 
-    private static string BuildRegex_Language() 
+    public static string BuildRegex_Language(ICollection<string> keywords) 
     {
-      return $@"({cCmdPrefix}~(?:[^ \t]\w+)?)";
+      string concatKeywords = string.Join("|", keywords);
+      return $@"({cCmdPrefix}{concatKeywords}(?:[^ \t]\w+)?)";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(ICollection<string> keywords)
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
 
       // Example: "\param[in] myParameter"
       // NOTE: Although the parameter "myParameter" is required, we nevertheless want to highlight the "\param[in]"
@@ -539,16 +350,16 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/yCZkWA/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd() also treats the 1 parameter as optional to provide
       // early syntax highlighting (if the parameter does not yet exist). Neverthless, we need a different regex
@@ -556,34 +367,34 @@ namespace VSDoxyHighlighter
       //   \param: MyParameter  --> The ":" is invalid syntax, and nothing should be formatted. Doxygen complains.
       //   \par: My paragraph  --> The title of the paragraph is ": My paragraph". Probably not what the user intended,
       //                           but nevertheless doxygen parses it that way.
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]*([^\n\r]*))?";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/qaaWBO/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/8QcyXW/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(string[] keywords)
+    public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/Z7R3xS/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
 
       // (1) Match the required word. As noted before, we actually treat it as optional.
       // (2) Optional word
@@ -594,23 +405,23 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(string[] keywords)
+    public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/fCM8p7/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(string[] keywords)
+    public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(ICollection<string> keywords)
     {
       // https://regex101.com/r/yxbTV1/1
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:(?:[ \t]*((?:""[^""]*"")|(?:(?<=[ \t])[^ \t\n\r]*))?)|[\n\r]|$)";
     }
 
-    private static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(string[] keywords)
+    public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(ICollection<string> keywords)
     {
       // Examples:
       //   \ref Class::Func()
@@ -618,7 +429,7 @@ namespace VSDoxyHighlighter
       //   Text \ref subsection1. The point is not part of the parameter.
       //   \ref func(double, int) should match also match the double and int and also the parantheses.
       //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
 
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -642,21 +453,22 @@ namespace VSDoxyHighlighter
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)?(?:[ \t]+(""[^\r\n]*?""))?)|[\n\r]|$)";
     }
 
-    private const string cRegex_1OptionalCaption_1OptionalSizeIndication =
+    public const string cRegex_1OptionalCaption_1OptionalSizeIndication =
       //| Optional quoted caption | Optional width              | Optional height             |
       //|_________________________|_____________________________|_____________________________| 
       @"(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
 
-    private static string BuildRegex_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
+    public static string BuildRegex_1OptionalCaption_1OptionalSizeIndication(ICollection<string> keywords) 
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       // Example: \dot "foo test"  width=2\textwidth   height=1cm
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
-    private static string BuildRegex_StartUmlCommandWithBracesOptions() 
+    public static string BuildRegex_StartUmlCommandWithBracesOptions(ICollection<string> keywords) 
     {
-      return $@"({cCmdPrefix}startuml(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
+      string concatKeywords = string.Join("|", keywords);
+      return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     private const string cRegexForOptionalFileWithOptionalQuotes =
@@ -668,21 +480,22 @@ namespace VSDoxyHighlighter
       //   _____  _________________|_______________
       @"(?:[ \t]+((?:""[^\r\n]*?"")|(?:[^ \t\r\n]*)))?";
 
-    private static string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(string[] keywords) 
+    public static string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(ICollection<string> keywords) 
     {
-      string concatKeywords = String.Join("|", keywords);
+      string concatKeywords = string.Join("|", keywords);
       // Examples:
       //   Without quotes: @dotfile filename    "foo test" width=200cm height=1cm
       //      With quotes: @dotfile "file name" "foo test" width=200cm height=1cm
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
-    private static string BuildRegex_ImageCommand()
+    public static string BuildRegex_ImageCommand(ICollection<string> keywords)
     {
+      string concatKeywords = string.Join("|", keywords);
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/VN43Fy/1
-      return $@"({cCmdPrefix}image(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
+      return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
     }
 
 
@@ -720,7 +533,9 @@ namespace VSDoxyHighlighter
       public System.Runtime.CompilerServices.ITuple types { get; set; }
     };
 
-    private static readonly List<FragmentMatcher> mMatchers;
+    private readonly List<DoxygenCommandGroup> mDoxygenCommandGroups;
+    private readonly List<FragmentMatcher> mMatchers;
+
     private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
     // In my tests, each individual regex always used less than 100ms.

@@ -16,6 +16,24 @@ using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
+  // Enumeration of all possible classifications. We could have also used the string IDs, but an enum is more convenient
+  // (e.g. to find all occurrences).
+  // Order doesn't matter, but the numeric values are used as indices!
+  public enum ClassificationEnum : uint
+  {
+    Command1,
+    Note,
+    Warning,
+    Parameter1,
+    Parameter2,
+    Title,
+    EmphasisMinor,
+    EmphasisMajor,
+    Strikethrough,
+    InlineCode
+  }
+
+
   /// <summary>
   /// Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
   /// to store the classification's configuration in the registry.
@@ -33,19 +51,22 @@ namespace VSDoxyHighlighter
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
 
-    public static readonly Dictionary<FormatType, string> ToID = new Dictionary<FormatType, string>(){
-        {FormatType.Command, ID_command},
-        {FormatType.Parameter1, ID_parameter1},
-        {FormatType.Parameter2, ID_parameter2},
-        {FormatType.Title, ID_title},
-        {FormatType.Warning, ID_warningKeyword},
-        {FormatType.Note, ID_noteKeyword},
-        {FormatType.EmphasisMinor, ID_emphasisMinor},
-        {FormatType.EmphasisMajor, ID_emphasisMajor},
-        {FormatType.Strikethrough, ID_strikethrough},
-        {FormatType.InlineCode, ID_inlineCode},
+    public static readonly Dictionary<ClassificationEnum, string> ToID = new Dictionary<ClassificationEnum, string>(){
+        {ClassificationEnum.Command1, ID_command},
+        {ClassificationEnum.Parameter1, ID_parameter1},
+        {ClassificationEnum.Parameter2, ID_parameter2},
+        {ClassificationEnum.Title, ID_title},
+        {ClassificationEnum.Warning, ID_warningKeyword},
+        {ClassificationEnum.Note, ID_noteKeyword},
+        {ClassificationEnum.EmphasisMinor, ID_emphasisMinor},
+        {ClassificationEnum.EmphasisMajor, ID_emphasisMajor},
+        {ClassificationEnum.Strikethrough, ID_strikethrough},
+        {ClassificationEnum.InlineCode, ID_inlineCode},
       };
   }
+
+
+
 
 
 
@@ -141,21 +162,20 @@ namespace VSDoxyHighlighter
       // CommentCommandCompletionSource needs it to check whether some point is inside of a comment.
       textBuffer.Properties.AddProperty(typeof(SpanSplitter), mSpanSplitter);
 
-      mFormatter = new CommentFormatter();
-
-      int numFormats = Enum.GetNames(typeof(FormatType)).Length;
-      Debug.Assert(numFormats == IDs.ToID.Count);
-
-      mFormatTypeToClassificationType = new IClassificationType[numFormats];
-      foreach (var formatTypeAndID in IDs.ToID) {
-        IClassificationType classificationType = registry.GetClassificationType(formatTypeAndID.Value);
+      int numClassifications = Enum.GetNames(typeof(ClassificationEnum)).Length;
+      Debug.Assert(numClassifications == IDs.ToID.Count);
+      mClassificationEnumToInstance = new IClassificationType[numClassifications];
+      foreach (var enumAndID in IDs.ToID) {
+        IClassificationType classificationType = registry.GetClassificationType(enumAndID.Value);
         Debug.Assert(classificationType != null);
-        mFormatTypeToClassificationType[(uint)formatTypeAndID.Key] = classificationType;
+        mClassificationEnumToInstance[(uint)enumAndID.Key] = classificationType;
       }
 
       ThreadHelper.ThrowIfNotOnUIThread();
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mGeneralOptions.SettingsChanged += OnSettingsChanged;
+
+      InitCommentFormatter();
     }
 
 
@@ -221,9 +241,10 @@ namespace VSDoxyHighlighter
 
           // Convert the list of fragments that should be formatted to Visual Studio types.
           foreach (FormattedFragment fragment in fragmentsToFormat) {
-            IClassificationType classificationType = mFormatTypeToClassificationType[(uint)fragment.Type];
+            IClassificationType classificationInstance = mClassificationEnumToInstance[(uint)fragment.Classification];
             var spanToFormat = new Span(commentSpan.span.Start + fragment.StartIndex, fragment.Length);
-            result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, spanToFormat), classificationType));
+            var snapshotSpan = new SnapshotSpan(textSnapshot, spanToFormat);
+            result.Add(new ClassificationSpan(snapshotSpan, classificationInstance));
           }
         }
 #else
@@ -274,9 +295,11 @@ namespace VSDoxyHighlighter
     }
 
 
+
     // When this function is called, the user clicked on "OK" in the options.
     private void OnSettingsChanged(object sender, EventArgs e)
     {
+      InitCommentFormatter();
       InvalidateCache();
 
       // Some of our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
@@ -307,12 +330,20 @@ namespace VSDoxyHighlighter
     }
 
 
+    private void InitCommentFormatter()
+    {
+      var commandGroups = DoxygenCommands.FromConfigList(mGeneralOptions.DoxygenCommandsConfig);
+      mFormatter = new CommentFormatter(commandGroups);
+    }
+
+
     private readonly ITextBuffer mTextBuffer;
     private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
-    private readonly CommentFormatter mFormatter;
-    private readonly IClassificationType[] mFormatTypeToClassificationType;
+    private readonly IClassificationType[] mClassificationEnumToInstance;
     private readonly GeneralOptionsPage mGeneralOptions;
+
+    private CommentFormatter mFormatter;
 
     private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
     private int mCachedVersion = -1;

@@ -173,14 +173,16 @@ namespace VSDoxyHighlighter
         var runs = new List<ClassifiedTextRun>();
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
-        runs.Add(new ClassifiedTextRun(IDs.ToID[FormatType.Command], "\\" + cmd.Command));
+
+        // TODO: Proper mapping from the command string to the classification. I.e. call FindClassificationEnumForFragment().
+        runs.Add(new ClassifiedTextRun(IDs.ToID[ClassificationEnum.Command1], "\\" + cmd.Command));
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
         if (cmd.Parameters == "") {
           runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
         }
         else {
-          runs.Add(new ClassifiedTextRun(IDs.ToID[FormatType.Parameter2], cmd.Parameters));
+          runs.Add(new ClassifiedTextRun(IDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
         }
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 

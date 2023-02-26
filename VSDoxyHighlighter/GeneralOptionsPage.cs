@@ -1,9 +1,52 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+
 namespace VSDoxyHighlighter
 {
+  public class DoxygenCommandInConfig
+  {
+    [Category("Command")]
+    [DisplayName("Command")]
+    [Description("The Doxygen command that gets configured.")]
+    [ReadOnly(true)]
+    public string Command { get; set; } = "NEW_COMMAND";
+
+    private const string PropertiesCategory = "Properties";
+
+    [Category(PropertiesCategory)]
+    [DisplayName("Classification")]
+    [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
+    public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
+
+    [Category(PropertiesCategory)]
+    [DisplayName("Arguments")]
+    [Description("The arguments that the Doxygen command expects. This is currently readonly and just displayed for information purposes.")]
+    [ReadOnly(true)]
+    [TypeConverter(typeof(StringConverter))]
+    public ITuple FragmentTypes { get; set; }
+
+    // This is not a property so that it does not appear as option.
+    public RegexCreatorDelegate RegexCreator;
+//#error This is problematic: Cannot serialize a delegate... Similar problematic is the tuple.
+
+    // Get a sensible display in the CollectionEditor.
+    public override string ToString()
+    {
+      return Command;
+    }
+  }
+
+
+
   /// <summary>
   /// Represents the "General" options in the tools -> options menu.
   /// I.e. contains the settings of the extension that can be configured by the user, besides
@@ -111,5 +154,143 @@ namespace VSDoxyHighlighter
     [DisplayName("Enable in \"/*!\"")]
     [Description("Enables the extension in comments starting with \"/*!\".")]
     public bool EnableInSlashStarExclamation { get; set; } = true;
+
+
+    //----------------
+    // Commands configuration
+
+    public const string CommandsConfigurationSubCategory = "Configuration of commands";
+
+    [Category(CommandsConfigurationSubCategory)]
+    [DisplayName("Individual Doxygen commands (use the \"...\" button!)")]
+    [Description("Allows some configuration of individual Doxygen commands. Please do not edit the string in the grid directly. "
+       + "Instead, use the \"...\" button on the right of the row.")]
+    [TypeConverter(typeof(SerializationViaStringConverter))]
+    [Editor(typeof(DoxygenCommandCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
+    public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; set; } = DoxygenCommands.DefaultDoxygenCommandsInConfig;
+
+
+    //----------------
+    // Helpers
+
+    /// <summary>
+    ///  Serializes some type T to and from a string, such that Visual Studio's saving facilities can save and load the data.
+    /// </summary>
+    //public class SerializationViaStringConverter<T> : TypeConverter where T : class
+    //{
+    //  public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    //  {
+    //    return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+    //  }
+
+    //  public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+    //  {
+    //    return destinationType == typeof(T) || base.CanConvertTo(context, destinationType);
+    //  }
+
+    //  public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+    //  {
+    //    if (value is string valueAsString) {
+    //      using (var stringReader = new System.IO.StringReader(valueAsString)) {
+    //        var serializer = new XmlSerializer(typeof(T));
+    //        return serializer.Deserialize(stringReader) as T;
+    //      }
+    //    }
+    //    else {
+    //      return base.ConvertFrom(context, culture, value);
+    //    }
+    //  }
+
+    //  public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+    //  {
+    //    if (destinationType == typeof(string) && value is T valueAsT) {
+    //      using (var stringWriter = new System.IO.StringWriter()) {
+    //        var serializer = new XmlSerializer(valueAsT.GetType());
+    //        serializer.Serialize(stringWriter, valueAsT);
+    //        return stringWriter.ToString();
+    //      }
+    //    }
+    //    else {
+    //      return base.ConvertTo(context, culture, value, destinationType);
+    //    }
+    //  }
+    //}
+
+    public class SerializationViaStringConverter : TypeConverter
+    {
+      public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+      {
+        return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+      }
+
+      public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+      {
+        return destinationType == typeof(List<DoxygenCommandInConfig>) || base.CanConvertTo(context, destinationType);
+      }
+
+      public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+      {
+        if (value is string valueAsString) {
+          using (var stringReader = new System.IO.StringReader(valueAsString)) {
+            try {
+              var serializer = new XmlSerializer(typeof(List<DoxygenCommandInConfig>));
+              return serializer.Deserialize(stringReader) as List<DoxygenCommandInConfig>;
+            }
+            catch (Exception ex) {
+              throw;
+            }
+          }
+        }
+        else {
+          return base.ConvertFrom(context, culture, value);
+        }
+      }
+
+      public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+      {
+        if (destinationType == typeof(string) && value is List<DoxygenCommandInConfig> valueAsT) {
+          using (var stringWriter = new System.IO.StringWriter()) {
+            try {
+              var serializer = new XmlSerializer(valueAsT.GetType());
+              serializer.Serialize(stringWriter, valueAsT);
+              return stringWriter.ToString();
+            }
+            catch (Exception ex) {
+              throw;
+            }
+          }
+        }
+        else {
+          return base.ConvertTo(context, culture, value, destinationType);
+        }
+      }
+    }
+
+    /// <summary>
+    /// CollectionEditor that is used for the configuration of individual Doxygen commands.
+    /// </summary>
+    private class DoxygenCommandCollectionEditor : CollectionEditor
+    {
+      public DoxygenCommandCollectionEditor(Type type)
+         : base(type)
+      {
+      }
+
+      protected override CollectionForm CreateCollectionForm()
+      {
+        CollectionForm form = base.CreateCollectionForm();
+        
+        // For now, we do not support adding or removing commands. So hide the corresponding buttons.
+        ((ButtonBase)form.Controls.Find("addButton", true).First()).Hide();
+        ((ButtonBase)form.Controls.Find("removeButton", true).First()).Hide();
+
+        // The order of the commands does not matter. So hide the corresponding buttons.
+        ((ButtonBase)form.Controls.Find("upButton", true).First()).Hide();
+        ((ButtonBase)form.Controls.Find("downButton", true).First()).Hide();
+
+        return form;
+      }
+    }
+
   }
 }
