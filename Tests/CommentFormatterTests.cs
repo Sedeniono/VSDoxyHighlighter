@@ -66,7 +66,7 @@ namespace VSDoxyHighlighter.Tests
 
     public static CommentFormatter CreateDefaultCommentFormatter() 
     {
-      return new CommentFormatter(DoxygenCommands.FromConfigList(DoxygenCommands.DefaultDoxygenCommandsInConfig));
+      return new CommentFormatter(DoxygenCommands.ApplyConfigList(DoxygenCommands.DefaultDoxygenCommandsInConfig));
     }
   }
 

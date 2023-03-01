@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -74,33 +75,56 @@ namespace VSDoxyHighlighter
     public static readonly List<DoxygenCommandInConfig> DefaultDoxygenCommandsInConfig;
 
 
-    public static List<DoxygenCommandInConfig> ToConfigList(ICollection<DoxygenCommandGroup> commandGroups)
+    /// <summary>
+    /// Given a collection of commands as configured by the user, returns a copy of the 
+    /// default doxygen command groups modified according to the configuration.
+    /// </summary>
+    public static List<DoxygenCommandGroup> ApplyConfigList(ICollection<DoxygenCommandInConfig> configList) 
     {
-      var result = new List<DoxygenCommandInConfig>();
-      foreach (DoxygenCommandGroup cmdGroup in commandGroups) {
-        foreach (string cmd in cmdGroup.Commands) {
-          var newConfig = new DoxygenCommandInConfig() {
-            Command = cmd,
-            Classification = cmdGroup.DoxygenCommandType,
-            RegexCreator = cmdGroup.RegexCreator,
-            FragmentTypes = cmdGroup.FragmentTypes
-          };
-          result.Add(newConfig);
+      var ungrouped = new List<DoxygenCommandGroup>();
+      foreach (DoxygenCommandInConfig configElem in configList) {
+        (int groupIndex, int indexForCommandsInGroup) = FindCommandIndexInDefaults(configElem.Command);
+        Debug.Assert(groupIndex >= 0);
+        Debug.Assert(indexForCommandsInGroup >= 0);
+
+        if (groupIndex >= 0 && indexForCommandsInGroup >= 0) { 
+          DoxygenCommandGroup origGroup = mDefaultDoxygenCommands[groupIndex];
+          ungrouped.Add(new DoxygenCommandGroup(
+            new List<string>() { configElem.Command }, configElem.Classification, origGroup.RegexCreator, origGroup.FragmentTypes));
         }
       }
-      return result;
+
+      return FromUngroupedList(ungrouped);
     }
 
 
-    public static List<DoxygenCommandGroup> FromConfigList(ICollection<DoxygenCommandInConfig> configList)
+    private static (int groupIndex, int indexForCommandsInGroup) FindCommandIndexInDefaults(string cmd) 
+    {
+      for (int groupIndex = 0; groupIndex < mDefaultDoxygenCommands.Length; ++groupIndex) {
+        var group = mDefaultDoxygenCommands[groupIndex];
+        int cmdIndex = group.Commands.FindIndex(s => s == cmd);
+        if (cmdIndex >= 0) { 
+          return (groupIndex, cmdIndex);
+        }
+      }
+      return (-1, -1);
+    }
+
+
+    /// <summary>
+    /// Given a collection of groups with only a single command in each group, groups all of them together.
+    /// </summary>
+    private static List<DoxygenCommandGroup> FromUngroupedList(ICollection<DoxygenCommandGroup> ungrouped)
     {
       var merged = new Dictionary<(DoxygenCommandType, RegexCreatorDelegate, ITuple), List<string>>();
-      foreach (DoxygenCommandInConfig config in configList) {
-        var arg = (config.Classification, config.RegexCreator, config.FragmentTypes);
+      foreach (DoxygenCommandGroup group in ungrouped) {
+        var arg = (group.DoxygenCommandType, group.RegexCreator, group.FragmentTypes);
         if (!merged.ContainsKey(arg)) {
           merged[arg] = new List<string>();
         }
-        merged[arg].Add(config.Command);
+
+        Debug.Assert(group.Commands.Count == 1);
+        merged[arg].Add(group.Commands[0]);
       }
 
       var resultGroups = new List<DoxygenCommandGroup>();
@@ -122,6 +146,24 @@ namespace VSDoxyHighlighter
         ).ToList();
 
       return sortedResult;
+    }
+
+    /// <summary>
+    /// Returns the appropriate list to be used in the options dialog to configure the given command groups.
+    /// </summary>
+    private static List<DoxygenCommandInConfig> ToConfigList(ICollection<DoxygenCommandGroup> commandGroups)
+    {
+      var result = new List<DoxygenCommandInConfig>();
+      foreach (DoxygenCommandGroup cmdGroup in commandGroups) {
+        foreach (string cmd in cmdGroup.Commands) {
+          var newConfig = new DoxygenCommandInConfig() {
+            Command = cmd,
+            Classification = cmdGroup.DoxygenCommandType
+          };
+          result.Add(newConfig);
+        }
+      }
+      return result;
     }
 
 

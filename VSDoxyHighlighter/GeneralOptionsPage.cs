@@ -27,16 +27,12 @@ namespace VSDoxyHighlighter
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
     public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
 
-    [Category(PropertiesCategory)]
-    [DisplayName("Arguments")]
-    [Description("The arguments that the Doxygen command expects. This is currently readonly and just displayed for information purposes.")]
-    [ReadOnly(true)]
-    [TypeConverter(typeof(StringConverter))]
-    public ITuple FragmentTypes { get; set; }
-
-    // This is not a property so that it does not appear as option.
-    public RegexCreatorDelegate RegexCreator;
-//#error This is problematic: Cannot serialize a delegate... Similar problematic is the tuple.
+    //[Category(PropertiesCategory)]
+    //[DisplayName("Arguments")]
+    //[Description("The arguments that the Doxygen command expects. This is currently readonly and just displayed for information purposes.")]
+    //[ReadOnly(true)]
+    //[TypeConverter(typeof(StringConverter))]
+    //public ITuple FragmentTypes { get; set; }
 
     // Get a sensible display in the CollectionEditor.
     public override string ToString()

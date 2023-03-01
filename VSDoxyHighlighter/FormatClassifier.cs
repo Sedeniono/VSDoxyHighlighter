@@ -332,7 +332,7 @@ namespace VSDoxyHighlighter
 
     private void InitCommentFormatter()
     {
-      var commandGroups = DoxygenCommands.FromConfigList(mGeneralOptions.DoxygenCommandsConfig);
+      var commandGroups = DoxygenCommands.ApplyConfigList(mGeneralOptions.DoxygenCommandsConfig);
       mFormatter = new CommentFormatter(commandGroups);
     }
 
