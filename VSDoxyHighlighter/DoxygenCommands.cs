@@ -163,6 +163,9 @@ namespace VSDoxyHighlighter
           result.Add(newConfig);
         }
       }
+
+      // TODO: Sort the list, so that in the options the list appears sorted. Otherwise it is hard to find a command.
+
       return result;
     }
 

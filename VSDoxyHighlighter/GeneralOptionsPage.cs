@@ -5,19 +5,22 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace VSDoxyHighlighter
 {
+  [DataContract]
   public class DoxygenCommandInConfig
   {
     [Category("Command")]
     [DisplayName("Command")]
     [Description("The Doxygen command that gets configured.")]
     [ReadOnly(true)]
+    [DataMember(Name = "Cmd", Order = 0)]
     public string Command { get; set; } = "NEW_COMMAND";
 
     private const string PropertiesCategory = "Properties";
@@ -25,6 +28,7 @@ namespace VSDoxyHighlighter
     [Category(PropertiesCategory)]
     [DisplayName("Classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
+    [DataMember(Name = "Clsif", Order = 1)]
     public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
 
     //[Category(PropertiesCategory)]
@@ -224,16 +228,21 @@ namespace VSDoxyHighlighter
         return destinationType == typeof(List<DoxygenCommandInConfig>) || base.CanConvertTo(context, destinationType);
       }
 
+      /// <summary>
+      /// Conversion **from** string.
+      /// </summary>
       public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
       {
         if (value is string valueAsString) {
-          using (var stringReader = new System.IO.StringReader(valueAsString)) {
+          using (var memStream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(valueAsString))) {
             try {
-              var serializer = new XmlSerializer(typeof(List<DoxygenCommandInConfig>));
-              return serializer.Deserialize(stringReader) as List<DoxygenCommandInConfig>;
+              var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
+              return (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
             }
             catch (Exception ex) {
-              throw;
+              ActivityLog.LogWarning("VSDoxyHighlighter", $"Conversion from a string failed. Exception message: {ex.ToString()}");
+              // TODO: Is restoring the defaults really a good idea? Can we maybe display a message box and ask the user?
+              return DoxygenCommands.DefaultDoxygenCommandsInConfig;
             }
           }
         }
@@ -242,18 +251,16 @@ namespace VSDoxyHighlighter
         }
       }
 
+      /// <summary>
+      /// Conversion **to** string.
+      /// </summary>
       public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
       {
         if (destinationType == typeof(string) && value is List<DoxygenCommandInConfig> valueAsT) {
-          using (var stringWriter = new System.IO.StringWriter()) {
-            try {
-              var serializer = new XmlSerializer(valueAsT.GetType());
-              serializer.Serialize(stringWriter, valueAsT);
-              return stringWriter.ToString();
-            }
-            catch (Exception ex) {
-              throw;
-            }
+          using (var memStream = new System.IO.MemoryStream()) {
+            var serializer = new DataContractJsonSerializer(valueAsT.GetType());
+            serializer.WriteObject(memStream, valueAsT);
+            return Encoding.UTF8.GetString(memStream.ToArray());
           }
         }
         else {
