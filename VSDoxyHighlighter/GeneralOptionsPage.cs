@@ -13,6 +13,10 @@ using System.Windows.Forms;
 
 namespace VSDoxyHighlighter
 {
+  /// <summary>
+  /// Represents a single Doxygen command that can be configured by the user.
+  /// Note that its members are serialized to and from a string!
+  /// </summary>
   [DataContract]
   public class DoxygenCommandInConfig
   {
@@ -37,6 +41,9 @@ namespace VSDoxyHighlighter
     //[ReadOnly(true)]
     //[TypeConverter(typeof(StringConverter))]
     //public ITuple FragmentTypes { get; set; }
+
+//#error Allow config of fragment types? I think that should be trivial...
+//#error Also check all the TODO comments
 
     // Get a sensible display in the CollectionEditor.
     public override string ToString()

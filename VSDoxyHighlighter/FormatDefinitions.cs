@@ -58,15 +58,15 @@ namespace VSDoxyHighlighter
   //===========================================================
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_command)]
-  [Name(IDs.ID_command)]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_command1)]
+  [Name(IDs.ID_command1)]
   [UserVisible(true)]
   [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
   internal sealed class CommandFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public CommandFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_command, "VSDoxyHighlighter - Command")
+      : base(defaultColors, IDs.ID_command1, "VSDoxyHighlighter - Command")
     {
     }
   }
@@ -97,6 +97,21 @@ namespace VSDoxyHighlighter
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
       : base(defaultColors, IDs.ID_noteKeyword, "VSDoxyHighlighter - Note")
+    {
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_exceptions)]
+  [Name(IDs.ID_exceptions)]
+  [UserVisible(true)]
+  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  internal sealed class ExceptionFormat : FormatDefinitionBase
+  {
+    [ImportingConstructor]
+    public ExceptionFormat(DefaultColors defaultColors)
+      : base(defaultColors, IDs.ID_exceptions, "VSDoxyHighlighter - Exceptions")
     {
     }
   }

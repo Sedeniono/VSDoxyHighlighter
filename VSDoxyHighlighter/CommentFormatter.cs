@@ -150,15 +150,18 @@ namespace VSDoxyHighlighter
             }
 
             if (commandGroupIdx >= 0) {
-              switch (mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType) {
+              DoxygenCommandType cmdType = mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
+              switch (cmdType) {
                 case DoxygenCommandType.Command1:
                   return ClassificationEnum.Command1;
                 case DoxygenCommandType.Note:
                   return ClassificationEnum.Note;
                 case DoxygenCommandType.Warning:
                   return ClassificationEnum.Warning;
+                case DoxygenCommandType.Exceptions:
+                  return ClassificationEnum.Exceptions;
                 default:
-                  throw new Exception("Unknown switch");
+                  throw new Exception($"Unknown DoxygenCommandType: {cmdType}");
               }
             }
           }
@@ -179,7 +182,7 @@ namespace VSDoxyHighlighter
         case FragmentType.InlineCode:
           return ClassificationEnum.InlineCode;
         default:
-          throw new Exception("Unknown switch");
+          throw new Exception($"Unknown fragment type: {fragmentType}");
       }
     }
 

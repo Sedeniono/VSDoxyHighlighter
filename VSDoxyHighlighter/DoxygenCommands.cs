@@ -11,12 +11,13 @@ namespace VSDoxyHighlighter
 {
   // Types of Doxygen commands that start with "\" or "@". This is used to map different commands to different classifications (i.e. colors).
   // The parameters to the Doxygen commands are not affected by this.
-  // Appears in the options dialog.
-  public enum DoxygenCommandType
+  // Appears in the options dialog. The numerical values get serialized.
+  public enum DoxygenCommandType : uint
   {
-    Command1,
-    Note,
-    Warning,
+    Command1 = 1,
+    Note = 10,
+    Warning = 20,
+    Exceptions = 30,
   }
 
 
@@ -26,7 +27,7 @@ namespace VSDoxyHighlighter
   // Note: This does not necessarily directly map to a specific classification (i.e. color).
   public enum FragmentType
   {
-    Command, // The doxygen command itself, e.g. "@param" or "@brief". The command itself can be classified differently, compare DoxygenCommandType.
+    Command, // The doxygen command itself, e.g. "@param" or "@brief". Different commands are mapped to different classifications, compare DoxygenCommandType.
     Parameter1, // Parameter to some ordinary doxygen command
     Parameter2, // Used for parameters of commands in running text or for some commands with more than one successive parameter
     Title, // Parameter to some ordinary doxygen command that represents a title
@@ -270,12 +271,21 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "param", "tparam", "param[in]", "param[out]", "param[in,out]", "throw", "throws",
-            "exception", "concept", "def", "enum", "extends", "idlexcept", "implements",
+            "param", "tparam", "param[in]", "param[out]", "param[in,out]",
+            "concept", "def", "enum", "extends", "implements",
             "memberof", "namespace", "package", "relates", "related",
             "relatesalso", "relatedalso", "retval"
           },
           DoxygenCommandType.Command1,
+          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
+          (FragmentType.Command, FragmentType.Parameter1)
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "throw", "throws", "exception", "idlexcept"
+          },
+          DoxygenCommandType.Exceptions,
           CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
           (FragmentType.Command, FragmentType.Parameter1)
         ),

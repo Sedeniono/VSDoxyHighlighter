@@ -277,8 +277,9 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\hideinitializer", ClassificationEnum.Command1),
 
-        new Utils.FormattedFragmentText(@"\idlexcept", ClassificationEnum.Command1),
+        new Utils.FormattedFragmentText(@"\idlexcept", ClassificationEnum.Exceptions),
         new Utils.FormattedFragmentText(@"exception", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\implements", ClassificationEnum.Command1),
         new Utils.FormattedFragmentText(@"ISomeInterface_", ClassificationEnum.Parameter1),
 
@@ -412,7 +413,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\endcond", ClassificationEnum.Command1),
         new Utils.FormattedFragmentText(@"\endif", ClassificationEnum.Command1),
 
-        new Utils.FormattedFragmentText(@"\exception", ClassificationEnum.Command1),
+        new Utils.FormattedFragmentText(@"\exception", ClassificationEnum.Exceptions),
         new Utils.FormattedFragmentText(@"std::out_of_range", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\if", ClassificationEnum.Command1),
@@ -471,11 +472,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\since", ClassificationEnum.Command1),
         new Utils.FormattedFragmentText(@"\test", ClassificationEnum.Command1),
 
-        new Utils.FormattedFragmentText(@"\throw", ClassificationEnum.Command1),
+        new Utils.FormattedFragmentText(@"\throw", ClassificationEnum.Exceptions),
         new Utils.FormattedFragmentText(@"std::out_of_range", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText(@"\throws", ClassificationEnum.Command1),
+        new Utils.FormattedFragmentText(@"\throws", ClassificationEnum.Exceptions),
         new Utils.FormattedFragmentText(@"someException", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText("@throws", ClassificationEnum.Command1),
+        new Utils.FormattedFragmentText("@throws", ClassificationEnum.Exceptions),
         new Utils.FormattedFragmentText("std::runtime_error", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText("@ref", ClassificationEnum.Command1),
         new Utils.FormattedFragmentText("someFunc()", ClassificationEnum.Parameter2),

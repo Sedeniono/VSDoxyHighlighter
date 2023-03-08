@@ -24,6 +24,7 @@ namespace VSDoxyHighlighter
     Command1,
     Note,
     Warning,
+    Exceptions,
     Parameter1,
     Parameter2,
     Title,
@@ -40,24 +41,26 @@ namespace VSDoxyHighlighter
   /// </summary>
   public static class IDs
   {
-    public const string ID_command = "VSDoxyHighlighter_Command";
+    public const string ID_command1 = "VSDoxyHighlighter_Command";
     public const string ID_parameter1 = "VSDoxyHighlighter_Parameter1";
     public const string ID_parameter2 = "VSDoxyHighlighter_Parameter2";
     public const string ID_title = "VSDoxyHighlighter_Title";
     public const string ID_warningKeyword = "VSDoxyHighlighter_Warning";
     public const string ID_noteKeyword = "VSDoxyHighlighter_Note";
+    public const string ID_exceptions = "VSDoxyHighlighter_Exceptions";
     public const string ID_emphasisMinor = "VSDoxyHighlighter_EmphasisMinor";
     public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
 
     public static readonly Dictionary<ClassificationEnum, string> ToID = new Dictionary<ClassificationEnum, string>(){
-        {ClassificationEnum.Command1, ID_command},
+        {ClassificationEnum.Command1, ID_command1},
         {ClassificationEnum.Parameter1, ID_parameter1},
         {ClassificationEnum.Parameter2, ID_parameter2},
         {ClassificationEnum.Title, ID_title},
         {ClassificationEnum.Warning, ID_warningKeyword},
         {ClassificationEnum.Note, ID_noteKeyword},
+        {ClassificationEnum.Exceptions, ID_exceptions},
         {ClassificationEnum.EmphasisMinor, ID_emphasisMinor},
         {ClassificationEnum.EmphasisMajor, ID_emphasisMajor},
         {ClassificationEnum.Strikethrough, ID_strikethrough},
@@ -77,7 +80,7 @@ namespace VSDoxyHighlighter
   {
 #pragma warning disable 169
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_command)]
+    [Name(IDs.ID_command1)]
     private static ClassificationTypeDefinition typeDefinitionForCommand;
 
     [Export(typeof(ClassificationTypeDefinition))]
@@ -87,6 +90,10 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_noteKeyword)]
     private static ClassificationTypeDefinition typeDefinitionForNoteKeyword;
+    
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_exceptions)]
+    private static ClassificationTypeDefinition typeDefinitionForExceptions;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_parameter1)]

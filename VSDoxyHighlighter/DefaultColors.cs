@@ -208,26 +208,28 @@ namespace VSDoxyHighlighter
 
     // Default colors for light color themes.
     static readonly Dictionary<string, TextProperties> cLightColors = new Dictionary<string, TextProperties> {
-      { IDs.ID_command,        new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),  background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),  background: null, isBold: false, isItalic: false) },
-      { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(0, 0, 0),     background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_warningKeyword, new TextProperties(foreground: Color.FromRgb(200, 0, 0),   background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_noteKeyword,    new TextProperties(foreground: Color.FromRgb(255, 155, 0), background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_emphasisMinor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: false, isItalic: true) },
-      { IDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),    background: null, isBold: true,  isItalic: false) },
-      { IDs.ID_strikethrough,  new TextProperties(foreground: null,                       background: null, isBold: false, isItalic: false) },
-      { IDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(85, 85, 85),  background: Color.FromRgb(235, 235, 235), isBold: false, isItalic: false) },
+      { IDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: false, isItalic: false) },
+      { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(0, 0, 0),       background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_warningKeyword, new TextProperties(foreground: Color.FromRgb(200, 0, 0),     background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_noteKeyword,    new TextProperties(foreground: Color.FromRgb(255, 137, 19),  background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_exceptions,     new TextProperties(foreground: Color.FromRgb(190, 120, 169), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_emphasisMinor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: false, isItalic: true) },
+      { IDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_strikethrough,  new TextProperties(foreground: null,                         background: null, isBold: false, isItalic: false) },
+      { IDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(85, 85, 85),    background: Color.FromRgb(235, 235, 235), isBold: false, isItalic: false) },
     };
 
     // Default colors for dark color themes.
     static readonly Dictionary<string, TextProperties> cDarkColors = new Dictionary<string, TextProperties> {
-      { IDs.ID_command,        new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: false, isItalic: false) },
       { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(206, 206, 206), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_warningKeyword, new TextProperties(foreground: Color.FromRgb(255, 36, 23),   background: null, isBold: true,  isItalic: false) },
       { IDs.ID_noteKeyword,    new TextProperties(foreground: Color.FromRgb(255, 155, 0),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_exceptions,     new TextProperties(foreground: Color.FromRgb(202, 145, 186), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_emphasisMinor,  new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: false, isItalic: true) },
       { IDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(166, 215, 157), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_strikethrough,  new TextProperties(foreground: null,                         background: null, isBold: false, isItalic: false) },
