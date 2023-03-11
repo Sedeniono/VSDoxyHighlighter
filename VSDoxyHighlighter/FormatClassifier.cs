@@ -255,7 +255,7 @@ namespace VSDoxyHighlighter
           }
         }
 #else
-        IClassificationType classificationType = mFormatTypeToClassificationType[(uint)cCommentTypeDebugFormats[commentSpan.commentType]];
+        IClassificationType classificationType = mClassificationEnumToInstance[(uint)cCommentTypeDebugFormats[commentSpan.commentType]];
         result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, commentSpan.span), classificationType));
 #endif
       }
@@ -358,14 +358,14 @@ namespace VSDoxyHighlighter
     private bool mDisposed = false;
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
-    static readonly Dictionary<CommentType, FormatType> cCommentTypeDebugFormats = new Dictionary<CommentType, FormatType> {
-      { CommentType.TripleSlash, FormatType.Command },
-      { CommentType.DoubleSlashExclamation, FormatType.Parameter1 },
-      { CommentType.DoubleSlash, FormatType.Title },
-      { CommentType.SlashStarStar, FormatType.EmphasisMinor },
-      { CommentType.SlashStarExclamation, FormatType.Note },
-      { CommentType.SlashStar, FormatType.InlineCode },
-      { CommentType.Unknown, FormatType.Warning },
+    static readonly Dictionary<CommentType, ClassificationEnum> cCommentTypeDebugFormats = new Dictionary<CommentType, ClassificationEnum> {
+      { CommentType.TripleSlash, ClassificationEnum.Command1 },
+      { CommentType.DoubleSlashExclamation, ClassificationEnum.Parameter1 },
+      { CommentType.DoubleSlash, ClassificationEnum.Title },
+      { CommentType.SlashStarStar, ClassificationEnum.EmphasisMinor },
+      { CommentType.SlashStarExclamation, ClassificationEnum.Note },
+      { CommentType.SlashStar, ClassificationEnum.InlineCode },
+      { CommentType.Unknown, ClassificationEnum.Warning },
     };
 #endif
   }
