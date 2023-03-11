@@ -19,13 +19,16 @@
 
     /// <summary>
     /// The description of the Doxygen command: The string is just the concatenation of the 
-    /// individual strings. However, we also have some semantic information. If the FormatType
-    /// is null, then it is ordinary text.
+    /// individual strings. However, we also have some semantic information:
+    /// - If the first item is null, then it is ordinary text.
+    /// - If the first item is a ClassificationEnum, then we apply that classification as-is.
+    /// - If the first item is a FragmentType, then we convert it to a ClassificationEnum taking
+    ///   into account the user settings.
     /// </summary>
-    public readonly (ClassificationEnum?, string)[] Description;
+    public readonly (object, string)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, (ClassificationEnum?, string)[] description)
+    public DoxygenHelpPageCommand(string command, string parameters, (object, string)[] description)
     {
       Command = command;
       Parameters = parameters;

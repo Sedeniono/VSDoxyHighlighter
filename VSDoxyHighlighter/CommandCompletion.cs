@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
 using static Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
+using System.Windows.Documents;
 
 namespace VSDoxyHighlighter
 {
@@ -173,12 +174,13 @@ namespace VSDoxyHighlighter
       if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
         var runs = new List<ClassifiedTextRun>();
 
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
-
+        //------ Add a line with the actual command.
         string cmdWithSlash = "\\" + cmd.Command;
-        ClassificationEnum commandClassification = GetClassificationForCommand(session.TextView.TextBuffer, cmdWithSlash);
+        ClassificationEnum commandClassification = GetClassificationForCommandOrDefault(session.TextView.TextBuffer, cmdWithSlash);
+        runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
         runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
 
+        //------ Add a line with the command's parameters.
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
         if (cmd.Parameters == "") {
           runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
@@ -189,13 +191,9 @@ namespace VSDoxyHighlighter
         }
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
-        foreach (var fragment in cmd.Description) {
-          if (fragment.Item1 == null) {
-            runs.AddRange(ClassifiedTextElement.CreatePlainText(fragment.Item2).Runs);
-          }
-          else {
-            runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[fragment.Item1.Value], fragment.Item2));
-          }
+        //------ Add the whole description.
+        foreach (var descriptionFragment in cmd.Description) {
+          AddTextRunsForDescriptionFragment(session.TextView.TextBuffer, descriptionFragment, runs);
         }
 
         return Task.FromResult<object>(new ClassifiedTextElement(runs));
@@ -227,20 +225,49 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ClassificationEnum GetClassificationForCommand(ITextBuffer textBuffer, string cmdWithSlash)
+    private ClassificationEnum GetClassificationForCommandOrDefault(ITextBuffer textBuffer, string cmdWithSlash)
+    {
+      ClassificationEnum? correctClassification = GetClassificationForFragment(textBuffer, FragmentType.Command, cmdWithSlash);
+      if (correctClassification.HasValue) {
+        return correctClassification.Value;
+      }
+      else {
+        return ClassificationEnum.Command1;
+      }
+    }
+
+
+    private ClassificationEnum? GetClassificationForFragment(ITextBuffer textBuffer, FragmentType fragmentType, string fragmentText)
     {
       // Exploit the existing CommentClassifier associated with the text buffer to figure out how a
       // command is supposed to get classified (it depends on the settings configured by the user!).
       if (textBuffer.Properties.TryGetProperty(
                 typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
-        ClassificationEnum? correctClassification
-            = commentClassifier.CommentParser.FindClassificationEnumForFragment(FragmentType.Command, cmdWithSlash);
-        if (correctClassification != null) {
-          return correctClassification.Value;
+        return commentClassifier.CommentParser.FindClassificationEnumForFragment(fragmentType, fragmentText);
+      }
+
+      return null;
+    }
+
+
+    private void AddTextRunsForDescriptionFragment(ITextBuffer textBuffer, (object, string) descriptionFragment, List<ClassifiedTextRun> outputList)
+    {
+      if (descriptionFragment.Item1 is ClassificationEnum classification) {
+        // Use the given classification as-is.
+        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.Item2));
+        return;
+      }
+
+      if (descriptionFragment.Item1 is FragmentType fragmentType) {
+        // Convert the fragment type to the classification by taking into account the user settings.
+        ClassificationEnum? itemClassification = GetClassificationForFragment(textBuffer, fragmentType, descriptionFragment.Item2);
+        if (itemClassification.HasValue) {
+          outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[itemClassification.Value], descriptionFragment.Item2));
+          return;
         }
       }
 
-      return ClassificationEnum.Command1;
+      outputList.AddRange(ClassifiedTextElement.CreatePlainText(descriptionFragment.Item2).Runs);
     }
 
 
