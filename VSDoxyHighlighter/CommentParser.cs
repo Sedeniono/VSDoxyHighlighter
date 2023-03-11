@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 
@@ -235,9 +236,8 @@ namespace VSDoxyHighlighter
 
       // Add all Doxygen commands
       foreach (DoxygenCommandGroup cmdGroup in doxygenCommands) {
-        var escapedCommands = cmdGroup.Commands.ConvertAll(s => Regex.Escape(s));
         matchers.Add(new FragmentMatcher {
-          re = new Regex(cmdGroup.RegexCreator(escapedCommands), cOptions),
+          re = new Regex(cmdGroup.RegexCreator(cmdGroup.Commands), cOptions),
           types = cmdGroup.FragmentTypes
         });
       }
@@ -322,7 +322,7 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_KeywordAtLineStart_NoParam(ICollection<string> keywords)
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
@@ -335,39 +335,38 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_CodeCommand(ICollection<string> keywords)
     {
       // Command \code, \code{cpp}, ...
-      string concatKeywords = string.Join("|", keywords);
-      string validFileExtensions = string.Join("|", cCodeFileExtensions);
-      validFileExtensions = validFileExtensions.Replace("+", @"\+");
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+      string validFileExtensions = ConcatKeywordsForRegex(cCodeFileExtensions);
       return $@"({cCmdPrefix}{concatKeywords}(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
     }
 
     public static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(ICollection<string> keywords)
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
     public static string BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))";
     }
 
     public static string BuildRegex_FormulaEnvironmentStart(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}{concatKeywords}\{{.*\}}\{{?)";
     }
 
     public static string BuildRegex_Language(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}{concatKeywords}(?:[^ \t]\w+)?)";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(ICollection<string> keywords)
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: "\param[in] myParameter"
       // NOTE: Although the parameter "myParameter" is required, we nevertheless want to highlight the "\param[in]"
@@ -389,7 +388,7 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/yCZkWA/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
@@ -401,7 +400,7 @@ namespace VSDoxyHighlighter
       //   \param: MyParameter  --> The ":" is invalid syntax, and nothing should be formatted. Doxygen complains.
       //   \par: My paragraph  --> The title of the paragraph is ": My paragraph". Probably not what the user intended,
       //                           but nevertheless doxygen parses it that way.
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b(?:[ \t]*([^\n\r]*))?";
     }
 
@@ -410,7 +409,7 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/qaaWBO/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
@@ -419,7 +418,7 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/8QcyXW/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
@@ -428,7 +427,7 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/Z7R3xS/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // (1) Match the required word. As noted before, we actually treat it as optional.
       // (2) Optional word
@@ -444,14 +443,14 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/fCM8p7/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(ICollection<string> keywords)
     {
       // https://regex101.com/r/yxbTV1/1
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:(?:[ \t]*((?:""[^""]*"")|(?:(?<=[ \t])[^ \t\n\r]*))?)|[\n\r]|$)";
     }
 
@@ -463,7 +462,7 @@ namespace VSDoxyHighlighter
       //   Text \ref subsection1. The point is not part of the parameter.
       //   \ref func(double, int) should match also match the double and int and also the parantheses.
       //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
@@ -494,14 +493,14 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_1OptionalCaption_1OptionalSizeIndication(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       // Example: \dot "foo test"  width=2\textwidth   height=1cm
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     public static string BuildRegex_StartUmlCommandWithBracesOptions(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
@@ -516,7 +515,7 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication(ICollection<string> keywords) 
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       // Examples:
       //   Without quotes: @dotfile filename    "foo test" width=200cm height=1cm
       //      With quotes: @dotfile "file name" "foo test" width=200cm height=1cm
@@ -525,13 +524,26 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_ImageCommand(ICollection<string> keywords)
     {
-      string concatKeywords = string.Join("|", keywords);
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/VN43Fy/1
       return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
     }
 
+
+    private static string ConcatKeywordsForRegex(ICollection<string> keywords) 
+    {
+      // We need to order the keywords by **descending** length so that the regex matches the longer keyword first.
+      // For example: There are the Doxygen commands "\--" and "\---". So the regex should contain
+      // "(---|--)" and not "(--|---)", since the latter will never match "---" while the first does.
+      // Also, we need to escape any special characters.
+      var orderedAndEscapedKeywords 
+        = keywords.OrderByDescending(s => s.Length).ToList().ConvertAll(s => Regex.Escape(s));
+
+      string concatKeywords = string.Join("|", orderedAndEscapedKeywords);
+      return concatKeywords;
+    }
 
     /// <summary>
     /// Comparer that sorts formatted fragments by their position in the text. 
