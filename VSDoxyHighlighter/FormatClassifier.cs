@@ -194,7 +194,7 @@ namespace VSDoxyHighlighter
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mGeneralOptions.SettingsChanged += OnSettingsChanged;
 
-      InitCommentFormatter();
+      InitCommentParser();
     }
 
 
@@ -256,7 +256,7 @@ namespace VSDoxyHighlighter
           string codeText = textSnapshot.GetText(commentSpan.span);
 
           // Scan the given text for keywords and get the proper formatting for it.
-          var fragmentsToFormat = mFormatter.FormatText(codeText);
+          var fragmentsToFormat = mParser.Parse(codeText);
 
           // Convert the list of fragments that should be formatted to Visual Studio types.
           foreach (FormattedFragment fragment in fragmentsToFormat) {
@@ -314,13 +314,13 @@ namespace VSDoxyHighlighter
 
     public SpanSplitter SpanSplitter { get { return mSpanSplitter; } }
 
-    public CommentFormatter CommentFormatter { get { return mFormatter; } }
+    public CommentParser CommentParser { get { return mParser; } }
 
 
     // When this function is called, the user clicked on "OK" in the options.
     private void OnSettingsChanged(object sender, EventArgs e)
     {
-      InitCommentFormatter();
+      InitCommentParser();
       InvalidateCache();
 
       // Some of our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
@@ -351,10 +351,10 @@ namespace VSDoxyHighlighter
     }
 
 
-    private void InitCommentFormatter()
+    private void InitCommentParser()
     {
       var commandGroups = DoxygenCommands.ApplyConfigList(mGeneralOptions.DoxygenCommandsConfig);
-      mFormatter = new CommentFormatter(commandGroups);
+      mParser = new CommentParser(commandGroups);
     }
 
 
@@ -364,7 +364,7 @@ namespace VSDoxyHighlighter
     private readonly IClassificationType[] mClassificationEnumToInstance;
     private readonly GeneralOptionsPage mGeneralOptions;
 
-    private CommentFormatter mFormatter;
+    private CommentParser mParser;
 
     private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
     private int mCachedVersion = -1;

@@ -68,16 +68,16 @@ namespace VSDoxyHighlighter
 
 
   /// <summary>
-  /// Provides facilities to format the doxygen comments in a piece of source code.
+  /// Provides facilities to parse some piece of comment text for doxygen commands, markdown, etc.
   /// This implements the main logic to find the fragments that should be formatted. It
   /// is independent of Visual Studio services, and thus can be easily unit tested.
   /// 
   /// Note that it does NOT identify which pieces of some text are located in comments
   /// and which lie outside of it. Rather, it expects only the text in comments as input.
   /// </summary>
-  public class CommentFormatter
+  public class CommentParser
   {
-    public CommentFormatter(List<DoxygenCommandGroup> doxygenCommands) 
+    public CommentParser(List<DoxygenCommandGroup> doxygenCommands) 
     {
       mDoxygenCommandGroups = doxygenCommands;
       mMatchers = BuildMatchers(doxygenCommands);
@@ -95,7 +95,7 @@ namespace VSDoxyHighlighter
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.
     /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
-    public SortedSet<FormattedFragment> FormatText(string text)
+    public SortedSet<FormattedFragment> Parse(string text)
     {
       text = text.TrimEnd();
       if (text.EndsWith("*/")) {

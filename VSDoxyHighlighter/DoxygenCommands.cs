@@ -195,7 +195,7 @@ namespace VSDoxyHighlighter
               "rtfonly", "verbatim", "xmlonly"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_NoParam,
+          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -204,7 +204,7 @@ namespace VSDoxyHighlighter
             "code"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_CodeCommand,
+          CommentParser.BuildRegex_CodeCommand,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -217,7 +217,7 @@ namespace VSDoxyHighlighter
             "endverbatim", "endxmlonly", "n"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
+          CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -228,7 +228,7 @@ namespace VSDoxyHighlighter
             @"---", @"--", @"{", @"}"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
+          CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -237,7 +237,7 @@ namespace VSDoxyHighlighter
             "f"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_FormulaEnvironmentStart,
+          CommentParser.BuildRegex_FormulaEnvironmentStart,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -246,7 +246,7 @@ namespace VSDoxyHighlighter
             "~"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_Language,
+          CommentParser.BuildRegex_Language,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -255,7 +255,7 @@ namespace VSDoxyHighlighter
             "warning", "raisewarning"
           },
           DoxygenCommandType.Warning,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_NoParam,
+          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -264,7 +264,7 @@ namespace VSDoxyHighlighter
             "note", "todo", "attention", "bug", "deprecated"
           },
           DoxygenCommandType.Note,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_NoParam,
+          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
           Tuple.Create(FragmentType.Command)
         ),
 
@@ -279,7 +279,7 @@ namespace VSDoxyHighlighter
             "relatesalso", "relatedalso", "retval"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
           (FragmentType.Command, FragmentType.Parameter1)
         ),
 
@@ -288,7 +288,7 @@ namespace VSDoxyHighlighter
             "throw", "throws", "exception", "idlexcept"
           },
           DoxygenCommandType.Exceptions,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
           (FragmentType.Command, FragmentType.Parameter1)
         ),
 
@@ -304,7 +304,7 @@ namespace VSDoxyHighlighter
             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
           (FragmentType.Command, FragmentType.Parameter1)
         ),
 
@@ -313,7 +313,7 @@ namespace VSDoxyHighlighter
             "cond"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
           (FragmentType.Command, FragmentType.Parameter1)
         ),
 
@@ -322,7 +322,7 @@ namespace VSDoxyHighlighter
             "par", "name"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
           (FragmentType.Command, FragmentType.Title)
         ),
 
@@ -331,7 +331,7 @@ namespace VSDoxyHighlighter
             "mainpage"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
           (FragmentType.Command, FragmentType.Title)
         ),
 
@@ -341,7 +341,7 @@ namespace VSDoxyHighlighter
             "copydoc", "copybrief", "copydetails", "emoji"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
           (FragmentType.Command, FragmentType.Parameter2)
@@ -352,7 +352,7 @@ namespace VSDoxyHighlighter
             "a", "e", "em"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           (FragmentType.Command, FragmentType.EmphasisMinor)
         ),
 
@@ -361,7 +361,7 @@ namespace VSDoxyHighlighter
             "b"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           (FragmentType.Command, FragmentType.EmphasisMajor)
         ),
 
@@ -370,7 +370,7 @@ namespace VSDoxyHighlighter
             "qualifier"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
           (FragmentType.Command, FragmentType.Parameter1)
         ),
 
@@ -384,7 +384,7 @@ namespace VSDoxyHighlighter
             "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
           (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title)
         ),
 
@@ -393,7 +393,7 @@ namespace VSDoxyHighlighter
             "showdate"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
           (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title)
         ),
 
@@ -402,7 +402,7 @@ namespace VSDoxyHighlighter
             "ref", "subpage"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
           (FragmentType.Command, FragmentType.Parameter2, FragmentType.Title)
@@ -415,7 +415,7 @@ namespace VSDoxyHighlighter
             "category", "class", "interface", "protocol", "struct", "union"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
+          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
           (FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title)
         ),
 
@@ -424,7 +424,7 @@ namespace VSDoxyHighlighter
             "startuml"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_StartUmlCommandWithBracesOptions,
+          CommentParser.BuildRegex_StartUmlCommandWithBracesOptions,
           (FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
         ),
 
@@ -433,7 +433,7 @@ namespace VSDoxyHighlighter
             "dot", "msc"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
+          CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
           (FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
         ),
 
@@ -444,7 +444,7 @@ namespace VSDoxyHighlighter
             "dotfile", "mscfile", "diafile"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
+          CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
           (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
         ),
 
@@ -453,7 +453,7 @@ namespace VSDoxyHighlighter
             "image"
           },
           DoxygenCommandType.Command1,
-          CommentFormatter.BuildRegex_ImageCommand,
+          CommentParser.BuildRegex_ImageCommand,
           (FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
         ),
 

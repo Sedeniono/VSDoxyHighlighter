@@ -234,7 +234,7 @@ namespace VSDoxyHighlighter
       if (textBuffer.Properties.TryGetProperty(
                 typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
         ClassificationEnum? correctClassification
-            = commentClassifier.CommentFormatter.FindClassificationEnumForFragment(FragmentType.Command, cmdWithSlash);
+            = commentClassifier.CommentParser.FindClassificationEnumForFragment(FragmentType.Command, cmdWithSlash);
         if (correctClassification != null) {
           return correctClassification.Value;
         }
@@ -289,7 +289,7 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline,anchor:YOUR_ID}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline}");
 
-      foreach (string extension in CommentFormatter.cCodeFileExtensions.Reverse()) {
+      foreach (string extension in CommentParser.cCodeFileExtensions.Reverse()) {
         InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
       }
     }

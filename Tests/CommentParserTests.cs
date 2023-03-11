@@ -64,21 +64,21 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    public static CommentFormatter CreateDefaultCommentFormatter() 
+    public static CommentParser CreateDefaultCommentParser() 
     {
-      return new CommentFormatter(DoxygenCommands.ApplyConfigList(DoxygenCommands.DefaultDoxygenCommandsInConfig));
+      return new CommentParser(DoxygenCommands.ApplyConfigList(DoxygenCommands.DefaultDoxygenCommandsInConfig));
     }
   }
 
 
   [TestClass()]
-  public class CommentFormatterTests
+  public class CommentParserTests
   {
     [TestMethod()]
     public void EmptyStringShouldCauseNoFormatting()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText("");
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse("");
       Assert.IsNotNull(actualFragments);
       Assert.AreEqual(0, actualFragments.Count);
     }
@@ -87,8 +87,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void BasicCStyleCommentsShouldBeFormatted()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("BasicCStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -124,8 +124,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void BasicCppStyleCommentsShouldBeFormatted()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("BasicCppStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -888,7 +888,7 @@ namespace VSDoxyHighlighter.Tests
       var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
       Assert.IsTrue(Regex.Matches(input, "\r\n").Count > 10); // Cross-check the input file
 
-      var actualFragments = Utils.CreateDefaultCommentFormatter().FormatText(input);
+      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
 
       var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
@@ -909,7 +909,7 @@ namespace VSDoxyHighlighter.Tests
       Assert.IsTrue(Regex.Matches(input, "\r").Count == 0); // Cross-check
 
       var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
-      var actualTextFragments = Utils.ConvertToTextFragments(input, Utils.CreateDefaultCommentFormatter().FormatText(input));
+      var actualTextFragments = Utils.ConvertToTextFragments(input, Utils.CreateDefaultCommentParser().Parse(input));
 
       CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
     }
@@ -918,8 +918,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void CasesWhereNothingShouldBeFormatted()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
 
       Assert.AreEqual(0, actualFragments.Count);
@@ -929,8 +929,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void SingleStarShouldFormatItalic()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
@@ -941,8 +941,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void SingleUnderscoreShouldFormatItalic()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
@@ -971,8 +971,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void DoubleStarShouldFormatBold()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
@@ -983,8 +983,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void DoubleUnderscoreShouldFormatBold()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
@@ -995,8 +995,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void DoubleTildeShouldFormatStrikethrough()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleTilde.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.Strikethrough);
@@ -1025,8 +1025,8 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void InlineCodeShouldBeFormatted()
     {
-      var formatter = Utils.CreateDefaultCommentFormatter();
-      var actualFragments = formatter.FormatText(
+      var formatter = Utils.CreateDefaultCommentParser();
+      var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -1049,7 +1049,7 @@ namespace VSDoxyHighlighter.Tests
     public void UnicodeParametersShouldWork()
     {
       var input = Utils.ReadTestInputFromFile("UnicodeParametersUTF8.cpp");
-      var actualFragments = Utils.CreateDefaultCommentFormatter().FormatText(input);
+      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         new Utils.FormattedFragmentText("@param", ClassificationEnum.Command1),

@@ -50,7 +50,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CommandCompletion.cs" />
-    <Compile Include="CommentFormatter.cs" />
+    <Compile Include="CommentParser.cs" />
     <Compile Include="DefaultColors.cs" />
     <Compile Include="DoxygenCommands.cs" />
     <Compile Include="DoxygenHelpPageParser\DoxygenCommandsGeneratedFromHelpPage.cs" />
