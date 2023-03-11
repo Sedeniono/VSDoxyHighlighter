@@ -90,7 +90,9 @@ namespace VSDoxyHighlighter
         Debug.Assert(groupIndex >= 0);
         Debug.Assert(indexForCommandsInGroup >= 0);
 
-        if (groupIndex >= 0 && indexForCommandsInGroup >= 0) { 
+        if (groupIndex >= 0 && indexForCommandsInGroup >= 0) {
+          Debug.Assert(ungrouped.FindIndex(group => group.Commands.Contains(configElem.Command)) < 0);
+
           DoxygenCommandGroup origGroup = mDefaultDoxygenCommands[groupIndex];
           ungrouped.Add(new DoxygenCommandGroup(
             new List<string>() { configElem.Command }, configElem.Classification, origGroup.RegexCreator, origGroup.FragmentTypes));
@@ -127,6 +129,7 @@ namespace VSDoxyHighlighter
         }
 
         Debug.Assert(group.Commands.Count == 1);
+        Debug.Assert(!merged[arg].Contains(group.Commands[0]));
         merged[arg].Add(group.Commands[0]);
       }
 
@@ -295,7 +298,7 @@ namespace VSDoxyHighlighter
         new DoxygenCommandGroup(
           new List<string> {
             "dir", "example", "example{lineno}", "file", "fn", "ingroup", "overload",
-            "property", "typedef", "var", "cond",
+            "property", "typedef", "var",
             "elseif", "if", "ifnot",
             "dontinclude", "dontinclude{lineno}",
             "include", "include{lineno}", "include{doc}", "includelineno", "includedoc",
