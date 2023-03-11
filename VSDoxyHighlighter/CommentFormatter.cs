@@ -118,7 +118,7 @@ namespace VSDoxyHighlighter
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
                 FragmentType fragmentType = (FragmentType)matcher.types[idx];
                 string fragmentText = text.Substring(group.Index, group.Length);
-                ClassificationEnum? classification = FindClassificationEnumForFragment(mDoxygenCommandGroups, fragmentType, fragmentText);
+                ClassificationEnum? classification = FindClassificationEnumForFragment(fragmentType, fragmentText);
                 if (classification != null) {
                   result.Add(new FormattedFragment(group.Index, group.Length, classification.Value));
                 }
@@ -132,7 +132,13 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static ClassificationEnum? FindClassificationEnumForFragment(List<DoxygenCommandGroup> knownCommands, FragmentType fragmentType, string fragmentText)
+    /// <summary>
+    /// Maps the given <paramref name="fragmentType"/> to a classification. In case of a command, the mapped-to classification
+    /// depends on the command, which must be given by <paramref name="fragmentText"/>.
+    /// </summary>
+    /// <returns>The classification. Returns null in case the fragmentType is a Command and the fragmentText contains
+    /// and unknown command.</returns>
+    public ClassificationEnum? FindClassificationEnumForFragment(FragmentType fragmentType, string fragmentText)
     {
       switch (fragmentType) {
         case FragmentType.Command:
@@ -141,16 +147,16 @@ namespace VSDoxyHighlighter
             string commandWithoutStart = fragmentText.Substring(1);
 
             // TODO: SLOW. Use a dictionary???
-            int commandGroupIdx = knownCommands.FindIndex(group => group.Commands.Contains(commandWithoutStart));
+            int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
             if (commandGroupIdx < 0) {
               // Some commands such as "\code" come with special regex parsers that attach addition parameters directly to the command.
               // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-              commandGroupIdx = knownCommands.FindIndex(
+              commandGroupIdx = mDoxygenCommandGroups.FindIndex(
                 group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
             }
 
             if (commandGroupIdx >= 0) {
-              DoxygenCommandType cmdType = knownCommands[commandGroupIdx].DoxygenCommandType;
+              DoxygenCommandType cmdType = mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
               switch (cmdType) {
                 case DoxygenCommandType.Command1:
                   return ClassificationEnum.Command1;

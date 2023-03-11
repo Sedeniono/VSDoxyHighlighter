@@ -180,8 +180,6 @@ namespace VSDoxyHighlighter
       mVSCppColorer.CppColorerReclassifiedSpan += OnVSCppColorerReclassifiedSpan;
 
       mSpanSplitter = new SpanSplitter(mVSCppColorer);
-      // CommentCommandCompletionSource needs it to check whether some point is inside of a comment.
-      textBuffer.Properties.AddProperty(typeof(SpanSplitter), mSpanSplitter);
 
       int numClassifications = Enum.GetNames(typeof(ClassificationEnum)).Length;
       Debug.Assert(numClassifications == ClassificationIDs.ToID.Count);
@@ -311,10 +309,12 @@ namespace VSDoxyHighlighter
         mVSCppColorer.CppColorerReclassifiedSpan -= OnVSCppColorerReclassifiedSpan;
         mVSCppColorer.Dispose();
       }
-      
-      mTextBuffer.Properties.RemoveProperty(typeof(SpanSplitter));
     }
 
+
+    public SpanSplitter SpanSplitter { get { return mSpanSplitter; } }
+
+    public CommentFormatter CommentFormatter { get { return mFormatter; } }
 
 
     // When this function is called, the user clicked on "OK" in the options.

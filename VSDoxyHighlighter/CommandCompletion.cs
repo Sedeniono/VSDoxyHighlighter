@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
+using static Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
 
 namespace VSDoxyHighlighter
 {
@@ -174,8 +175,9 @@ namespace VSDoxyHighlighter
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
 
-        // TODO: Proper mapping from the command string to the classification. I.e. call FindClassificationEnumForFragment().
-        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Command1], "\\" + cmd.Command));
+        string cmdWithSlash = "\\" + cmd.Command;
+        ClassificationEnum commandClassification = GetClassificationForCommand(session.TextView.TextBuffer, cmdWithSlash);
+        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
         if (cmd.Parameters == "") {
@@ -206,9 +208,13 @@ namespace VSDoxyHighlighter
 
     private bool IsLocationInEnabledCommentType(SnapshotPoint triggerLocation)
     {
+      // Exploit the existing CommentClassifier associated with the text buffer to figure out whether
+      // the location is in a comment type where autocomplete should be enabled. The CommentClassifier
+      // got created by Visual Studio via CommentClassifierProvider.GetClassifier() when the text
+      // buffer got created.
       if (triggerLocation.Snapshot.TextBuffer.Properties.TryGetProperty(
-                typeof(SpanSplitter), out SpanSplitter spanSplitter)) {
-        CommentType? commentType = spanSplitter.GetTypeOfCommentBeforeLocation(triggerLocation);
+                typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+        CommentType? commentType = commentClassifier.SpanSplitter.GetTypeOfCommentBeforeLocation(triggerLocation);
         if (commentType != null) {
           return mGeneralOptions.IsEnabledInCommentType(commentType.Value);
         }
@@ -218,6 +224,23 @@ namespace VSDoxyHighlighter
       }
 
       return false;
+    }
+
+
+    private ClassificationEnum GetClassificationForCommand(ITextBuffer textBuffer, string cmdWithSlash)
+    {
+      // Exploit the existing CommentClassifier associated with the text buffer to figure out how a
+      // command is supposed to get classified (it depends on the settings configured by the user!).
+      if (textBuffer.Properties.TryGetProperty(
+                typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+        ClassificationEnum? correctClassification
+            = commentClassifier.CommentFormatter.FindClassificationEnumForFragment(FragmentType.Command, cmdWithSlash);
+        if (correctClassification != null) {
+          return correctClassification.Value;
+        }
+      }
+
+      return ClassificationEnum.Command1;
     }
 
 
