@@ -170,8 +170,24 @@ namespace VSDoxyHighlighter
         }
       }
 
-      // TODO: Sort the list, so that in the options the list appears sorted. Otherwise it is hard to find a command.
+      // Sort the commands to make it easier for the user to find a specific command in the options dialog.
+      // We put all the non-letter commands (\~, \<, etc.) at the end, and otherwise sort alphabetically.
+      int CompareConfigs(DoxygenCommandInConfig c1, DoxygenCommandInConfig c2) 
+      {
+        bool isLetter1 = char.IsLetter(c1.Command[0]);
+        bool isLetter2 = char.IsLetter(c2.Command[0]);
+        if ((isLetter1 && isLetter2) || (!isLetter1 && !isLetter2)) {
+          return string.Compare(c1.Command, c2.Command, StringComparison.InvariantCulture);
+        }
+        else if (isLetter1) {
+          return -1;
+        }
+        else {
+          return 1;
+        }
+      }
 
+      result.Sort(CompareConfigs);
       return result;
     }
 
