@@ -146,18 +146,10 @@ namespace VSDoxyHighlighter
             // Strip the initial "\" or "@".
             string commandWithoutStart = fragmentText.Substring(1);
 
-            // TODO: SLOW. Use a dictionary???
-            int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
-            if (commandGroupIdx < 0) {
-              // Some commands such as "\code" come with special regex parsers that attach addition parameters directly to the command.
-              // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-              commandGroupIdx = mDoxygenCommandGroups.FindIndex(
-                group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
-            }
+            DoxygenCommandType? cmdType = FindTypeForCommand(commandWithoutStart);
 
-            if (commandGroupIdx >= 0) {
-              DoxygenCommandType cmdType = mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
-              switch (cmdType) {
+            if (cmdType.HasValue) {
+              switch (cmdType.Value) {
                 case DoxygenCommandType.Command1:
                   return ClassificationEnum.Command1;
                 case DoxygenCommandType.Command2:
@@ -194,6 +186,24 @@ namespace VSDoxyHighlighter
         default:
           throw new Exception($"Unknown fragment type: {fragmentType}");
       }
+    }
+
+
+    private DoxygenCommandType? FindTypeForCommand(string commandWithoutStart)
+    {
+      int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
+      if (commandGroupIdx < 0) {
+        // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
+        // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
+        commandGroupIdx = mDoxygenCommandGroups.FindIndex(
+          group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
+      }
+
+      if (commandGroupIdx >= 0) {
+        return mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
+      }
+
+      return null;
     }
 
 
