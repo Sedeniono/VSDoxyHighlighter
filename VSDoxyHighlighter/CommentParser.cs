@@ -80,6 +80,14 @@ namespace VSDoxyHighlighter
     public CommentParser(List<DoxygenCommandGroup> doxygenCommands) 
     {
       mDoxygenCommandGroups = doxygenCommands;
+
+      mCommandStringToTypeMap = new Dictionary<string, DoxygenCommandType>();
+      foreach (DoxygenCommandGroup group in mDoxygenCommandGroups) {
+        foreach (string cmd in group.Commands) {
+          mCommandStringToTypeMap.Add(cmd, group.DoxygenCommandType);
+        }
+      }
+
       mMatchers = BuildMatchers(doxygenCommands);
     }
 
@@ -191,16 +199,19 @@ namespace VSDoxyHighlighter
 
     private DoxygenCommandType? FindTypeForCommand(string commandWithoutStart)
     {
-      int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
-      if (commandGroupIdx < 0) {
-        // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
-        // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-        commandGroupIdx = mDoxygenCommandGroups.FindIndex(
-          group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
+      if (mCommandStringToTypeMap.TryGetValue(commandWithoutStart, out var commandType)) { 
+        return commandType;
       }
 
-      if (commandGroupIdx >= 0) {
-        return mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
+      // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
+      // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
+      // And also cache the result for the future.
+      foreach (DoxygenCommandGroup group in mDoxygenCommandGroups) {
+        int commandIdx = group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd));
+        if (commandIdx >= 0) {
+          mCommandStringToTypeMap.Add(commandWithoutStart, group.DoxygenCommandType); // Cache the result
+          return group.DoxygenCommandType;
+        }
       }
 
       return null;
@@ -557,6 +568,8 @@ namespace VSDoxyHighlighter
     };
 
     private readonly List<DoxygenCommandGroup> mDoxygenCommandGroups;
+    private Dictionary<string /*commandWithoutStart*/, DoxygenCommandType> mCommandStringToTypeMap;
+
     private readonly List<FragmentMatcher> mMatchers;
 
     private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
