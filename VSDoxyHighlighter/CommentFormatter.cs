@@ -118,7 +118,7 @@ namespace VSDoxyHighlighter
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
                 FragmentType fragmentType = (FragmentType)matcher.types[idx];
                 string fragmentText = text.Substring(group.Index, group.Length);
-                ClassificationEnum? classification = FindClassificationEnumForFragment(fragmentType, fragmentText);
+                ClassificationEnum? classification = FindClassificationEnumForFragment(mDoxygenCommandGroups, fragmentType, fragmentText);
                 if (classification != null) {
                   result.Add(new FormattedFragment(group.Index, group.Length, classification.Value));
                 }
@@ -132,7 +132,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ClassificationEnum? FindClassificationEnumForFragment(FragmentType fragmentType, string fragmentText)
+    private static ClassificationEnum? FindClassificationEnumForFragment(List<DoxygenCommandGroup> knownCommands, FragmentType fragmentType, string fragmentText)
     {
       switch (fragmentType) {
         case FragmentType.Command:
@@ -141,16 +141,16 @@ namespace VSDoxyHighlighter
             string commandWithoutStart = fragmentText.Substring(1);
 
             // TODO: SLOW. Use a dictionary???
-            int commandGroupIdx = mDoxygenCommandGroups.FindIndex(group => group.Commands.Contains(commandWithoutStart));
+            int commandGroupIdx = knownCommands.FindIndex(group => group.Commands.Contains(commandWithoutStart));
             if (commandGroupIdx < 0) {
               // Some commands such as "\code" come with special regex parsers that attach addition parameters directly to the command.
               // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-              commandGroupIdx = mDoxygenCommandGroups.FindIndex(
+              commandGroupIdx = knownCommands.FindIndex(
                 group => group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd)) >= 0);
             }
 
             if (commandGroupIdx >= 0) {
-              DoxygenCommandType cmdType = mDoxygenCommandGroups[commandGroupIdx].DoxygenCommandType;
+              DoxygenCommandType cmdType = knownCommands[commandGroupIdx].DoxygenCommandType;
               switch (cmdType) {
                 case DoxygenCommandType.Command1:
                   return ClassificationEnum.Command1;

@@ -63,192 +63,192 @@ namespace VSDoxyHighlighter
   //===========================================================
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_command1)]
-  [Name(IDs.ID_command1)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_command1)]
+  [Name(ClassificationIDs.ID_command1)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)] 
   internal sealed class Command1Format : FormatDefinitionBase
   {
     [ImportingConstructor]
     public Command1Format(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_command1, "VSDoxyHighlighter - Command 1")
+      : base(defaultColors, ClassificationIDs.ID_command1, "VSDoxyHighlighter - Command 1")
     {
     }
   }
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_command2)]
-  [Name(IDs.ID_command2)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_command2)]
+  [Name(ClassificationIDs.ID_command2)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class Command2Format : FormatDefinitionBase
   {
     [ImportingConstructor]
     public Command2Format(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_command2, "VSDoxyHighlighter - Command 2")
+      : base(defaultColors, ClassificationIDs.ID_command2, "VSDoxyHighlighter - Command 2")
     {
     }
   }
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_command3)]
-  [Name(IDs.ID_command3)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_command3)]
+  [Name(ClassificationIDs.ID_command3)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class Command3Format : FormatDefinitionBase
   {
     [ImportingConstructor]
     public Command3Format(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_command3, "VSDoxyHighlighter - Command 3")
+      : base(defaultColors, ClassificationIDs.ID_command3, "VSDoxyHighlighter - Command 3")
     {
     }
   }
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_warningKeyword)]
-  [Name(IDs.ID_warningKeyword)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_warningKeyword)]
+  [Name(ClassificationIDs.ID_warningKeyword)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class WarningKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public WarningKeywordFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_warningKeyword, "VSDoxyHighlighter - Warning")
+      : base(defaultColors, ClassificationIDs.ID_warningKeyword, "VSDoxyHighlighter - Warning")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_noteKeyword)]
-  [Name(IDs.ID_noteKeyword)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_noteKeyword)]
+  [Name(ClassificationIDs.ID_noteKeyword)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class NoteKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public NoteKeywordFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_noteKeyword, "VSDoxyHighlighter - Note")
+      : base(defaultColors, ClassificationIDs.ID_noteKeyword, "VSDoxyHighlighter - Note")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_exceptions)]
-  [Name(IDs.ID_exceptions)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_exceptions)]
+  [Name(ClassificationIDs.ID_exceptions)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ExceptionFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public ExceptionFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_exceptions, "VSDoxyHighlighter - Exceptions")
+      : base(defaultColors, ClassificationIDs.ID_exceptions, "VSDoxyHighlighter - Exceptions")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_parameter1)]
-  [Name(IDs.ID_parameter1)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_parameter1)]
+  [Name(ClassificationIDs.ID_parameter1)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ParameterFormat1 : FormatDefinitionBase
   {
     [ImportingConstructor]
     public ParameterFormat1(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_parameter1, "VSDoxyHighlighter - Parameter 1")
+      : base(defaultColors, ClassificationIDs.ID_parameter1, "VSDoxyHighlighter - Parameter 1")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_parameter2)]
-  [Name(IDs.ID_parameter2)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_parameter2)]
+  [Name(ClassificationIDs.ID_parameter2)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ParameterFormat2 : FormatDefinitionBase
   {
     [ImportingConstructor]
     public ParameterFormat2(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_parameter2, "VSDoxyHighlighter - Parameter 2")
+      : base(defaultColors, ClassificationIDs.ID_parameter2, "VSDoxyHighlighter - Parameter 2")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMinor)]
-  [Name(IDs.ID_emphasisMinor)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_emphasisMinor)]
+  [Name(ClassificationIDs.ID_emphasisMinor)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class EmphasisMinorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public EmphasisMinorFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_emphasisMinor, "VSDoxyHighlighter - Emphasis (minor)")
+      : base(defaultColors, ClassificationIDs.ID_emphasisMinor, "VSDoxyHighlighter - Emphasis (minor)")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMajor)]
-  [Name(IDs.ID_emphasisMajor)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_emphasisMajor)]
+  [Name(ClassificationIDs.ID_emphasisMajor)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class EmphasisMajorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public EmphasisMajorFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_emphasisMajor, "VSDoxyHighlighter - Emphasis (major)")
+      : base(defaultColors, ClassificationIDs.ID_emphasisMajor, "VSDoxyHighlighter - Emphasis (major)")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
-  [Name(IDs.ID_inlineCode)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_inlineCode)]
+  [Name(ClassificationIDs.ID_inlineCode)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class InlineCodeFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public InlineCodeFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_inlineCode, "VSDoxyHighlighter - Inline code")
+      : base(defaultColors, ClassificationIDs.ID_inlineCode, "VSDoxyHighlighter - Inline code")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
-  [Name(IDs.ID_title)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_title)]
+  [Name(ClassificationIDs.ID_title)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class TitleFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public TitleFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_title, "VSDoxyHighlighter - Title")
+      : base(defaultColors, ClassificationIDs.ID_title, "VSDoxyHighlighter - Title")
     {
     }
   }
 
 
   [Export(typeof(EditorFormatDefinition))]
-  [ClassificationType(ClassificationTypeNames = IDs.ID_strikethrough)]
-  [Name(IDs.ID_strikethrough)]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_strikethrough)]
+  [Name(ClassificationIDs.ID_strikethrough)]
   [UserVisible(true)]
   [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class StrikethroughFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
     public StrikethroughFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_strikethrough, "VSDoxyHighlighter - Strikethrough")
+      : base(defaultColors, ClassificationIDs.ID_strikethrough, "VSDoxyHighlighter - Strikethrough")
     {
     }
 

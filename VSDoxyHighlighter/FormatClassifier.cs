@@ -41,7 +41,7 @@ namespace VSDoxyHighlighter
   /// Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
   /// to store the classification's configuration in the registry.
   /// </summary>
-  public static class IDs
+  public static class ClassificationIDs
   {
     public const string ID_command1 = "VSDoxyHighlighter_Command";
     public const string ID_command2 = "VSDoxyHighlighter_Command2";
@@ -86,55 +86,55 @@ namespace VSDoxyHighlighter
   {
 #pragma warning disable 169
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_command1)]
+    [Name(ClassificationIDs.ID_command1)]
     private static ClassificationTypeDefinition typeDefinitionForCommand;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_command2)]
+    [Name(ClassificationIDs.ID_command2)]
     private static ClassificationTypeDefinition typeDefinitionForCommand2;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_command3)]
+    [Name(ClassificationIDs.ID_command3)]
     private static ClassificationTypeDefinition typeDefinitionForCommand3;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_warningKeyword)]
+    [Name(ClassificationIDs.ID_warningKeyword)]
     private static ClassificationTypeDefinition typeDefinitionForWarningKeyword;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_noteKeyword)]
+    [Name(ClassificationIDs.ID_noteKeyword)]
     private static ClassificationTypeDefinition typeDefinitionForNoteKeyword;
     
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_exceptions)]
+    [Name(ClassificationIDs.ID_exceptions)]
     private static ClassificationTypeDefinition typeDefinitionForExceptions;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_parameter1)]
+    [Name(ClassificationIDs.ID_parameter1)]
     private static ClassificationTypeDefinition typeDefinitionForParameter1;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_parameter2)]
+    [Name(ClassificationIDs.ID_parameter2)]
     private static ClassificationTypeDefinition typeDefinitionForParameter2;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_emphasisMinor)]
+    [Name(ClassificationIDs.ID_emphasisMinor)]
     private static ClassificationTypeDefinition typeDefinitionForEmphasisMinor;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_emphasisMajor)]
+    [Name(ClassificationIDs.ID_emphasisMajor)]
     private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_strikethrough)]
+    [Name(ClassificationIDs.ID_strikethrough)]
     private static ClassificationTypeDefinition typeDefinitionForStrikethrough;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_inlineCode)]
+    [Name(ClassificationIDs.ID_inlineCode)]
     private static ClassificationTypeDefinition typeDefinitionForInlineCode;
 
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(IDs.ID_title)]
+    [Name(ClassificationIDs.ID_title)]
     private static ClassificationTypeDefinition typeDefinitionForTitle;
 #pragma warning restore 169
   }
@@ -184,9 +184,9 @@ namespace VSDoxyHighlighter
       textBuffer.Properties.AddProperty(typeof(SpanSplitter), mSpanSplitter);
 
       int numClassifications = Enum.GetNames(typeof(ClassificationEnum)).Length;
-      Debug.Assert(numClassifications == IDs.ToID.Count);
+      Debug.Assert(numClassifications == ClassificationIDs.ToID.Count);
       mClassificationEnumToInstance = new IClassificationType[numClassifications];
-      foreach (var enumAndID in IDs.ToID) {
+      foreach (var enumAndID in ClassificationIDs.ToID) {
         IClassificationType classificationType = registry.GetClassificationType(enumAndID.Value);
         Debug.Assert(classificationType != null);
         mClassificationEnumToInstance[(uint)enumAndID.Key] = classificationType;

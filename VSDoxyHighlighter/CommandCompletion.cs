@@ -175,14 +175,15 @@ namespace VSDoxyHighlighter
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
 
         // TODO: Proper mapping from the command string to the classification. I.e. call FindClassificationEnumForFragment().
-        runs.Add(new ClassifiedTextRun(IDs.ToID[ClassificationEnum.Command1], "\\" + cmd.Command));
+        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Command1], "\\" + cmd.Command));
 
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
         if (cmd.Parameters == "") {
           runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
         }
         else {
-          runs.Add(new ClassifiedTextRun(IDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
+          // Using "Parameter2" since, by default, it is displayed non-bold, causing a nicer display.
+          runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
         }
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
@@ -191,7 +192,7 @@ namespace VSDoxyHighlighter
             runs.AddRange(ClassifiedTextElement.CreatePlainText(fragment.Item2).Runs);
           }
           else {
-            runs.Add(new ClassifiedTextRun(IDs.ToID[fragment.Item1.Value], fragment.Item2));
+            runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[fragment.Item1.Value], fragment.Item2));
           }
         }
 
