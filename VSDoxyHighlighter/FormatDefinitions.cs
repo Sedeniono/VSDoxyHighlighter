@@ -23,6 +23,11 @@ namespace VSDoxyHighlighter
 
   internal abstract class FormatDefinitionBase : ClassificationFormatDefinition, IFormatDefinition
   {
+    // In case a certain piece of text gets multiple classification format definitions, only one can
+    // win. This is defined by the "Order" attribute. We use "after highest" to override the Viasfora
+    // extension in comments.
+    internal const string cFormatPriority = DefaultOrderings.Highest;
+
     protected FormatDefinitionBase(DefaultColors defaultColors, string ID, string displayName) 
     {
       if (defaultColors == null) {
@@ -61,22 +66,49 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_command1)]
   [Name(IDs.ID_command1)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
-  internal sealed class CommandFormat : FormatDefinitionBase
+  [Order(After = FormatDefinitionBase.cFormatPriority)] 
+  internal sealed class Command1Format : FormatDefinitionBase
   {
     [ImportingConstructor]
-    public CommandFormat(DefaultColors defaultColors)
-      : base(defaultColors, IDs.ID_command1, "VSDoxyHighlighter - Command")
+    public Command1Format(DefaultColors defaultColors)
+      : base(defaultColors, IDs.ID_command1, "VSDoxyHighlighter - Command 1")
     {
     }
   }
 
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_command2)]
+  [Name(IDs.ID_command2)]
+  [UserVisible(true)]
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
+  internal sealed class Command2Format : FormatDefinitionBase
+  {
+    [ImportingConstructor]
+    public Command2Format(DefaultColors defaultColors)
+      : base(defaultColors, IDs.ID_command2, "VSDoxyHighlighter - Command 2")
+    {
+    }
+  }
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = IDs.ID_command3)]
+  [Name(IDs.ID_command3)]
+  [UserVisible(true)]
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
+  internal sealed class Command3Format : FormatDefinitionBase
+  {
+    [ImportingConstructor]
+    public Command3Format(DefaultColors defaultColors)
+      : base(defaultColors, IDs.ID_command3, "VSDoxyHighlighter - Command 3")
+    {
+    }
+  }
 
   [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = IDs.ID_warningKeyword)]
   [Name(IDs.ID_warningKeyword)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class WarningKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -91,7 +123,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_noteKeyword)]
   [Name(IDs.ID_noteKeyword)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class NoteKeywordFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -106,7 +138,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_exceptions)]
   [Name(IDs.ID_exceptions)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ExceptionFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -121,7 +153,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_parameter1)]
   [Name(IDs.ID_parameter1)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ParameterFormat1 : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -136,7 +168,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_parameter2)]
   [Name(IDs.ID_parameter2)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class ParameterFormat2 : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -151,7 +183,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMinor)]
   [Name(IDs.ID_emphasisMinor)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class EmphasisMinorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -166,7 +198,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_emphasisMajor)]
   [Name(IDs.ID_emphasisMajor)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class EmphasisMajorFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -181,7 +213,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_inlineCode)]
   [Name(IDs.ID_inlineCode)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class InlineCodeFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -196,7 +228,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_title)]
   [Name(IDs.ID_title)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class TitleFormat : FormatDefinitionBase
   {
     [ImportingConstructor]
@@ -211,7 +243,7 @@ namespace VSDoxyHighlighter
   [ClassificationType(ClassificationTypeNames = IDs.ID_strikethrough)]
   [Name(IDs.ID_strikethrough)]
   [UserVisible(true)]
-  [Order(After = DefaultOrderings.Highest)] // After highest required to override Viasfora in comments
+  [Order(After = FormatDefinitionBase.cFormatPriority)]
   internal sealed class StrikethroughFormat : FormatDefinitionBase
   {
     [ImportingConstructor]

@@ -154,6 +154,10 @@ namespace VSDoxyHighlighter
               switch (cmdType) {
                 case DoxygenCommandType.Command1:
                   return ClassificationEnum.Command1;
+                case DoxygenCommandType.Command2:
+                  return ClassificationEnum.Command2;
+                case DoxygenCommandType.Command3:
+                  return ClassificationEnum.Command3;
                 case DoxygenCommandType.Note:
                   return ClassificationEnum.Note;
                 case DoxygenCommandType.Warning:

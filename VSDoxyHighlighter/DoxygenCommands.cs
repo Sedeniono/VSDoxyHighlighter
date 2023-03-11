@@ -15,6 +15,8 @@ namespace VSDoxyHighlighter
   public enum DoxygenCommandType : uint
   {
     Command1 = 1,
+    Command2 = 2,
+    Command3 = 3,
     Note = 10,
     Warning = 20,
     Exceptions = 30,

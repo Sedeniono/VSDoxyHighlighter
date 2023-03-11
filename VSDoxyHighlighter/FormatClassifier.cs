@@ -18,10 +18,12 @@ namespace VSDoxyHighlighter
 {
   // Enumeration of all possible classifications. We could have also used the string IDs, but an enum is more convenient
   // (e.g. to find all occurrences).
-  // Order doesn't matter, but the numeric values are used as indices!
+  // Order doesn't matter, but the numeric values are used as indices! (But they aren't serialized anywhere.)
   public enum ClassificationEnum : uint
   {
     Command1,
+    Command2, // Not used by default, but the user can configure commands to use it.
+    Command3, // Not used by default, but the user can configure commands to use it.
     Note,
     Warning,
     Exceptions,
@@ -42,6 +44,8 @@ namespace VSDoxyHighlighter
   public static class IDs
   {
     public const string ID_command1 = "VSDoxyHighlighter_Command";
+    public const string ID_command2 = "VSDoxyHighlighter_Command2";
+    public const string ID_command3 = "VSDoxyHighlighter_Command3";
     public const string ID_parameter1 = "VSDoxyHighlighter_Parameter1";
     public const string ID_parameter2 = "VSDoxyHighlighter_Parameter2";
     public const string ID_title = "VSDoxyHighlighter_Title";
@@ -55,6 +59,8 @@ namespace VSDoxyHighlighter
 
     public static readonly Dictionary<ClassificationEnum, string> ToID = new Dictionary<ClassificationEnum, string>(){
         {ClassificationEnum.Command1, ID_command1},
+        {ClassificationEnum.Command2, ID_command2},
+        {ClassificationEnum.Command3, ID_command3},
         {ClassificationEnum.Parameter1, ID_parameter1},
         {ClassificationEnum.Parameter2, ID_parameter2},
         {ClassificationEnum.Title, ID_title},
@@ -82,6 +88,14 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_command1)]
     private static ClassificationTypeDefinition typeDefinitionForCommand;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_command2)]
+    private static ClassificationTypeDefinition typeDefinitionForCommand2;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(IDs.ID_command3)]
+    private static ClassificationTypeDefinition typeDefinitionForCommand3;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(IDs.ID_warningKeyword)]

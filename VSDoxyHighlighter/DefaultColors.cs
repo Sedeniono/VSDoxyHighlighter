@@ -209,6 +209,8 @@ namespace VSDoxyHighlighter
     // Default colors for light color themes.
     static readonly Dictionary<string, TextProperties> cLightColors = new Dictionary<string, TextProperties> {
       { IDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_command2,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_command3,       new TextProperties(foreground: Color.FromRgb(64, 128, 128), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: false, isItalic: false) },
       { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(0, 0, 0),       background: null, isBold: true,  isItalic: false) },
@@ -224,6 +226,8 @@ namespace VSDoxyHighlighter
     // Default colors for dark color themes.
     static readonly Dictionary<string, TextProperties> cDarkColors = new Dictionary<string, TextProperties> {
       { IDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_command2,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
+      { IDs.ID_command3,       new TextProperties(foreground: Color.FromRgb(205, 255, 206), background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: true,  isItalic: false) },
       { IDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: false, isItalic: false) },
       { IDs.ID_title,          new TextProperties(foreground: Color.FromRgb(206, 206, 206), background: null, isBold: true,  isItalic: false) },
