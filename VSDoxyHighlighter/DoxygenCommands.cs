@@ -42,6 +42,10 @@ namespace VSDoxyHighlighter
 
   public delegate string RegexCreatorDelegate(ICollection<string> keywords);
 
+
+  /// <summary>
+  /// Used to group all Doxygen commands that get parsed and classified the same.
+  /// </summary>
   public struct DoxygenCommandGroup
   {
     public List<string> Commands { get; private set; }
@@ -69,20 +73,115 @@ namespace VSDoxyHighlighter
 
 
 
-
-  public static class DoxygenCommands
+  /// <summary>
+  /// Represents the "database" of known Doxygen commands, i.e. commands that start with a "\" or "@".
+  /// The class itself contains the default settings for the commands as static members.
+  /// An instance represents the commands as configured by the user. Note that the only existing
+  /// instance should be the one that can be retrieved via `VSDoxyHighlighterPackage.DoxygenCommands`.
+  /// </summary>
+  public class DoxygenCommands : IDisposable
   {
+    public DoxygenCommands(IGeneralOptions options) 
+    {
+      mGeneralOptions = options; 
+      mGeneralOptions.SettingsChanged += OnSettingsChanged;
+
+      InitCommands();
+    }
+
+    /// <summary>
+    /// Event gets sent when the commands got updated because the user changed the settings.
+    /// </summary>
+    public event EventHandler CommandsGotUpdated;
+
     /// <summary>
     /// The default list of commands to use for the options dialog.
     /// </summary>
     public static readonly List<DoxygenCommandInConfig> DefaultDoxygenCommandsInConfig;
 
+    /// <summary>
+    /// Returns all commands, as configured by the user.
+    /// </summary>
+    public List<DoxygenCommandGroup> CommandGroups { get; private set; }
+
+    /// <summary>
+    /// Maps the given command (which must not start with the initial "\" or "@") to the command type,
+    /// as configured by the user.
+    /// </summary>
+    public DoxygenCommandType? FindTypeForCommand(string commandWithoutStart)
+    {
+      // We need to use a lock since we update the map below, and at least the code for the
+      // command autocomplete box calls it from worker threads, while e.g. the format classifier
+      // works on the main thread.
+      // TODO: Profile.
+      lock (mLockForMap) {
+        if (mCommandStringToTypeMap.TryGetValue(commandWithoutStart, out var commandType)) {
+          return commandType;
+        }
+
+        // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
+        // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
+        // And also cache the result for the future.
+        foreach (DoxygenCommandGroup group in CommandGroups) {
+          int commandIdx = group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd));
+          if (commandIdx >= 0) {
+            mCommandStringToTypeMap.Add(commandWithoutStart, group.DoxygenCommandType); // Cache the result
+            return group.DoxygenCommandType;
+          }
+        }
+
+        return null;
+      }
+    }
+
+
+    public void Dispose()
+    {
+      if (mDisposed) {
+        return;
+      }
+      mDisposed = true;
+
+      if (mGeneralOptions != null) {
+        mGeneralOptions.SettingsChanged -= OnSettingsChanged;
+      }
+    }
+
+
+    private void OnSettingsChanged(object sender, EventArgs e)
+    {
+      InitCommands();
+      CommandsGotUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    private void InitCommands()
+    {
+      CommandGroups = ApplyConfigList(mGeneralOptions.DoxygenCommandsConfig);
+
+      mCommandStringToTypeMap = new Dictionary<string, DoxygenCommandType>();
+      foreach (DoxygenCommandGroup group in CommandGroups) {
+        foreach (string cmd in group.Commands) {
+          mCommandStringToTypeMap.Add(cmd, group.DoxygenCommandType);
+        }
+      }
+    }
+
+
+    private bool mDisposed = false;
+    private readonly IGeneralOptions mGeneralOptions;
+    private Dictionary<string /*commandWithoutStart*/, DoxygenCommandType> mCommandStringToTypeMap;
+    private static readonly object mLockForMap = new object();
+
+  
+    //-----------------------------------------------------------------------------------
+    // Static helpers and members
 
     /// <summary>
     /// Given a collection of commands as configured by the user, returns a copy of the 
     /// default doxygen command groups modified according to the configuration.
     /// </summary>
-    public static List<DoxygenCommandGroup> ApplyConfigList(ICollection<DoxygenCommandInConfig> configList) 
+    private static List<DoxygenCommandGroup> ApplyConfigList(ICollection<DoxygenCommandInConfig> configList) 
     {
       var ungrouped = new List<DoxygenCommandGroup>();
       foreach (DoxygenCommandInConfig configElem in configList) {

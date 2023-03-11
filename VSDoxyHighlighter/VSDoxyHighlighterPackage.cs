@@ -45,7 +45,7 @@ namespace VSDoxyHighlighter
   [Guid(VSDoxyHighlighterPackage.PackageGuidString)]
   public sealed class VSDoxyHighlighterPackage : AsyncPackage
   {
-    public static GeneralOptionsPage GeneralOptions {
+    public static IGeneralOptions GeneralOptions {
       get {
         ThreadHelper.ThrowIfNotOnUIThread();
         if (mGeneralOptions == null) {
@@ -55,13 +55,28 @@ namespace VSDoxyHighlighter
       }
     }
 
+    public static DoxygenCommands DoxygenCommands {
+      get {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        if (mDoxygenCommands == null) {
+          LoadPackage();
+        }
+        return mDoxygenCommands;
+      }
+    }
 
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
       await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
       mGeneralOptions = (GeneralOptionsPage)GetDialogPage(typeof(GeneralOptionsPage));
+      mDoxygenCommands = new DoxygenCommands(mGeneralOptions);
     }
 
+    protected override void Dispose(bool disposing)
+    {
+      mDoxygenCommands.Dispose();
+      base.Dispose(disposing);
+    }
 
     // Loads our package, especially getting the options pages.
     private static void LoadPackage() 
@@ -89,5 +104,6 @@ namespace VSDoxyHighlighter
     private const string MainSettingsCategory = "VSDoxyHighlighter";
 
     private static GeneralOptionsPage mGeneralOptions;
+    private static DoxygenCommands mDoxygenCommands;
   }
 }

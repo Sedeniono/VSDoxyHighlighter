@@ -53,6 +53,22 @@ namespace VSDoxyHighlighter
   }
 
 
+  /// <summary>
+  /// Interface for the properties in the options dialog.
+  /// Used to separate the actual properties from the DialogPage, i.e. the Visual Studio GUI stuff.
+  /// </summary>
+  public interface IGeneralOptions
+  {
+    bool EnableHighlighting { get; }
+    bool EnableAutocomplete { get; }
+
+    List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
+
+    event EventHandler SettingsChanged;
+
+    bool IsEnabledInCommentType(CommentType type);
+  }
+
 
   /// <summary>
   /// Represents the "General" options in the tools -> options menu.
@@ -61,7 +77,7 @@ namespace VSDoxyHighlighter
   /// </summary>
   // The GUID appears as "Category" in the vssettings file.
   [Guid("c3a8c4bb-8e5a-49a9-b3c3-343ed507f0f9")]
-  public class GeneralOptionsPage : DialogPage
+  public class GeneralOptionsPage : DialogPage, IGeneralOptions
   {
     // The string that appears in the tools -> options dialog when expanding the main node
     // for the VSDoxyHighlighter entry.

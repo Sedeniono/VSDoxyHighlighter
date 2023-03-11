@@ -57,6 +57,7 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
+      mDoxygenCommands = VSDoxyHighlighterPackage.DoxygenCommands;
     }
 
     /// <summary>
@@ -176,7 +177,7 @@ namespace VSDoxyHighlighter
 
         //------ Add a line with the actual command.
         string cmdWithSlash = "\\" + cmd.Command;
-        ClassificationEnum commandClassification = GetClassificationForCommandOrDefault(session.TextView.TextBuffer, cmdWithSlash);
+        ClassificationEnum commandClassification = GetClassificationForCommandOrDefault(cmdWithSlash);
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
         runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
 
@@ -193,7 +194,7 @@ namespace VSDoxyHighlighter
 
         //------ Add the whole description.
         foreach (var descriptionFragment in cmd.Description) {
-          AddTextRunsForDescriptionFragment(session.TextView.TextBuffer, descriptionFragment, runs);
+          AddTextRunsForDescriptionFragment(descriptionFragment, runs);
         }
 
         return Task.FromResult<object>(new ClassifiedTextElement(runs));
@@ -225,9 +226,9 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ClassificationEnum GetClassificationForCommandOrDefault(ITextBuffer textBuffer, string cmdWithSlash)
+    private ClassificationEnum GetClassificationForCommandOrDefault(string cmdWithSlash)
     {
-      ClassificationEnum? correctClassification = GetClassificationForFragment(textBuffer, FragmentType.Command, cmdWithSlash);
+      ClassificationEnum? correctClassification = GetClassificationForFragment(FragmentType.Command, cmdWithSlash);
       if (correctClassification.HasValue) {
         return correctClassification.Value;
       }
@@ -237,20 +238,13 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ClassificationEnum? GetClassificationForFragment(ITextBuffer textBuffer, FragmentType fragmentType, string fragmentText)
+    private ClassificationEnum? GetClassificationForFragment(FragmentType fragmentType, string fragmentText)
     {
-      // Exploit the existing CommentClassifier associated with the text buffer to figure out how a
-      // command is supposed to get classified (it depends on the settings configured by the user!).
-      if (textBuffer.Properties.TryGetProperty(
-                typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
-        return commentClassifier.CommentParser.FindClassificationEnumForFragment(fragmentType, fragmentText);
-      }
-
-      return null;
+      return CommentParser.FindClassificationEnumForFragment(mDoxygenCommands, fragmentType, fragmentText);
     }
 
 
-    private void AddTextRunsForDescriptionFragment(ITextBuffer textBuffer, (object, string) descriptionFragment, List<ClassifiedTextRun> outputList)
+    private void AddTextRunsForDescriptionFragment((object, string) descriptionFragment, List<ClassifiedTextRun> outputList)
     {
       if (descriptionFragment.Item1 is ClassificationEnum classification) {
         // Use the given classification as-is.
@@ -260,7 +254,7 @@ namespace VSDoxyHighlighter
 
       if (descriptionFragment.Item1 is FragmentType fragmentType) {
         // Convert the fragment type to the classification by taking into account the user settings.
-        ClassificationEnum? itemClassification = GetClassificationForFragment(textBuffer, fragmentType, descriptionFragment.Item2);
+        ClassificationEnum? itemClassification = GetClassificationForFragment(fragmentType, descriptionFragment.Item2);
         if (itemClassification.HasValue) {
           outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[itemClassification.Value], descriptionFragment.Item2));
           return;
@@ -339,7 +333,8 @@ namespace VSDoxyHighlighter
 
     private static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
 
-    private readonly GeneralOptionsPage mGeneralOptions;
+    private readonly IGeneralOptions mGeneralOptions;
+    private readonly DoxygenCommands mDoxygenCommands;
   }
 
 

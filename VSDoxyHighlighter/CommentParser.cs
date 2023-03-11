@@ -78,18 +78,10 @@ namespace VSDoxyHighlighter
   /// </summary>
   public class CommentParser
   {
-    public CommentParser(List<DoxygenCommandGroup> doxygenCommands) 
+    public CommentParser(DoxygenCommands doxygenCommands) 
     {
-      mDoxygenCommandGroups = doxygenCommands;
-
-      mCommandStringToTypeMap = new Dictionary<string, DoxygenCommandType>();
-      foreach (DoxygenCommandGroup group in mDoxygenCommandGroups) {
-        foreach (string cmd in group.Commands) {
-          mCommandStringToTypeMap.Add(cmd, group.DoxygenCommandType);
-        }
-      }
-
-      mMatchers = BuildMatchers(doxygenCommands);
+      mDoxygenCommands = doxygenCommands;
+      mMatchers = BuildMatchers(mDoxygenCommands.CommandGroups);
     }
 
 
@@ -127,7 +119,7 @@ namespace VSDoxyHighlighter
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
                 FragmentType fragmentType = (FragmentType)matcher.types[idx];
                 string fragmentText = text.Substring(group.Index, group.Length);
-                ClassificationEnum? classification = FindClassificationEnumForFragment(fragmentType, fragmentText);
+                ClassificationEnum? classification = FindClassificationEnumForFragment(mDoxygenCommands, fragmentType, fragmentText);
                 if (classification != null) {
                   result.Add(new FormattedFragment(group.Index, group.Length, classification.Value));
                 }
@@ -147,15 +139,16 @@ namespace VSDoxyHighlighter
     /// </summary>
     /// <returns>The classification. Returns null in case the fragmentType is a Command and the fragmentText contains
     /// and unknown command.</returns>
-    public ClassificationEnum? FindClassificationEnumForFragment(FragmentType fragmentType, string fragmentText)
+    public static ClassificationEnum? FindClassificationEnumForFragment(DoxygenCommands doxygenCommands, FragmentType fragmentType, string fragmentText)
     {
       switch (fragmentType) {
         case FragmentType.Command:
           if (fragmentText.Length > 0) {
             // Strip the initial "\" or "@".
+            Debug.Assert(fragmentText.StartsWith("\\") || fragmentText.StartsWith("@"));
             string commandWithoutStart = fragmentText.Substring(1);
 
-            DoxygenCommandType? cmdType = FindTypeForCommand(commandWithoutStart);
+            DoxygenCommandType? cmdType = doxygenCommands.FindTypeForCommand(commandWithoutStart);
 
             if (cmdType.HasValue) {
               switch (cmdType.Value) {
@@ -195,27 +188,6 @@ namespace VSDoxyHighlighter
         default:
           throw new Exception($"Unknown fragment type: {fragmentType}");
       }
-    }
-
-
-    private DoxygenCommandType? FindTypeForCommand(string commandWithoutStart)
-    {
-      if (mCommandStringToTypeMap.TryGetValue(commandWithoutStart, out var commandType)) { 
-        return commandType;
-      }
-
-      // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
-      // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-      // And also cache the result for the future.
-      foreach (DoxygenCommandGroup group in mDoxygenCommandGroups) {
-        int commandIdx = group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd));
-        if (commandIdx >= 0) {
-          mCommandStringToTypeMap.Add(commandWithoutStart, group.DoxygenCommandType); // Cache the result
-          return group.DoxygenCommandType;
-        }
-      }
-
-      return null;
     }
 
 
@@ -579,8 +551,7 @@ namespace VSDoxyHighlighter
       public System.Runtime.CompilerServices.ITuple types { get; set; }
     };
 
-    private readonly List<DoxygenCommandGroup> mDoxygenCommandGroups;
-    private Dictionary<string /*commandWithoutStart*/, DoxygenCommandType> mCommandStringToTypeMap;
+    private readonly DoxygenCommands mDoxygenCommands;
 
     private readonly List<FragmentMatcher> mMatchers;
 

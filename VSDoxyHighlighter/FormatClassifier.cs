@@ -192,13 +192,15 @@ namespace VSDoxyHighlighter
 
       ThreadHelper.ThrowIfNotOnUIThread();
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
-      mGeneralOptions.SettingsChanged += OnSettingsChanged;
+      mGeneralOptions.SettingsChanged += OnSettingsOrCommandsChanged;
+
+      mDoxygenCommands = VSDoxyHighlighterPackage.DoxygenCommands;
+      mDoxygenCommands.CommandsGotUpdated += OnSettingsOrCommandsChanged;
 
       InitCommentParser();
     }
 
 
-#pragma warning disable 67
     // We can call this event ourselves to tell Visual Studio that a certain span should be re-classified.
     // E.g. if we figured out that somewhere the opening of a comment is inserted by the user, and thus
     // all the following lines need to be re-classified.
@@ -207,7 +209,6 @@ namespace VSDoxyHighlighter
     // to re-classify everything to apply the proper comment color. This will also cause our
     // GetClassificationSpans() to be called again.
     public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
-#pragma warning restore 67
 
 
     /// <summary>
@@ -303,7 +304,10 @@ namespace VSDoxyHighlighter
       mDisposed = true;
 
       if (mGeneralOptions != null) {
-        mGeneralOptions.SettingsChanged -= OnSettingsChanged;
+        mGeneralOptions.SettingsChanged -= OnSettingsOrCommandsChanged;
+      }
+      if (mDoxygenCommands != null) {
+        mDoxygenCommands.CommandsGotUpdated -= OnSettingsOrCommandsChanged;
       }
       if (mVSCppColorer != null) {
         mVSCppColorer.CppColorerReclassifiedSpan -= OnVSCppColorerReclassifiedSpan;
@@ -314,11 +318,15 @@ namespace VSDoxyHighlighter
 
     public SpanSplitter SpanSplitter { get { return mSpanSplitter; } }
 
-    public CommentParser CommentParser { get { return mParser; } }
 
-
-    // When this function is called, the user clicked on "OK" in the options.
-    private void OnSettingsChanged(object sender, EventArgs e)
+    // When this function is called, the user clicked on "OK" in the options, or the list of Doxygen commands changed.
+    // We need to re-initialize most things.
+    // Note that with the current implementation, this is fired twice whenever the user clicked "OK" in the options:
+    // Once for our own subscription for the options, and once because the 'commands changed' event is also fired
+    // every time the user clicked "OK" in the options. In principle, the first call is of course unnecessary. However,
+    // we would need to ensure that we are notified after the Doxygen commands got updated. But since this hinges on
+    // the same event, getting the order right is fragile. Thus, for now we simply update twice.
+    private void OnSettingsOrCommandsChanged(object sender, EventArgs e)
     {
       InitCommentParser();
       InvalidateCache();
@@ -353,8 +361,7 @@ namespace VSDoxyHighlighter
 
     private void InitCommentParser()
     {
-      var commandGroups = DoxygenCommands.ApplyConfigList(mGeneralOptions.DoxygenCommandsConfig);
-      mParser = new CommentParser(commandGroups);
+      mParser = new CommentParser(mDoxygenCommands);
     }
 
 
@@ -362,7 +369,8 @@ namespace VSDoxyHighlighter
     private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
     private readonly IClassificationType[] mClassificationEnumToInstance;
-    private readonly GeneralOptionsPage mGeneralOptions;
+    private readonly IGeneralOptions mGeneralOptions;
+    private readonly DoxygenCommands mDoxygenCommands;
 
     private CommentParser mParser;
 

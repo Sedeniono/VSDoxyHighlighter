@@ -64,9 +64,28 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
+    private class IGeneralOptionsFake : IGeneralOptions
+    {
+      public bool EnableHighlighting { get; } = true;
+      public bool EnableAutocomplete { get; } = true;
+
+      public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
+
+      public bool IsEnabledInCommentType(CommentType type) { return true; }
+
+#pragma warning disable 67
+      public event EventHandler SettingsChanged;
+#pragma warning restore 67
+
+      public IGeneralOptionsFake()
+      {
+        DoxygenCommandsConfig = DoxygenCommands.DefaultDoxygenCommandsInConfig;
+      }
+    }
+
     public static CommentParser CreateDefaultCommentParser() 
     {
-      return new CommentParser(DoxygenCommands.ApplyConfigList(DoxygenCommands.DefaultDoxygenCommandsInConfig));
+      return new CommentParser(new DoxygenCommands(new IGeneralOptionsFake()));
     }
   }
 
