@@ -165,7 +165,7 @@ namespace VSDoxyHighlighter
                 case DoxygenCommandType.Exceptions:
                   return ClassificationEnum.Exceptions;
                 default:
-                  throw new Exception($"Unknown DoxygenCommandType: {cmdType}");
+                  throw new VSDoxyHighlighterException($"Unknown DoxygenCommandType: {cmdType}");
               }
             }
           }
@@ -186,7 +186,7 @@ namespace VSDoxyHighlighter
         case FragmentType.InlineCode:
           return ClassificationEnum.InlineCode;
         default:
-          throw new Exception($"Unknown fragment type: {fragmentType}");
+          throw new VSDoxyHighlighterException($"Unknown fragment type: {fragmentType}");
       }
     }
 

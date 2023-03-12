@@ -84,7 +84,7 @@ namespace VSDoxyHighlighter
       ThreadHelper.ThrowIfNotOnUIThread();
 
       if (mInLoadPackage) {
-        throw new Exception("VSDoxyHighlighter: Recursive LoadPackage() detected.");
+        throw new VSDoxyHighlighterException("VSDoxyHighlighter: Recursive LoadPackage() detected.");
       }
       mInLoadPackage = true;
 
@@ -92,13 +92,13 @@ namespace VSDoxyHighlighter
         var vsShell = (IVsShell)ServiceProvider.GlobalProvider.GetService(typeof(IVsShell));
         if (vsShell == null) {
           ActivityLog.LogError("VSDoxyHighlighter", "Failed to get IVsShell service.");
-          throw new Exception("VSDoxyHighlighter: Failed to get IVsShell service.");
+          throw new VSDoxyHighlighterException("VSDoxyHighlighter: Failed to get IVsShell service.");
         }
 
         var errorCode = vsShell.LoadPackage(ref PackageGuid, out IVsPackage loadedPackage);
         if (errorCode != Microsoft.VisualStudio.VSConstants.S_OK) {
           ActivityLog.LogError("VSDoxyHighlighter", $"Failed to load own package. Error code: {errorCode}");
-          throw new Exception($"VSDoxyHighlighter: Failed to load own package. Error code: {errorCode}");
+          throw new VSDoxyHighlighterException($"VSDoxyHighlighter: Failed to load own package. Error code: {errorCode}");
         }
       }
       finally { 

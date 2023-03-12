@@ -92,7 +92,7 @@ namespace VSDoxyHighlighter
         case Theme.Dark:
           return cDarkColors;
         default:
-          throw new System.Exception("Unknown Theme");
+          throw new VSDoxyHighlighterException("Unknown Theme");
       }
     }
 
@@ -126,7 +126,7 @@ namespace VSDoxyHighlighter
       fontAndColorCacheManager.CheckCache(ref mFontAndColorCategoryGUID, out int _);
 
       if (fontAndColorStorage.OpenCategory(ref mFontAndColorCategoryGUID, (uint)__FCSTORAGEFLAGS.FCSF_READONLY) != VSConstants.S_OK) {
-        throw new System.Exception("Failed to open font and color registry.");
+        throw new VSDoxyHighlighterException("Failed to open font and color registry.");
       }
 
       IClassificationFormatMap formatMap = mClassificationFormatMapService.GetClassificationFormatMap(category: "text");
@@ -183,7 +183,7 @@ namespace VSDoxyHighlighter
         fontAndColorStorage.CloseCategory();
 
         if (fontAndColorCacheManager.ClearCache(ref mFontAndColorCategoryGUID) != VSConstants.S_OK) {
-          throw new System.Exception("Failed to clear cache of FontAndColorCacheManager.");
+          throw new VSDoxyHighlighterException("Failed to clear cache of FontAndColorCacheManager.");
         }
       }
     }

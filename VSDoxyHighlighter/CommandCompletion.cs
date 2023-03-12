@@ -320,7 +320,7 @@ namespace VSDoxyHighlighter
     {
       int idx = cAmendedDoxygenCommands.FindIndex(x => x.Command == originalCommand);
       if (idx < 0) {
-        throw new System.ArgumentException($"Command '{originalCommand}' not found in list of Doxygen commands.");
+        throw new VSDoxyHighlighterException($"Command '{originalCommand}' not found in list of Doxygen commands.");
       }
       DoxygenHelpPageCommand original = cAmendedDoxygenCommands[idx];
       commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Description));

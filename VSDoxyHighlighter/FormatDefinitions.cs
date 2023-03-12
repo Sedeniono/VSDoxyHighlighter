@@ -31,7 +31,7 @@ namespace VSDoxyHighlighter
     protected FormatDefinitionBase(DefaultColors defaultColors, string ID, string displayName) 
     {
       if (defaultColors == null) {
-        throw new System.ArgumentNullException("VSDoxyHighlighter: The 'DefaultColors' to a FormatDefinition is null");
+        throw new VSDoxyHighlighterException("VSDoxyHighlighter: The 'DefaultColors' to a FormatDefinition is null");
       }
 
       mID = ID;

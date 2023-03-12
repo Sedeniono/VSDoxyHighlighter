@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="SpanSplitter.cs" />
     <Compile Include="VisualStudioCppColorer.cs" />
+    <Compile Include="VSDoxyHighlighterException.cs" />
     <Compile Include="VSDoxyHighlighterPackage.cs" />
   </ItemGroup>
   <ItemGroup>
