@@ -13,18 +13,22 @@ using System.Windows.Forms;
 
 namespace VSDoxyHighlighter
 {
+  //==========================================================================================
+  // DoxygenCommandInConfig
+  //==========================================================================================
+
   /// <summary>
   /// Represents a single Doxygen command that can be configured by the user.
   /// Note that its members are serialized to and from a string!
   /// </summary>
-  [DataContract]
+  [DataContract] // Enables serialization via SerializationViaStringConverter
   public class DoxygenCommandInConfig
   {
     [Category("Command")]
     [DisplayName("Command")]
     [Description("The Doxygen command that gets configured.")]
     [ReadOnly(true)]
-    [DataMember(Name = "Cmd", Order = 0)]
+    [DataMember(Name = "Cmd", Order = 0)] // Enables serialization via SerializationViaStringConverter
     public string Command { get; set; } = "NEW_COMMAND";
 
     private const string PropertiesCategory = "Properties";
@@ -32,7 +36,7 @@ namespace VSDoxyHighlighter
     [Category(PropertiesCategory)]
     [DisplayName("Classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
-    [DataMember(Name = "Clsif", Order = 1)]
+    [DataMember(Name = "Clsif", Order = 1)] // Enables serialization via SerializationViaStringConverter
     public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
 
     //[Category(PropertiesCategory)]
@@ -53,6 +57,11 @@ namespace VSDoxyHighlighter
   }
 
 
+
+  //==========================================================================================
+  // IGeneralOptions
+  //==========================================================================================
+
   /// <summary>
   /// Interface for the properties in the options dialog.
   /// Used to separate the actual properties from the DialogPage, i.e. the Visual Studio GUI stuff.
@@ -70,13 +79,17 @@ namespace VSDoxyHighlighter
   }
 
 
+
+  //==========================================================================================
+  // GeneralOptionsPage
+  //==========================================================================================
+
   /// <summary>
   /// Represents the "General" options in the tools -> options menu.
   /// I.e. contains the settings of the extension that can be configured by the user, besides
   /// the classifier ones that Visual Studio automatically puts into the fonts & colors category.
   /// </summary>
-  // The GUID appears as "Category" in the vssettings file.
-  [Guid("c3a8c4bb-8e5a-49a9-b3c3-343ed507f0f9")]
+  [Guid("c3a8c4bb-8e5a-49a9-b3c3-343ed507f0f9")] // The GUID appears as "Category" in the vssettings file.
   public class GeneralOptionsPage : DialogPage, IGeneralOptions
   {
     // The string that appears in the tools -> options dialog when expanding the main node
@@ -126,7 +139,9 @@ namespace VSDoxyHighlighter
 
     //----------------
     // Flags to enable/disable the main features of the extension
-    public const string FeaturesSubCategory = "Features";
+
+    // "\t" does not get printed, and is a hack to get the category to appear first in the property grid.
+    public const string FeaturesSubCategory = "\tFeatures";
 
     [Category(FeaturesSubCategory)]
     [DisplayName("Enable highlighting")]
@@ -144,7 +159,9 @@ namespace VSDoxyHighlighter
 
     //----------------
     // Comment types
-    public const string CommentTypesSubCategory = "Types of comments with highlighting and autocomplete";
+
+    // "\t" does not get printed, and is a hack to get the category to appear second in the property grid.
+    public const string CommentTypesSubCategory = "\tTypes of comments with highlighting and autocomplete";
 
     [Category(CommentTypesSubCategory)]
     [DisplayName("Enable in \"//\"")]
