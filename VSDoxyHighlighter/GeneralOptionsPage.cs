@@ -1,10 +1,14 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -21,14 +25,14 @@ namespace VSDoxyHighlighter
   /// Represents a single Doxygen command that can be configured by the user.
   /// Note that its members are serialized to and from a string!
   /// </summary>
-  [DataContract] // Enables serialization via SerializationViaStringConverter
+  [DataContract] // Enables serialization via DoxygenCommandInConfigListSerialization
   public class DoxygenCommandInConfig
   {
     [Category("Command")]
     [DisplayName("Command")]
     [Description("The Doxygen command that gets configured.")]
     [ReadOnly(true)]
-    [DataMember(Name = "Cmd", Order = 0)] // Enables serialization via SerializationViaStringConverter
+    [DataMember(Name = "Cmd", Order = 0)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public string Command { get; set; } = "NEW_COMMAND";
 
     private const string PropertiesCategory = "Properties";
@@ -36,7 +40,7 @@ namespace VSDoxyHighlighter
     [Category(PropertiesCategory)]
     [DisplayName("Classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
-    [DataMember(Name = "Clsif", Order = 1)] // Enables serialization via SerializationViaStringConverter
+    [DataMember(Name = "Clsif", Order = 1)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
 
     //[Category(PropertiesCategory)]
@@ -171,7 +175,7 @@ namespace VSDoxyHighlighter
     [Category(CommentTypesSubCategory)]
     [DisplayName("Enable in \"///\"")]
     [Description("Enables the extension in comments starting with \"///\". Note that Visual Studio classifies these "
-      + "as \"XML Doc comment\" and might use a different default text color or apply additional highlighting. See the "
+      + "as \"XML Doc comment\" and might use a different default textSpan color or apply additional highlighting. See the "
       + "\"XML Doc comment\" entries in the \"Fonts and Colors\" settings.")]
     public bool EnableInTripleSlash { get; set; } = true;
 
@@ -205,7 +209,8 @@ namespace VSDoxyHighlighter
     [DisplayName("Individual Doxygen commands (use the \"...\" button!)")]
     [Description("Allows some configuration of individual Doxygen commands. Please do not edit the string in the grid directly. "
        + "Instead, use the \"...\" button on the right of the row.")]
-    [TypeConverter(typeof(SerializationViaStringConverter))]
+    // VS cannot serialize the list by itself, need to do it manually. Otherwise, the settings would not get saved.
+    [TypeConverter(typeof(DoxygenCommandInConfigListSerialization))]
     [Editor(typeof(DoxygenCommandCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
     public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; set; } = DoxygenCommands.DefaultDoxygenCommandsInConfig;
 
@@ -214,49 +219,12 @@ namespace VSDoxyHighlighter
     // Helpers
 
     /// <summary>
-    ///  Serializes some type T to and from a string, such that Visual Studio's saving facilities can save and load the data.
+    /// Visual Studio does not support the conversion of lists to and from strings. We need to do it manually.
+    /// This class handles the issue for "List<DoxygenCommandInConfig>". As format we use JSON, which is
+    /// humanly readable and does not need much escaping when written to XML (the string gets written to
+    /// the vssettings file by VS as string, and the vssettings file is XML).
     /// </summary>
-    //public class SerializationViaStringConverter<T> : TypeConverter where T : class
-    //{
-    //  public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-    //  {
-    //    return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
-    //  }
-
-    //  public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-    //  {
-    //    return destinationType == typeof(T) || base.CanConvertTo(context, destinationType);
-    //  }
-
-    //  public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-    //  {
-    //    if (value is string valueAsString) {
-    //      using (var stringReader = new System.IO.StringReader(valueAsString)) {
-    //        var serializer = new XmlSerializer(typeof(T));
-    //        return serializer.Deserialize(stringReader) as T;
-    //      }
-    //    }
-    //    else {
-    //      return base.ConvertFrom(context, culture, value);
-    //    }
-    //  }
-
-    //  public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-    //  {
-    //    if (destinationType == typeof(string) && value is T valueAsT) {
-    //      using (var stringWriter = new System.IO.StringWriter()) {
-    //        var serializer = new XmlSerializer(valueAsT.GetType());
-    //        serializer.Serialize(stringWriter, valueAsT);
-    //        return stringWriter.ToString();
-    //      }
-    //    }
-    //    else {
-    //      return base.ConvertTo(context, culture, value, destinationType);
-    //    }
-    //  }
-    //}
-
-    public class SerializationViaStringConverter : TypeConverter
+    public class DoxygenCommandInConfigListSerialization : TypeConverter
     {
       public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
       {
@@ -273,6 +241,8 @@ namespace VSDoxyHighlighter
       /// </summary>
       public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
       {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
         if (value is string valueAsString) {
           using (var memStream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(valueAsString))) {
             try {
@@ -280,8 +250,11 @@ namespace VSDoxyHighlighter
               return (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
             }
             catch (Exception ex) {
-              ActivityLog.LogWarning("VSDoxyHighlighter", $"Conversion from a string failed. Exception message: {ex.ToString()}");
-              // TODO: Is restoring the defaults really a good idea? Can we maybe display a message box and ask the user?
+              // The serialization can fail if we made some non-backward compatible changes. Or if the user somehow
+              // corrupted the JSON string. Or if there is some other bug involved.
+              // What should we do in this case? For now, we tell the user about it and restore the default values
+              // after creating a backup.
+              HandleConversionFromStringError(valueAsString, ex);
               return DoxygenCommands.DefaultDoxygenCommandsInConfig;
             }
           }
@@ -290,6 +263,7 @@ namespace VSDoxyHighlighter
           return base.ConvertFrom(context, culture, value);
         }
       }
+
 
       /// <summary>
       /// Conversion **to** string.
@@ -307,7 +281,48 @@ namespace VSDoxyHighlighter
           return base.ConvertTo(context, culture, value, destinationType);
         }
       }
+
+
+      private static void HandleConversionFromStringError(string valueAsString, Exception ex)
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
+        string backupFilename = Path.GetTempPath() + "VSDoxyHighligher_Commands_" + Guid.NewGuid().ToString() + ".json";
+        try {
+          using (StreamWriter backupWriter = new StreamWriter(backupFilename)) {
+            backupWriter.WriteLine(valueAsString);
+          }
+        }
+        catch (Exception fileEx) {
+          ActivityLog.LogError(
+            "VSDoxyHighlighter",
+            $"Failed to write JSON backup file to '{backupFilename}' during handling of serialization exception. File writing exception: {fileEx}");
+          backupFilename = "Failed to write backup file";
+        }
+
+        ActivityLog.LogError(
+          "VSDoxyHighlighter",
+          "Conversion to 'List<DoxygenCommandInConfig>' from string failed. Restoring default configuration for commands."
+            + $" Original string was written to file '{backupFilename}'."
+            + $"\nException message: {ex}\nString: {valueAsString}");
+
+        InfoBar.ShowMessage(
+          icon: KnownMonikers.StatusError,
+          message: "VSDoxyHighlighter: Failed to parse Doxygen commands configuration from string. Backed up configuration and restored default.",
+          actions: new (string, Action)[] {
+                  ("Show details",
+                    () => MessageBox.Show(
+                      "VSDoxyHighlighter extension: Failed to convert the configuration of the Doxygen commands (which is stored as a JSON string) to an actual 'List<DoxygenCommandInConfig>'. "
+                      + "Corrupt settings or maybe a bug in the extension?\n"
+                      + "Default configuration of commands got restored.\n"
+                      + $"Original JSON string written to: {backupFilename}.\n\n"
+                      + $"Exception message from the conversion: {ex}\n\n"
+                      + $"JSON string that failed to get parse:\n{valueAsString}",
+                      "VSDoxyHighlighter error", MessageBoxButtons.OK, MessageBoxIcon.Error))}
+        );
+      }
     }
+
 
     /// <summary>
     /// CollectionEditor that is used for the configuration of individual Doxygen commands.
@@ -334,6 +349,5 @@ namespace VSDoxyHighlighter
         return form;
       }
     }
-
   }
 }
