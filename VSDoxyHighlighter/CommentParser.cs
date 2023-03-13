@@ -144,8 +144,11 @@ namespace VSDoxyHighlighter
       switch (fragmentType) {
         case FragmentType.Command:
           if (fragmentText.Length > 0) {
+            if (!fragmentText.StartsWith("\\") && !fragmentText.StartsWith("@")) {
+              return null;
+            }
+
             // Strip the initial "\" or "@".
-            Debug.Assert(fragmentText.StartsWith("\\") || fragmentText.StartsWith("@"));
             string commandWithoutStart = fragmentText.Substring(1);
 
             DoxygenCommandType? cmdType = doxygenCommands.FindTypeForCommand(commandWithoutStart);
@@ -164,8 +167,6 @@ namespace VSDoxyHighlighter
                   return ClassificationEnum.Warning;
                 case DoxygenCommandType.Exceptions:
                   return ClassificationEnum.Exceptions;
-                default:
-                  throw new VSDoxyHighlighterException($"Unknown DoxygenCommandType: {cmdType}");
               }
             }
           }
@@ -185,9 +186,9 @@ namespace VSDoxyHighlighter
           return ClassificationEnum.Strikethrough;
         case FragmentType.InlineCode:
           return ClassificationEnum.InlineCode;
-        default:
-          throw new VSDoxyHighlighterException($"Unknown fragment type: {fragmentType}");
       }
+
+      return null; // Can happen if something in the configuration went wrong.
     }
 
 
@@ -203,7 +204,7 @@ namespace VSDoxyHighlighter
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.InlineCode)
+        types = new FragmentType[] { FragmentType.InlineCode }
       });
 
       // Add all Doxygen commands
@@ -241,35 +242,35 @@ namespace VSDoxyHighlighter
         //                        1           2a     2b               2c                   2d               2e            3
         //                __________________  __ ____________ _________________ __________________________ __ ____________________________
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.EmphasisMinor)
+        types = new FragmentType[] { FragmentType.EmphasisMinor }
       });
 
       // **bold**
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.EmphasisMajor)
+        types = new FragmentType[] { FragmentType.EmphasisMajor }
       });
 
       // _italic_
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.EmphasisMinor)
+        types = new FragmentType[] { FragmentType.EmphasisMinor }
       });
 
       // __bold__
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.EmphasisMajor)
+        types = new FragmentType[] { FragmentType.EmphasisMajor }
       });
 
       // ~~strikethrough~~
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = Tuple.Create(FragmentType.Strikethrough)
+        types = new FragmentType[] { FragmentType.Strikethrough }
       });
 
 
@@ -548,7 +549,7 @@ namespace VSDoxyHighlighter
       public Regex re { get; set; }
 
       // One FormatType for each capturing group in the regex.
-      public System.Runtime.CompilerServices.ITuple types { get; set; }
+      public FragmentType[] types { get; set; }
     };
 
     private readonly DoxygenCommands mDoxygenCommands;

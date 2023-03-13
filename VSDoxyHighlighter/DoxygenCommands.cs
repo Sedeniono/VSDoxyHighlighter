@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TextTemplating;
+﻿using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.TextTemplating;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,15 +12,15 @@ namespace VSDoxyHighlighter
 {
   // Types of Doxygen commands that start with "\" or "@". This is used to map different commands to different classifications (i.e. colors).
   // The parameters to the Doxygen commands are not affected by this.
-  // Appears in the options dialog. The numerical values get serialized.
+  // Note: Appears in the options dialog. Also, the numerical values get serialized.
   public enum DoxygenCommandType : uint
   {
     Command1 = 1,
-    Command2 = 2,
-    Command3 = 3,
-    Note = 10,
-    Warning = 20,
-    Exceptions = 30,
+    Command2 = 20,
+    Command3 = 30,
+    Note = 100,
+    Warning = 200,
+    Exceptions = 300,
   }
 
 
@@ -56,13 +57,13 @@ namespace VSDoxyHighlighter
     // For example, "\ref the_reference" contains of two fragments ("\ref" and "the_reference"). These two
     // distinct fragments are parsed by the regex. Their corresponding types are listed here.
     // So this must contain from FragmentType for every group in the regex.
-    public ITuple FragmentTypes { get; private set; }
+    public FragmentType[] FragmentTypes { get; private set; }
 
     public DoxygenCommandGroup(
         List<string> cmds,
         DoxygenCommandType doxygenCommandType,
         RegexCreatorDelegate regexCreator,
-        ITuple fragmentTypes)
+        FragmentType[] fragmentTypes)
     {
       Commands = cmds;
       DoxygenCommandType = doxygenCommandType;
@@ -193,8 +194,15 @@ namespace VSDoxyHighlighter
           Debug.Assert(ungrouped.FindIndex(group => group.Commands.Contains(configElem.Command)) < 0);
 
           DoxygenCommandGroup origGroup = mDefaultDoxygenCommands[groupIndex];
+
+          FragmentType[] fragmentTypes = new FragmentType[configElem.Parameters.Length + 1];
+          fragmentTypes[0] = FragmentType.Command;
+          for (int idx = 0; idx < configElem.Parameters.Length; ++idx) { 
+            fragmentTypes[idx + 1] = ParameterTypeToFragmentType(configElem.Parameters[idx]);
+          }
+
           ungrouped.Add(new DoxygenCommandGroup(
-            new List<string>() { configElem.Command }, configElem.Classification, origGroup.RegexCreator, origGroup.FragmentTypes));
+            new List<string>() { configElem.Command }, configElem.Classification, origGroup.RegexCreator, fragmentTypes));
         }
       }
 
@@ -220,7 +228,7 @@ namespace VSDoxyHighlighter
     /// </summary>
     private static List<DoxygenCommandGroup> FromUngroupedList(ICollection<DoxygenCommandGroup> ungrouped)
     {
-      var merged = new Dictionary<(DoxygenCommandType, RegexCreatorDelegate, ITuple), List<string>>();
+      var merged = new Dictionary<(DoxygenCommandType, RegexCreatorDelegate, FragmentType[]), List<string>>();
       foreach (DoxygenCommandGroup group in ungrouped) {
         var arg = (group.DoxygenCommandType, group.RegexCreator, group.FragmentTypes);
         if (!merged.ContainsKey(arg)) {
@@ -247,7 +255,7 @@ namespace VSDoxyHighlighter
       // So we sort the result with some arbitrary criterion. Using the negative Count to get the common
       // "\brief" command early one, which is convenient for debugging.
       var sortedResult = resultGroups.OrderBy(
-          group => (group.FragmentTypes.Length, -group.Commands.Count, group.FragmentTypes, group.Commands[0])
+          group => (group.FragmentTypes.Length, -group.Commands.Count, group.Commands[0])
         ).ToList();
 
       return sortedResult;
@@ -263,7 +271,9 @@ namespace VSDoxyHighlighter
         foreach (string cmd in cmdGroup.Commands) {
           var newConfig = new DoxygenCommandInConfig() {
             Command = cmd,
-            Classification = cmdGroup.DoxygenCommandType
+            Classification = cmdGroup.DoxygenCommandType,
+            // Skip the first fragment since the user is not supposed to change the fragment type of the command itself.
+            Parameters = cmdGroup.FragmentTypes.Skip(1).Select(t => FragmentTypeToParameterType(t)).ToArray()
           };
           result.Add(newConfig);
         }
@@ -291,6 +301,56 @@ namespace VSDoxyHighlighter
     }
 
 
+    private static ParameterTypeInConfig FragmentTypeToParameterType(FragmentType type) 
+    {
+      switch (type) {
+        case FragmentType.Parameter1: 
+          return ParameterTypeInConfig.Parameter1;
+        case FragmentType.Parameter2: 
+          return ParameterTypeInConfig.Parameter2;
+        case FragmentType.Title: 
+          return ParameterTypeInConfig.Title;
+        case FragmentType.EmphasisMinor: 
+          return ParameterTypeInConfig.EmphasisMinor;
+        case FragmentType.EmphasisMajor: 
+          return ParameterTypeInConfig.EmphasisMajor;
+        case FragmentType.Strikethrough: 
+          return ParameterTypeInConfig.Strikethrough;
+        case FragmentType.InlineCode: 
+          return ParameterTypeInConfig.InlineCode;
+
+        // Especially: FragmentType.Command cannot be converted.
+        default:
+          Debug.Assert(false);
+          throw new VSDoxyHighlighterException($"Attempted to convert FragmentType '{type}' to ParameterTypeInConfig, which is not possible.");
+      }
+    }
+
+
+    private static FragmentType ParameterTypeToFragmentType(ParameterTypeInConfig type)
+    {
+      switch (type) {
+        case ParameterTypeInConfig.Parameter1:
+          return FragmentType.Parameter1;
+        case ParameterTypeInConfig.Parameter2:
+          return FragmentType.Parameter2;
+        case ParameterTypeInConfig.Title:
+          return FragmentType.Title;
+        case ParameterTypeInConfig.EmphasisMinor:
+          return FragmentType.EmphasisMinor;
+        case ParameterTypeInConfig.EmphasisMajor:
+          return FragmentType.EmphasisMajor;
+        case ParameterTypeInConfig.Strikethrough:
+          return FragmentType.Strikethrough;
+        case ParameterTypeInConfig.InlineCode:
+          return FragmentType.InlineCode;
+        default:
+          Debug.Assert(false);
+          throw new VSDoxyHighlighterException($"Unknown ParameterTypeInConfig '{type}'.");
+      }
+    }
+
+
     static DoxygenCommands()
     {
       mDefaultDoxygenCommands = new DoxygenCommandGroup[] {
@@ -314,7 +374,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -323,7 +383,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_CodeCommand,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -336,7 +396,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -347,7 +407,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -356,7 +416,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_FormulaEnvironmentStart,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -365,7 +425,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_Language,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -374,7 +434,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Warning,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -383,7 +443,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Note,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          Tuple.Create(FragmentType.Command)
+          new FragmentType[] { FragmentType.Command }
         ),
 
 
@@ -398,7 +458,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
-          (FragmentType.Command, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -407,7 +467,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Exceptions,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
-          (FragmentType.Command, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -423,7 +483,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          (FragmentType.Command, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -432,7 +492,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          (FragmentType.Command, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -441,7 +501,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          (FragmentType.Command, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -450,7 +510,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          (FragmentType.Command, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -462,7 +522,7 @@ namespace VSDoxyHighlighter
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          (FragmentType.Command, FragmentType.Parameter2)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter2 }
         ),
 
         new DoxygenCommandGroup(
@@ -471,7 +531,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          (FragmentType.Command, FragmentType.EmphasisMinor)
+          new FragmentType[] { FragmentType.Command, FragmentType.EmphasisMinor }
         ),
 
         new DoxygenCommandGroup(
@@ -480,7 +540,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          (FragmentType.Command, FragmentType.EmphasisMajor)
+          new FragmentType[] { FragmentType.Command, FragmentType.EmphasisMajor }
         ),
 
         new DoxygenCommandGroup(
@@ -489,7 +549,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
-          (FragmentType.Command, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
         ),
 
 
@@ -503,7 +563,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
-          (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -512,7 +572,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
-          (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -523,7 +583,7 @@ namespace VSDoxyHighlighter
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          (FragmentType.Command, FragmentType.Parameter2, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter2, FragmentType.Title }
         ),
 
         //----- With up to three parameters -------
@@ -534,7 +594,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
-          (FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -543,7 +603,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_StartUmlCommandWithBracesOptions,
-          (FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -552,7 +612,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
-          (FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
         ),
 
         //----- More parameters -------
@@ -563,7 +623,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
-          (FragmentType.Command, FragmentType.Parameter1, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -572,7 +632,7 @@ namespace VSDoxyHighlighter
           },
           DoxygenCommandType.Command1,
           CommentParser.BuildRegex_ImageCommand,
-          (FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1)
+          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
         ),
 
       };

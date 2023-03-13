@@ -1,8 +1,10 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 using Task = System.Threading.Tasks.Task;
 
 namespace VSDoxyHighlighter
@@ -74,7 +76,9 @@ namespace VSDoxyHighlighter
 
     protected override void Dispose(bool disposing)
     {
-      mDoxygenCommands.Dispose();
+      if (disposing && mDoxygenCommands != null) {
+        mDoxygenCommands.Dispose();
+      }
       base.Dispose(disposing);
     }
 
@@ -91,14 +95,17 @@ namespace VSDoxyHighlighter
       try {
         var vsShell = (IVsShell)ServiceProvider.GlobalProvider.GetService(typeof(IVsShell));
         if (vsShell == null) {
+          // Note: Not attempting to show an info bar, since showing the info bar requires an IVsShell, too.
           ActivityLog.LogError("VSDoxyHighlighter", "Failed to get IVsShell service.");
           throw new VSDoxyHighlighterException("VSDoxyHighlighter: Failed to get IVsShell service.");
         }
 
         var errorCode = vsShell.LoadPackage(ref PackageGuid, out IVsPackage loadedPackage);
         if (errorCode != Microsoft.VisualStudio.VSConstants.S_OK) {
-          ActivityLog.LogError("VSDoxyHighlighter", $"Failed to load own package. Error code: {errorCode}");
-          throw new VSDoxyHighlighterException($"VSDoxyHighlighter: Failed to load own package. Error code: {errorCode}");
+          string errorMessage = $"VSDoxyHighlighter: Failed to load package. Error code: 0x{errorCode:X}.";
+          ActivityLog.LogError("VSDoxyHighlighter", errorMessage);
+          InfoBar.ShowMessage(KnownMonikers.StatusError, errorMessage);
+          throw new VSDoxyHighlighterException(errorMessage);
         }
       }
       finally { 
