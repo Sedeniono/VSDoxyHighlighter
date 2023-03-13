@@ -337,14 +337,20 @@ namespace VSDoxyHighlighter
       protected override CollectionForm CreateCollectionForm()
       {
         CollectionForm form = base.CreateCollectionForm();
-        
-        // For now, we do not support adding or removing commands. So hide the corresponding buttons.
-        ((ButtonBase)form.Controls.Find("addButton", true).First()).Hide();
-        ((ButtonBase)form.Controls.Find("removeButton", true).First()).Hide();
 
-        // The order of the commands does not matter. So hide the corresponding buttons.
-        ((ButtonBase)form.Controls.Find("upButton", true).First()).Hide();
-        ((ButtonBase)form.Controls.Find("downButton", true).First()).Hide();
+        try {
+          // For now, we do not support adding or removing Doxygen commands. So hide the corresponding buttons.
+          ((ButtonBase)form.Controls.Find("addButton", true).First()).Hide();
+          ((ButtonBase)form.Controls.Find("removeButton", true).First()).Hide();
+
+          // The order of the Doxygen commands should not be changed by the user, since it shouldn't matter.
+          // So hide the corresponding buttons.
+          ((ButtonBase)form.Controls.Find("upButton", true).First()).Hide();
+          ((ButtonBase)form.Controls.Find("downButton", true).First()).Hide();
+        }
+        catch (Exception ex) {
+          ActivityLog.LogError("VSDoxyHighlighter", $"Exception occurred while creating DoxygenCommandCollectionEditor: {ex}");
+        }
 
         return form;
       }
