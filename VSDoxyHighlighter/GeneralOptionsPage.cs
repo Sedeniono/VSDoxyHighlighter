@@ -54,11 +54,7 @@ namespace VSDoxyHighlighter
     [DisplayName("Command classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
     [DataMember(Name = "CmdClsif", Order = 1, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
-    public ClassificationEnum CommandClassification { get; set; } = ClassificationEnum.Command1;
-
-
-    // TODO: Introduce some dummy parameter classifications.
-    //       Or rather: Remove the "Command2+3" stuff. Instead, add "Generic1,2,3,4,5..."?
+    public ClassificationEnum CommandClassification { get; set; } = ClassificationEnum.Command;
 
     [Category(ClassificationsCategory)]
     [DisplayName("Parameter classifications")]

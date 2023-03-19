@@ -279,7 +279,7 @@ namespace VSDoxyHighlighter
               "rtfonly", "verbatim", "xmlonly"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -287,7 +287,7 @@ namespace VSDoxyHighlighter
             "code"
           },
           CommentParser.BuildRegex_CodeCommand,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -299,7 +299,7 @@ namespace VSDoxyHighlighter
             "endverbatim", "endxmlonly", "n"
           },
           CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -309,7 +309,7 @@ namespace VSDoxyHighlighter
             @"---", @"--", @"{", @"}"
           },
           CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -317,7 +317,7 @@ namespace VSDoxyHighlighter
             "f"
           },
           CommentParser.BuildRegex_FormulaEnvironmentStart,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -325,7 +325,7 @@ namespace VSDoxyHighlighter
             "~"
           },
           CommentParser.BuildRegex_Language,
-          new ClassificationEnum[] { ClassificationEnum.Command1 }
+          new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
         new DoxygenCommandGroup(
@@ -355,7 +355,7 @@ namespace VSDoxyHighlighter
             "relatesalso", "relatedalso", "retval"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -378,7 +378,7 @@ namespace VSDoxyHighlighter
             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -386,7 +386,7 @@ namespace VSDoxyHighlighter
             "cond"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -394,7 +394,7 @@ namespace VSDoxyHighlighter
             "par", "name"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -402,7 +402,7 @@ namespace VSDoxyHighlighter
             "mainpage"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -413,7 +413,7 @@ namespace VSDoxyHighlighter
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter2 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter2 }
         ),
 
         new DoxygenCommandGroup(
@@ -421,7 +421,7 @@ namespace VSDoxyHighlighter
             "a", "e", "em"
           },
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.EmphasisMinor }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.EmphasisMinor }
         ),
 
         new DoxygenCommandGroup(
@@ -429,7 +429,7 @@ namespace VSDoxyHighlighter
             "b"
           },
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.EmphasisMajor }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.EmphasisMajor }
         ),
 
         new DoxygenCommandGroup(
@@ -437,7 +437,7 @@ namespace VSDoxyHighlighter
             "qualifier"
           },
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
 
@@ -450,7 +450,7 @@ namespace VSDoxyHighlighter
             "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -458,7 +458,7 @@ namespace VSDoxyHighlighter
             "showdate"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -468,7 +468,7 @@ namespace VSDoxyHighlighter
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
 
         //----- With up to three parameters -------
@@ -478,7 +478,7 @@ namespace VSDoxyHighlighter
             "category", "class", "interface", "protocol", "struct", "union"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -486,7 +486,7 @@ namespace VSDoxyHighlighter
             "startuml"
           },
           CommentParser.BuildRegex_StartUmlCommandWithBracesOptions,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -494,7 +494,7 @@ namespace VSDoxyHighlighter
             "dot", "msc"
           },
           CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         //----- More parameters -------
@@ -504,7 +504,7 @@ namespace VSDoxyHighlighter
             "dotfile", "mscfile", "diafile"
           },
           CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -512,7 +512,7 @@ namespace VSDoxyHighlighter
             "image"
           },
           CommentParser.BuildRegex_ImageCommand,
-          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
       };

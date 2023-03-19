@@ -208,9 +208,7 @@ namespace VSDoxyHighlighter
 
     // Default colors for light color themes.
     static readonly Dictionary<string, TextProperties> cLightColors = new Dictionary<string, TextProperties> {
-      { ClassificationIDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
-      { ClassificationIDs.ID_command2,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
-      { ClassificationIDs.ID_command3,       new TextProperties(foreground: Color.FromRgb(64, 128, 128), background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_command,        new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: false, isItalic: false) },
       { ClassificationIDs.ID_title,          new TextProperties(foreground: Color.FromRgb(0, 0, 0),       background: null, isBold: true,  isItalic: false) },
@@ -221,13 +219,16 @@ namespace VSDoxyHighlighter
       { ClassificationIDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_strikethrough,  new TextProperties(foreground: null,                         background: null, isBold: false, isItalic: false) },
       { ClassificationIDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(85, 85, 85),    background: Color.FromRgb(235, 235, 235), isBold: false, isItalic: false) },
+      { ClassificationIDs.ID_generic1,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic2,       new TextProperties(foreground: Color.FromRgb(64, 128, 128),  background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic3,       new TextProperties(foreground: Color.FromRgb(255, 68, 0),    background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic4,       new TextProperties(foreground: Color.FromRgb(71, 0, 255),    background: null, isBold: false, isItalic: false) },
+      { ClassificationIDs.ID_generic5,       new TextProperties(foreground: Color.FromRgb(9, 255, 156),   background: null, isBold: false, isItalic: false) },
     };
 
     // Default colors for dark color themes.
     static readonly Dictionary<string, TextProperties> cDarkColors = new Dictionary<string, TextProperties> {
-      { ClassificationIDs.ID_command1,       new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
-      { ClassificationIDs.ID_command2,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
-      { ClassificationIDs.ID_command3,       new TextProperties(foreground: Color.FromRgb(205, 255, 206), background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_command,        new TextProperties(foreground: Color.FromRgb(140, 203, 128), background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter1,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter2,     new TextProperties(foreground: Color.FromRgb(86, 156, 214),  background: null, isBold: false, isItalic: false) },
       { ClassificationIDs.ID_title,          new TextProperties(foreground: Color.FromRgb(206, 206, 206), background: null, isBold: true,  isItalic: false) },
@@ -238,6 +239,11 @@ namespace VSDoxyHighlighter
       { ClassificationIDs.ID_emphasisMajor,  new TextProperties(foreground: Color.FromRgb(166, 215, 157), background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_strikethrough,  new TextProperties(foreground: null,                         background: null, isBold: false, isItalic: false) },
       { ClassificationIDs.ID_inlineCode,     new TextProperties(foreground: Color.FromRgb(200, 200, 200), background: Color.FromRgb(51, 51, 51), isBold: false, isItalic: false) },
+      { ClassificationIDs.ID_generic1,       new TextProperties(foreground: Color.FromRgb(132, 232, 0),   background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic2,       new TextProperties(foreground: Color.FromRgb(205, 255, 206), background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic3,       new TextProperties(foreground: Color.FromRgb(255, 68, 0),    background: null, isBold: true,  isItalic: false) },
+      { ClassificationIDs.ID_generic4,       new TextProperties(foreground: Color.FromRgb(170, 227, 255), background: null, isBold: false, isItalic: false) },
+      { ClassificationIDs.ID_generic5,       new TextProperties(foreground: Color.FromRgb(71, 185, 74),   background: null, isBold: false, isItalic: false) },
     };
 
     

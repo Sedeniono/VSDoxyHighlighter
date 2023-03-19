@@ -21,19 +21,24 @@ namespace VSDoxyHighlighter
   // NOTE: The values are serialized in the options page! Also, the values are used as indices!
   public enum ClassificationEnum : uint
   {
-    Command1 = 0,
-    Command2 = 1, // Not used by default, but the user can configure commands to use it.
-    Command3 = 2, // Not used by default, but the user can configure commands to use it.
-    Note = 3,
-    Warning = 4,
-    Exceptions = 5,
-    Parameter1 = 6,
-    Parameter2 = 7,
-    Title = 8,
-    EmphasisMinor = 9,
-    EmphasisMajor = 10,
-    Strikethrough = 11,
-    InlineCode = 12
+    Command = 0,
+    Note = 1,
+    Warning = 2,
+    Exceptions = 3,
+    Parameter1 = 4,
+    Parameter2 = 5,
+    Title = 6,
+    EmphasisMinor = 7,
+    EmphasisMajor = 8,
+    Strikethrough = 9,
+    InlineCode = 10,
+    // The following are not used by default. But they exist so that the user can configure some
+    // commands or parameters to use themto have some additional colors.
+    Generic1 = 11,
+    Generic2 = 12,
+    Generic3 = 13,
+    Generic4 = 14,
+    Generic5 = 15
   }
 
 
@@ -43,9 +48,7 @@ namespace VSDoxyHighlighter
   /// </summary>
   public static class ClassificationIDs
   {
-    public const string ID_command1 = "VSDoxyHighlighter_Command";
-    public const string ID_command2 = "VSDoxyHighlighter_Command2";
-    public const string ID_command3 = "VSDoxyHighlighter_Command3";
+    public const string ID_command = "VSDoxyHighlighter_Command";
     public const string ID_parameter1 = "VSDoxyHighlighter_Parameter1";
     public const string ID_parameter2 = "VSDoxyHighlighter_Parameter2";
     public const string ID_title = "VSDoxyHighlighter_Title";
@@ -56,11 +59,14 @@ namespace VSDoxyHighlighter
     public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
+    public const string ID_generic1 = "VSDoxyHighlighter_Generic1";
+    public const string ID_generic2 = "VSDoxyHighlighter_Generic2";
+    public const string ID_generic3 = "VSDoxyHighlighter_Generic3";
+    public const string ID_generic4 = "VSDoxyHighlighter_Generic4";
+    public const string ID_generic5 = "VSDoxyHighlighter_Generic5";
 
     public static readonly Dictionary<ClassificationEnum, string> ToID = new Dictionary<ClassificationEnum, string>(){
-        {ClassificationEnum.Command1, ID_command1},
-        {ClassificationEnum.Command2, ID_command2},
-        {ClassificationEnum.Command3, ID_command3},
+        {ClassificationEnum.Command, ID_command},
         {ClassificationEnum.Parameter1, ID_parameter1},
         {ClassificationEnum.Parameter2, ID_parameter2},
         {ClassificationEnum.Title, ID_title},
@@ -71,6 +77,11 @@ namespace VSDoxyHighlighter
         {ClassificationEnum.EmphasisMajor, ID_emphasisMajor},
         {ClassificationEnum.Strikethrough, ID_strikethrough},
         {ClassificationEnum.InlineCode, ID_inlineCode},
+        {ClassificationEnum.Generic1, ID_generic1},
+        {ClassificationEnum.Generic2, ID_generic2},
+        {ClassificationEnum.Generic3, ID_generic3},
+        {ClassificationEnum.Generic4, ID_generic4},
+        {ClassificationEnum.Generic5, ID_generic5},
       };
   }
 
@@ -86,16 +97,8 @@ namespace VSDoxyHighlighter
   {
 #pragma warning disable 169
     [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_command1)]
+    [Name(ClassificationIDs.ID_command)]
     private static ClassificationTypeDefinition typeDefinitionForCommand;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_command2)]
-    private static ClassificationTypeDefinition typeDefinitionForCommand2;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_command3)]
-    private static ClassificationTypeDefinition typeDefinitionForCommand3;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_warningKeyword)]
@@ -136,6 +139,26 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_title)]
     private static ClassificationTypeDefinition typeDefinitionForTitle;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_generic1)]
+    private static ClassificationTypeDefinition typeDefinitionForGeneric1;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_generic2)]
+    private static ClassificationTypeDefinition typeDefinitionForGeneric2;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_generic3)]
+    private static ClassificationTypeDefinition typeDefinitionForGeneric3;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_generic4)]
+    private static ClassificationTypeDefinition typeDefinitionForGeneric4;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_generic5)]
+    private static ClassificationTypeDefinition typeDefinitionForGeneric5;
 #pragma warning restore 169
   }
 

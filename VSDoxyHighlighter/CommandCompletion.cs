@@ -240,7 +240,7 @@ namespace VSDoxyHighlighter
       }
       else {
         Debug.Assert(false);
-        return ClassificationEnum.Command1;
+        return ClassificationEnum.Command;
       }
     }
 
