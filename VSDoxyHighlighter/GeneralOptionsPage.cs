@@ -45,7 +45,7 @@ namespace VSDoxyHighlighter
     [DisplayName("Command")]
     [Description("The Doxygen command that gets configured.")]
     [ReadOnly(true)]
-    [DataMember(Name = "Cmd", Order = 0)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    [DataMember(Name = "Cmd", Order = 0, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public string Command { get; set; } = "NEW_COMMAND";
 
     private const string ClassificationsCategory = "Classifications";
@@ -53,7 +53,7 @@ namespace VSDoxyHighlighter
     [Category(ClassificationsCategory)]
     [DisplayName("Command classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
-    [DataMember(Name = "CmdClsif", Order = 1)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    [DataMember(Name = "CmdClsif", Order = 1, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public ClassificationEnum CommandClassification { get; set; } = ClassificationEnum.Command1;
 
 
@@ -63,8 +63,8 @@ namespace VSDoxyHighlighter
     [Category(ClassificationsCategory)]
     [DisplayName("Parameter classifications")]
     [Description("Allows to change how the parameters of a Doxygen command should get classified.")]
-    [DataMember(Name = "Params", Order = 2)] // Enables serialization via DoxygenCommandInConfigListSerialization
-    [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))]
+    [DataMember(Name = "Params", Order = 2, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))] // Just changes the default value displayed in the property grid.
     [ReadOnly(true)] // Causes to hide the "..." button (and thus to resize etc the array), but nevertheless allows changing the elements of the array.
     public ClassificationEnum[] ParametersClassifications { get; set; } = new ClassificationEnum[] { };
 
@@ -309,13 +309,17 @@ namespace VSDoxyHighlighter
     {
       foreach (DoxygenCommandInConfig cmd in parsed) {
         if (!DoxygenCommands.IsKnownDefaultCommand(cmd.Command)) {
-          throw new VSDoxyHighlighterException(
-            $"Command '{cmd.Command}' is not known.");
+          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' is not known.");
         }
 
         if (!Enum.IsDefined(typeof(ClassificationEnum), cmd.CommandClassification)) {
           throw new VSDoxyHighlighterException(
             $"Command classification converted from string to enum resulted in an invalid enum value '{cmd.CommandClassification}' for command '{cmd.Command}'.");
+        }
+
+        // Note: Length 0 is allowed, but not null.
+        if (cmd.ParametersClassifications == null) {
+          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' has no parameter classifications.");
         }
 
         for (int paramClsifIdx = 0; paramClsifIdx < cmd.ParametersClassifications.Length; ++paramClsifIdx) {
