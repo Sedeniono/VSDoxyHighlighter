@@ -194,10 +194,8 @@ namespace VSDoxyHighlighter
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mGeneralOptions.SettingsChanged += OnSettingsOrCommandsChanged;
 
-      mDoxygenCommands = VSDoxyHighlighterPackage.DoxygenCommands;
-      mDoxygenCommands.CommandsGotUpdated += OnSettingsOrCommandsChanged;
-
-      InitCommentParser();
+      mParser = VSDoxyHighlighterPackage.CommentParser;
+      mParser.ParsingMethodChanged += OnSettingsOrCommandsChanged;
     }
 
 
@@ -306,8 +304,8 @@ namespace VSDoxyHighlighter
       if (mGeneralOptions != null) {
         mGeneralOptions.SettingsChanged -= OnSettingsOrCommandsChanged;
       }
-      if (mDoxygenCommands != null) {
-        mDoxygenCommands.CommandsGotUpdated -= OnSettingsOrCommandsChanged;
+      if (mParser != null) {
+        mParser.ParsingMethodChanged -= OnSettingsOrCommandsChanged;
       }
       if (mVSCppColorer != null) {
         mVSCppColorer.CppColorerReclassifiedSpan -= OnVSCppColorerReclassifiedSpan;
@@ -322,13 +320,12 @@ namespace VSDoxyHighlighter
     // When this function is called, the user clicked on "OK" in the options, or the list of Doxygen commands changed.
     // We need to re-initialize most things.
     // Note that with the current implementation, this is fired twice whenever the user clicked "OK" in the options:
-    // Once for our own subscription for the options, and once because the 'commands changed' event is also fired
+    // Once for our own subscription for the options, and once because the 'parser changed' event is also fired
     // every time the user clicked "OK" in the options. In principle, the first call is of course unnecessary. However,
     // we would need to ensure that we are notified after the Doxygen commands got updated. But since this hinges on
     // the same event, getting the order right is fragile. Thus, for now we simply update twice.
     private void OnSettingsOrCommandsChanged(object sender, EventArgs e)
     {
-      InitCommentParser();
       InvalidateCache();
 
       // Some of our settings might or might not have changed. Regardless, we force a re-classification of the whole text.
@@ -359,20 +356,12 @@ namespace VSDoxyHighlighter
     }
 
 
-    private void InitCommentParser()
-    {
-      mParser = new CommentParser(mDoxygenCommands);
-    }
-
-
     private readonly ITextBuffer mTextBuffer;
     private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
     private readonly IClassificationType[] mClassificationEnumToInstance;
     private readonly IGeneralOptions mGeneralOptions;
-    private readonly DoxygenCommands mDoxygenCommands;
-
-    private CommentParser mParser;
+    private readonly CommentParser mParser;
 
     private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
     private int mCachedVersion = -1;

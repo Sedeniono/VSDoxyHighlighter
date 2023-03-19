@@ -73,14 +73,26 @@ namespace VSDoxyHighlighter
   /// 
   /// Note that it does NOT identify which pieces of some text are located in comments
   /// and which lie outside of it. Rather, it expects only the text in comments as input.
+  /// 
+  /// In the context of Visual Studio (i.e. not in the context of unit tests), only one instance
+  /// should really exist. There is no need to initialize the regex etc multiple times. Thus,
+  /// use VSDoxyHighlighterPackage.CommentParser outside of tests.
   /// </summary>
-  public class CommentParser
+  public class CommentParser : IDisposable
   {
     public CommentParser(DoxygenCommands doxygenCommands) 
     {
       mDoxygenCommands = doxygenCommands;
-      mMatchers = BuildMatchers(mDoxygenCommands.CommandGroups);
+      mDoxygenCommands.CommandsGotUpdated += OnDoxygenCommandsGotUpdated;
+
+      InitMatchers();
     }
+
+
+    /// <summary>
+    /// Event gets sent when the underlying configuration changes.
+    /// </summary>
+    public event EventHandler ParsingMethodChanged;
 
 
     /// <summary>
@@ -124,6 +136,32 @@ namespace VSDoxyHighlighter
       }
 
       return result;
+    }
+
+
+    public void Dispose()
+    {
+      if (mDisposed) {
+        return;
+      }
+      mDisposed = true;
+
+      if (mDoxygenCommands != null) {
+        mDoxygenCommands.CommandsGotUpdated -= OnDoxygenCommandsGotUpdated;
+      }
+    }
+
+
+    private void OnDoxygenCommandsGotUpdated(object sender, EventArgs e)
+    {
+      InitMatchers();
+      ParsingMethodChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    private void InitMatchers() 
+    {
+      mMatchers = BuildMatchers(mDoxygenCommands.CommandGroups);
     }
 
 
@@ -489,7 +527,8 @@ namespace VSDoxyHighlighter
 
     private readonly DoxygenCommands mDoxygenCommands;
 
-    private readonly List<FragmentMatcher> mMatchers;
+    private List<FragmentMatcher> mMatchers;
+    private bool mDisposed = false;
 
     private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 

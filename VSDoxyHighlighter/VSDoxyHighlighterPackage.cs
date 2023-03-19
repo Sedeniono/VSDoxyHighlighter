@@ -57,13 +57,13 @@ namespace VSDoxyHighlighter
       }
     }
 
-    public static DoxygenCommands DoxygenCommands {
+    public static CommentParser CommentParser {
       get {
         ThreadHelper.ThrowIfNotOnUIThread();
-        if (mDoxygenCommands == null) {
+        if (mCommentParser == null) {
           LoadPackage();
         }
-        return mDoxygenCommands;
+        return mCommentParser;
       }
     }
 
@@ -72,12 +72,14 @@ namespace VSDoxyHighlighter
       await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
       mGeneralOptions = (GeneralOptionsPage)GetDialogPage(typeof(GeneralOptionsPage));
       mDoxygenCommands = new DoxygenCommands(mGeneralOptions);
+      mCommentParser = new CommentParser(mDoxygenCommands);
     }
 
     protected override void Dispose(bool disposing)
     {
-      if (disposing && mDoxygenCommands != null) {
-        mDoxygenCommands.Dispose();
+      if (disposing) {
+        mCommentParser?.Dispose();
+        mDoxygenCommands?.Dispose();
       }
       base.Dispose(disposing);
     }
@@ -122,6 +124,7 @@ namespace VSDoxyHighlighter
 
     private static GeneralOptionsPage mGeneralOptions;
     private static DoxygenCommands mDoxygenCommands;
+    private static CommentParser mCommentParser;
 
     private static bool mInLoadPackage = false;
   }

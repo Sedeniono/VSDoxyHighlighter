@@ -56,8 +56,12 @@ namespace VSDoxyHighlighter
     public CommentCommandCompletionSource() 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      // We don't subscribe to change events of the options or the parser: A CommentCommandCompletionSource is
+      // only relevent while a specific autocomplete box is shown. Every autocomplete box gets its own instance.
+      // The user cannot really change the settings while keeping such a box open.
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
-      mDoxygenCommands = VSDoxyHighlighterPackage.DoxygenCommands;
+      mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }
 
     /// <summary>
@@ -230,8 +234,7 @@ namespace VSDoxyHighlighter
     {
       Debug.Assert(cmdWithSlash.StartsWith("\\") || cmdWithSlash.StartsWith("@"));
 
-      // TODO: Performance...
-      SortedSet<FormattedFragment> parsed = new CommentParser(mDoxygenCommands).Parse(cmdWithSlash);
+      SortedSet<FormattedFragment> parsed = mCommentParser.Parse(cmdWithSlash);
       if (parsed.Count == 1) {
         return parsed.Max.Classification;
       }
@@ -334,7 +337,7 @@ namespace VSDoxyHighlighter
     private static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
 
     private readonly IGeneralOptions mGeneralOptions;
-    private readonly DoxygenCommands mDoxygenCommands;
+    private readonly CommentParser mCommentParser;
   }
 
 
