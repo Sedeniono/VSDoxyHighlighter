@@ -3,6 +3,11 @@
 ![test and build](https://github.com/Sedeniono/VSDoxyHighlighter/actions/workflows/build_and_test.yml/badge.svg)
 
 
+[![VS Marketplace rating](https://img.shields.io/visual-studio-marketplace/stars/Sedenion.VSDoxyHighlighter?label=VS%20Marketplace%3A%20Rating&color=green)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
+[![VS Marketplace downloads](https://img.shields.io/visual-studio-marketplace/d/Sedenion.VSDoxyHighlighter?label=Downloads)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
+[![VS Marketplace installs](https://img.shields.io/visual-studio-marketplace/i/Sedenion.VSDoxyHighlighter?label=Installs)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
+
+
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Features](#features)
@@ -11,6 +16,9 @@
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
 - [Configuration](#configuration)
   - [Fonts and colors](#fonts-and-colors)
+    - [Classifications](#classifications)
+    - [Mapping of commands and parameters to classifications](#mapping-of-commands-and-parameters-to-classifications)
+    - [Color schemes](#color-schemes)
   - [Comment types](#comment-types)
 - [Known problems](#known-problems)
 
@@ -25,10 +33,10 @@ Note that Visual Studio Code is **not** supported.
 
 # Installation
 
-Only Visual Studio 2022 is supported.
-
 You can get the extension from the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter).
 All releases can also be found [here on github](https://github.com/Sedeniono/VSDoxyHighlighter/releases): Download the `*.vsix` file and open it to install the extension.
+
+Only Visual Studio 2022 is supported.
 
 For a list of the most important changes in each version (change log), also see the [list of releases](https://github.com/Sedeniono/VSDoxyHighlighter/releases).
 
@@ -59,7 +67,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported. For example, both `\brief` and `@brief` are highlighted.
 - [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.9.6) are supported.
 - Highlighting partially supports markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
-- The extension comes with two different default color schemes, one for dark and one for light Visual Studio themes. See the configuration section below for more information.
+- The extension comes with two different default color schemes, one for dark and one for light Visual Studio themes. The colors can also be configured. See the configuration section below for more information.
 - Syntax highlighting can be disabled entirely in the VSDoxyHighlighter options.
 
 
@@ -82,22 +90,49 @@ Especially, important messages such as warnings or notes are harder to overlook 
   - Visual Studio 16.6 and above support this out-of-the-box, compare [this blog post](https://devblogs.microsoft.com/cppblog/doxygen-and-xml-doc-comment-support/).
   - There are also extensions available that allow a more fine grained control over the generated comment, e.g. ["Doxygen Comments"](https://marketplace.visualstudio.com/items?itemName=FinnGegenmantel.doxygenComments) or ["DoxygenComments"](https://marketplace.visualstudio.com/items?itemName=NickKhrapov.DoxygenComments2022) (yes, these two extensions have almost the same name).
 - Show a help text while hovering over Doxygen commands.
+- Allow adding custom commands.
 
 
 
 # Configuration
 
 ## Fonts and colors
-The extension comes with two different color schemes, one for dark and one for light Visual Studio themes.
-The appropriate default scheme is selected automatically.
-To this end, the detection of the active Visual Studio theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
 
-The colors and fonts used for the various keywords can be configured in the Visual Studio settings &rarr; Environment &rarr; Fonts and Colors. All elements corresponding to the extension start with **"VSDoxyHighlighter"**.
-Note that Visual Studio stores the settings per color theme.
+### Classifications
+The extension comes with several so called "classifications". Those are the entires shown in the in the Visual Studio options &rarr; *Environment* &rarr; *Fonts and Colors*. All elements corresponding to the extension start with "VSDoxyHighlighter".
+Feel free to change the colors to your liking.
 
 One thing that you might realize is that the color of ordinary text in "`///`"-comments might be different to the color in other comments.
 This has nothing to do with the extension. Visual Studio classifies "`///`"-comments as "XML Doc Comment" and formats them differently by default.
-You can change the color in the "Fonts and Colors" settings.
+You can change the color in the *Fonts and Colors* settings.
+
+### Mapping of commands and parameters to classifications
+A different topic is how the extension maps some given command and its parameters to the classifications.
+This mapping can be configured, too, by opening the VS options &rarr; *VSDoxyHighlighter* &rarr; *General*.
+Then select the "*Individual Doxygen commands*" row and click on the "..." button on the right.
+This allows you to change, for every command individually, the classifications used for the command itself and all of its parameters.
+Note that adding or removing commands is currently not supported.
+
+To give a bit more freedom, the extension defines some additional classifications "Generic1", "Generic2", etc.
+These are **not** used by default for anything.
+However, you may use them to colorize some commands or parameters differently compared to the defaults, without affecting the colors for all other commands and parameters.
+For example, assume you want to change the color of only the `\brief` command to a specific yellow. All other commands (such as `\details` etc.) should remain unchanged.
+Then you could change the classification of the `\brief` command to "Generic1" and (in the *Environment* &rarr; *Fonts and Colors* settings) change the color of the "VSDoxyHighlighter - Generic 1" classification to yellow. As long as the classification is not used by any other command or parameter, `\brief` will exclusively use the specific yellow.
+In case the number of available "Generic" classifications is not enough, feel free to [create an issue](https://github.com/Sedeniono/VSDoxyHighlighter/issues).
+
+### Color schemes
+The extension comes with two different color schemes, one for dark and one for light Visual Studio themes. 
+(The theme can be changed in the VS options by going to *Environment* &rarr; *General* and changing the *Color Theme* setting).
+The appropriate default scheme is selected automatically based on the current VS theme.
+The detection of the active VS theme is not coupled to the name of the theme. Instead, the decision is made based on the color of the background. As such, the default colors should be reasonable for more than just the default themes shipped with Visual Studio.
+
+Visual Studio stores the settings per color theme. 
+For example, assume you change the color of titles to e.g. red.
+Then you switch the theme. Then the color of the titles will have switched to the new theme's currently configured color, and the colors shown in the *Fonts and Colors* section will have changed accordingly.
+You can then configure the colors for that theme, e.g. titles to green.
+If you then switch back to the original theme, all colors will switch back, too, and you will get the originally configured red color for titles again.
+
+
 
 
 ## Comment types
