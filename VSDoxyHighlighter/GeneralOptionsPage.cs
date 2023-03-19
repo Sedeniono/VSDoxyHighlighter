@@ -41,7 +41,7 @@ namespace VSDoxyHighlighter
   [DataContract] // Enables serialization via DoxygenCommandInConfigListSerialization
   public class DoxygenCommandInConfig
   {
-    [Category("Command")]
+    [Category("\tCommand")] // "\t" does not get printed, and is a hack to get the category to appear first in the property grid.
     [DisplayName("Command")]
     [Description("The Doxygen command that gets configured.")]
     [ReadOnly(true)]
@@ -218,7 +218,7 @@ namespace VSDoxyHighlighter
     [Category(CommandsConfigurationSubCategory)]
     [DisplayName("Individual Doxygen commands (use the \"...\" button!)")]
     [Description("Allows some configuration of individual Doxygen commands. Please do not edit the string in the grid directly. "
-       + "Instead, use the \"...\" button on the right of the row.")]
+       + "Instead, use the \"...\" button on the right side of the row.")]
     // VS cannot serialize the list by itself, need to do it manually. Otherwise, the settings would not get saved.
     [TypeConverter(typeof(DoxygenCommandInConfigListSerialization))]
     [Editor(typeof(FixedElementsCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
