@@ -53,14 +53,14 @@ namespace VSDoxyHighlighter
     [Category(ClassificationsCategory)]
     [DisplayName("Command classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
-    [DataMember(Name = "CmdClsif", Order = 1, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    [DataMember(Name = "CmdCls", Order = 1, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public ClassificationEnum CommandClassification { get; set; } = ClassificationEnum.Command;
 
     [Category(ClassificationsCategory)]
     [DisplayName("Parameter classifications")]
     [Description("Allows to change how the parameters of a Doxygen command should get classified.")]
-    [DataMember(Name = "Params", Order = 2, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
-    [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))] // Just changes the default value displayed in the property grid.
+    [DataMember(Name = "ParCls", Order = 2, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))] // Just changes the default value displayed in the property grid. Not used by the serialization.
     [ReadOnly(true)] // Causes to hide the "..." button (and thus to resize etc the array), but nevertheless allows changing the elements of the array.
     public ClassificationEnum[] ParametersClassifications { get; set; } = new ClassificationEnum[] { };
 
@@ -363,7 +363,7 @@ namespace VSDoxyHighlighter
                       + "Default configuration of commands got restored.\n"
                       + $"Original JSON string written to: {backupFilename}.\n\n"
                       + $"Exception message from the conversion: {ex}\n\n"
-                      + $"JSON string that failed to get parse:\n{valueAsString}",
+                      + $"JSON string that failed to get parsed:\n{valueAsString}",
                       "VSDoxyHighlighter error", MessageBoxButtons.OK, MessageBoxIcon.Error))}
       );
     }
