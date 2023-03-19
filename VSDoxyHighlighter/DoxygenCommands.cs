@@ -46,6 +46,11 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Used to group all Doxygen commands that get parsed and classified the same.
+  /// The commands of on group are parsed via the same regex (essentially, they get concatenated
+  /// via "|" in the regex).
+  /// The grouping of commands is important so that commands that result in the same type etc
+  /// are parsed with the same regex. So instead of having more than 200 regex, we have less
+  /// than 30. That should improve performance.
   /// </summary>
   public struct DoxygenCommandGroup
   {
@@ -98,7 +103,12 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// The default list of commands to use for the options dialog.
     /// </summary>
-    public static readonly List<DoxygenCommandInConfig> DefaultDoxygenCommandsInConfig;
+    public static readonly List<DoxygenCommandInConfig> DefaultCommandsInConfig;
+
+    /// <summary>
+    /// The default list of command groups that we define in the extension.
+    /// </summary>
+    public static readonly DoxygenCommandGroup[] DefaultCommandGroups;
 
     /// <summary>
     /// Returns all commands, as configured by the user.
@@ -182,7 +192,17 @@ namespace VSDoxyHighlighter
     /// Given a collection of commands as configured by the user, returns a copy of the 
     /// default doxygen command groups modified according to the configuration.
     /// </summary>
-    private static List<DoxygenCommandGroup> ApplyConfigList(ICollection<DoxygenCommandInConfig> configList) 
+    private static List<DoxygenCommandGroup> ApplyConfigList(ICollection<DoxygenCommandInConfig> configList)
+    {
+      var ungrouped = ConfigListToUngroupedGroups(configList);
+      return GroupListOfUngrouped(ungrouped);
+    }
+
+
+    /// <summary>
+    /// Converts each DoxygenCommandInConfig into exactly one DoxygenCommandGroup. The commands are not grouped.
+    /// </summary>
+    private static List<DoxygenCommandGroup> ConfigListToUngroupedGroups(ICollection<DoxygenCommandInConfig> configList)
     {
       var ungrouped = new List<DoxygenCommandGroup>();
       foreach (DoxygenCommandInConfig configElem in configList) {
@@ -193,11 +213,11 @@ namespace VSDoxyHighlighter
         if (groupIndex >= 0 && indexForCommandsInGroup >= 0) {
           Debug.Assert(ungrouped.FindIndex(group => group.Commands.Contains(configElem.Command)) < 0);
 
-          DoxygenCommandGroup origGroup = mDefaultDoxygenCommands[groupIndex];
+          DoxygenCommandGroup origGroup = DefaultCommandGroups[groupIndex];
 
           FragmentType[] fragmentTypes = new FragmentType[configElem.Parameters.Length + 1];
           fragmentTypes[0] = FragmentType.Command;
-          for (int idx = 0; idx < configElem.Parameters.Length; ++idx) { 
+          for (int idx = 0; idx < configElem.Parameters.Length; ++idx) {
             fragmentTypes[idx + 1] = ParameterTypeToFragmentType(configElem.Parameters[idx]);
           }
 
@@ -206,14 +226,14 @@ namespace VSDoxyHighlighter
         }
       }
 
-      return FromUngroupedList(ungrouped);
+      return ungrouped;
     }
 
 
     private static (int groupIndex, int indexForCommandsInGroup) FindCommandIndexInDefaults(string cmd) 
     {
-      for (int groupIndex = 0; groupIndex < mDefaultDoxygenCommands.Length; ++groupIndex) {
-        var group = mDefaultDoxygenCommands[groupIndex];
+      for (int groupIndex = 0; groupIndex < DefaultCommandGroups.Length; ++groupIndex) {
+        var group = DefaultCommandGroups[groupIndex];
         int cmdIndex = group.Commands.FindIndex(s => s == cmd);
         if (cmdIndex >= 0) { 
           return (groupIndex, cmdIndex);
@@ -226,23 +246,29 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// Given a collection of groups with only a single command in each group, groups all of them together.
     /// </summary>
-    private static List<DoxygenCommandGroup> FromUngroupedList(ICollection<DoxygenCommandGroup> ungrouped)
+    private static List<DoxygenCommandGroup> GroupListOfUngrouped(ICollection<DoxygenCommandGroup> ungrouped)
     {
-      var merged = new Dictionary<(DoxygenCommandType, RegexCreatorDelegate, FragmentType[]), List<string>>();
+      var merged = new Dictionary<
+        (string dataAsString, RegexCreatorDelegate), 
+        (DoxygenCommandType cmdType, FragmentType[] fragmentTypes, List<string> cmds)>();
+
       foreach (DoxygenCommandGroup group in ungrouped) {
-        var arg = (group.DoxygenCommandType, group.RegexCreator, group.FragmentTypes);
+        // We cannot sensibly use an array as dictionary key, since it won't compare the actual content of the arrays.
+        // Workaround: Convert it to a string.
+        string dataAsString = string.Concat(group.DoxygenCommandType.ToString(), string.Join("|", group.FragmentTypes));
+        var arg = (dataAsString, group.RegexCreator);
         if (!merged.ContainsKey(arg)) {
-          merged[arg] = new List<string>();
+          merged[arg] = (group.DoxygenCommandType, group.FragmentTypes, new List<string>());
         }
 
         Debug.Assert(group.Commands.Count == 1);
-        Debug.Assert(!merged[arg].Contains(group.Commands[0]));
-        merged[arg].Add(group.Commands[0]);
+        Debug.Assert(!merged[arg].cmds.Contains(group.Commands[0]));
+        merged[arg].cmds.Add(group.Commands[0]);
       }
 
       var resultGroups = new List<DoxygenCommandGroup>();
       foreach (var mergedItem in merged) {
-        var group = new DoxygenCommandGroup(mergedItem.Value, mergedItem.Key.Item1, mergedItem.Key.Item2, mergedItem.Key.Item3);
+        var group = new DoxygenCommandGroup(mergedItem.Value.cmds, mergedItem.Value.cmdType, mergedItem.Key.Item2, mergedItem.Value.fragmentTypes);
         resultGroups.Add(group);
       }
 
@@ -353,7 +379,7 @@ namespace VSDoxyHighlighter
 
     static DoxygenCommands()
     {
-      mDefaultDoxygenCommands = new DoxygenCommandGroup[] {
+      DefaultCommandGroups = new DoxygenCommandGroup[] {
 
         //----- With no parameters -------
 
@@ -638,10 +664,8 @@ namespace VSDoxyHighlighter
       };
 
 
-      DefaultDoxygenCommandsInConfig = ToConfigList(mDefaultDoxygenCommands);
+      DefaultCommandsInConfig = ToConfigList(DefaultCommandGroups);
     }
-
-    private static readonly DoxygenCommandGroup[] mDefaultDoxygenCommands;
   }
 
 

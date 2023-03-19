@@ -51,6 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommentParserTests.cs" />
+    <Compile Include="DoxygenCommandsTests.cs" />
+    <Compile Include="GeneralOptionsFake.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

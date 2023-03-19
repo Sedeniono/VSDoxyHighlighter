@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter.Tests
 {
-  class Utils
+  internal class Utils
   {
     public static string ReadTestInputFromFile(string filenameWithoutPath)
     {
@@ -64,28 +64,9 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    private class IGeneralOptionsFake : IGeneralOptions
-    {
-      public bool EnableHighlighting { get; } = true;
-      public bool EnableAutocomplete { get; } = true;
-
-      public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
-
-      public bool IsEnabledInCommentType(CommentType type) { return true; }
-
-#pragma warning disable 67
-      public event EventHandler SettingsChanged;
-#pragma warning restore 67
-
-      public IGeneralOptionsFake()
-      {
-        DoxygenCommandsConfig = DoxygenCommands.DefaultDoxygenCommandsInConfig;
-      }
-    }
-
     public static CommentParser CreateDefaultCommentParser() 
     {
-      return new CommentParser(new DoxygenCommands(new IGeneralOptionsFake()));
+      return new CommentParser(new DoxygenCommands(new GeneralOptionsFake()));
     }
   }
 
@@ -136,7 +117,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(645, 6, ClassificationEnum.Command1), // @brief after /**
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -166,7 +147,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(415, 6, ClassificationEnum.Command1), // @brief
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -916,7 +897,7 @@ namespace VSDoxyHighlighter.Tests
       Utils.WriteFragmentsToFile("VariousKeywords_Expected.txt", expectedTextFragments);
       Utils.WriteFragmentsToFile("VariousKeywords_Actual.txt", actualTextFragments);
 
-      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
+      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
 
 
@@ -930,7 +911,7 @@ namespace VSDoxyHighlighter.Tests
       var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
       var actualTextFragments = Utils.ConvertToTextFragments(input, Utils.CreateDefaultCommentParser().Parse(input));
 
-      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
+      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
 
 
@@ -953,7 +934,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -965,7 +946,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -995,7 +976,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -1007,7 +988,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -1019,7 +1000,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleTilde.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.Strikethrough);
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -1060,7 +1041,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(167, 45, ClassificationEnum.InlineCode),
       };
 
-      CollectionAssert.AreEquivalent(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
@@ -1083,7 +1064,7 @@ namespace VSDoxyHighlighter.Tests
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
-      CollectionAssert.AreEquivalent(expectedTextFragments, actualTextFragments);
+      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
   }
 }

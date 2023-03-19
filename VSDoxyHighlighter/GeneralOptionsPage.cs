@@ -226,7 +226,7 @@ namespace VSDoxyHighlighter
     // VS cannot serialize the list by itself, need to do it manually. Otherwise, the settings would not get saved.
     [TypeConverter(typeof(DoxygenCommandInConfigListSerialization))]
     [Editor(typeof(FixedElementsCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
-    public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; set; } = DoxygenCommands.DefaultDoxygenCommandsInConfig;
+    public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; set; } = DoxygenCommands.DefaultCommandsInConfig;
   }
 
 
@@ -264,7 +264,7 @@ namespace VSDoxyHighlighter
         using (var memStream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(valueAsString))) {
           try {
             // For development purposes: Uncomment the following line to override the stored settings.
-            //return DoxygenCommands.DefaultDoxygenCommandsInConfig;
+            //return DoxygenCommands.DefaultCommandsInConfig;
 
             var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
             return (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
@@ -275,7 +275,7 @@ namespace VSDoxyHighlighter
             // What should we do in this case? For now, we tell the user about it and restore the default values
             // after creating a backup.
             HandleConversionFromStringError(valueAsString, ex);
-            return DoxygenCommands.DefaultDoxygenCommandsInConfig;
+            return DoxygenCommands.DefaultCommandsInConfig;
           }
         }
       }
