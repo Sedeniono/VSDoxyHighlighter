@@ -10,37 +10,6 @@ using System.Runtime.CompilerServices;
 
 namespace VSDoxyHighlighter
 {
-  // Types of Doxygen commands that start with "\" or "@". This is used to map different commands to different classifications (i.e. colors).
-  // The parameters to the Doxygen commands are not affected by this.
-  // Note: Appears in the options dialog. Also, the numerical values get serialized.
-  public enum DoxygenCommandType : uint
-  {
-    Command1 = 1,
-    Command2 = 20,
-    Command3 = 30,
-    Note = 100,
-    Warning = 200,
-    Exceptions = 300,
-  }
-
-
-  // The parsing results in fragments. For example, "\ref myRef" contains two fragments, "\ref" and "myRef".
-  // The first fragment would be the command itself, the second a parameter. This enum is an enumeration of the
-  // possible types that the parser finds.
-  // Note: This does not necessarily directly map to a specific classification (i.e. color).
-  public enum FragmentType
-  {
-    Command, // The doxygen command itself, e.g. "@param" or "@brief". Different commands are mapped to different classifications, compare DoxygenCommandType.
-    Parameter1, // Parameter to some ordinary doxygen command
-    Parameter2, // Used for parameters of commands in running text or for some commands with more than one successive parameter
-    Title, // Parameter to some ordinary doxygen command that represents a title
-    EmphasisMinor, // Usually italic
-    EmphasisMajor, // Usually bold
-    Strikethrough,
-    InlineCode // E.g. `inline code`
-  }
-
-
   public delegate string RegexCreatorDelegate(ICollection<string> keywords);
 
 
@@ -55,25 +24,24 @@ namespace VSDoxyHighlighter
   public struct DoxygenCommandGroup
   {
     public List<string> Commands { get; private set; }
-    public DoxygenCommandType DoxygenCommandType { get; private set; }
 
     public RegexCreatorDelegate RegexCreator { get; private set; }
 
-    // For example, "\ref the_reference" contains of two fragments ("\ref" and "the_reference"). These two
-    // distinct fragments are parsed by the regex. Their corresponding types are listed here.
-    // So this must contain from FragmentType for every group in the regex.
-    public FragmentType[] FragmentTypes { get; private set; }
+    /// <summary>
+    /// For each group in the regex, there must be one element. The first element is
+    /// for the Doxygen command itself, the remaining ones for the command's parameters.
+    /// </summary>
+    public ClassificationEnum[] Classifications { get; private set; }
 
     public DoxygenCommandGroup(
         List<string> cmds,
-        DoxygenCommandType doxygenCommandType,
         RegexCreatorDelegate regexCreator,
-        FragmentType[] fragmentTypes)
+        ClassificationEnum[] classifications)
     {
       Commands = cmds;
-      DoxygenCommandType = doxygenCommandType;
       RegexCreator = regexCreator;
-      FragmentTypes = fragmentTypes;
+      Debug.Assert(classifications.Length > 0);
+      Classifications = classifications;
     }
   }
 
@@ -115,36 +83,6 @@ namespace VSDoxyHighlighter
     /// </summary>
     public List<DoxygenCommandGroup> CommandGroups { get; private set; }
 
-    /// <summary>
-    /// Maps the given command (which must not start with the initial "\" or "@") to the command type,
-    /// as configured by the user.
-    /// </summary>
-    public DoxygenCommandType? FindTypeForCommand(string commandWithoutStart)
-    {
-      // We need to use a lock since we update the map below, and at least the code for the
-      // command autocomplete box calls it from worker threads, while e.g. the format classifier
-      // works on the main thread.
-      // TODO: Profile.
-      lock (mLockForMap) {
-        if (mCommandStringToTypeMap.TryGetValue(commandWithoutStart, out var commandType)) {
-          return commandType;
-        }
-
-        // Some commands such as "\code" come with special regex parsers that attach additional parameters directly to the command.
-        // For example, we get as fragmentText "\code{.py}" here. So if we couldn't match it exactly, check for matching start.
-        // And also cache the result for the future.
-        foreach (DoxygenCommandGroup group in CommandGroups) {
-          int commandIdx = group.Commands.FindIndex(origCmd => commandWithoutStart.StartsWith(origCmd));
-          if (commandIdx >= 0) {
-            mCommandStringToTypeMap.Add(commandWithoutStart, group.DoxygenCommandType); // Cache the result
-            return group.DoxygenCommandType;
-          }
-        }
-
-        return null;
-      }
-    }
-
 
     public void Dispose()
     {
@@ -159,6 +97,12 @@ namespace VSDoxyHighlighter
     }
 
 
+    public static bool IsKnownDefaultCommand(string cmd) 
+    {
+      return DefaultCommandsInConfig.FindIndex(cfgElem => cfgElem.Command == cmd) >= 0;
+    }
+
+
     private void OnSettingsChanged(object sender, EventArgs e)
     {
       InitCommands();
@@ -169,24 +113,15 @@ namespace VSDoxyHighlighter
     private void InitCommands()
     {
       CommandGroups = ApplyConfigList(mGeneralOptions.DoxygenCommandsConfig);
-
-      mCommandStringToTypeMap = new Dictionary<string, DoxygenCommandType>();
-      foreach (DoxygenCommandGroup group in CommandGroups) {
-        foreach (string cmd in group.Commands) {
-          mCommandStringToTypeMap.Add(cmd, group.DoxygenCommandType);
-        }
-      }
     }
 
 
     private bool mDisposed = false;
     private readonly IGeneralOptions mGeneralOptions;
-    private Dictionary<string /*commandWithoutStart*/, DoxygenCommandType> mCommandStringToTypeMap;
-    private static readonly object mLockForMap = new object();
 
   
     //-----------------------------------------------------------------------------------
-    // Static helpers and members
+    // Private static helpers and members
 
     /// <summary>
     /// Given a collection of commands as configured by the user, returns a copy of the 
@@ -215,14 +150,10 @@ namespace VSDoxyHighlighter
 
           DoxygenCommandGroup origGroup = DefaultCommandGroups[groupIndex];
 
-          FragmentType[] fragmentTypes = new FragmentType[configElem.Parameters.Length + 1];
-          fragmentTypes[0] = FragmentType.Command;
-          for (int idx = 0; idx < configElem.Parameters.Length; ++idx) {
-            fragmentTypes[idx + 1] = ParameterTypeToFragmentType(configElem.Parameters[idx]);
-          }
+          var classifications = configElem.ParametersClassifications.Prepend(configElem.CommandClassification).ToArray();
 
           ungrouped.Add(new DoxygenCommandGroup(
-            new List<string>() { configElem.Command }, configElem.Classification, origGroup.RegexCreator, fragmentTypes));
+            new List<string>() { configElem.Command }, origGroup.RegexCreator, classifications));
         }
       }
 
@@ -249,16 +180,16 @@ namespace VSDoxyHighlighter
     private static List<DoxygenCommandGroup> GroupListOfUngrouped(ICollection<DoxygenCommandGroup> ungrouped)
     {
       var merged = new Dictionary<
-        (string dataAsString, RegexCreatorDelegate), 
-        (DoxygenCommandType cmdType, FragmentType[] fragmentTypes, List<string> cmds)>();
+        (string dataAsString, RegexCreatorDelegate regex), 
+        (ClassificationEnum[] clsifs, List<string> cmds)>();
 
       foreach (DoxygenCommandGroup group in ungrouped) {
         // We cannot sensibly use an array as dictionary key, since it won't compare the actual content of the arrays.
         // Workaround: Convert it to a string.
-        string dataAsString = string.Concat(group.DoxygenCommandType.ToString(), string.Join("|", group.FragmentTypes));
+        string dataAsString = string.Join("|", group.Classifications);
         var arg = (dataAsString, group.RegexCreator);
         if (!merged.ContainsKey(arg)) {
-          merged[arg] = (group.DoxygenCommandType, group.FragmentTypes, new List<string>());
+          merged[arg] = (group.Classifications, new List<string>());
         }
 
         Debug.Assert(group.Commands.Count == 1);
@@ -268,7 +199,7 @@ namespace VSDoxyHighlighter
 
       var resultGroups = new List<DoxygenCommandGroup>();
       foreach (var mergedItem in merged) {
-        var group = new DoxygenCommandGroup(mergedItem.Value.cmds, mergedItem.Value.cmdType, mergedItem.Key.Item2, mergedItem.Value.fragmentTypes);
+        var group = new DoxygenCommandGroup(mergedItem.Value.cmds, mergedItem.Key.regex, mergedItem.Value.clsifs);
         resultGroups.Add(group);
       }
 
@@ -281,7 +212,7 @@ namespace VSDoxyHighlighter
       // So we sort the result with some arbitrary criterion. Using the negative Count to get the common
       // "\brief" command early one, which is convenient for debugging.
       var sortedResult = resultGroups.OrderBy(
-          group => (group.FragmentTypes.Length, -group.Commands.Count, group.Commands[0])
+          group => (group.Classifications.Length, -group.Commands.Count, group.Commands[0])
         ).ToList();
 
       return sortedResult;
@@ -297,9 +228,8 @@ namespace VSDoxyHighlighter
         foreach (string cmd in cmdGroup.Commands) {
           var newConfig = new DoxygenCommandInConfig() {
             Command = cmd,
-            Classification = cmdGroup.DoxygenCommandType,
-            // Skip the first fragment since the user is not supposed to change the fragment type of the command itself.
-            Parameters = cmdGroup.FragmentTypes.Skip(1).Select(t => FragmentTypeToParameterType(t)).ToArray()
+            CommandClassification = cmdGroup.Classifications[0],
+            ParametersClassifications = cmdGroup.Classifications.Skip(1).ToArray()
           };
           result.Add(newConfig);
         }
@@ -327,56 +257,6 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static ParameterTypeInConfig FragmentTypeToParameterType(FragmentType type) 
-    {
-      switch (type) {
-        case FragmentType.Parameter1: 
-          return ParameterTypeInConfig.Parameter1;
-        case FragmentType.Parameter2: 
-          return ParameterTypeInConfig.Parameter2;
-        case FragmentType.Title: 
-          return ParameterTypeInConfig.Title;
-        case FragmentType.EmphasisMinor: 
-          return ParameterTypeInConfig.EmphasisMinor;
-        case FragmentType.EmphasisMajor: 
-          return ParameterTypeInConfig.EmphasisMajor;
-        case FragmentType.Strikethrough: 
-          return ParameterTypeInConfig.Strikethrough;
-        case FragmentType.InlineCode: 
-          return ParameterTypeInConfig.InlineCode;
-
-        // Especially: FragmentType.Command cannot be converted.
-        default:
-          Debug.Assert(false);
-          throw new VSDoxyHighlighterException($"Attempted to convert FragmentType '{type}' to ParameterTypeInConfig, which is not possible.");
-      }
-    }
-
-
-    private static FragmentType ParameterTypeToFragmentType(ParameterTypeInConfig type)
-    {
-      switch (type) {
-        case ParameterTypeInConfig.Parameter1:
-          return FragmentType.Parameter1;
-        case ParameterTypeInConfig.Parameter2:
-          return FragmentType.Parameter2;
-        case ParameterTypeInConfig.Title:
-          return FragmentType.Title;
-        case ParameterTypeInConfig.EmphasisMinor:
-          return FragmentType.EmphasisMinor;
-        case ParameterTypeInConfig.EmphasisMajor:
-          return FragmentType.EmphasisMajor;
-        case ParameterTypeInConfig.Strikethrough:
-          return FragmentType.Strikethrough;
-        case ParameterTypeInConfig.InlineCode:
-          return FragmentType.InlineCode;
-        default:
-          Debug.Assert(false);
-          throw new VSDoxyHighlighterException($"Unknown ParameterTypeInConfig '{type}'.");
-      }
-    }
-
-
     static DoxygenCommands()
     {
       DefaultCommandGroups = new DoxygenCommandGroup[] {
@@ -398,18 +278,16 @@ namespace VSDoxyHighlighter
               "arg", "li", "docbookonly", "htmlonly", "htmlonly[block]", "latexonly", "manonly",
               "rtfonly", "verbatim", "xmlonly"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "code"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_CodeCommand,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
@@ -420,9 +298,8 @@ namespace VSDoxyHighlighter
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly", "n"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
@@ -431,45 +308,40 @@ namespace VSDoxyHighlighter
             @"@", @"&", @"$", @"#", @"<", @">", @"%", @".", @"=", @"::", @"|",
             @"---", @"--", @"{", @"}"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "f"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_FormulaEnvironmentStart,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "~"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_Language,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Command1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "warning", "raisewarning"
           },
-          DoxygenCommandType.Warning,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Warning }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "note", "todo", "attention", "bug", "deprecated"
           },
-          DoxygenCommandType.Note,
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
-          new FragmentType[] { FragmentType.Command }
+          new ClassificationEnum[] { ClassificationEnum.Note }
         ),
 
 
@@ -482,18 +354,16 @@ namespace VSDoxyHighlighter
             "memberof", "namespace", "package", "relates", "related",
             "relatesalso", "relatedalso", "retval"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "throw", "throws", "exception", "idlexcept"
           },
-          DoxygenCommandType.Exceptions,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Exceptions, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
@@ -507,36 +377,32 @@ namespace VSDoxyHighlighter
             "verbinclude", "htmlinclude", "htmlinclude[block]", "latexinclude",
             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "cond"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "par", "name"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "mainpage"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
@@ -544,38 +410,34 @@ namespace VSDoxyHighlighter
             "p", "c", "anchor", "cite", "link", "refitem",
             "copydoc", "copybrief", "copydetails", "emoji"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter2 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter2 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "a", "e", "em"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          new FragmentType[] { FragmentType.Command, FragmentType.EmphasisMinor }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.EmphasisMinor }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "b"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
-          new FragmentType[] { FragmentType.Command, FragmentType.EmphasisMajor }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.EmphasisMajor }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "qualifier"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1 }
         ),
 
 
@@ -587,29 +449,26 @@ namespace VSDoxyHighlighter
             "section", "subsection", "subsubsection", "paragraph",
             "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "showdate"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "ref", "subpage"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter2, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
 
         //----- With up to three parameters -------
@@ -618,27 +477,24 @@ namespace VSDoxyHighlighter
           new List<string> {
             "category", "class", "interface", "protocol", "struct", "union"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "startuml"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_StartUmlCommandWithBracesOptions,
-          new FragmentType[] { FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "dot", "msc"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
-          new FragmentType[] { FragmentType.Command, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         //----- More parameters -------
@@ -647,18 +503,16 @@ namespace VSDoxyHighlighter
           new List<string> {
             "dotfile", "mscfile", "diafile"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(
           new List<string> {
             "image"
           },
-          DoxygenCommandType.Command1,
           CommentParser.BuildRegex_ImageCommand,
-          new FragmentType[] { FragmentType.Command, FragmentType.Parameter1, FragmentType.Parameter2, FragmentType.Title, FragmentType.Parameter1, FragmentType.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command1, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
       };

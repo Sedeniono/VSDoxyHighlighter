@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Imaging;
+﻿using EnvDTE;
+using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using System;
@@ -32,6 +33,7 @@ namespace VSDoxyHighlighter
     InlineCode = 600
   }
 
+
   /// <summary>
   /// Represents a single Doxygen command that can be configured by the user.
   /// Note that its members are serialized to and from a string!
@@ -46,27 +48,25 @@ namespace VSDoxyHighlighter
     [DataMember(Name = "Cmd", Order = 0)] // Enables serialization via DoxygenCommandInConfigListSerialization
     public string Command { get; set; } = "NEW_COMMAND";
 
-    private const string PropertiesCategory = "Properties";
+    private const string ClassificationsCategory = "Classifications";
 
-    [Category(PropertiesCategory)]
+    [Category(ClassificationsCategory)]
     [DisplayName("Command classification")]
     [Description("Specifies which classification from the fonts & colors dialog is used for this command.")]
-    [DataMember(Name = "Clsif", Order = 1)] // Enables serialization via DoxygenCommandInConfigListSerialization
-    public DoxygenCommandType Classification { get; set; } = DoxygenCommandType.Command1;
+    [DataMember(Name = "CmdClsif", Order = 1)] // Enables serialization via DoxygenCommandInConfigListSerialization
+    public ClassificationEnum CommandClassification { get; set; } = ClassificationEnum.Command1;
 
-
-    // TODO: We have some weird mixture of fragmentTypes vs classifications going on here, I think.
-    // What the user actually wants to specify here is the classification, I think?
 
     // TODO: Introduce some dummy parameter classifications.
+    //       Or rather: Remove the "Command2+3" stuff. Instead, add "Generic1,2,3,4,5..."?
 
-    [Category(PropertiesCategory)]
-    [DisplayName("Parameter types")]
+    [Category(ClassificationsCategory)]
+    [DisplayName("Parameter classifications")]
     [Description("Allows to change how the parameters of a Doxygen command should get classified.")]
     [DataMember(Name = "Params", Order = 2)] // Enables serialization via DoxygenCommandInConfigListSerialization
     [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))]
     [ReadOnly(true)] // Causes to hide the "..." button (and thus to resize etc the array), but nevertheless allows changing the elements of the array.
-    public ParameterTypeInConfig[] Parameters { get; set; } = new ParameterTypeInConfig[] { };
+    public ClassificationEnum[] ParametersClassifications { get; set; } = new ClassificationEnum[] { };
 
     // Get a sensible display in the CollectionEditor.
     public override string ToString()
@@ -267,7 +267,9 @@ namespace VSDoxyHighlighter
             //return DoxygenCommands.DefaultCommandsInConfig;
 
             var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
-            return (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
+            var commands = (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
+            ValidateParsedFromString(commands);
+            return commands;
           }
           catch (Exception ex) {
             // The serialization can fail if we made some non-backward compatible changes. Or if the user somehow
@@ -303,6 +305,30 @@ namespace VSDoxyHighlighter
     }
 
 
+    private static void ValidateParsedFromString(IEnumerable<DoxygenCommandInConfig> parsed)
+    {
+      foreach (DoxygenCommandInConfig cmd in parsed) {
+        if (!DoxygenCommands.IsKnownDefaultCommand(cmd.Command)) {
+          throw new VSDoxyHighlighterException(
+            $"Command '{cmd.Command}' is not known.");
+        }
+
+        if (!Enum.IsDefined(typeof(ClassificationEnum), cmd.CommandClassification)) {
+          throw new VSDoxyHighlighterException(
+            $"Command classification converted from string to enum resulted in an invalid enum value '{cmd.CommandClassification}' for command '{cmd.Command}'.");
+        }
+
+        for (int paramClsifIdx = 0; paramClsifIdx < cmd.ParametersClassifications.Length; ++paramClsifIdx) {
+          ClassificationEnum paramClsif = cmd.ParametersClassifications[paramClsifIdx];
+          if (!Enum.IsDefined(typeof(ClassificationEnum), paramClsif)) {
+            throw new VSDoxyHighlighterException(
+              $"Parameter classification {paramClsifIdx+1} converted from string to enum resulted in an invalid enum value '{paramClsif}' for command '{cmd.Command}'.");
+          }
+        }
+      }
+    }
+
+
     private static void HandleConversionFromStringError(string valueAsString, Exception ex)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
@@ -328,7 +354,7 @@ namespace VSDoxyHighlighter
 
       InfoBar.ShowMessage(
         icon: KnownMonikers.StatusError,
-        message: "VSDoxyHighlighter: Failed to parse Doxygen commands configuration from string. Backed up configuration and restored default.",
+        message: "VSDoxyHighlighter: Failed to parse Doxygen commands configuration from string. Backed up configuration and restored defaults.",
         actions: new (string, Action)[] {
                   ("Show details",
                     () => MessageBox.Show(
@@ -349,7 +375,7 @@ namespace VSDoxyHighlighter
   //==========================================================================================
 
   /// <summary>
-  /// Custom converter to define a custom text that should be displayed for the DoxygenCommandInConfig.Parameters array.
+  /// Custom converter to define a custom text that should be displayed for the DoxygenCommandInConfig.ParametersClassifications array.
   /// The string is NOT serialized using this converter, because that variable is serialized "manually" via JSON
   /// rather than by the Visual Studio machinery.
   /// </summary>

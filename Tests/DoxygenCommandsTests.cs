@@ -20,9 +20,8 @@ namespace VSDoxyHighlighter.Tests
         DoxygenCommandGroup resultGroup = result[resultGroupIdx];
 
         CollectionAssert.AreEquivalent(expectedGroup.Commands, resultGroup.Commands); // Same elements, order does not matter
-        Assert.AreEqual(expectedGroup.DoxygenCommandType, resultGroup.DoxygenCommandType);
         Assert.AreEqual(expectedGroup.RegexCreator, resultGroup.RegexCreator);
-        CollectionAssert.AreEqual(expectedGroup.FragmentTypes, resultGroup.FragmentTypes); // Same elements in the same order
+        CollectionAssert.AreEqual(expectedGroup.Classifications, resultGroup.Classifications); // Same elements in the same order
       }
     }
   }

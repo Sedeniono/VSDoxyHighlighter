@@ -177,7 +177,7 @@ namespace VSDoxyHighlighter
 
         //------ Add a line with the actual command.
         string cmdWithSlash = "\\" + cmd.Command;
-        ClassificationEnum commandClassification = GetClassificationForCommandOrDefault(cmdWithSlash);
+        ClassificationEnum commandClassification = GetClassificationForCommand(cmdWithSlash);
         runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
         runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
 
@@ -226,21 +226,19 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ClassificationEnum GetClassificationForCommandOrDefault(string cmdWithSlash)
+    private ClassificationEnum GetClassificationForCommand(string cmdWithSlash)
     {
-      ClassificationEnum? correctClassification = GetClassificationForFragment(FragmentType.Command, cmdWithSlash);
-      if (correctClassification.HasValue) {
-        return correctClassification.Value;
+      Debug.Assert(cmdWithSlash.StartsWith("\\") || cmdWithSlash.StartsWith("@"));
+
+      // TODO: Performance...
+      SortedSet<FormattedFragment> parsed = new CommentParser(mDoxygenCommands).Parse(cmdWithSlash);
+      if (parsed.Count == 1) {
+        return parsed.Max.Classification;
       }
       else {
+        Debug.Assert(false);
         return ClassificationEnum.Command1;
       }
-    }
-
-
-    private ClassificationEnum? GetClassificationForFragment(FragmentType fragmentType, string fragmentText)
-    {
-      return CommentParser.FindClassificationEnumForFragment(mDoxygenCommands, fragmentType, fragmentText);
     }
 
 
@@ -252,12 +250,14 @@ namespace VSDoxyHighlighter
         return;
       }
 
-      if (descriptionFragment.Item1 is FragmentType fragmentType) {
-        // Convert the fragment type to the classification by taking into account the user settings.
-        ClassificationEnum? itemClassification = GetClassificationForFragment(fragmentType, descriptionFragment.Item2);
-        if (itemClassification.HasValue) {
-          outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[itemClassification.Value], descriptionFragment.Item2));
-          return;
+      if (descriptionFragment.Item1 is DoxygenHelpPageCommand.OtherTypesEnum otherType) {
+        switch (otherType) {
+          case DoxygenHelpPageCommand.OtherTypesEnum.Command:
+            ClassificationEnum classificationForOther = GetClassificationForCommand(descriptionFragment.Item2);
+            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.Item2));
+            return;
+          default:
+            throw new VSDoxyHighlighterException($"Unknown value for DoxygenHelpPageCommand.OtherTypesEnum: {otherType}");
         }
       }
 

@@ -17,23 +17,23 @@ using Microsoft.VisualStudio.Shell;
 namespace VSDoxyHighlighter
 {
   // Enumeration of all possible classifications. We could have also used the string IDs, but an enum is more convenient
-  // (e.g. to find all occurrences).
-  // Order doesn't matter, but the numeric values are used as indices! (But they aren't serialized anywhere.)
+  // (e.g. to find all occurrences, or to get shorter serialized values).
+  // NOTE: The values are serialized in the options page! Also, the values are used as indices!
   public enum ClassificationEnum : uint
   {
-    Command1,
-    Command2, // Not used by default, but the user can configure commands to use it.
-    Command3, // Not used by default, but the user can configure commands to use it.
-    Note,
-    Warning,
-    Exceptions,
-    Parameter1,
-    Parameter2,
-    Title,
-    EmphasisMinor,
-    EmphasisMajor,
-    Strikethrough,
-    InlineCode
+    Command1 = 0,
+    Command2 = 1, // Not used by default, but the user can configure commands to use it.
+    Command3 = 2, // Not used by default, but the user can configure commands to use it.
+    Note = 3,
+    Warning = 4,
+    Exceptions = 5,
+    Parameter1 = 6,
+    Parameter2 = 7,
+    Title = 8,
+    EmphasisMinor = 9,
+    EmphasisMajor = 10,
+    Strikethrough = 11,
+    InlineCode = 12
   }
 
 

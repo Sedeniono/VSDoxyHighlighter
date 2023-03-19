@@ -6,6 +6,12 @@
   /// </summary>
   public class DoxygenHelpPageCommand
   {
+    public enum OtherTypesEnum
+    {
+      Command
+    }
+
+
     /// <summary>
     /// The Doxygen command, without the "\". For example: "param"
     /// </summary>
@@ -22,7 +28,7 @@
     /// individual strings. However, we also have some semantic information:
     /// - If the first item is null, then it is ordinary text.
     /// - If the first item is a ClassificationEnum, then we apply that classification as-is.
-    /// - If the first item is a FragmentType, then we convert it to a ClassificationEnum taking
+    /// - If the first item is a OtherTypesEnum, then we convert it to a ClassificationEnum taking
     ///   into account the user settings.
     /// </summary>
     public readonly (object, string)[] Description;

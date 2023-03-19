@@ -425,7 +425,7 @@ def map_fragment_type_to_csharp_type(type: FragmentType) -> str:
     elif type == FragmentType.Warning:
         return "ClassificationEnum.Warning"
     elif type == FragmentType.Command:
-        return "FragmentType.Command"
+        return "DoxygenHelpPageCommand.OtherTypesEnum.Command"
     else:
         raise Exception("Unknown FragmentType")
 

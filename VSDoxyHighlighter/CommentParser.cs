@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter
 {
-
-
   /// <summary>
   /// Represents how a single continuous piece of text should be formatted.
   /// </summary>
@@ -110,19 +108,15 @@ namespace VSDoxyHighlighter
       // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
       var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
 
-      foreach (var matcher in mMatchers) {
+      foreach (FragmentMatcher matcher in mMatchers) {
         var foundMatches = matcher.re.Matches(text);
         foreach (Match m in foundMatches) {
-          if (1 < m.Groups.Count && m.Groups.Count <= matcher.types.Length + 1) {
+          if (1 < m.Groups.Count && m.Groups.Count <= matcher.classifications.Length + 1) {
             for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
               Group group = m.Groups[idx + 1];
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
-                FragmentType fragmentType = (FragmentType)matcher.types[idx];
-                string fragmentText = text.Substring(group.Index, group.Length);
-                ClassificationEnum? classification = FindClassificationEnumForFragment(mDoxygenCommands, fragmentType, fragmentText);
-                if (classification != null) {
-                  result.Add(new FormattedFragment(group.Index, group.Length, classification.Value));
-                }
+                ClassificationEnum classificationsOfGroups = matcher.classifications[idx];
+                result.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
               }
             }
           }
@@ -130,65 +124,6 @@ namespace VSDoxyHighlighter
       }
 
       return result;
-    }
-
-
-    /// <summary>
-    /// Maps the given <paramref name="fragmentType"/> to a classification. In case of a command, the mapped-to classification
-    /// depends on the command, which must be given by <paramref name="fragmentText"/>.
-    /// </summary>
-    /// <returns>The classification. Returns null in case the fragmentType is a Command and the fragmentText contains
-    /// and unknown command.</returns>
-    public static ClassificationEnum? FindClassificationEnumForFragment(DoxygenCommands doxygenCommands, FragmentType fragmentType, string fragmentText)
-    {
-      switch (fragmentType) {
-        case FragmentType.Command:
-          if (fragmentText.Length > 0) {
-            if (!fragmentText.StartsWith("\\") && !fragmentText.StartsWith("@")) {
-              return null;
-            }
-
-            // Strip the initial "\" or "@".
-            string commandWithoutStart = fragmentText.Substring(1);
-
-            DoxygenCommandType? cmdType = doxygenCommands.FindTypeForCommand(commandWithoutStart);
-
-            if (cmdType.HasValue) {
-              switch (cmdType.Value) {
-                case DoxygenCommandType.Command1:
-                  return ClassificationEnum.Command1;
-                case DoxygenCommandType.Command2:
-                  return ClassificationEnum.Command2;
-                case DoxygenCommandType.Command3:
-                  return ClassificationEnum.Command3;
-                case DoxygenCommandType.Note:
-                  return ClassificationEnum.Note;
-                case DoxygenCommandType.Warning:
-                  return ClassificationEnum.Warning;
-                case DoxygenCommandType.Exceptions:
-                  return ClassificationEnum.Exceptions;
-              }
-            }
-          }
-          return null;
-
-        case FragmentType.Parameter1:
-          return ClassificationEnum.Parameter1;
-        case FragmentType.Parameter2:
-          return ClassificationEnum.Parameter2;
-        case FragmentType.Title:
-          return ClassificationEnum.Title;
-        case FragmentType.EmphasisMinor:
-          return ClassificationEnum.EmphasisMinor;
-        case FragmentType.EmphasisMajor:
-          return ClassificationEnum.EmphasisMajor;
-        case FragmentType.Strikethrough: 
-          return ClassificationEnum.Strikethrough;
-        case FragmentType.InlineCode:
-          return ClassificationEnum.InlineCode;
-      }
-
-      return null; // Can happen if something in the configuration went wrong.
     }
 
 
@@ -204,14 +139,14 @@ namespace VSDoxyHighlighter
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.InlineCode }
+        classifications = new ClassificationEnum[] { ClassificationEnum.InlineCode }
       });
 
       // Add all Doxygen commands
       foreach (DoxygenCommandGroup cmdGroup in doxygenCommands) {
         matchers.Add(new FragmentMatcher {
           re = new Regex(cmdGroup.RegexCreator(cmdGroup.Commands), cOptions),
-          types = cmdGroup.FragmentTypes
+          classifications = cmdGroup.Classifications
         });
       }
 
@@ -242,35 +177,35 @@ namespace VSDoxyHighlighter
         //                        1           2a     2b               2c                   2d               2e            3
         //                __________________  __ ____________ _________________ __________________________ __ ____________________________
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.EmphasisMinor }
+        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
       });
 
       // **bold**
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.EmphasisMajor }
+        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
       });
 
       // _italic_
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.EmphasisMinor }
+        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
       });
 
       // __bold__
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.EmphasisMajor }
+        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
       });
 
       // ~~strikethrough~~
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        types = new FragmentType[] { FragmentType.Strikethrough }
+        classifications = new ClassificationEnum[] { ClassificationEnum.Strikethrough }
       });
 
 
@@ -544,12 +479,12 @@ namespace VSDoxyHighlighter
     /// Represents one regex that is used to detect a certain type of doxygen command, together
     /// with the appropriate formatting (FormatType) for reach captured group in the regex.
     /// </summary>
-    struct FragmentMatcher
+    private struct FragmentMatcher
     {
       public Regex re { get; set; }
 
-      // One FormatType for each capturing group in the regex.
-      public FragmentType[] types { get; set; }
+      // One element for each capturing group in the regex.
+      public ClassificationEnum[] classifications { get; set; }
     };
 
     private readonly DoxygenCommands mDoxygenCommands;
