@@ -21,7 +21,7 @@ namespace VSDoxyHighlighter
   /// are parsed with the same regex. So instead of having more than 200 regex, we have less
   /// than 30. That should improve performance.
   /// </summary>
-  public struct DoxygenCommandGroup
+  public class DoxygenCommandGroup
   {
     public List<string> Commands { get; private set; }
 
