@@ -267,10 +267,12 @@ namespace VSDoxyHighlighter
         return cachedClassifications;
       }
 
-      // First step: Identify the comment sections in the given span.
+      // First step: Identify those parts in the span that are actually comments and not code.
+      // But do not yet parse the text for the Doxygen commands.
       List<CommentSpan> commentSpans = mSpanSplitter.SplitIntoComments(originalSpanToCheck);
       
-      // Second step: Apply the formatting to each comment span.
+      // Second step: For each identified piece of comment, parse it for Doxygen commands and add
+      // the corresponding formatting.
       var result = new List<ClassificationSpan>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING

@@ -50,6 +50,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CommandCompletion.cs" />
+    <Compile Include="CommandQuickInfo.cs" />
     <Compile Include="CommentParser.cs" />
     <Compile Include="DefaultColors.cs" />
     <Compile Include="DoxygenCommands.cs" />

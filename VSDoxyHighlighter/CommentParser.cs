@@ -515,7 +515,7 @@ namespace VSDoxyHighlighter
 
     /// <summary>
     /// Represents one regex that is used to detect a certain type of doxygen command, together
-    /// with the appropriate formatting (FormatType) for reach captured group in the regex.
+    /// with the appropriate formatting (FormatType) for each captured group in the regex.
     /// </summary>
     private struct FragmentMatcher
     {
