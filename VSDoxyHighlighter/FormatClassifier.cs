@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
 
 namespace VSDoxyHighlighter
 {
@@ -237,7 +238,7 @@ namespace VSDoxyHighlighter
     /// Thus, this function searches for words to which apply syntax highlighting, and for each one 
     /// found returns a ClassificationSpan.
     /// 
-    /// The function is typically called with individual lines.
+    /// The function is typically called by VS with individual lines.
     /// </summary>
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
     {
@@ -267,36 +268,42 @@ namespace VSDoxyHighlighter
         return cachedClassifications;
       }
 
+      var formattedFragments = ParseSpan(originalSpanToCheck);
+      var classificationSpans = FormattedFragmentsToClassifications(textSnapshot, formattedFragments);
+
+      mCache[originalSpanToCheck.Span] = classificationSpans;
+      return classificationSpans;
+    }
+
+
+    /// <summary>
+    /// Parses the given span for comments and the comments themselves for Doxygen commands, markdown, etc.
+    /// Returns a list of found fragments that should be formatted. Note that the start index in each returned
+    /// fragment is absolute (i.e. relative to the start of the whole text buffer).
+    /// </summary>
+    public List<FormattedFragment> ParseSpan(SnapshotSpan originalSpanToCheck)
+    {      
       // First step: Identify those parts in the span that are actually comments and not code.
       // But do not yet parse the text for the Doxygen commands.
       List<CommentSpan> commentSpans = mSpanSplitter.SplitIntoComments(originalSpanToCheck);
-      
-      // Second step: For each identified piece of comment, parse it for Doxygen commands and add
-      // the corresponding formatting.
-      var result = new List<ClassificationSpan>();
+
+      // Second step: For each identified piece of comment, parse it for Doxygen commands, markdown, etc.
+      ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
+      var result = new List<FormattedFragment>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
         if (mGeneralOptions.IsEnabledInCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
-
-          // Scan the given text for keywords and get the proper formatting for it.
           var fragmentsToFormat = mParser.Parse(codeText);
-
-          // Convert the list of fragments that should be formatted to Visual Studio types.
-          foreach (FormattedFragment fragment in fragmentsToFormat) {
-            IClassificationType classificationInstance = mClassificationEnumToInstance[(uint)fragment.Classification];
-            var spanToFormat = new Span(commentSpan.span.Start + fragment.StartIndex, fragment.Length);
-            var snapshotSpan = new SnapshotSpan(textSnapshot, spanToFormat);
-            result.Add(new ClassificationSpan(snapshotSpan, classificationInstance));
-          }
+          // Convert each fragment start from relative to absolute position.
+          result.AddRange(fragmentsToFormat.Select(
+            orig => new FormattedFragment(commentSpan.span.Start + orig.StartIndex, orig.Length, orig.Classification)));
         }
 #else
-        IClassificationType classificationType = mClassificationEnumToInstance[(uint)cCommentTypeDebugFormats[commentSpan.commentType]];
-        result.Add(new ClassificationSpan(new SnapshotSpan(textSnapshot, commentSpan.span), classificationType));
+        result.Add(new FormattedFragment(commentSpan.span.Start, commentSpan.span.Length, cCommentTypeDebugFormats[commentSpan.commentType]));
 #endif
       }
 
-      mCache[originalSpanToCheck.Span] = result;
       return result;
     }
 
@@ -381,6 +388,19 @@ namespace VSDoxyHighlighter
     }
 
 
+    private List<ClassificationSpan> FormattedFragmentsToClassifications(ITextSnapshot textSnapshot, IEnumerable<FormattedFragment> formattedFragments)
+    {
+      var result = new List<ClassificationSpan>();
+      foreach (FormattedFragment fragment in formattedFragments) {
+        IClassificationType classificationInstance = mClassificationEnumToInstance[(uint)fragment.Classification];
+        var spanToFormat = new Span(fragment.StartIndex, fragment.Length);
+        var snapshotSpan = new SnapshotSpan(textSnapshot, spanToFormat);
+        result.Add(new ClassificationSpan(snapshotSpan, classificationInstance));
+      }
+      return result;
+    }
+
+
     private readonly ITextBuffer mTextBuffer;
     private readonly IVisualStudioCppColorer mVSCppColorer;
     private readonly SpanSplitter mSpanSplitter;
@@ -395,7 +415,7 @@ namespace VSDoxyHighlighter
 
 #if ENABLE_COMMENT_TYPE_DEBUGGING
     static readonly Dictionary<CommentType, ClassificationEnum> cCommentTypeDebugFormats = new Dictionary<CommentType, ClassificationEnum> {
-      { CommentType.TripleSlash, ClassificationEnum.Command1 },
+      { CommentType.TripleSlash, ClassificationEnum.Command },
       { CommentType.DoubleSlashExclamation, ClassificationEnum.Parameter1 },
       { CommentType.DoubleSlash, ClassificationEnum.Title },
       { CommentType.SlashStarStar, ClassificationEnum.EmphasisMinor },
