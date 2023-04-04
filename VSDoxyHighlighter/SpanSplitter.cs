@@ -121,11 +121,11 @@ namespace VSDoxyHighlighter
       //    is in a comment is insufficient because of strings and "//" style comments. Detecting strings by itself is
       //    also highly non-trivial due to similar reasons (multiline strings, raw strings, line continuation via "\").
       //  - A "/*" might not start a comment if there is another "/*" before without a corresponding "*/".
-      //    I.e. in "/* foo1 /* foo2 */" the "/*" after "foo1" does not start the comment.
+      //    E.g. in "/* foo1 /* foo2 */" the "/*" after "foo1" does not start the comment.
       //  - The code should be fast. Due to the global character of the multiline comments, some sort of caching needs
       //    to be applied. The cache needs to be updated whenever some text changes, but the update should be as local
       //    as possible for performance reasons. Yet, if the user types e.g. "/*", potentially everything afterwards
-      //    needs to be re-classified as comment (or not).
+      //    needs to be re-classified as comment (or not, if it happens for example in a string).
       //
       // ==> We do not attempt to implement this. Especially considering that Visual Studio itself must somewhere
       //     somehow already have solved this task. The "somewhere" is in the tagger named "Microsoft.VisualC.CppColorer".
@@ -136,7 +136,14 @@ namespace VSDoxyHighlighter
       //     I have not really tried it, but I fear that calling GetClassifier() calls our code, and thus we might end up with
       //     an infinite recursion. Of course, there would be ways to bypass this problem (if it really does occur). But
       //     the approach with the dedicated tagger seems favorable since it limits the request to only that specific tagger,
-      //     and does not involve all the other existing classifiers.
+      //     and does not involve all the other existing taggers. Additionally, it seems as if Visual Studio does not cache
+      //     the classifications anywhere, meaning IClassifierAggregatorService computes every classification again on-the-fly,
+      //     even if they had been computed before and could be reused in principle. Therefore, the more extensions use the
+      //     IClassifierAggregatorService, the more expensive it potentially becomes.
+      //     Also note that there is EnvDTE.FileCodeModel (and there is even a VCFileCodeModel), which apparently is supposed
+      //     to provide an API to the source code. However, it does not seem to know anything at all about comments. Attempting
+      //     to call FileCodeModel.CodeElementFromPoint() with a location in a comment does not yield any result for any value
+      //     in the vsCMElement enum. Also compare e.g. https://stackoverflow.com/q/34222467/3740047.
       //
       // ==> There are basically two disadvantages with this approach: First, we cannot really write automated tests for it
       //     because we would need to have a running Visual Studio instance. Second, it is a hack and thus might break without

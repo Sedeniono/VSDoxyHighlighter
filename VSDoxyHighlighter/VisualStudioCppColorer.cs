@@ -15,7 +15,7 @@ namespace VSDoxyHighlighter
   /// Wraps the access to Visual Studio's default tagger for C/C++ code.
   /// Should be disposed at the end to ensure that the event gets unsubscribed.
   /// 
-  /// Also compare the comment in SpanSplitter.SplitIntoComments().
+  /// Also compare the comment in SpanSplitter.SplitIntoComments() for the reason why we need this.
   /// </summary>
   interface IVisualStudioCppColorer : IDisposable
   {
