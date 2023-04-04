@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.Text;
 using System.Collections.Generic;
 using System;
-using System.Windows;
 using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
@@ -75,8 +74,11 @@ namespace VSDoxyHighlighter
     public event EventHandler<SnapshotSpanEventArgs> CppColorerReclassifiedSpan;
 
 
-    public IEnumerable<ITagSpan<IClassificationTag>> TryGetTags(NormalizedSnapshotSpanCollection spans) 
+    public IEnumerable<ITagSpan<IClassificationTag>> TryGetTags(NormalizedSnapshotSpanCollection spans)
     {
+      // vsCppTagger.GetTags() seems to return no tags at all if we are not on the main thread.
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       var vsCppTagger = FindDefaultVSCppTagger();
       if (vsCppTagger == null) {
         return null;
