@@ -78,16 +78,18 @@ namespace VSDoxyHighlighter
 
 
   //=======================================================================================
-  // SpanSplitter
+  // CommentExtractor
   //=======================================================================================
 
   /// <summary>
-  /// Class responsible for diving up some spans into comments, and identify the type of the 
-  /// comment ("//", "///", "/*", etc). It is NOT responsible for any doxygen formatting.
+  /// Class responsible for getting those parts of some given text span that represent C/C++ comments, 
+  /// together with the type of the comment ("//", "///", "/*", etc). 
+  /// NOTE: It is NOT responsible for any doxygen formatting. It is just about dividing some given text
+  /// into parts representing comments and non-comments.
   /// </summary>
-  internal class SpanSplitter
+  internal class CommentExtractor
   {
-    public SpanSplitter(IVisualStudioCppColorer vsCppColorer) 
+    public CommentExtractor(IVisualStudioCppColorer vsCppColorer) 
     {
       mVSCppColorer = vsCppColorer;
       mCommentTypeIdentification = new CommentTypeIdentification(vsCppColorer);
@@ -103,10 +105,15 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// Decomposes the given span into comments. The returned list of spans all represent comments.
     /// I.e. it filters out all text in the given span that is NOT within a comment, and returns the remaining
-    /// parts as list.
+    /// parts as list as well as the comment type.
     /// 
     /// Every comment receives its own entry. For example, if the input is "/**//**/", the returned list
-    /// contains two entries.
+    /// contains two entries (namely the first "/**/" and the second "/**/"). Another example: If the input 
+    /// is "A/**/B/**/C", then "A", "B" and "C" are not in a comment, so the result is again two entries
+    /// (namely the first "/**/" and the second "/**/").
+    /// 
+    /// Since the code exploits the Visual Studio's cpp colorer, it should give 100% correct results. I.e. it
+    /// knows of raw string literals, line continuations, nested comments, etc.
     /// </summary>
     public List<CommentSpan> SplitIntoComments(SnapshotSpan spanToCheck)
     {
@@ -469,7 +476,7 @@ namespace VSDoxyHighlighter
     private (bool foundStart, VSCommentFragment? lastFragmentInPreviousLine)
       FragmentContainsCommentStartAssuredly(ITagSpan<IClassificationTag> commentFragment)
     {
-      Debug.Assert(SpanSplitter.IsVSComment(commentFragment));
+      Debug.Assert(CommentExtractor.IsVSComment(commentFragment));
 
       var textSnapshot = commentFragment.Span.Snapshot;
 
@@ -540,7 +547,7 @@ namespace VSDoxyHighlighter
       int indexOfCommentTagInLine = vsTags.Count() - 1;
       while (indexOfCommentTagInLine >= 0) {
         var curElem = vsTags.ElementAt(indexOfCommentTagInLine);
-        if (curElem.Span.Contains(charIdx) && SpanSplitter.IsVSComment(curElem)) {
+        if (curElem.Span.Contains(charIdx) && CommentExtractor.IsVSComment(curElem)) {
           return indexOfCommentTagInLine;
         }
         --indexOfCommentTagInLine;

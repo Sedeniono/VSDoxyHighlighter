@@ -203,7 +203,7 @@ namespace VSDoxyHighlighter
       mVSCppColorer = new DefaultVSCppColorerImpl(textBuffer);
       mVSCppColorer.CppColorerReclassifiedSpan += OnVSCppColorerReclassifiedSpan;
 
-      mSpanSplitter = new SpanSplitter(mVSCppColorer);
+      mCommentExtractor = new CommentExtractor(mVSCppColorer);
 
       int numClassifications = Enum.GetNames(typeof(ClassificationEnum)).Length;
       Debug.Assert(numClassifications == ClassificationIDs.ToID.Count);
@@ -285,7 +285,7 @@ namespace VSDoxyHighlighter
     {      
       // First step: Identify those parts in the span that are actually comments and not code.
       // But do not yet parse the text for the Doxygen commands.
-      List<CommentSpan> commentSpans = mSpanSplitter.SplitIntoComments(originalSpanToCheck);
+      List<CommentSpan> commentSpans = mCommentExtractor.SplitIntoComments(originalSpanToCheck);
 
       // Second step: For each identified piece of comment, parse it for Doxygen commands, markdown, etc.
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
@@ -346,7 +346,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    public SpanSplitter SpanSplitter { get { return mSpanSplitter; } }
+    public CommentExtractor CommentExtractor { get { return mCommentExtractor; } }
 
 
     // When this function is called, the user clicked on "OK" in the options, or the list of Doxygen commands changed.
@@ -372,7 +372,7 @@ namespace VSDoxyHighlighter
     {
       InvalidateCache();
 
-      // Since our classification logic is based on the VS cpp colorer (due to the cache, but also because of the SpanSplitter),
+      // Since our classification logic is based on the VS cpp colorer (due to the cache, but also because of the CommentExtractor),
       // we need to trigger a reclassification, too. In principle, even without us triggering another reclassification, the one from
       // the VS cpp colorer might be enough. However, this would depend on the execution order of the listeners of the VS cpp
       // colorer's TagsChanged event. This is brittle. So we trigger one ourselves.
@@ -384,7 +384,7 @@ namespace VSDoxyHighlighter
     {
       mCache.Clear();
       mCachedVersion = -1;
-      mSpanSplitter.InvalidateCache();
+      mCommentExtractor.InvalidateCache();
     }
 
 
@@ -403,7 +403,7 @@ namespace VSDoxyHighlighter
 
     private readonly ITextBuffer mTextBuffer;
     private readonly IVisualStudioCppColorer mVSCppColorer;
-    private readonly SpanSplitter mSpanSplitter;
+    private readonly CommentExtractor mCommentExtractor;
     private readonly IClassificationType[] mClassificationEnumToInstance;
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mParser;

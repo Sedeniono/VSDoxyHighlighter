@@ -218,7 +218,7 @@ namespace VSDoxyHighlighter
       // buffer got created.
       if (triggerLocation.Snapshot.TextBuffer.Properties.TryGetProperty(
                 typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
-        CommentType? commentType = commentClassifier.SpanSplitter.GetTypeOfCommentBeforeLocation(triggerLocation);
+        CommentType? commentType = commentClassifier.CommentExtractor.GetTypeOfCommentBeforeLocation(triggerLocation);
         if (commentType != null) {
           return mGeneralOptions.IsEnabledInCommentType(commentType.Value);
         }
