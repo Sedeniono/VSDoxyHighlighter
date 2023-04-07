@@ -7,7 +7,7 @@
 // Despite using the Visual Studio formatter, some non-trivial logic is necessary
 // to identify the type of the comment ("//", "///", "/*", etc). This file contains
 // various combinations of those. The idea is to define ENABLE_COMMENT_TYPE_DEBUGGING
-// in the FormatClassifier.cs source file, in which case the doxygen highlighting
+// in the CommentClassifier.cs source file, in which case the doxygen highlighting
 // is disabled and instead each comment type is highlighted differently. This makes
 // debugging and testing easier.
 

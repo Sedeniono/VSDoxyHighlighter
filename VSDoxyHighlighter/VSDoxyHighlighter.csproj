@@ -56,8 +56,8 @@
     <Compile Include="DoxygenCommands.cs" />
     <Compile Include="DoxygenHelpPageParser\DoxygenCommandsGeneratedFromHelpPage.cs" />
     <Compile Include="DoxygenHelpPageParser\DoxygenHelpPageCommand.cs" />
-    <Compile Include="FormatClassifier.cs" />
-    <Compile Include="FormatDefinitions.cs" />
+    <Compile Include="CommentClassifier.cs" />
+    <Compile Include="ClassificationFormatDefinitions.cs" />
     <Compile Include="GeneralOptionsPage.cs" />
     <Compile Include="InfoBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

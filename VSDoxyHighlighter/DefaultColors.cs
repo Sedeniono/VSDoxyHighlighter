@@ -72,9 +72,9 @@ namespace VSDoxyHighlighter
     }
 
 
-    public void RegisterFormatDefinition(IFormatDefinition f) 
+    public void RegisterClassificationDefinition(IClassificationDefinition c) 
     {
-      mFormatDefinitions.Add(f);
+      mClassificationDefinitions.Add(c);
     }
 
 
@@ -174,7 +174,7 @@ namespace VSDoxyHighlighter
         // the formatMap), but the registry cache ends up with the wrong colors. After a restart of VS, it uses the cached values
         // and therefore we get the wrong colors.
         // By changing the colors also on the ClassificationFormatDefinition, the issue appears to be fixed.
-        foreach (IFormatDefinition f in mFormatDefinitions) {
+        foreach (IClassificationDefinition f in mClassificationDefinitions) {
           f.Reinitialize();
         }
       }
@@ -264,7 +264,7 @@ namespace VSDoxyHighlighter
     [Import]
     private IClassificationTypeRegistryService mClassificationTypeRegistryService = null;
 
-    private List<IFormatDefinition> mFormatDefinitions = new List<IFormatDefinition>();
+    private List<IClassificationDefinition> mClassificationDefinitions = new List<IClassificationDefinition>();
 
     private bool mDisposed = false;
   }

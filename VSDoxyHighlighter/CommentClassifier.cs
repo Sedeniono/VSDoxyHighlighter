@@ -17,6 +17,10 @@ using System.Linq;
 
 namespace VSDoxyHighlighter
 {
+  //=========================================================================================
+  // ClassificationEnum
+  //=========================================================================================
+
   // Enumeration of all possible classifications. We could have also used the string IDs, but an enum is more convenient
   // (e.g. to find all occurrences, or to get shorter serialized values).
   // NOTE: The values are serialized in the options page! Also, the values are used as indices!
@@ -42,6 +46,10 @@ namespace VSDoxyHighlighter
     Generic5 = 15
   }
 
+
+  //=========================================================================================
+  // ClassificationIDs
+  //=========================================================================================
 
   /// <summary>
   /// Identifiers for the classifications. E.g., Visual Studio will use these strings as keys
@@ -87,87 +95,13 @@ namespace VSDoxyHighlighter
   }
 
 
-
-
-
-
-  /// <summary>
-  /// Tells Visual Studio via MEF about the classifications provided by the extension.
-  /// </summary>
-  internal static class CommentClassificationDefinitions
-  {
-#pragma warning disable 169
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_command)]
-    private static ClassificationTypeDefinition typeDefinitionForCommand;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_warningKeyword)]
-    private static ClassificationTypeDefinition typeDefinitionForWarningKeyword;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_noteKeyword)]
-    private static ClassificationTypeDefinition typeDefinitionForNoteKeyword;
-    
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_exceptions)]
-    private static ClassificationTypeDefinition typeDefinitionForExceptions;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_parameter1)]
-    private static ClassificationTypeDefinition typeDefinitionForParameter1;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_parameter2)]
-    private static ClassificationTypeDefinition typeDefinitionForParameter2;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_emphasisMinor)]
-    private static ClassificationTypeDefinition typeDefinitionForEmphasisMinor;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_emphasisMajor)]
-    private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_strikethrough)]
-    private static ClassificationTypeDefinition typeDefinitionForStrikethrough;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_inlineCode)]
-    private static ClassificationTypeDefinition typeDefinitionForInlineCode;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_title)]
-    private static ClassificationTypeDefinition typeDefinitionForTitle;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_generic1)]
-    private static ClassificationTypeDefinition typeDefinitionForGeneric1;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_generic2)]
-    private static ClassificationTypeDefinition typeDefinitionForGeneric2;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_generic3)]
-    private static ClassificationTypeDefinition typeDefinitionForGeneric3;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_generic4)]
-    private static ClassificationTypeDefinition typeDefinitionForGeneric4;
-
-    [Export(typeof(ClassificationTypeDefinition))]
-    [Name(ClassificationIDs.ID_generic5)]
-    private static ClassificationTypeDefinition typeDefinitionForGeneric5;
-#pragma warning restore 169
-  }
-
-
-
+  //=========================================================================================
+  // CommentClassifierProvider
+  //=========================================================================================
 
   /// <summary>
   /// Factory for CommentClassifier. Automatically created and used by MEF.
+  /// GetClassifier() is called by Visual Studio to create a new classifier to a given text buffer.
   /// </summary>
   [Export(typeof(IClassifierProvider))]
   [ContentType("C/C++")]
@@ -187,9 +121,12 @@ namespace VSDoxyHighlighter
 
 
 
+  //=========================================================================================
+  // CommentClassifier
+  //=========================================================================================
 
   /// <summary>
-  /// Main "entry" point that is used by Visual Studio to get the format (i.e. classification)
+  /// Main "entry" point that is used by Visual Studio to get the classification (i.e. "format")
   /// of some code span. An instance of this class is created by Visual Studio per text buffer
   /// via CommentClassifierProvider. Visual Studio then calls GetClassificationSpans() to get
   /// the classification.
@@ -312,7 +249,7 @@ namespace VSDoxyHighlighter
     {
       // TODO: This is currently dead code.
       // Visual Studio does not call the Dispose() function. It does get called for ITagger, but not for IClassifier.
-      // This looks like a bug: The reasons is probably that the Dispose() method of ClassifierTagger (which owns the
+      // This looks like a bug: The reason is probably that the Dispose() method of ClassifierTagger (which owns the
       // IClassifiers) does not call Dispose() on its IClassifiers:
       // https://github.com/microsoft/vs-editor-api/blob/0209a13c58194d4f2a7d03a2615ef03e857547e7/src/Editor/Text/Impl/ClassificationAggregator/ClassifierTagger.cs#L74
       //
@@ -326,7 +263,7 @@ namespace VSDoxyHighlighter
       // So both ways of doing it is broken due to Visual Studio bugs (VS 17.4.2). Having Dispose() not being called seems
       // like the lesser evil. Especially considering that I failed to trigger a garbage collection that frees the associated
       // ITextBuffer, even when closing the whole Visual Studio solution (but not Visual Studio itself). So Visual Studio
-      // appears to not clean up the memory there, too.
+      // appears to not clean up the memory there anyway.
 
       if (mDisposed) {
         return;
