@@ -235,9 +235,9 @@ namespace VSDoxyHighlighter
     {
       Debug.Assert(cmdWithSlash.StartsWith("\\") || cmdWithSlash.StartsWith("@"));
 
-      SortedSet<FormattedFragment> parsed = mCommentParser.Parse(cmdWithSlash);
-      if (parsed.Count == 1) {
-        return parsed.Max.Classification;
+      var parsed = mCommentParser.Parse(cmdWithSlash);
+      if (parsed.Count() == 1) {
+        return parsed.First().Classification;
       }
       else {
         Debug.Assert(false);

@@ -106,7 +106,7 @@ namespace VSDoxyHighlighter
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.
     /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
-    public SortedSet<FormattedFragment> Parse(string text)
+    public IEnumerable<FormattedFragment> Parse(string text)
     {
       text = text.TrimEnd();
       if (text.EndsWith("*/")) {

@@ -7,6 +7,7 @@ using System.IO;
 using System.Diagnostics;
 using static System.Collections.Specialized.BitVector32;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace VSDoxyHighlighter.Tests
 {
@@ -41,7 +42,7 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    public static List<FormattedFragmentText> ConvertToTextFragments(string text, ICollection<FormattedFragment> fragments)
+    public static List<FormattedFragmentText> ConvertToTextFragments(string text, IEnumerable<FormattedFragment> fragments)
     {
       var result = new List<FormattedFragmentText>();
       foreach (FormattedFragment fragment in fragments) {
@@ -80,7 +81,7 @@ namespace VSDoxyHighlighter.Tests
       var formatter = Utils.CreateDefaultCommentParser();
       var actualFragments = formatter.Parse("");
       Assert.IsNotNull(actualFragments);
-      Assert.AreEqual(0, actualFragments.Count);
+      Assert.AreEqual(0, actualFragments.Count());
     }
 
 
@@ -117,7 +118,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(645, 6, ClassificationEnum.Command), // @brief after /**
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -147,7 +148,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(415, 6, ClassificationEnum.Command), // @brief
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -922,7 +923,7 @@ namespace VSDoxyHighlighter.Tests
       var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
 
-      Assert.AreEqual(0, actualFragments.Count);
+      Assert.AreEqual(0, actualFragments.Count());
     }
 
 
@@ -934,7 +935,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -946,7 +947,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -976,7 +977,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -988,7 +989,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -1000,7 +1001,7 @@ namespace VSDoxyHighlighter.Tests
         Utils.ReadTestInputFromFile("Markdown_DoubleTilde.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.Strikethrough);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
@@ -1041,7 +1042,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(167, 45, ClassificationEnum.InlineCode),
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
+      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
     }
 
 
