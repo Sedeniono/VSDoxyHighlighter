@@ -117,9 +117,7 @@ namespace VSDoxyHighlighter
         text = text.Substring(0, text.Length - 2);
       }
 
-      // Note SortedSet: If there are multiple fragments that overlap, the first regex wins.
-      var result = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
-
+      var allFragments = new List<FormattedFragment>();
       foreach (FragmentMatcher matcher in mMatchers) {
         var foundMatches = matcher.re.Matches(text);
         foreach (Match m in foundMatches) {
@@ -128,14 +126,36 @@ namespace VSDoxyHighlighter
               Group group = m.Groups[idx + 1];
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
                 ClassificationEnum classificationsOfGroups = matcher.classifications[idx];
-                result.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
+                allFragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
               }
             }
           }
         }
       }
 
-      return result;
+      // In case of overlapping fragments, let the fragment win which starts first. This seems like a sensible thing to do.
+      // Especially consider markdown nested in e.g. titles. For example, consider the comment:
+      //    @par Some @b text and `backtics`
+      // Due to the sorting, everything after "@par" gets interpreted as title and the formatting of "@b" and the backtics effectively
+      // get ignored.
+      // Doxygen itself actually applies formatting also in titles. However, we don't do this at the moment for two reasons: First,
+      // to keep it simple. Second, Doxygen's support for such nested formatting seems fragile and maybe not officially supported;
+      // for example, applying backtics in page titles causes the html tag "<tt>" to actually appear in the list of pages rather than
+      // the formatted text.
+      //
+      // Using OrderBy() rather than Sort() to get a stable sort: Of two fragments that start at the same position, let that one win
+      // which was matched by the earlier regex. At the time of writing this, it should not actually be possible that two regex
+      // return matches that start at the same position, but who knows what the future holds.
+      //
+      // Also, NOT passing "sorted" directly into the constructed of SortedSet because apparently the constructor does not iterate
+      // over the input IEnumerable in the correct order.
+      var sorted = allFragments.OrderBy(fragment => fragment.StartIndex);
+      var filtered = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
+      foreach (var fragment in sorted) { // Add the fragments in the correct order, to let the first one win in case of overlaps
+        filtered.Add(fragment);
+      }
+
+      return filtered;
     }
 
 
@@ -169,8 +189,7 @@ namespace VSDoxyHighlighter
     {
       var matchers = new List<FragmentMatcher>();
 
-      // NOTE: The order in which the regexes are created and added here matters!
-      // If there is more than one regex matching a certain text fragment, the first one wins.
+      // NOTE: The order in which the regexes are created and added here should not matter.
 
       // `inline code`
       // Note: Right at the start to overwrite all others.

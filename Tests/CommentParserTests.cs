@@ -1067,5 +1067,29 @@ namespace VSDoxyHighlighter.Tests
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
       CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
+
+
+    [TestMethod()]
+    public void IfFragmentsOverlapTheFirstOneShouldWin()
+    {
+      var input = Utils.ReadTestInputFromFile("OverlappingHighlights.cpp");
+      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
+
+      var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
+        new Utils.FormattedFragmentText(@"`backtics @b should win`", ClassificationEnum.InlineCode),
+
+        new Utils.FormattedFragmentText(@"**bold `should win` over**", ClassificationEnum.EmphasisMajor),
+
+        new Utils.FormattedFragmentText(@"@mainpage", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"Some `inline`, **bold** and *italic* text should loose to titles", ClassificationEnum.Title),
+
+        new Utils.FormattedFragmentText(@"@par", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"Some other @b cmd should @ref loose to @a title", ClassificationEnum.Title),
+      };
+
+      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
+    }
+
   }
 }
