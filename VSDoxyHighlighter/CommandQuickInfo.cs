@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Imaging;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Windows.Shapes;
-
+using Microsoft.VisualStudio.Shell;
 
 namespace VSDoxyHighlighter
 {
@@ -63,20 +63,17 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      //await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-
-      // TODO: Problem: DefaultVSCppColorerImpl.TryGetTags() (used by CommentClassifier) does not find anything if we are not on the main thread.
-      //       It breaks in some native code or something like this.
-      //       This here is a quick & dirty test for this.
-      //   ==> Use the non-async API?
-      //   ==> Get the factory for switching from the package (would that work?)?
-      //   ==> Don't use CommentClassifier?
-      //   ==> Have a look whether we maybe can ditch the VSCppColorer and use an official API?
-      var c = (Microsoft.VisualStudio.Threading.JoinableTaskContext)(
-        session.GetType().GetField("JoinableTaskContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-        .GetValue(session)); //session.JoinableTaskContext;
-      await c.Factory.SwitchToMainThreadAsync(cancellationToken);
+      // Need to switch to the main thread for CommentClassifier. More precisely, because of Visual Studio's cpp colorer
+      // (DefaultVSCppColorerImpl.TryGetTags()) which gets called by CommentClassifier. It fails to return anything if we
+      // are not on the main thread.
+      // An alternative would be to completely rely on the caches in the CommentClassifier and to ensure to never call the
+      // VS cpp colorer from here. I think this should work in practice, since the classification is most likely triggered
+      // before a quick info gets triggered here. But it still feels like a hack. Also, we would need some synchronization
+      // for the caches to avoid race conditions.
+      // So, for simplicity, we switch to the main thread. It most likely does not hurt performance noticeably since the
+      // caches in the CommentClassifier buffer the most expensive parts. And because the quick info does not get triggered
+      // hundreds of times in every second.
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
       (int cmdStartIdx, DoxygenHelpPageCommand cmd) = TryGetCommandInfoAtTriggerPoint(triggerPoint.Value);
 
@@ -190,27 +187,28 @@ namespace VSDoxyHighlighter
       //}
 
 
-      var lineNumber = triggerPoint.Value.GetContainingLine().LineNumber;
-      var lineSpan = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(triggerPoint.Value.GetContainingLine().Extent, SpanTrackingMode.EdgeInclusive);
+      //var lineNumber = triggerPoint.Value.GetContainingLine().LineNumber;
+      //var lineSpan = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(triggerPoint.Value.GetContainingLine().Extent, SpanTrackingMode.EdgeInclusive);
 
-      var lineNumberElm = new ContainerElement(
-          ContainerElementStyle.Wrapped,
-          new ImageElement(_icon),
-          new ClassifiedTextElement(
-              new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "Line number: "),
-              new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, $"{lineNumber + 1}")
-          ));
+      //var lineNumberElm = new ContainerElement(
+      //    ContainerElementStyle.Wrapped,
+      //    new ImageElement(_icon),
+      //    new ClassifiedTextElement(
+      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "Line number: "),
+      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, $"{lineNumber + 1}")
+      //    ));
 
-      var dateElm = new ContainerElement(
-          ContainerElementStyle.Stacked,
-          lineNumberElm,
-          new ClassifiedTextElement(
-              new ClassifiedTextRun(PredefinedClassificationTypeNames.SymbolDefinition, "The current date: "),
-              new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, DateTime.Now.ToShortDateString())
-          ));
+      //var dateElm = new ContainerElement(
+      //    ContainerElementStyle.Stacked,
+      //    lineNumberElm,
+      //    new ClassifiedTextElement(
+      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.SymbolDefinition, "The current date: "),
+      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, DateTime.Now.ToShortDateString())
+      //    ));
 
-      //return Task.FromResult(new QuickInfoItem(lineSpan, dateElm));
-      return new QuickInfoItem(lineSpan, dateElm);
+      ////return Task.FromResult(new QuickInfoItem(lineSpan, dateElm));
+      //return new QuickInfoItem(lineSpan, dateElm);
+      return null;
     }
 
 
@@ -229,12 +227,13 @@ namespace VSDoxyHighlighter
 
     private (int cmdStartIdx, DoxygenHelpPageCommand) TryGetCommandInfoAtTriggerPoint(SnapshotPoint triggerPoint)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       if (triggerPoint.Snapshot.TextBuffer.Properties.TryGetProperty(
             typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
 
         ITextSnapshotLine line = triggerPoint.GetContainingLine();
 
-        // TODO: Race condition. At least the VS colorer caches things. Need some mutex there? Or switch to main thread?
         // TODO: Also cache the result in ParseSpan? Consider the very long comment; the performance to the quick info will be bad otherwise...
         var foundFragments = commentClassifier.ParseSpan(line.Extent);
         foreach (FormattedFragment fragment in foundFragments) {

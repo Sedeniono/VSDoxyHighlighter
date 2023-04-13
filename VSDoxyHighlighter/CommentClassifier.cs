@@ -185,6 +185,8 @@ namespace VSDoxyHighlighter
         return new List<ClassificationSpan>();
       }
 
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
       // Performance optimization: GetClassificationSpans() gets called several times after every edit.
@@ -219,7 +221,13 @@ namespace VSDoxyHighlighter
     /// fragment is absolute (i.e. relative to the start of the whole text buffer).
     /// </summary>
     public List<FormattedFragment> ParseSpan(SnapshotSpan originalSpanToCheck)
-    {      
+    {
+      // Because the used DefaultVSCppColorerImpl, we need to be on the main thread (since the Visual Studio cpp colorer
+      // seems to not work if not on it). Also, we know that we call this code here on the main thread; and we use caches.
+      // So, if it were called on a different thread and if the issue with the VS cpp colorer did not exist, we would
+      // need some synchronization for the caches at least.
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       // First step: Identify those parts in the span that are actually comments and not code.
       // But do not yet parse the text for the Doxygen commands.
       List<CommentSpan> commentSpans = mCommentExtractor.SplitIntoComments(originalSpanToCheck);
