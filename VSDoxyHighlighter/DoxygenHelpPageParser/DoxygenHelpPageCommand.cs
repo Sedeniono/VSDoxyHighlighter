@@ -32,6 +32,12 @@ namespace VSDoxyHighlighter
     public readonly string Parameters;
 
     /// <summary>
+    /// The html anchor for the command. I.e. appending this anchor "https://www.doxygen.nl/manual/commands.html#"
+    /// results in a hyperlink to the online documentation.
+    /// </summary>
+    public readonly string Anchor;
+
+    /// <summary>
     /// The description of the Doxygen command: The string is just the concatenation of the 
     /// individual strings. However, we also have some semantic information:
     /// - If the first item is null, then it is ordinary text.
@@ -42,10 +48,11 @@ namespace VSDoxyHighlighter
     public readonly (object, string)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, (object, string)[] description)
+    public DoxygenHelpPageCommand(string command, string parameters, string anchor, (object, string)[] description)
     {
       Command = command;
       Parameters = parameters;
+      Anchor = anchor;
       Description = description;
     }
   }
@@ -61,6 +68,8 @@ namespace VSDoxyHighlighter
     /// All the Doxygen commands, as extracted from the official help page and amended for use in the extension.
     /// </summary>
     public static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
+
+    private static readonly string cOnlineDocumentationLink = "https://www.doxygen.nl/manual/commands.html";
 
 
     /// <summary>
@@ -101,6 +110,17 @@ namespace VSDoxyHighlighter
         // Using "Parameter2" since, by default, it is displayed non-bold, causing a nicer display.
         runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], helpPageInfo.Parameters));
       }
+      runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
+
+      string hyperlink = $"{cOnlineDocumentationLink}#{helpPageInfo.Anchor}";
+      runs.AddRange(ClassifiedTextElement.CreateHyperlink(
+          text: "Click HERE to open the online documentation.", 
+          tooltip: $"Opens \"{hyperlink}\" in your browser", 
+          navigationAction: () => {
+            // https://stackoverflow.com/a/61035650/3740047
+            Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
+          })
+        .Runs);
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
       // Add the whole description.
@@ -196,7 +216,7 @@ namespace VSDoxyHighlighter
         throw new VSDoxyHighlighterException($"Command '{originalCommand}' not found in list of Doxygen commands.");
       }
       DoxygenHelpPageCommand original = cAmendedDoxygenCommands[idx];
-      commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Description));
+      commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Anchor, original.Description));
     }
   }
 }
