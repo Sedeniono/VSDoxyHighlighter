@@ -9,6 +9,7 @@ namespace VSDoxyHighlighter.Tests
   {
     public bool EnableHighlighting { get; } = true;
     public bool EnableAutocomplete { get; } = true;
+    public bool EnableQuickInfo { get; } = true;
 
     public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 

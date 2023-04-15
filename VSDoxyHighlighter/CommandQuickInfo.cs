@@ -51,6 +51,11 @@ namespace VSDoxyHighlighter
       ThreadHelper.ThrowIfNotOnUIThread();
 
       mTextBuffer = textBuffer;
+
+      // We don't subscribe to change events of the options or the parser: A CommentCommandAsyncQuickInfoSource is
+      // only relevent while a specific quick info box is shown. Every quick info box gets its own instance.
+      // The user cannot really change the settings while keeping such a box open.
+      mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }
 
@@ -66,6 +71,10 @@ namespace VSDoxyHighlighter
     /// </summary>
     public async Task<QuickInfoItem> GetQuickInfoItemAsync(IAsyncQuickInfoSession session, CancellationToken cancellationToken)
     {
+      if (!mGeneralOptions.EnableQuickInfo) {
+        return null;
+      }
+
       SnapshotPoint? triggerPoint = session.GetTriggerPoint(mTextBuffer.CurrentSnapshot);
       if (triggerPoint == null) {
         return null;
@@ -156,7 +165,8 @@ namespace VSDoxyHighlighter
     }
 
 
-    private readonly ITextBuffer mTextBuffer;
+    private readonly ITextBuffer mTextBuffer; 
+    private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;
   }
 }

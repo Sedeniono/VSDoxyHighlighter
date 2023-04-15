@@ -84,6 +84,7 @@ namespace VSDoxyHighlighter
   {
     bool EnableHighlighting { get; }
     bool EnableAutocomplete { get; }
+    bool EnableQuickInfo { get; }
 
     List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 
@@ -160,16 +161,21 @@ namespace VSDoxyHighlighter
     [Category(FeaturesSubCategory)]
     [DisplayName("Enable highlighting")]
     [Description("Enables the syntax highlighting of commands in comments. " 
-      + "Note that with the other settings you can define in which comment types the highlighting is enabled.")]
+      + "Note that with the settings below you can define in which comment types the highlighting is enabled.")]
     public bool EnableHighlighting { get; set; } = true;
 
     [Category(FeaturesSubCategory)]
     [DisplayName("Enable IntelliSense")]
     [Description("Enables the autocomplete of commands while typing in comments (\"IntelliSense\"): "
       + "When enabled and you type a \"\\\" or \"@\" in a comment, a list of all Doxygen commands appears. "
-      + "Note that with the other settings you can define in which comment types the autocomplete is enabled.")]
+      + "Note that with the settings below you can define in which comment types the autocomplete is enabled.")]
     public bool EnableAutocomplete { get; set; } = true;
 
+    [Category(FeaturesSubCategory)]
+    [DisplayName("Enable quick info")]
+    [Description("If enabled, hovering over a Doxygen command will display the help text of that command. "
+      + "Note that with the settings below you can define in which comment types the quick info is enabled.")]
+    public bool EnableQuickInfo { get; set; } = true;
 
     //----------------
     // Comment types
