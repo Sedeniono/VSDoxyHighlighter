@@ -96,12 +96,12 @@ namespace VSDoxyHighlighter
 
       if (fragmentGroup != null && helpPageInfo != null) {
         // TODO: Retain hyperlinks and "Click here"?
-        // TODO: Hyperlink to online documentation
         // TODO: What about markdown?
 
         // Only the first fragment can contain the Doxygen command.
         ClassificationEnum commandClassification = fragmentGroup.Fragments[0].Classification;
-        var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, helpPageInfo, commandClassification);
+        var description = AllDoxygenHelpPageCommands.ConstructDescription(
+          mCommentParser, helpPageInfo, commandClassification, showHyperlinks: true);
 
         // If the user moves away with the mouse from this tracking span, the quick info vanishes.
         var spanWhereQuickInfoIsValid = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(

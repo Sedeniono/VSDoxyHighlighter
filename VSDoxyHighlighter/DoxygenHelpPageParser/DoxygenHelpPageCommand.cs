@@ -76,11 +76,14 @@ namespace VSDoxyHighlighter
     /// Given a specific Doxygen command from the help page, constructs a description suitable for use by Visual Studio
     /// in tool tips.
     /// </summary>
-    public static ClassifiedTextElement ConstructDescription(CommentParser commentParser, DoxygenHelpPageCommand helpPageInfo)
+    public static ClassifiedTextElement ConstructDescription(
+      CommentParser commentParser, 
+      DoxygenHelpPageCommand helpPageInfo,
+      bool showHyperlinks)
     {
       string cmdWithSlash = "\\" + helpPageInfo.Command;
       ClassificationEnum commandClassification = commentParser.GetClassificationForCommand(cmdWithSlash);
-      return ConstructDescription(commentParser, helpPageInfo, commandClassification);
+      return ConstructDescription(commentParser, helpPageInfo, commandClassification, showHyperlinks);
     }
 
 
@@ -92,7 +95,8 @@ namespace VSDoxyHighlighter
     public static ClassifiedTextElement ConstructDescription(
       CommentParser commentParser,
       DoxygenHelpPageCommand helpPageInfo,
-      ClassificationEnum commandClassification)
+      ClassificationEnum commandClassification,
+      bool showHyperlinks)
     {
       var runs = new List<ClassifiedTextRun>();
 
@@ -108,20 +112,27 @@ namespace VSDoxyHighlighter
       }
       else {
         // Using "Parameter2" since, by default, it is displayed non-bold, causing a nicer display.
+        // Note: Attempting to apply the classifications that the user configured for the individual parameters
+        // would be nice, but this is hard. The help text cannot be simply parsed with our usual CommentParser,
+        // since the help text follows different rules (it uses "[", "<", etc to indicate the semantic of each
+        // parameter). So for now we do not attempt this.
         runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], helpPageInfo.Parameters));
       }
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
-      string hyperlink = $"{cOnlineDocumentationLink}#{helpPageInfo.Anchor}";
-      runs.AddRange(ClassifiedTextElement.CreateHyperlink(
-          text: "Click HERE to open the online documentation.", 
-          tooltip: $"Opens \"{hyperlink}\" in your browser", 
-          navigationAction: () => {
-            // https://stackoverflow.com/a/61035650/3740047
-            Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
-          })
-        .Runs);
-      runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
+      // If desired, add a clickable hyperlink to the only documentation.
+      if (showHyperlinks) {
+        string hyperlink = $"{cOnlineDocumentationLink}#{helpPageInfo.Anchor}";
+        runs.AddRange(ClassifiedTextElement.CreateHyperlink(
+            text: "Click HERE to open the online documentation.",
+            tooltip: $"Opens \"{hyperlink}\" in your browser.",
+            navigationAction: () => {
+              // https://stackoverflow.com/a/61035650/3740047
+              Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
+            })
+          .Runs);
+        runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
+      }
 
       // Add the whole description.
       foreach (var descriptionFragment in helpPageInfo.Description) {

@@ -178,7 +178,8 @@ namespace VSDoxyHighlighter
     public /*async*/ Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
     {
       if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
-        var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, cmd);
+        // We don't show hyperlinks because Visual Studio does not allow clicking on them.
+        var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, cmd, showHyperlinks: false);
         return Task.FromResult<object>(description);
       }
 
