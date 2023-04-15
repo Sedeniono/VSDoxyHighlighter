@@ -208,7 +208,7 @@ namespace VSDoxyHighlighter
       }
 
       var formattedFragments = ParseSpan(originalSpanToCheck);
-      var classificationSpans = FormattedFragmentsToClassifications(textSnapshot, formattedFragments);
+      var classificationSpans = FormattedFragmentGroupsToClassifications(textSnapshot, formattedFragments);
 
       mCache[originalSpanToCheck.Span] = classificationSpans;
       return classificationSpans;
@@ -220,7 +220,7 @@ namespace VSDoxyHighlighter
     /// Returns a list of found fragments that should be formatted. Note that the start index in each returned
     /// fragment is absolute (i.e. relative to the start of the whole text buffer).
     /// </summary>
-    public List<FormattedFragment> ParseSpan(SnapshotSpan originalSpanToCheck)
+    public IEnumerable<FormattedFragmentGroup> ParseSpan(SnapshotSpan originalSpanToCheck)
     {
       // Because the used DefaultVSCppColorerImpl, we need to be on the main thread (since the Visual Studio cpp colorer
       // seems to not work if not on it). Also, we know that we call this code here on the main thread; and we use caches.
@@ -234,18 +234,19 @@ namespace VSDoxyHighlighter
 
       // Second step: For each identified piece of comment, parse it for Doxygen commands, markdown, etc.
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
-      var result = new List<FormattedFragment>();
+      var result = new List<FormattedFragmentGroup>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
         if (mGeneralOptions.IsEnabledInCommentType(commentSpan.commentType)) {
           string codeText = textSnapshot.GetText(commentSpan.span);
-          var fragmentsToFormat = mParser.Parse(codeText);
-          // Convert each fragment start from relative to absolute position.
-          result.AddRange(fragmentsToFormat.Select(
-            orig => new FormattedFragment(commentSpan.span.Start + orig.StartIndex, orig.Length, orig.Classification)));
+          var fragmentGroupsToFormat = mParser.Parse(codeText);
+          // Convert each start position of a fragment: Instead of relative to "codeText", it
+          // should be absolute (i.e. relative to the span start).
+          result.AddRange(MakeFormattedFragmentGroupsAbsolute(fragmentGroupsToFormat, commentSpan.span.Start));
         }
 #else
-        result.Add(new FormattedFragment(commentSpan.span.Start, commentSpan.span.Length, cCommentTypeDebugFormats[commentSpan.commentType]));
+        var debugFragment = new FormattedFragment(commentSpan.span.Start, commentSpan.span.Length, cCommentTypeDebugFormats[commentSpan.commentType]);
+        result.Add(new FormattedFragmentGroup(new List<FormattedFragment>() {debugFragment}));
 #endif
       }
 
@@ -333,16 +334,32 @@ namespace VSDoxyHighlighter
     }
 
 
-    private List<ClassificationSpan> FormattedFragmentsToClassifications(ITextSnapshot textSnapshot, IEnumerable<FormattedFragment> formattedFragments)
+    private List<ClassificationSpan> FormattedFragmentGroupsToClassifications(ITextSnapshot textSnapshot, IEnumerable<FormattedFragmentGroup> formattedFragmentGroups)
     {
       var result = new List<ClassificationSpan>();
-      foreach (FormattedFragment fragment in formattedFragments) {
-        IClassificationType classificationInstance = mClassificationEnumToInstance[(uint)fragment.Classification];
-        var spanToFormat = new Span(fragment.StartIndex, fragment.Length);
-        var snapshotSpan = new SnapshotSpan(textSnapshot, spanToFormat);
-        result.Add(new ClassificationSpan(snapshotSpan, classificationInstance));
+      foreach (FormattedFragmentGroup group in formattedFragmentGroups) {
+        foreach (FormattedFragment fragment in group.Fragments) {
+          IClassificationType classificationInstance = mClassificationEnumToInstance[(uint)fragment.Classification];
+          var spanToFormat = new Span(fragment.StartIndex, fragment.Length);
+          var snapshotSpan = new SnapshotSpan(textSnapshot, spanToFormat);
+          result.Add(new ClassificationSpan(snapshotSpan, classificationInstance));
+        }
       }
       return result;
+    }
+
+
+    /// <summary>
+    /// Converts the start of all given fragments to start at <paramref name="absoluteTextStart"/>.
+    /// </summary>
+    private IEnumerable<FormattedFragmentGroup> MakeFormattedFragmentGroupsAbsolute(IEnumerable<FormattedFragmentGroup> formattedCommands, int absoluteTextStart)
+    {
+      var withAbsolutePositions = formattedCommands.Select(
+        origGroup => new FormattedFragmentGroup(
+          origGroup.Fragments.Select(
+            fragment => new FormattedFragment(absoluteTextStart + fragment.StartIndex, fragment.Length, fragment.Classification))
+          .ToList()));
+      return withAbsolutePositions;
     }
 
 

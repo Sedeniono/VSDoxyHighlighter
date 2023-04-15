@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Windows.Shapes;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
 
 namespace VSDoxyHighlighter
 {
@@ -235,8 +236,11 @@ namespace VSDoxyHighlighter
         ITextSnapshotLine line = triggerPoint.GetContainingLine();
 
         // TODO: Also cache the result in ParseSpan? Consider the very long comment; the performance to the quick info will be bad otherwise...
-        var foundFragments = commentClassifier.ParseSpan(line.Extent);
-        foreach (FormattedFragment fragment in foundFragments) {
+        var foundFragmentGroups = commentClassifier.ParseSpan(line.Extent);
+        foreach (FormattedFragmentGroup group in foundFragmentGroups) {
+          // Only the first fragment can contain the Doxygen command.
+          FormattedFragment fragment = group.Fragments[0];
+
           // Note: fragment.StartIndex is already an absolute index (i.e. relative to the start of the text buffer).
           if (fragment.StartIndex <= triggerPoint.Position && triggerPoint.Position <= fragment.EndIndex) {
             string potentialCmdWithSlash = triggerPoint.Snapshot.GetText(fragment.StartIndex, fragment.EndIndex - fragment.StartIndex + 1);

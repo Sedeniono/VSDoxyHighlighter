@@ -9,7 +9,30 @@ using System.Text.RegularExpressions;
 namespace VSDoxyHighlighter
 {
   /// <summary>
+  /// Contains formatting information for a full Doxygen command, including its parameters.
+  /// Every command (including its parameters) is represented by one instance. Also, a piece
+  /// of markdown text is represented by one instance, although it will only have a single
+  /// entry in the list.
+  /// </summary>
+  public class FormattedFragmentGroup 
+  {
+    public IList<FormattedFragment> Fragments{ get; private set; }
+
+    public int StartIndex => Fragments[0].StartIndex;
+    public int EndIndex => Fragments[Fragments.Count - 1].EndIndex;
+
+    public FormattedFragmentGroup(IList<FormattedFragment> fragments) 
+    {
+      Debug.Assert(fragments != null && fragments.Count() > 0);
+      Fragments = fragments;
+    }
+  }
+
+
+  /// <summary>
   /// Represents how a single continuous piece of text should be formatted.
+  /// I.e. basically represents e.g. a Doxygen command (without its parameters), a single
+  /// parameter of a Doxygen command, or a markdown formatted piece of text.
   /// </summary>
   [DebuggerDisplay("StartIndex={StartIndex}, Length={Length}, Classification={Classification}")]
   public struct FormattedFragment
@@ -106,7 +129,7 @@ namespace VSDoxyHighlighter
     /// <param name="text">This whole text is formatted.</param>
     /// <returns>A list of fragments that point into the given "text" and which should be formatted.
     /// FormattedFragment.startIndex==0 means the first character in the input "text".</returns>
-    public IEnumerable<FormattedFragment> Parse(string text)
+    public IEnumerable<FormattedFragmentGroup> Parse(string text)
     {
       text = text.TrimEnd();
       if (text.EndsWith("*/")) {
@@ -117,23 +140,28 @@ namespace VSDoxyHighlighter
         text = text.Substring(0, text.Length - 2);
       }
 
-      var allFragments = new List<FormattedFragment>();
+      var allFragmentGroups = new List<FormattedFragmentGroup>();
       foreach (FragmentMatcher matcher in mMatchers) {
         var foundMatches = matcher.re.Matches(text);
         foreach (Match m in foundMatches) {
           if (1 < m.Groups.Count && m.Groups.Count <= matcher.classifications.Length + 1) {
+            var fragments = new List<FormattedFragment>();
             for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
               Group group = m.Groups[idx + 1];
               if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
                 ClassificationEnum classificationsOfGroups = matcher.classifications[idx];
-                allFragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
+                fragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
               }
+            }
+
+            if (fragments.Count > 0) {
+              allFragmentGroups.Add(new FormattedFragmentGroup(fragments));
             }
           }
         }
       }
 
-      // In case of overlapping fragments, let the fragment win which starts first. This seems like a sensible thing to do.
+      // In case of overlapping fragment groups, let the group win which starts first. This seems like a sensible thing to do.
       // Especially consider markdown nested in e.g. titles. For example, consider the comment:
       //    @par Some @b text and `backtics`
       // Due to the sorting, everything after "@par" gets interpreted as title and the formatting of "@b" and the backtics effectively
@@ -143,16 +171,16 @@ namespace VSDoxyHighlighter
       // for example, applying backtics in page titles causes the html tag "<tt>" to actually appear in the list of pages rather than
       // the formatted text.
       //
-      // Using OrderBy() rather than Sort() to get a stable sort: Of two fragments that start at the same position, let that one win
+      // Using OrderBy() rather than Sort() to get a stable sort: Of two groups that start at the same position, let that one win
       // which was matched by the earlier regex. At the time of writing this, it should not actually be possible that two regex
       // return matches that start at the same position, but who knows what the future holds.
       //
       // Also, NOT passing "sorted" directly into the constructed of SortedSet because apparently the constructor does not iterate
       // over the input IEnumerable in the correct order.
-      var sorted = allFragments.OrderBy(fragment => fragment.StartIndex);
-      var filtered = new SortedSet<FormattedFragment>(new NonOverlappingFragmentsComparer());
-      foreach (var fragment in sorted) { // Add the fragments in the correct order, to let the first one win in case of overlaps
-        filtered.Add(fragment);
+      var sorted = allFragmentGroups.OrderBy(fragment => fragment.StartIndex);
+      var filtered = new SortedSet<FormattedFragmentGroup>(new NonOverlappingCommandGroupsComparer());
+      foreach (var fragmentGroup in sorted) { // Add the fragments in the correct order, to let the first one win in case of overlaps
+        filtered.Add(fragmentGroup);
       }
 
       return filtered;
@@ -514,9 +542,9 @@ namespace VSDoxyHighlighter
     /// Comparer that sorts formatted fragments by their position in the text. 
     /// Overlapping fragments are treated as equal, so that only one can win in the end.
     /// </summary>
-    private class NonOverlappingFragmentsComparer : IComparer<FormattedFragment>
+    private class NonOverlappingCommandGroupsComparer : IComparer<FormattedFragmentGroup>
     {
-      public int Compare(FormattedFragment lhs, FormattedFragment rhs)
+      public int Compare(FormattedFragmentGroup lhs, FormattedFragmentGroup rhs)
       {
         if (lhs.EndIndex < rhs.StartIndex) {
           return -1;

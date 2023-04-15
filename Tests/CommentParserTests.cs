@@ -8,6 +8,7 @@ using System.Diagnostics;
 using static System.Collections.Specialized.BitVector32;
 using System.Text.RegularExpressions;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace VSDoxyHighlighter.Tests
 {
@@ -42,14 +43,26 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
-    public static List<FormattedFragmentText> ConvertToTextFragments(string text, IEnumerable<FormattedFragment> fragments)
+    public static List<FormattedFragmentText> ConvertToTextFragments(string text, IEnumerable<FormattedFragmentGroup> fragmentGroups)
     {
       var result = new List<FormattedFragmentText>();
-      foreach (FormattedFragment fragment in fragments) {
-        Assert.IsTrue(fragment.Length > 0);
-        Assert.IsTrue(fragment.EndIndex < text.Length);
-        string str = text.Substring(fragment.StartIndex, fragment.Length);
-        result.Add(new FormattedFragmentText(str, fragment.Classification));
+      foreach (FormattedFragmentGroup group in fragmentGroups) {
+        foreach (FormattedFragment fragment in group.Fragments) {
+          Assert.IsTrue(fragment.Length > 0);
+          Assert.IsTrue(fragment.EndIndex < text.Length);
+          string str = text.Substring(fragment.StartIndex, fragment.Length);
+          result.Add(new FormattedFragmentText(str, fragment.Classification));
+        }
+      }
+      return result;
+    }
+
+
+    public static List<FormattedFragment> ToFlatFragmentList(IEnumerable<FormattedFragmentGroup> fragmentGroups) 
+    {
+      var result = new List<FormattedFragment>();
+      foreach (FormattedFragmentGroup group in fragmentGroups) {
+        result.AddRange(group.Fragments);
       }
       return result;
     }
@@ -89,7 +102,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCStyleCommentsShouldBeFormatted()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("BasicCStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -118,7 +131,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(645, 6, ClassificationEnum.Command), // @brief after /**
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -126,7 +139,7 @@ namespace VSDoxyHighlighter.Tests
     public void BasicCppStyleCommentsShouldBeFormatted()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("BasicCppStyleFormatting.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -148,7 +161,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(415, 6, ClassificationEnum.Command), // @brief
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -889,10 +902,8 @@ namespace VSDoxyHighlighter.Tests
       var input = Utils.ReadTestInputFromFile("VariousKeywords.cpp");
       Assert.IsTrue(Regex.Matches(input, "\r\n").Count > 10); // Cross-check the input file
 
-      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
-
       var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
-      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      var actualTextFragments = Utils.ConvertToTextFragments(input, Utils.CreateDefaultCommentParser().Parse(input));
 
       // Write fragments to file for easy checking of test failures.
       Utils.WriteFragmentsToFile("VariousKeywords_Expected.txt", expectedTextFragments);
@@ -922,7 +933,6 @@ namespace VSDoxyHighlighter.Tests
       var formatter = Utils.CreateDefaultCommentParser();
       var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
-
       Assert.AreEqual(0, actualFragments.Count());
     }
 
@@ -931,11 +941,11 @@ namespace VSDoxyHighlighter.Tests
     public void SingleStarShouldFormatItalic()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -943,11 +953,11 @@ namespace VSDoxyHighlighter.Tests
     public void SingleUnderscoreShouldFormatItalic()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
 
       var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -973,11 +983,11 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleStarShouldFormatBold()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -985,11 +995,11 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleUnderscoreShouldFormatBold()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -997,11 +1007,11 @@ namespace VSDoxyHighlighter.Tests
     public void DoubleTildeShouldFormatStrikethrough()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_DoubleTilde.cpp"));
 
       var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.Strikethrough);
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -1027,7 +1037,7 @@ namespace VSDoxyHighlighter.Tests
     public void InlineCodeShouldBeFormatted()
     {
       var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragments = formatter.Parse(
+      var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
 
       var expectedFragments = new List<FormattedFragment>() {
@@ -1042,7 +1052,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(167, 45, ClassificationEnum.InlineCode),
       };
 
-      CollectionAssert.AreEqual(expectedFragments, actualFragments.ToList());
+      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
     }
 
 
@@ -1050,7 +1060,7 @@ namespace VSDoxyHighlighter.Tests
     public void UnicodeParametersShouldWork()
     {
       var input = Utils.ReadTestInputFromFile("UnicodeParametersUTF8.cpp");
-      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
+      var actualFragmentGroups = Utils.CreateDefaultCommentParser().Parse(input);
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         new Utils.FormattedFragmentText("@param", ClassificationEnum.Command),
@@ -1064,7 +1074,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText("**te\U0001F600st**", ClassificationEnum.EmphasisMajor),
       };
 
-      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragmentGroups);
       CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
 
@@ -1073,21 +1083,25 @@ namespace VSDoxyHighlighter.Tests
     public void IfFragmentsOverlapTheFirstOneShouldWin()
     {
       var input = Utils.ReadTestInputFromFile("OverlappingHighlights.cpp");
-      var actualFragments = Utils.CreateDefaultCommentParser().Parse(input);
+      var actualFragmentGroups = Utils.CreateDefaultCommentParser().Parse(input);
 
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         new Utils.FormattedFragmentText(@"`backtics @b should win`", ClassificationEnum.InlineCode),
-
         new Utils.FormattedFragmentText(@"**bold `should win` over**", ClassificationEnum.EmphasisMajor),
+        new Utils.FormattedFragmentText(@"`@par inline @b code should @ref win since it @a comes first`", ClassificationEnum.InlineCode),
+        new Utils.FormattedFragmentText(@"*@par italic @b should @ref win since it @a comes first*", ClassificationEnum.EmphasisMinor),
 
         new Utils.FormattedFragmentText(@"@mainpage", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"Some `inline`, **bold** and *italic* text should loose to titles", ClassificationEnum.Title),
+        
+        new Utils.FormattedFragmentText(@"@par", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"`inline` text at the start should also loose to titles", ClassificationEnum.Title),
 
         new Utils.FormattedFragmentText(@"@par", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"Some other @b cmd should @ref loose to @a title", ClassificationEnum.Title),
       };
 
-      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragments);
+      var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragmentGroups);
       CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
     }
 

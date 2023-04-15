@@ -237,12 +237,14 @@ namespace VSDoxyHighlighter
 
       var parsed = mCommentParser.Parse(cmdWithSlash);
       if (parsed.Count() == 1) {
-        return parsed.First().Classification;
+        FormattedFragmentGroup group = parsed.First();
+        if (group.Fragments.Count == 1) {
+          return group.Fragments[0].Classification;
+        }
       }
-      else {
-        Debug.Assert(false);
-        return ClassificationEnum.Command;
-      }
+      
+      Debug.Assert(false);
+      return ClassificationEnum.Command;
     }
 
 
