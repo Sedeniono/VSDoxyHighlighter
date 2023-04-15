@@ -283,12 +283,10 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
                 raise Exception("Empty hyperlink")
             if not hyperlink.startswith("http"):
                 raise Exception("Hyperlink does not start with http")
-            orig_fragments = fragments
-            fragments: list[Fragment] = []
-            for f in orig_fragments:
+            for f in fragments:
                 if f.hyperlink != "":
                     raise Exception("Found nested hyperlink")
-                fragments.append(Fragment(f.type, f.content, hyperlink))
+                f.hyperlink = hyperlink
         elif "id" in tag.attrs and "name" in tag.attrs:
             pass
         elif "class" in tag.attrs and "anchor" in tag["class"] and "id" in tag.attrs:
