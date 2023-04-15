@@ -179,13 +179,34 @@ namespace VSDoxyHighlighter
     /// </summary>
     public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan originalSpanToCheck)
     {
-      mVSCppColorer.InitializeLazily(); // Ensure the events are set up properly.
+      mVSCppColorer.InitializeLazily(); // Ensure the events are set up properly, even if the highlighting is not enabled.
 
       if (!mGeneralOptions.EnableHighlighting) {
-        return new List<ClassificationSpan>();
+        return Array.Empty<ClassificationSpan>();
       }
 
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      var formattedFragments = ParseSpan(originalSpanToCheck);
+      var classificationSpans = FormattedFragmentGroupsToClassifications(originalSpanToCheck.Snapshot, formattedFragments);
+      return classificationSpans;
+    }
+
+
+    /// <summary>
+    /// Parses the given span for comments and the comments themselves for Doxygen commands, markdown, etc.
+    /// Returns a list of found fragments that should be formatted. Note that the start index in each returned
+    /// fragment is absolute (i.e. relative to the start of the whole text buffer).
+    /// </summary>
+    public IEnumerable<FormattedFragmentGroup> ParseSpan(SnapshotSpan originalSpanToCheck)
+    {
+      // Because of the used DefaultVSCppColorerImpl, we need to be on the main thread (since the Visual Studio cpp colorer
+      // seems to not work if called from somewhere else). Also, we know that we do call this code here on the main thread; and
+      // we use caches. So, if it were called on a different thread and if the issue with the VS cpp colorer did not exist, we
+      // would need some synchronization for the caches at least.
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      mVSCppColorer.InitializeLazily(); // Ensure the events are set up properly.
 
       ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
 
@@ -199,41 +220,21 @@ namespace VSDoxyHighlighter
       //    and when they request the classifications from these aggregators, our code gets triggered again.
       // 5) Scrolling in the text documents also constantly triggers GetClassificationSpans() calls.
       // ==> We optimize (3), (4) and (5) via a cache. This reduces the CPU load very notably.
+      //
+      // Additionally, the code also gets called for the quick info, where we also can reuse the cache.
       if (mCachedVersion != textSnapshot.Version.VersionNumber) {
         InvalidateCache();
         mCachedVersion = textSnapshot.Version.VersionNumber;
       }
-      else if (mCache.TryGetValue(originalSpanToCheck.Span, out var cachedClassifications)) {
-        return cachedClassifications;
+      else if (mCache.TryGetValue(originalSpanToCheck.Span, out var cachedFormattedFragmentGroups)) {
+        return cachedFormattedFragmentGroups;
       }
-
-      var formattedFragments = ParseSpan(originalSpanToCheck);
-      var classificationSpans = FormattedFragmentGroupsToClassifications(textSnapshot, formattedFragments);
-
-      mCache[originalSpanToCheck.Span] = classificationSpans;
-      return classificationSpans;
-    }
-
-
-    /// <summary>
-    /// Parses the given span for comments and the comments themselves for Doxygen commands, markdown, etc.
-    /// Returns a list of found fragments that should be formatted. Note that the start index in each returned
-    /// fragment is absolute (i.e. relative to the start of the whole text buffer).
-    /// </summary>
-    public IEnumerable<FormattedFragmentGroup> ParseSpan(SnapshotSpan originalSpanToCheck)
-    {
-      // Because the used DefaultVSCppColorerImpl, we need to be on the main thread (since the Visual Studio cpp colorer
-      // seems to not work if not on it). Also, we know that we call this code here on the main thread; and we use caches.
-      // So, if it were called on a different thread and if the issue with the VS cpp colorer did not exist, we would
-      // need some synchronization for the caches at least.
-      ThreadHelper.ThrowIfNotOnUIThread();
 
       // First step: Identify those parts in the span that are actually comments and not code.
       // But do not yet parse the text for the Doxygen commands.
       List<CommentSpan> commentSpans = mCommentExtractor.SplitIntoComments(originalSpanToCheck);
 
       // Second step: For each identified piece of comment, parse it for Doxygen commands, markdown, etc.
-      ITextSnapshot textSnapshot = originalSpanToCheck.Snapshot;
       var result = new List<FormattedFragmentGroup>();
       foreach (CommentSpan commentSpan in commentSpans) {
 #if !ENABLE_COMMENT_TYPE_DEBUGGING
@@ -250,6 +251,7 @@ namespace VSDoxyHighlighter
 #endif
       }
 
+      mCache[originalSpanToCheck.Span] = result;
       return result;
     }
 
@@ -370,7 +372,7 @@ namespace VSDoxyHighlighter
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mParser;
 
-    private Dictionary<Span, IList<ClassificationSpan>> mCache = new Dictionary<Span, IList<ClassificationSpan>>();
+    private Dictionary<Span, IEnumerable<FormattedFragmentGroup>> mCache = new Dictionary<Span, IEnumerable<FormattedFragmentGroup>>();
     private int mCachedVersion = -1;
 
     private bool mDisposed = false;

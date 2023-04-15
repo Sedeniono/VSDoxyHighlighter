@@ -235,7 +235,6 @@ namespace VSDoxyHighlighter
 
         ITextSnapshotLine line = triggerPoint.GetContainingLine();
 
-        // TODO: Also cache the result in ParseSpan? Consider the very long comment; the performance to the quick info will be bad otherwise...
         var foundFragmentGroups = commentClassifier.ParseSpan(line.Extent);
         foreach (FormattedFragmentGroup group in foundFragmentGroups) {
           // Note: We check whether the trigger point is anywhere in the whole group. I.e. if the mouse cursor hovers over
