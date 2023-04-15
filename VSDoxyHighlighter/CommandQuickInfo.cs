@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Windows.Shapes;
 using Microsoft.VisualStudio.Shell;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter
 {
@@ -76,14 +77,13 @@ namespace VSDoxyHighlighter
       // hundreds of times in every second.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-      (int cmdStartIdx, DoxygenHelpPageCommand cmd) = TryGetCommandInfoAtTriggerPoint(triggerPoint.Value);
+      (FormattedFragmentGroup fragmentGroup, DoxygenHelpPageCommand cmd) = TryGetCommandInfoAtTriggerPoint(triggerPoint.Value);
 
-      if (cmd != null) {
+      if (fragmentGroup != null && cmd != null) {
         // TODO: Don't just copy & paste this from the autocomplete.
         // TODO: Need to sort by length of something like this. I.e. don't return infos for \returns if user hovers over \return
         // TODO: Retain hyperlinks and "Click here"?
         // TODO: Hyperlink to online documentation
-        // TODO: Show info also when hovering over parameters
 
         var runs = new List<ClassifiedTextRun>();
 
@@ -98,9 +98,9 @@ namespace VSDoxyHighlighter
           runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
         }
 
-        runs.AddRange(ClassifiedTextElement.CreateHyperlink("\nHyperlink lineText", "Tooltip for test", () => {
-          int dummy = 0; // Called when clicked
-        }).Runs);
+        //runs.AddRange(ClassifiedTextElement.CreateHyperlink("\nHyperlink lineText", "Tooltip for test", () => {
+        //  int dummy = 0; // Called when clicked
+        //}).Runs);
 
         //runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
@@ -114,8 +114,8 @@ namespace VSDoxyHighlighter
         //}
 
         var lineSpan2 = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(
-          cmdStartIdx,
-          cmd.Command.Length + 1,
+          fragmentGroup.StartIndex,
+          fragmentGroup.Length + 1,
           SpanTrackingMode.EdgeInclusive);
 
         //return Task.FromResult(new QuickInfoItem(lineSpan2, new ClassifiedTextElement(runs)));
@@ -226,7 +226,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private (int cmdStartIdx, DoxygenHelpPageCommand) TryGetCommandInfoAtTriggerPoint(SnapshotPoint triggerPoint)
+    private (FormattedFragmentGroup fragmentGroup, DoxygenHelpPageCommand) TryGetCommandInfoAtTriggerPoint(SnapshotPoint triggerPoint)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -238,21 +238,23 @@ namespace VSDoxyHighlighter
         // TODO: Also cache the result in ParseSpan? Consider the very long comment; the performance to the quick info will be bad otherwise...
         var foundFragmentGroups = commentClassifier.ParseSpan(line.Extent);
         foreach (FormattedFragmentGroup group in foundFragmentGroups) {
-          // Only the first fragment can contain the Doxygen command.
-          FormattedFragment fragment = group.Fragments[0];
-
-          // Note: fragment.StartIndex is already an absolute index (i.e. relative to the start of the text buffer).
-          if (fragment.StartIndex <= triggerPoint.Position && triggerPoint.Position <= fragment.EndIndex) {
-            string potentialCmdWithSlash = triggerPoint.Snapshot.GetText(fragment.StartIndex, fragment.EndIndex - fragment.StartIndex + 1);
+          // Note: We check whether the trigger point is anywhere in the whole group. I.e. if the mouse cursor hovers over
+          // a parameter of a Doxygen command, we want to show the information for the command.
+          // Note: The indices are already absolute (i.e. relative to the start of the text buffer).
+          if (group.StartIndex <= triggerPoint.Position && triggerPoint.Position <= group.EndIndex) {
+            // Only the first fragment can contain the Doxygen command.
+            FormattedFragment fragmentWithCommand = group.Fragments[0];
+            string potentialCmdWithSlash = triggerPoint.Snapshot.GetText(
+              fragmentWithCommand.StartIndex, fragmentWithCommand.EndIndex - fragmentWithCommand.StartIndex + 1);
             DoxygenHelpPageCommand helpPageCmd = TryFindHelpPageCommand(potentialCmdWithSlash);
             if (helpPageCmd != null) {
-              return (fragment.StartIndex, helpPageCmd);
+              return (group, helpPageCmd);
             }
           }
         }
       }
 
-      return (-1, null);
+      return (null, null);
     }
 
 

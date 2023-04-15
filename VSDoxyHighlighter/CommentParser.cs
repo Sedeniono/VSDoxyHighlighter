@@ -10,9 +10,9 @@ namespace VSDoxyHighlighter
 {
   /// <summary>
   /// Contains formatting information for a full Doxygen command, including its parameters.
-  /// Every command (including its parameters) is represented by one instance. Also, a piece
-  /// of markdown text is represented by one instance, although it will only have a single
-  /// entry in the list.
+  /// Every Doxygen command (including its parameters) is represented by one instance, where the command 
+  /// (including the "\" or "@") is in "Fragments[0]", and the parameters are in the remaining elements.
+  /// A piece of markdown text will only have a single entry in "Fragments".
   /// </summary>
   public class FormattedFragmentGroup 
   {
@@ -20,6 +20,7 @@ namespace VSDoxyHighlighter
 
     public int StartIndex => Fragments[0].StartIndex;
     public int EndIndex => Fragments[Fragments.Count - 1].EndIndex;
+    public int Length => EndIndex - StartIndex + 1;
 
     public FormattedFragmentGroup(IList<FormattedFragment> fragments) 
     {
@@ -55,10 +56,7 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// The index of the last formatted character.
     /// </summary>
-    public int EndIndex
-    {
-      get { return Math.Max(StartIndex + Length - 1, StartIndex); }
-    }
+    public int EndIndex => Math.Max(StartIndex + Length - 1, StartIndex);
 
     public FormattedFragment(int startIndex, int length, ClassificationEnum classification)
     {
