@@ -116,7 +116,12 @@ namespace VSDoxyHighlighter
 
         ITextSnapshotLine line = triggerPoint.GetContainingLine();
 
-        var foundFragmentGroups = commentClassifier.ParseSpan(line.Extent);
+        // We use the extent **including** the linear break characters (\r\n) because CommentClassifier.GetClassificationSpans()
+        // is called by Visual Studio typically with lines including them, meaning that the CommentClassifier caches lines
+        // including the line break characters. So, by including them here, too, the ParseSpan() method can more likely simply
+        // return already cached information.
+        var foundFragmentGroups = commentClassifier.ParseSpan(line.ExtentIncludingLineBreak);
+
         foreach (FormattedFragmentGroup group in foundFragmentGroups) {
           // Note: We check whether the trigger point is anywhere in the whole group. I.e. if the mouse cursor hovers over
           // a parameter of a Doxygen command, we want to show the information for the command.
