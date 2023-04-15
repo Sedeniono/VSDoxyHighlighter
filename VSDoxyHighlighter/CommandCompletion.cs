@@ -178,31 +178,8 @@ namespace VSDoxyHighlighter
     public /*async*/ Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
     {
       if (item.Properties.TryGetProperty(typeof(DoxygenHelpPageCommand), out DoxygenHelpPageCommand cmd)) {
-        var runs = new List<ClassifiedTextRun>();
-
-        //------ Add a line with the actual command.
-        string cmdWithSlash = "\\" + cmd.Command;
-        ClassificationEnum commandClassification = GetClassificationForCommand(cmdWithSlash);
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
-        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
-
-        //------ Add a line with the command's parameters.
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
-        if (cmd.Parameters == "") {
-          runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
-        }
-        else {
-          // Using "Parameter2" since, by default, it is displayed non-bold, causing a nicer display.
-          runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
-        }
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
-
-        //------ Add the whole description.
-        foreach (var descriptionFragment in cmd.Description) {
-          AddTextRunsForDescriptionFragment(descriptionFragment, runs);
-        }
-
-        return Task.FromResult<object>(new ClassifiedTextElement(runs));
+        var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, cmd);
+        return Task.FromResult<object>(description);
       }
 
       Debug.Assert(false);
@@ -228,46 +205,6 @@ namespace VSDoxyHighlighter
       }
 
       return false;
-    }
-
-
-    private ClassificationEnum GetClassificationForCommand(string cmdWithSlash)
-    {
-      Debug.Assert(cmdWithSlash.StartsWith("\\") || cmdWithSlash.StartsWith("@"));
-
-      var parsed = mCommentParser.Parse(cmdWithSlash);
-      if (parsed.Count() == 1) {
-        FormattedFragmentGroup group = parsed.First();
-        if (group.Fragments.Count == 1) {
-          return group.Fragments[0].Classification;
-        }
-      }
-      
-      Debug.Assert(false);
-      return ClassificationEnum.Command;
-    }
-
-
-    private void AddTextRunsForDescriptionFragment((object, string) descriptionFragment, List<ClassifiedTextRun> outputList)
-    {
-      if (descriptionFragment.Item1 is ClassificationEnum classification) {
-        // Use the given classification as-is.
-        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.Item2));
-        return;
-      }
-
-      if (descriptionFragment.Item1 is DoxygenHelpPageCommand.OtherTypesEnum otherType) {
-        switch (otherType) {
-          case DoxygenHelpPageCommand.OtherTypesEnum.Command:
-            ClassificationEnum classificationForOther = GetClassificationForCommand(descriptionFragment.Item2);
-            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.Item2));
-            return;
-          default:
-            throw new VSDoxyHighlighterException($"Unknown value for DoxygenHelpPageCommand.OtherTypesEnum: {otherType}");
-        }
-      }
-
-      outputList.AddRange(ClassifiedTextElement.CreatePlainText(descriptionFragment.Item2).Runs);
     }
 
 

@@ -39,13 +39,21 @@ namespace VSDoxyHighlighter
   // CommentCommandAsyncQuickInfoSource
   //================================================================================
 
-  // Based on https://github.com/microsoft/VSSDK-Extensibility-Samples/tree/master/AsyncQuickInfo
+  /// <summary>
+  /// Responsible for providing the information that gets displayed in the quick info tool tip while
+  /// the user hovers with the mouse over a specific piece of text.
+  /// Based on https://github.com/microsoft/VSSDK-Extensibility-Samples/tree/master/AsyncQuickInfo
+  /// </summary>
   internal sealed class CommentCommandAsyncQuickInfoSource : IAsyncQuickInfoSource
   {
     public CommentCommandAsyncQuickInfoSource(ITextBuffer textBuffer)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       mTextBuffer = textBuffer;
+      mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }
+
 
     public void Dispose()
     {
@@ -53,15 +61,13 @@ namespace VSDoxyHighlighter
 
 
     /// <summary>
-    /// Called by Visual Studio no a background thread when the user hovers over some arbitrary piece of text in the text buffer.
+    /// Called by Visual Studio on a background thread when the user hovers over some arbitrary piece of text in the text buffer.
     /// It is then the function's job to figure out whether some specific quick info should be returned and displayed, or not.
     /// </summary>
     public async Task<QuickInfoItem> GetQuickInfoItemAsync(IAsyncQuickInfoSession session, CancellationToken cancellationToken)
     {
       SnapshotPoint? triggerPoint = session.GetTriggerPoint(mTextBuffer.CurrentSnapshot);
-
       if (triggerPoint == null) {
-        //return Task.FromResult<QuickInfoItem>(null);
         return null;
       }
 
@@ -77,156 +83,31 @@ namespace VSDoxyHighlighter
       // hundreds of times in every second.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-      (FormattedFragmentGroup fragmentGroup, DoxygenHelpPageCommand cmd) = TryGetCommandInfoAtTriggerPoint(triggerPoint.Value);
+      (DoxygenHelpPageCommand helpPageInfo, FormattedFragmentGroup fragmentGroup) = TryGetHelpPageInfoForTriggerPoint(triggerPoint.Value);
 
-      if (fragmentGroup != null && cmd != null) {
-        // TODO: Don't just copy & paste this from the autocomplete.
-        // TODO: Need to sort by length of something like this. I.e. don't return infos for \returns if user hovers over \return
+      if (fragmentGroup != null && helpPageInfo != null) {
         // TODO: Retain hyperlinks and "Click here"?
         // TODO: Hyperlink to online documentation
+        // TODO: What about markdown?
 
-        var runs = new List<ClassifiedTextRun>();
+        // Only the first fragment can contain the Doxygen command.
+        ClassificationEnum commandClassification = fragmentGroup.Fragments[0].Classification;
+        var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, helpPageInfo, commandClassification);
 
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
-        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Command], "\\" + cmd.Command));
-
-        runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
-        if (cmd.Parameters == "") {
-          runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
-        }
-        else {
-          runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
-        }
-
-        //runs.AddRange(ClassifiedTextElement.CreateHyperlink("\nHyperlink lineText", "Tooltip for test", () => {
-        //  int dummy = 0; // Called when clicked
-        //}).Runs);
-
-        //runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
-
-        //foreach (var fragment in cmd.Description) {
-        //  if (fragment.Item1 == null) {
-        //    runs.AddRange(ClassifiedTextElement.CreatePlainText(fragment.Item2).Runs);
-        //  }
-        //  else {
-        //    runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[fragment.Item1.Value], fragment.Item2));
-        //  }
-        //}
-
-        var lineSpan2 = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(
+        // If the user moves away with the mouse from this tracking span, the quick info vanishes.
+        var spanWhereQuickInfoIsValid = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(
           fragmentGroup.StartIndex,
-          fragmentGroup.Length + 1,
+          fragmentGroup.Length,
           SpanTrackingMode.EdgeInclusive);
 
-        //return Task.FromResult(new QuickInfoItem(lineSpan2, new ClassifiedTextElement(runs)));
-        return new QuickInfoItem(lineSpan2, new ClassifiedTextElement(runs));
+        return new QuickInfoItem(spanWhereQuickInfoIsValid, description);
       }
 
-
-      //ITextSnapshotLine line = triggerPoint.Value.GetContainingLine();
-
-      //string lineText = line.GetText();
-      //int triggerIdxInText = triggerPoint.Value.Position - line.Start.Position;
-
-      //// TODO: Why not using the same machinery as GetClassificationSpans()?
-      //// Might make sense, to display quickinfo also for non-highlighted commands, such as "\brief" not at the start?
-
-      //if (0 <= triggerIdxInText && triggerIdxInText < lineText.Length) {
-      //  int commandStartIdx = FindCommandStartIndexIncludingSlashOrAt(lineText, triggerIdxInText);
-      //  if (commandStartIdx >= 0) {
-      //    int commandEndIdx = FindCommandEndIndex(lineText, triggerIdxInText);
-      //    if (commandEndIdx > commandStartIdx) {
-      //      // TODO: Check whether in enabled comment type.
-
-      //      string potentialCommand = lineText.Substring(commandStartIdx + 1, commandEndIdx - commandStartIdx);
-      //      foreach (DoxygenHelpPageCommand cmd in AllDoxygenHelpPageCommands.cAmendedDoxygenCommands) {
-      //        if (potentialCommand.StartsWith(cmd.Command)) {
-
-      //          // TODO: Don't just copy & paste this from the autocomplete.
-      //          // TODO: Need to sort by length of something like this. I.e. don't return infos for \returns if user hovers over \return
-      //          // TODO: Retain hyperlinks and "Click here"?
-      //          // TODO: Hyperlink to online documentation
-
-      //          var runs = new List<ClassifiedTextRun>();
-
-      //          runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
-      //          runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Command], "\\" + cmd.Command));
-
-      //          runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
-      //          if (cmd.Parameters == "") {
-      //            runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
-      //          }
-      //          else {
-      //            runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], cmd.Parameters));
-      //          }
-
-      //          runs.AddRange(ClassifiedTextElement.CreateHyperlink("\nHyperlink lineText", "Tooltip for test", () => {
-      //            int dummy = 0; // Called when clicked
-      //          }).Runs);
-
-      //          //runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
-
-      //          //foreach (var fragment in cmd.Description) {
-      //          //  if (fragment.Item1 == null) {
-      //          //    runs.AddRange(ClassifiedTextElement.CreatePlainText(fragment.Item2).Runs);
-      //          //  }
-      //          //  else {
-      //          //    runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[fragment.Item1.Value], fragment.Item2));
-      //          //  }
-      //          //}
-
-      //          var lineSpan2 = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(
-      //            commandStartIdx + line.Start.Position,
-      //            cmd.Command.Length + 1,
-      //            SpanTrackingMode.EdgeInclusive);
-
-      //          return Task.FromResult(new QuickInfoItem(lineSpan2, new ClassifiedTextElement(runs)));
-      //        }
-      //      }
-      //    }
-      //  }
-      //}
-
-
-      //var lineNumber = triggerPoint.Value.GetContainingLine().LineNumber;
-      //var lineSpan = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(triggerPoint.Value.GetContainingLine().Extent, SpanTrackingMode.EdgeInclusive);
-
-      //var lineNumberElm = new ContainerElement(
-      //    ContainerElementStyle.Wrapped,
-      //    new ImageElement(_icon),
-      //    new ClassifiedTextElement(
-      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "Line number: "),
-      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, $"{lineNumber + 1}")
-      //    ));
-
-      //var dateElm = new ContainerElement(
-      //    ContainerElementStyle.Stacked,
-      //    lineNumberElm,
-      //    new ClassifiedTextElement(
-      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.SymbolDefinition, "The current date: "),
-      //        new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, DateTime.Now.ToShortDateString())
-      //    ));
-
-      ////return Task.FromResult(new QuickInfoItem(lineSpan, dateElm));
-      //return new QuickInfoItem(lineSpan, dateElm);
       return null;
     }
 
 
-    private DoxygenHelpPageCommand TryFindHelpPageCommand(string potentialCmdWithSlash) 
-    {
-      if (potentialCmdWithSlash.Length <= 0) {
-        return null;
-      }
-      char startChar = potentialCmdWithSlash[0];
-      string potentialCmdWithoutSlash = (startChar == '\\' || startChar == '@') ? potentialCmdWithSlash.Substring(1) : potentialCmdWithSlash;
-
-      DoxygenHelpPageCommand foundCmd = AllDoxygenHelpPageCommands.cAmendedDoxygenCommands.Find(cmd => cmd.Command == potentialCmdWithoutSlash);
-      return foundCmd;
-    }
-
-
-    private (FormattedFragmentGroup fragmentGroup, DoxygenHelpPageCommand) TryGetCommandInfoAtTriggerPoint(SnapshotPoint triggerPoint)
+    private (DoxygenHelpPageCommand helpPageInfo, FormattedFragmentGroup fragmentGroup) TryGetHelpPageInfoForTriggerPoint(SnapshotPoint triggerPoint)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -240,14 +121,14 @@ namespace VSDoxyHighlighter
           // Note: We check whether the trigger point is anywhere in the whole group. I.e. if the mouse cursor hovers over
           // a parameter of a Doxygen command, we want to show the information for the command.
           // Note: The indices are already absolute (i.e. relative to the start of the text buffer).
-          if (group.StartIndex <= triggerPoint.Position && triggerPoint.Position <= group.EndIndex) {
+          if (group.StartIndex <= triggerPoint.Position && triggerPoint.Position <= group.EndIndex && group.Fragments.Count > 0) {
             // Only the first fragment can contain the Doxygen command.
             FormattedFragment fragmentWithCommand = group.Fragments[0];
-            string potentialCmdWithSlash = triggerPoint.Snapshot.GetText(
+            string potentialCmdWithSlashOrAt = triggerPoint.Snapshot.GetText(
               fragmentWithCommand.StartIndex, fragmentWithCommand.EndIndex - fragmentWithCommand.StartIndex + 1);
-            DoxygenHelpPageCommand helpPageCmd = TryFindHelpPageCommand(potentialCmdWithSlash);
+            DoxygenHelpPageCommand helpPageCmd = TryFindHelpPageCommand(potentialCmdWithSlashOrAt);
             if (helpPageCmd != null) {
-              return (group, helpPageCmd);
+              return (helpPageCmd, group);
             }
           }
         }
@@ -257,55 +138,20 @@ namespace VSDoxyHighlighter
     }
 
 
-    private int FindCommandStartIndexIncludingSlashOrAt(string lineText, int triggerIdx)
+    private DoxygenHelpPageCommand TryFindHelpPageCommand(string potentialCmdWithSlashOrAt)
     {
-      for (int idx = triggerIdx; idx >= 0; --idx) {
-        char c = lineText[idx];
-        if (c == '\\' || c == '@') {
-          // TODO: What about "\\\brief"?
-          // TODO: What about "\\brief"? Does this even highlight correctly?
-          return idx;
-        }
-        else if (char.IsWhiteSpace(c)) {
-          return -1;
-        }
-        else if (triggerIdx - idx > cMaxCommandLength) {
-          return -1;
-        }
+      if (potentialCmdWithSlashOrAt.Length <= 0) {
+        return null;
       }
+      char startChar = potentialCmdWithSlashOrAt[0];
+      string potentialCmdWithoutSlash = (startChar == '\\' || startChar == '@') ? potentialCmdWithSlashOrAt.Substring(1) : potentialCmdWithSlashOrAt;
 
-      return -1;
+      DoxygenHelpPageCommand foundCmd = AllDoxygenHelpPageCommands.cAmendedDoxygenCommands.Find(cmd => cmd.Command == potentialCmdWithoutSlash);
+      return foundCmd;
     }
 
-
-    private int FindCommandEndIndex(string lineText, int triggerIdx)
-    {
-      for (int idx = triggerIdx; idx < lineText.Length; ++idx) {
-        char c = lineText[idx];
-        bool mightBeInCommand = char.IsLetter(c)
-          //|| c == '(' || c == ')' || c == '[' || c == ']'
-          //|| c == '{' || c == '}' || c == '\\' || c == '@' || c == '~' || c == '&' || c == '$'
-          //|| c == '#' || c == '<' || c == '>' || c == '%' || c == '\"' || c == '.' || c == '='
-          //|| c == ':' || c == '|' || c == '-'
-          ;
-
-        if (!mightBeInCommand) {
-          return idx - 1;
-        }
-        else if (idx - triggerIdx > cMaxCommandLength) {
-          return -1;
-        }
-      }
-
-      return lineText.Length - 1;
-    }
 
     private readonly ITextBuffer mTextBuffer;
-
-
-    private static readonly ImageId _icon = KnownMonikers.AbstractCube.ToImageId();
-
-    // Proper value, or better take it from cCommands
-    private const int cMaxCommandLength = 30;
+    private readonly CommentParser mCommentParser;
   }
 }

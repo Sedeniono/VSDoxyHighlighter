@@ -185,6 +185,29 @@ namespace VSDoxyHighlighter
     }
 
 
+    /// <summary>
+    /// Assuming that <paramref name="cmdWithSlashOrAt"/> contains a Doxygen command (including the "/" or "@"),
+    /// returns the corresponding classification.
+    /// </summary>
+    /// <param name="cmdWithSlashOrAt"></param>
+    /// <returns></returns>
+    public ClassificationEnum GetClassificationForCommand(string cmdWithSlashOrAt)
+    {
+      Debug.Assert(cmdWithSlashOrAt.StartsWith("\\") || cmdWithSlashOrAt.StartsWith("@"));
+
+      var parsed = Parse(cmdWithSlashOrAt);
+      if (parsed.Count() == 1) {
+        FormattedFragmentGroup group = parsed.First();
+        if (group.Fragments.Count == 1) {
+          return group.Fragments[0].Classification;
+        }
+      }
+
+      Debug.Assert(false); // Unknown Doxygen command?
+      return ClassificationEnum.Command;
+    }
+
+
     public void Dispose()
     {
       if (mDisposed) {

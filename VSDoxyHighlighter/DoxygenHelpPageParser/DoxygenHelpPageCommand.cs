@@ -1,22 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.Text.Adornments;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace VSDoxyHighlighter
 {
   /// <summary>
-  /// Represents a single Doxygen command, which was extracted by an external script
+  /// Represents the help text for a single Doxygen command, which was extracted by an external script
   /// from https://www.doxygen.nl/manual/commands.html
   /// </summary>
   public class DoxygenHelpPageCommand
   {
     public enum OtherTypesEnum
     {
+      // Compare the 'Description' property: Used to indicate some piece of text in the help text
+      // is some sort of Doxygen command. But we need to figure out how to map it to a specific
+      // classification ourselves.
       Command
     }
 
 
     /// <summary>
-    /// The Doxygen command, without the "\". For example: "param"
+    /// The Doxygen command, without the "\" or "@". For example: "param"
     /// </summary>
     public readonly string Command;
 
@@ -52,7 +57,85 @@ namespace VSDoxyHighlighter
   /// </summary>
   public static class AllDoxygenHelpPageCommands 
   {
+    /// <summary>
+    /// All the Doxygen commands, as extracted from the official help page and amended for use in the extension.
+    /// </summary>
     public static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
+
+
+    /// <summary>
+    /// Given a specific Doxygen command from the help page, constructs a description suitable for use by Visual Studio
+    /// in tool tips.
+    /// </summary>
+    public static ClassifiedTextElement ConstructDescription(CommentParser commentParser, DoxygenHelpPageCommand helpPageInfo)
+    {
+      string cmdWithSlash = "\\" + helpPageInfo.Command;
+      ClassificationEnum commandClassification = commentParser.GetClassificationForCommand(cmdWithSlash);
+      return ConstructDescription(commentParser, helpPageInfo, commandClassification);
+    }
+
+
+    /// <summary>
+    /// The same as the other overload, but expects the classification to be used for the command itself
+    /// as parameter instead of computing it on the flow. (In case the classification is already known,
+    /// this saves a bit of performance.)
+    /// </summary>
+    public static ClassifiedTextElement ConstructDescription(
+      CommentParser commentParser,
+      DoxygenHelpPageCommand helpPageInfo,
+      ClassificationEnum commandClassification)
+    {
+      var runs = new List<ClassifiedTextRun>();
+
+      // Add a line with the actual command.
+      string cmdWithSlash = "\\" + helpPageInfo.Command;
+      runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
+      runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
+
+      // Add a line with the command's parameters.
+      runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
+      if (helpPageInfo.Parameters == "") {
+        runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
+      }
+      else {
+        // Using "Parameter2" since, by default, it is displayed non-bold, causing a nicer display.
+        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], helpPageInfo.Parameters));
+      }
+      runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
+
+      // Add the whole description.
+      foreach (var descriptionFragment in helpPageInfo.Description) {
+        AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, runs);
+      }
+
+      return new ClassifiedTextElement(runs);
+    }
+
+
+    private static void AddTextRunsForDescriptionFragment(
+      CommentParser commentParser,
+      (object, string) descriptionFragment, // Compare DoxygenHelpPageCommand
+      List<ClassifiedTextRun> outputList)
+    {
+      if (descriptionFragment.Item1 is ClassificationEnum classification) {
+        // Use the given classification as-is.
+        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.Item2));
+        return;
+      }
+
+      if (descriptionFragment.Item1 is DoxygenHelpPageCommand.OtherTypesEnum otherType) {
+        switch (otherType) {
+          case DoxygenHelpPageCommand.OtherTypesEnum.Command:
+            ClassificationEnum classificationForOther = commentParser.GetClassificationForCommand(descriptionFragment.Item2);
+            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.Item2));
+            return;
+          default:
+            throw new VSDoxyHighlighterException($"Unknown value for DoxygenHelpPageCommand.OtherTypesEnum: {otherType}");
+        }
+      }
+
+      outputList.AddRange(ClassifiedTextElement.CreatePlainText(descriptionFragment.Item2).Runs);
+    }
 
 
     static AllDoxygenHelpPageCommands()
