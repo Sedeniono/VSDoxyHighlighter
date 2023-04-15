@@ -3,7 +3,7 @@ Command: addtogroup
 Parameters: <name> [(title)]
 Anchor: cmdaddtogroup  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdaddtogroup
 Help text:
-Defines a group just like [\defgroup], but in contrast to that command using the same <name> more than once will not result in a warning, but rather one group with a merged documentation and the first title found in any of the commands.
+Defines a group just like [\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§, but in contrast to that command using the same <name> more than once will not result in a warning, but rather one group with a merged documentation and the first title found in any of the commands.
 
 The title is optional, so this command can also be used to add a number of entities to an existing group using ```@{``` and ```@}``` like this:
 
@@ -26,7 +26,7 @@ The title is optional, so this command can also be used to add a number of entit
    
      /*! @} */
 
-```See also: page Grouping, commands [\defgroup], [\ingroup], and [\weakgroup].
+```See also: page Grouping§https://www.doxygen.nl/manual/grouping.html§, commands [\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§, [\ingroup]§https://www.doxygen.nl/manual/commands.html#cmdingroup§, and [\weakgroup]§https://www.doxygen.nl/manual/commands.html#cmdweakgroup§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -35,11 +35,11 @@ Command: callgraph
 Parameters: 
 Anchor: cmdcallgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcallgraph
 Help text:
-When this command is put in a comment block of a function or method and HAVE_DOT is set to ```YES```, then doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of CALL_GRAPH.
+When this command is put in a comment block of a function or method and HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§ is set to ```YES```, then doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§.
 
 !Note:! The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
 
-See also: command [\callergraph], command [\hidecallgraph], command [\hidecallergraph] and option CALL_GRAPH
+See also: command [\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§, command [\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§, command [\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§ and option CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -48,11 +48,11 @@ Command: hidecallgraph
 Parameters: 
 Anchor: cmdhidecallgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph
 Help text:
-When this command is put in a comment block of a function or method and then doxygen will not generate a call graph for that function. The call graph will not be generated regardless of the value of CALL_GRAPH.
+When this command is put in a comment block of a function or method and then doxygen will not generate a call graph for that function. The call graph will not be generated regardless of the value of CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§.
 
 !Note:! The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
 
-See also: command [\callergraph], command [\callgraph], command [\hidecallergraph] and option CALL_GRAPH
+See also: command [\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§, command [\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§, command [\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§ and option CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -61,11 +61,11 @@ Command: callergraph
 Parameters: 
 Anchor: cmdcallergraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcallergraph
 Help text:
-When this command is put in a comment block of a function or method and HAVE_DOT is set to ```YES```, then doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of CALLER_GRAPH.
+When this command is put in a comment block of a function or method and HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§ is set to ```YES```, then doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§.
 
 !Note:! The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
 
-See also: command [\callgraph], command [\hidecallgraph], command [\hidecallergraph] and option CALLER_GRAPH
+See also: command [\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§, command [\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§, command [\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§ and option CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -74,11 +74,11 @@ Command: hidecallergraph
 Parameters: 
 Anchor: cmdhidecallergraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph
 Help text:
-When this command is put in a comment block of a function or method and then doxygen will not generate a caller graph for that function. The caller graph will not be generated regardless of the value of CALLER_GRAPH.
+When this command is put in a comment block of a function or method and then doxygen will not generate a caller graph for that function. The caller graph will not be generated regardless of the value of CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§.
 
 !Note:! The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
 
-See also: command [\callergraph], command [\callgraph], command [\hidecallgraph] and option CALLER_GRAPH
+See also: command [\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§, command [\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§, command [\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§ and option CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -87,11 +87,11 @@ Command: showrefby
 Parameters: 
 Anchor: cmdshowrefby  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowrefby
 Help text:
-When this command is put in a comment block of a function, method or variable, then doxygen will generate an overview for that function, method, variable of the, documented, functions and methods that call / use it. The overview will be generated regardless of the value of REFERENCED_BY_RELATION.
+When this command is put in a comment block of a function, method or variable, then doxygen will generate an overview for that function, method, variable of the, documented, functions and methods that call / use it. The overview will be generated regardless of the value of REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§.
 
 !Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
-See also: command [\showrefs], command [\hiderefby], command [\hiderefs] and option REFERENCED_BY_RELATION
+See also: command [\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§, command [\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§, command [\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§ and option REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -100,11 +100,11 @@ Command: hiderefby
 Parameters: 
 Anchor: cmdhiderefby  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhiderefby
 Help text:
-When this command is put in a comment block of a function, method or variable then doxygen will not generate an overview for that function, method or variable of the functions and methods that call / use it. The overview will not be generated regardless of the value of REFERENCED_BY_RELATION.
+When this command is put in a comment block of a function, method or variable then doxygen will not generate an overview for that function, method or variable of the functions and methods that call / use it. The overview will not be generated regardless of the value of REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§.
 
 !Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
-See also: command [\showrefs], command [\showrefby], command [\hiderefs] and option REFERENCED_BY_RELATION
+See also: command [\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§, command [\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§, command [\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§ and option REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -113,11 +113,11 @@ Command: showrefs
 Parameters: 
 Anchor: cmdshowrefs  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowrefs
 Help text:
-When this command is put in a comment block of a function or method, then doxygen will generate an overview for that function or method of the functions and methods that call it. The overview will be generated regardless of the value of REFERENCES_RELATION.
+When this command is put in a comment block of a function or method, then doxygen will generate an overview for that function or method of the functions and methods that call it. The overview will be generated regardless of the value of REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§.
 
 !Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
-See also: command [\showrefby], command [\hiderefby], command [\hiderefs] and option REFERENCES_RELATION
+See also: command [\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§, command [\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§, command [\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§ and option REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -126,11 +126,11 @@ Command: hiderefs
 Parameters: 
 Anchor: cmdhiderefs  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhiderefs
 Help text:
-When this command is put in a comment block of a function or method and then doxygen will not generate an overview for that function or method of the functions and methods that call it. The overview will not be generated regardless of the value of REFERENCES_RELATION.
+When this command is put in a comment block of a function or method and then doxygen will not generate an overview for that function or method of the functions and methods that call it. The overview will not be generated regardless of the value of REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§.
 
 !Note:! The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
 
-See also: command [\showrefs], command [\showrefby], command [\hiderefby] and option REFERENCES_RELATION
+See also: command [\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§, command [\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§, command [\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§ and option REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -150,9 +150,9 @@ Command: category
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdcategory  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcategory
 Help text:
-For Objective-C only: Indicates that a comment block contains documentation for a class category with name <name>. The arguments are equal to the [\class] command.
+For Objective-C only: Indicates that a comment block contains documentation for a class category with name <name>. The arguments are equal to the [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§ command.
 
-See also: command [\class].
+See also: command [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -161,7 +161,7 @@ Command: class
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdclass  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdclass
 Help text:
-Indicates that a comment block contains documentation for a class with name <name>. Optionally a header file and a header name can be specified. If the header-file is specified, a link to a verbatim copy of the header will be included in the HTML documentation. The <header-name> argument can be used to overwrite the name of the link that is used in the class documentation to something other than <header-file>. This can be useful if the include name is not located on the default include path (like <X11/X.h>). With the <header-name> argument you can also specify how the include statement should look like, by adding either quotes or sharp brackets around the name. Sharp brackets are used if just the name is given. Note that the last two arguments can also be specified using the [\headerfile] command.
+Indicates that a comment block contains documentation for a class with name <name>. Optionally a header file and a header name can be specified. If the header-file is specified, a link to a verbatim copy of the header will be included in the HTML documentation. The <header-name> argument can be used to overwrite the name of the link that is used in the class documentation to something other than <header-file>. This can be useful if the include name is not located on the default include path (like <X11/X.h>). With the <header-name> argument you can also specify how the include statement should look like, by adding either quotes or sharp brackets around the name. Sharp brackets are used if just the name is given. Note that the last two arguments can also be specified using the [\headerfile]§https://www.doxygen.nl/manual/commands.html#cmdheaderfile§ command.
 
 Example: ```
    /* A dummy class */
@@ -174,7 +174,11 @@ Example: ```
     *  \brief This is a test class.
     *
     * Some details about the Test class.
-    */```
+    */
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/class/html/index.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -183,7 +187,7 @@ Command: concept
 Parameters: <name>
 Anchor: cmdconcept  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdconcept
 Help text:
-Indicates that a comment block contains documentation for a C++20 concept with name <name>. See also the [\headerfile] command to specify the header a user should be included to use the concept.
+Indicates that a comment block contains documentation for a C++20 concept with name <name>. See also the [\headerfile]§https://www.doxygen.nl/manual/commands.html#cmdheaderfile§ command to specify the header a user should be included to use the concept.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -214,7 +218,11 @@ Example: ```
    #define ABS(x) (((x)>0)?(x):-(x))
    #define MAX(x,y) ((x)>(y)?(x):(y))
    #define MIN(x,y) ((x)>(y)?(y):(x)) 
-           /*!< Computes the minimum of \a x and \a y. */```
+           /*!< Computes the minimum of \a x and \a y. */
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/define/html/define_8h.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -223,11 +231,11 @@ Command: defgroup
 Parameters: <name> (group title)
 Anchor: cmddefgroup  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddefgroup
 Help text:
-Indicates that a comment block contains documentation for a group of classes, files or namespaces. This can be used to categorize classes, files or namespaces, and document those categories. You can also use groups as members of other groups, thus building a hierarchy of groups.
+Indicates that a comment block contains documentation for a group§https://www.doxygen.nl/manual/grouping.html#modules§ of classes, files or namespaces. This can be used to categorize classes, files or namespaces, and document those categories. You can also use groups as members of other groups, thus building a hierarchy of groups.
 
 The <name> argument should be a single-word identifier.
 
-See also: page Grouping, commands [\ingroup], [\addtogroup], and [\weakgroup].
+See also: page Grouping§https://www.doxygen.nl/manual/grouping.html§, commands [\ingroup]§https://www.doxygen.nl/manual/commands.html#cmdingroup§, [\addtogroup]§https://www.doxygen.nl/manual/commands.html#cmdaddtogroup§, and [\weakgroup]§https://www.doxygen.nl/manual/commands.html#cmdweakgroup§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -236,7 +244,7 @@ Command: dir
 Parameters: [<path fragment>]
 Anchor: cmddir  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddir
 Help text:
-Indicates that a comment block contains documentation for a directory. The "path fragment" argument should include the directory name and enough of the path to be unique with respect to the other directories in the project. The STRIP_FROM_PATH option determines what is stripped from the full path before it appears in the output.
+Indicates that a comment block contains documentation for a directory. The "path fragment" argument should include the directory name and enough of the path to be unique with respect to the other directories in the project. The STRIP_FROM_PATH§https://www.doxygen.nl/manual/config.html#cfg_strip_from_path§ option determines what is stripped from the full path before it appears in the output.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -273,7 +281,11 @@ Example: ```
     
    /*! \var Enum_Test::TEnum Enum_Test::Val1
     * The description of the first enum value.
-    */```
+    */
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/enum/html/class_enum___test.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -282,11 +294,11 @@ Command: example
 Parameters: ['{lineno}'] <file-name>
 Anchor: cmdexample  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdexample
 Help text:
-Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option ```{lineno}``` to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option ```{lineno}``` to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH tag, you can include part of the absolute path to disambiguate it.
+If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag, you can include part of the absolute path to disambiguate it.
 
-If more than one source file is needed for the example, the [\include] command can be used.
+If more than one source file is needed for the example, the [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ command can be used.
 
 Example: ```
    /** A Example_Test class.
@@ -314,9 +326,14 @@ Example: ```
    {
      Example_Test t;
      t.example();
-   }```
+   }
 
-See also: command [\include].
+```  
+  Click here§https://www.doxygen.nl/manual/examples/example/html/examples.html§
+  for the corresponding HTML documentation that is generated by doxygen.
+   
+
+See also: command [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -325,7 +342,7 @@ Command: endinternal
 Parameters: 
 Anchor: cmdendinternal  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendinternal
 Help text:
-This command ends a documentation fragment that was started with a [\internal] command. The text between [\internal] and ```\endinternal``` will only be visible if INTERNAL_DOCS is set to ```YES```.
+This command ends a documentation fragment that was started with a [\internal]§https://www.doxygen.nl/manual/commands.html#cmdinternal§ command. The text between [\internal]§https://www.doxygen.nl/manual/commands.html#cmdinternal§ and ```\endinternal``` will only be visible if INTERNAL_DOCS§https://www.doxygen.nl/manual/config.html#cfg_internal_docs§ is set to ```YES```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -338,8 +355,9 @@ This command can be used to manually indicate an inheritance relation, when the 
 
 The file ```manual.c``` in the example directory shows how to use this command.
 
+Click here§https://www.doxygen.nl/manual/examples/manual/html/index.html§  for the corresponding HTML documentation that is generated by doxygen.
 
-See also: command [\implements] and command [\memberof]
+See also: command [\implements]§https://www.doxygen.nl/manual/commands.html#cmdimplements§ and command [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -352,7 +370,7 @@ Indicates that a comment block contains documentation for a source or header fil
 
 Important: The documentation of 
 global functions, variables, typedefs, and enums will only be included 
-in the output if the file they are in is documented as well or if EXTRACT_ALL is set to ```YES```.
+in the output if the file they are in is documented as well or if EXTRACT_ALL§https://www.doxygen.nl/manual/config.html#cfg_extract_all§ is set to ```YES```.
 
 Example: ```
    /** \file file.h
@@ -364,9 +382,14 @@ Example: ```
     * A global integer value.
     * More details about this value.
     */
-   extern int globalValue;```
+   extern int globalValue;
 
-!Note:! In the above example JAVADOC_AUTOBRIEF has been set to ```YES``` in the configuration file.
+```  
+  Click here§https://www.doxygen.nl/manual/examples/file/html/file_8h.html§
+  for the corresponding HTML documentation that is generated by doxygen.
+   
+
+!Note:! In the above example JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§ has been set to ```YES``` in the configuration file.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -382,11 +405,11 @@ Shows (part) of the file name in which this command is placed. The ```option``` 
     • ```directory``` the directory of the given file
     • ```full``` the full path and filename of the given file.
 
-In case no option is specified the ```filename``` is used unless FULL_PATH_NAMES is set to ```YES``` in which case ```full``` is used.
+In case no option is specified the ```filename``` is used unless FULL_PATH_NAMES§https://www.doxygen.nl/manual/config.html#cfg_full_path_names§ is set to ```YES``` in which case ```full``` is used.
 
-!Note:! the command \fileinfo cannot be used as argument to the [\file] command
+!Note:! the command \fileinfo cannot be used as argument to the [\file]§https://www.doxygen.nl/manual/commands.html#cmdfile§ command
 
-See also: command [\lineinfo]
+See also: command [\lineinfo]§https://www.doxygen.nl/manual/commands.html#cmdlineinfo§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -397,7 +420,7 @@ Anchor: cmdlineinfo  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html
 Help text:
 Shows the line number inside the file at which this command is placed.
 
-See also: command [\fileinfo]
+See also: command [\fileinfo]§https://www.doxygen.nl/manual/commands.html#cmdfileinfo§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -412,7 +435,7 @@ If your comment block *is* in front of the function declaration or definition th
 
 A full function declaration including arguments should be specified after the ```\fn``` command on a *single* line, since the argument ends at the end of the line!
 
-This command is equivalent to [\var], [\typedef], and [\property].
+This command is equivalent to [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§, [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§, and [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§.
 
 !!!Warning:!!! Do not use this command if it is not absolutely needed, since it will lead to duplication of information and thus to errors.
 
@@ -437,9 +460,14 @@ Example: ```
     *  \param n an integer.
     *  \exception std::out_of_range parameter is out of range.
     *  \return a character pointer.
-    */```
+    */
 
-See also: commands [\var], [\property], and [\typedef].
+```  
+  Click here§https://www.doxygen.nl/manual/examples/func/html/class_fn___test.html§
+  for the corresponding HTML documentation that is generated by doxygen.
+   
+
+See also: commands [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§, [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§, and [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -448,7 +476,7 @@ Command: headerfile
 Parameters: <header-file> [<header-name>]
 Anchor: cmdheaderfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdheaderfile
 Help text:
-Intended to be used for class, struct, or union documentation, where the documentation is in front of the definition. The arguments of this command are the same as the second and third argument of [\class]. The <header-file> name refers to the file that should be included by the application to obtain the definition of the class, struct, or union. The <header-name> argument can be used to overwrite the name of the link that is used in the class documentation to something other than <header-file>. This can be useful if the include name is not located on the default include path (like <X11/X.h>).
+Intended to be used for class, struct, or union documentation, where the documentation is in front of the definition. The arguments of this command are the same as the second and third argument of [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§. The <header-file> name refers to the file that should be included by the application to obtain the definition of the class, struct, or union. The <header-name> argument can be used to overwrite the name of the link that is used in the class documentation to something other than <header-file>. This can be useful if the include name is not located on the default include path (like <X11/X.h>).
 
 With the <header-name> argument you can also specify how the include statement should look like, by adding either double quotes or sharp brackets around the name. By default sharp brackets are used if just the name is given.
 
@@ -464,9 +492,9 @@ If a pair of double quotes is given for either the <header-file> or <header-name
      \headerfile test.h <>
      \headerfile <> 
 
-```To globally reverse the default include representation to local includes you can set FORCE_LOCAL_INCLUDES to ```YES```.
+```To globally reverse the default include representation to local includes you can set FORCE_LOCAL_INCLUDES§https://www.doxygen.nl/manual/config.html#cfg_force_local_includes§ to ```YES```.
 
-To disable the include information altogether set SHOW_HEADERFILE to ```NO```.
+To disable the include information altogether set SHOW_HEADERFILE§https://www.doxygen.nl/manual/config.html#cfg_show_headerfile§ to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -475,9 +503,9 @@ Command: hideinitializer
 Parameters: 
 Anchor: cmdhideinitializer  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideinitializer
 Help text:
-By default the value of a define and the initializer of a variable are displayed unless they are longer than 30 lines. By putting this command in a comment block of a define or variable, the initializer is always hidden. The maximum number of initialization lines can be changed by means of the configuration parameter MAX_INITIALIZER_LINES, the default value is 30.
+By default the value of a define and the initializer of a variable are displayed unless they are longer than 30 lines. By putting this command in a comment block of a define or variable, the initializer is always hidden. The maximum number of initialization lines can be changed by means of the configuration parameter MAX_INITIALIZER_LINES§https://www.doxygen.nl/manual/config.html#cfg_max_initializer_lines§, the default value is 30.
 
-See also: command [\showinitializer].
+See also: command [\showinitializer]§https://www.doxygen.nl/manual/commands.html#cmdshowinitializer§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -499,8 +527,9 @@ This command can be used to manually indicate an inheritance relation, when the 
 
 The file ```manual.c``` in the example directory shows how to use this command.
 
+Click here§https://www.doxygen.nl/manual/examples/manual/html/index.html§  for the corresponding HTML documentation that is generated by doxygen.
 
-See also: command [\extends] and command [\memberof]
+See also: command [\extends]§https://www.doxygen.nl/manual/commands.html#cmdextends§ and command [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -511,7 +540,7 @@ Anchor: cmdingroup  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 If the ```\ingroup``` command is placed in a comment block of a compound entity (like class, file or namespace), then it will be added to the group(s) identified by the ```<groupname>```(s). In case of members (like variable, functions, typedefs and enums) the member will be added only to one group (to avoid ambiguous linking targets in case a member is not documented in the context of its class, namespace or file, but only visible as part of a group).
 
-See also: page Grouping, commands [\defgroup], [\addtogroup], and [\weakgroup]
+See also: page Grouping§https://www.doxygen.nl/manual/grouping.html§, commands [\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§, [\addtogroup]§https://www.doxygen.nl/manual/commands.html#cmdaddtogroup§, and [\weakgroup]§https://www.doxygen.nl/manual/commands.html#cmdweakgroup§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -520,9 +549,9 @@ Command: interface
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdinterface  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinterface
 Help text:
-Indicates that a comment block contains documentation for an interface with name <name>. The arguments are equal to the arguments of the [\class] command.
+Indicates that a comment block contains documentation for an interface with name <name>. The arguments are equal to the arguments of the [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§ command.
 
-See also: command [\class].
+See also: command [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -531,13 +560,13 @@ Command: internal
 Parameters: 
 Anchor: cmdinternal  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinternal
 Help text:
-This command starts a documentation fragment that is meant for internal use only. The fragment naturally ends at the end of the comment block. You can also force the internal section to end earlier by using the [\endinternal] command.
+This command starts a documentation fragment that is meant for internal use only. The fragment naturally ends at the end of the comment block. You can also force the internal section to end earlier by using the [\endinternal]§https://www.doxygen.nl/manual/commands.html#cmdendinternal§ command.
 
-If the ```\internal``` command is put inside a section (see for example [\section]) all subsections after the command are considered to be internal as well. Only a new section at the same level will end the fragment that is considered internal.
+If the ```\internal``` command is put inside a section (see for example [\section]§https://www.doxygen.nl/manual/commands.html#cmdsection§) all subsections after the command are considered to be internal as well. Only a new section at the same level will end the fragment that is considered internal.
 
-You can use INTERNAL_DOCS in the configuration file to show (```YES```) or hide (```NO```) the internal documentation.
+You can use INTERNAL_DOCS§https://www.doxygen.nl/manual/config.html#cfg_internal_docs§ in the configuration file to show (```YES```) or hide (```NO```) the internal documentation.
 
-See also: command [\endinternal].
+See also: command [\endinternal]§https://www.doxygen.nl/manual/commands.html#cmdendinternal§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -567,7 +596,7 @@ Here is an example:
 
 ```You can refer to the main page using: ```\ref index```.
 
-See also: command [\section], command [\subsection], and command [\page].
+See also: command [\section]§https://www.doxygen.nl/manual/commands.html#cmdsection§, command [\subsection]§https://www.doxygen.nl/manual/commands.html#cmdsubsection§, and command [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -576,14 +605,15 @@ Command: memberof
 Parameters: <name>
 Anchor: cmdmemberof  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmemberof
 Help text:
-This command makes a function a member of a class in a similar way as [\relates] does, only with this command the function is represented as a real member of the class. This can be useful when the programming language does not support the concept of member functions natively (e.g. C).
+This command makes a function a member of a class in a similar way as [\relates]§https://www.doxygen.nl/manual/commands.html#cmdrelates§ does, only with this command the function is represented as a real member of the class. This can be useful when the programming language does not support the concept of member functions natively (e.g. C).
 
-It is also possible to use this command together with [\public], [\protected] or [\private].
+It is also possible to use this command together with [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§ or [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§.
 
 The file ```manual.c``` in the example directory shows how to use this command.
 
+Click here§https://www.doxygen.nl/manual/examples/manual/html/index.html§  for the corresponding HTML documentation that is generated by doxygen.
 
-See also: commands [\extends], [\implements], [\public], [\protected] and [\private].
+See also: commands [\extends]§https://www.doxygen.nl/manual/commands.html#cmdextends§, [\implements]§https://www.doxygen.nl/manual/commands.html#cmdimplements§, [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§ and [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -594,7 +624,7 @@ Anchor: cmdname  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmd
 Help text:
 This command turns a comment block into a header definition of a member group. The comment block should be followed by a ```@{``` ... ```@}``` block containing the members of the group.
 
-See section Member Groups for an example.
+See section Member Groups§https://www.doxygen.nl/manual/grouping.html#memgroup§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -614,7 +644,7 @@ Anchor: cmdnosubgrouping  ==>  Hyperlink: https://www.doxygen.nl/manual/commands
 Help text:
 This command can be put in the documentation of a class. It can be used in combination with member grouping to avoid that doxygen puts a member group as a subgroup of a Public/Protected/Private/... section.
 
-See also: commands [\publicsection], [\protectedsection] and [\privatesection].
+See also: commands [\publicsection]§https://www.doxygen.nl/manual/commands.html#cmdpublicsection§, [\protectedsection]§https://www.doxygen.nl/manual/commands.html#cmdprotectedsection§ and [\privatesection]§https://www.doxygen.nl/manual/commands.html#cmdprivatesection§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -635,7 +665,7 @@ Any other documentation that is inside the documentation block will by appended 
 
 Note 1: You are responsible that 
 there is indeed an earlier documented member that is overloaded by this 
-one. To prevent that document reorders the documentation you should set SORT_MEMBER_DOCS to ```NO``` in this case. 
+one. To prevent that document reorders the documentation you should set SORT_MEMBER_DOCS§https://www.doxygen.nl/manual/config.html#cfg_sort_member_docs§ to ```NO``` in this case. 
 
 Note 2: The ```\overload``` command does not work inside a one-line comment. 
 
@@ -663,7 +693,12 @@ Example: ```
     
    /*!
     * \overload void Overload_Test::drawRect(const Rect &r)
-    */```
+    */
+    
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/overload/html/class_overload___test.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -698,14 +733,19 @@ Example: ```
     
    /*! \page page2 Another page
      Even more info.
-   */```
+   */
 
-Note: The <name> argument consists of a combination of letters and number digits. If you wish to use upper case letters (e.g. ```MYPAGE1```), or mixed case letters (e.g. ```MyPage1```) in the <name> argument, you should set CASE_SENSE_NAMES to ```YES```.
+```  
+  Click here§https://www.doxygen.nl/manual/examples/page/html/pages.html§
+  for the corresponding HTML documentation that is generated by doxygen.
+   
+
+Note: The <name> argument consists of a combination of letters and number digits. If you wish to use upper case letters (e.g. ```MYPAGE1```), or mixed case letters (e.g. ```MyPage1```) in the <name> argument, you should set CASE_SENSE_NAMES§https://www.doxygen.nl/manual/config.html#cfg_case_sense_names§ to ```YES```.
  However, this is advisable only if your file system is case sensitive. 
 Otherwise (and for better portability) you should use all lower case 
 letters (e.g. ```mypage1```) for <name> in all references to the page.
 
-See also: command [\section], command [\subsection], and command [\ref].
+See also: command [\section]§https://www.doxygen.nl/manual/commands.html#cmdsection§, command [\subsection]§https://www.doxygen.nl/manual/commands.html#cmdsubsection§, and command [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -718,9 +758,9 @@ Indicates that the member documented by the comment block is private, i.e., shou
 
 Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
-For starting a section of private members, in a way similar to the "private:" class marker in C++, use [\privatesection].
+For starting a section of private members, in a way similar to the "private:" class marker in C++, use [\privatesection]§https://www.doxygen.nl/manual/commands.html#cmdprivatesection§.
 
-See also: commands [\memberof], [\public], [\protected] and [\privatesection].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§ and [\privatesection]§https://www.doxygen.nl/manual/commands.html#cmdprivatesection§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -731,7 +771,7 @@ Anchor: cmdprivatesection  ==>  Hyperlink: https://www.doxygen.nl/manual/command
 Help text:
 Starting a section of private members, in a way similar to the "private:" class marker in C++. Indicates that the member documented by the comment block is private, i.e., should only be accessed by other members in the same class.
 
-See also: commands [\memberof], [\public], [\protected] and [\private].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§ and [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -740,9 +780,9 @@ Command: property
 Parameters: (qualified property name)
 Anchor: cmdproperty  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdproperty
 Help text:
-Indicates that a comment block contains documentation for a property (either global or as a member of a class). This command is equivalent to [\fn], [\typedef], and [\var].
+Indicates that a comment block contains documentation for a property (either global or as a member of a class). This command is equivalent to [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§, and [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§.
 
-See also: commands [\fn], [\typedef], and [\var].
+See also: commands [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§, and [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -755,9 +795,9 @@ Indicates that the member documented by the comment block is protected, i.e., sh
 
 Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
-For starting a section of protected members, in a way similar to the "protected:" class marker in C++, use [\protectedsection].
+For starting a section of protected members, in a way similar to the "protected:" class marker in C++, use [\protectedsection]§https://www.doxygen.nl/manual/commands.html#cmdprotectedsection§.
 
-See also: commands [\memberof], [\public], [\private] and [\protectedsection].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§ and [\protectedsection]§https://www.doxygen.nl/manual/commands.html#cmdprotectedsection§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -768,7 +808,7 @@ Anchor: cmdprotectedsection  ==>  Hyperlink: https://www.doxygen.nl/manual/comma
 Help text:
 Starting a section of protected members, in a way similar to the "protected:" class marker in C++. Indicates that the member documented by the comment block is protected, i.e., should only be accessed by other members in the same or derived classes.
 
-See also: commands [\memberof], [\public], [\private] and [\protected].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§, [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§ and [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -777,9 +817,9 @@ Command: protocol
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdprotocol  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdprotocol
 Help text:
-Indicates that a comment block contains documentation for a protocol in Objective-C with name <name>. The arguments are equal to the [\class] command.
+Indicates that a comment block contains documentation for a protocol in Objective-C with name <name>. The arguments are equal to the [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§ command.
 
-See also: command [\class].
+See also: command [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -792,9 +832,9 @@ Indicates that the member documented by the comment block is public, i.e., can b
 
 Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
-For starting a section of public members, in a way similar to the "public:" class marker in C++, use [\publicsection].
+For starting a section of public members, in a way similar to the "public:" class marker in C++, use [\publicsection]§https://www.doxygen.nl/manual/commands.html#cmdpublicsection§.
 
-See also: commands [\memberof], [\protected], [\private] and [\publicsection].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§, [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§ and [\publicsection]§https://www.doxygen.nl/manual/commands.html#cmdpublicsection§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -805,7 +845,7 @@ Anchor: cmdpublicsection  ==>  Hyperlink: https://www.doxygen.nl/manual/commands
 Help text:
 Starting a section of public members, in a way similar to the "public:" class marker in C++. Indicates that the member documented by the comment block is public, i.e., can be accessed by any other class or function.
 
-See also: commands [\memberof], [\protected], [\private] and [\public].
+See also: commands [\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§, [\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§, [\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§ and [\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -850,7 +890,11 @@ Example: ```
     */
    void stringDebug()
    {
-   }```
+   }
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/relates/html/class_string.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -859,7 +903,7 @@ Command: related
 Parameters: <name>
 Anchor: cmdrelated  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrelated
 Help text:
-Equivalent to [\relates]
+Equivalent to [\relates]§https://www.doxygen.nl/manual/commands.html#cmdrelates§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -877,7 +921,7 @@ Command: relatedalso
 Parameters: <name>
 Anchor: cmdrelatedalso  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrelatedalso
 Help text:
-Equivalent to [\relatesalso]
+Equivalent to [\relatesalso]§https://www.doxygen.nl/manual/commands.html#cmdrelatesalso§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -886,9 +930,9 @@ Command: showinitializer
 Parameters: 
 Anchor: cmdshowinitializer  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowinitializer
 Help text:
-By default the value of a define and the initializer of a variable are only displayed if they are less than 30 lines long. By putting this command in a comment block of a define or variable, the initializer is shown unconditionally. The maximum number of initialization lines can be changed by means of the configuration parameter MAX_INITIALIZER_LINES, the default value is 30.
+By default the value of a define and the initializer of a variable are only displayed if they are less than 30 lines long. By putting this command in a comment block of a define or variable, the initializer is shown unconditionally. The maximum number of initialization lines can be changed by means of the configuration parameter MAX_INITIALIZER_LINES§https://www.doxygen.nl/manual/config.html#cfg_max_initializer_lines§, the default value is 30.
 
-See also: command [\hideinitializer].
+See also: command [\hideinitializer]§https://www.doxygen.nl/manual/commands.html#cmdhideinitializer§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -908,9 +952,9 @@ Command: struct
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdstruct  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdstruct
 Help text:
-Indicates that a comment block contains documentation for a struct with name <name>. The arguments are equal to the arguments of the [\class] command.
+Indicates that a comment block contains documentation for a struct with name <name>. The arguments are equal to the arguments of the [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§ command.
 
-See also: command [\class].
+See also: command [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -919,9 +963,9 @@ Command: typedef
 Parameters: (typedef declaration)
 Anchor: cmdtypedef  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdtypedef
 Help text:
-Indicates that a comment block contains documentation for a typedef (either global or as a member of a class). This command is equivalent to [\fn], [\property], and [\var].
+Indicates that a comment block contains documentation for a typedef (either global or as a member of a class). This command is equivalent to [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§, and [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§.
 
-See also: command [\fn], [\property], and [\var].
+See also: command [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§, and [\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -930,9 +974,9 @@ Command: union
 Parameters: <name> [<header-file>] [<header-name>]
 Anchor: cmdunion  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdunion
 Help text:
-Indicates that a comment block contains documentation for a union with name <name>. The arguments are equal to the arguments of the [\class] command.
+Indicates that a comment block contains documentation for a union with name <name>. The arguments are equal to the arguments of the [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§ command.
 
-See also: command [\class].
+See also: command [\class]§https://www.doxygen.nl/manual/commands.html#cmdclass§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -941,14 +985,14 @@ Command: var
 Parameters: (variable declaration)
 Anchor: cmdvar  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdvar
 Help text:
-Indicates that a comment block contains documentation for a variable or enum value (either global or as a member of a class). This command is equivalent to [\fn], [\property], and [\typedef].
+Indicates that a comment block contains documentation for a variable or enum value (either global or as a member of a class). This command is equivalent to [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§, and [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§.
 
 Note that for PHP one can also specify the type of the variable. The syntax is similar as for the ```phpDocumentor``` but the description has to start at the next line, i.e.
 ```
    @var  datatype $varname
    Description
 
-```See also: command [\fn], [\property], and [\typedef].
+```See also: command [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§, [\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§, and [\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -968,9 +1012,9 @@ Command: weakgroup
 Parameters: <name> [(title)]
 Anchor: cmdweakgroup  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdweakgroup
 Help text:
-Can be used exactly like [\addtogroup], but has a lower priority when it comes to resolving conflicting grouping definitions.
+Can be used exactly like [\addtogroup]§https://www.doxygen.nl/manual/commands.html#cmdaddtogroup§, but has a lower priority when it comes to resolving conflicting grouping definitions.
 
-See also: page Grouping and command [\addtogroup].
+See also: page Grouping§https://www.doxygen.nl/manual/grouping.html§ and command [\addtogroup]§https://www.doxygen.nl/manual/commands.html#cmdaddtogroup§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1003,7 +1047,11 @@ Example: ```
     *  \warning   Improper use can crash your application
     *  \copyright GNU Public License.
     */
-   class SomeNiceClass {};```
+   class SomeNiceClass {};
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/author/html/class_some_nice_class.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1012,7 +1060,7 @@ Command: authors
 Parameters: { list of authors }
 Anchor: cmdauthors  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdauthors
 Help text:
-Equivalent to [\author].
+Equivalent to [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1021,9 +1069,9 @@ Command: brief
 Parameters: { brief description }
 Anchor: cmdbrief  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdbrief
 Help text:
-Starts a paragraph that serves as a brief description. For classes and files the brief description will be used in lists and at the start of the documentation page. For class and file members, the brief description will be placed at the declaration of the member and prepended to the detailed description. A brief description may span several lines (although it is advised to keep it brief!). A brief description ends when a blank line or another sectioning command is encountered. If multiple ```\brief``` commands are present they will be joined. See section [\author] for an example.
+Starts a paragraph that serves as a brief description. For classes and files the brief description will be used in lists and at the start of the documentation page. For class and file members, the brief description will be placed at the declaration of the member and prepended to the detailed description. A brief description may span several lines (although it is advised to keep it brief!). A brief description ends when a blank line or another sectioning command is encountered. If multiple ```\brief``` commands are present they will be joined. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 
-Synonymous to [\short].
+Synonymous to [\short]§https://www.doxygen.nl/manual/commands.html#cmdshort§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1032,11 +1080,11 @@ Command: bug
 Parameters: { bug description }
 Anchor: cmdbug  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdbug
 Help text:
-Starts a paragraph where one or more bugs may be reported. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\bug``` commands will be joined into a single paragraph. Each bug description will start on a new line. Alternatively, one ```\bug``` command may mention several bugs. The ```\bug``` command ends when a blank line or some other sectioning command is encountered. See section [\author] for an example.
+Starts a paragraph where one or more bugs may be reported. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\bug``` commands will be joined into a single paragraph. Each bug description will start on a new line. Alternatively, one ```\bug``` command may mention several bugs. The ```\bug``` command ends when a blank line or some other sectioning command is encountered. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 
 The description will also add an item to a separate Bug list and the two instances of the description will be cross-referenced. Each item in the Bug list will be preceded by a header that indicates the origin of the item.
 
-The Bug list and the corresponding entries can be disabled by setting the GENERATE_BUGLIST to ```NO```.
+The Bug list and the corresponding entries can be disabled by setting the GENERATE_BUGLIST§https://www.doxygen.nl/manual/config.html#cfg_generate_buglist§ to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1045,11 +1093,11 @@ Command: cond
 Parameters: [(section-label)]
 Anchor: cmdcond  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcond
 Help text:
-Starts a conditional section that ends with a corresponding [\endcond] command, which is typically found in another comment block. The main purpose of this pair of commands is to (conditionally) exclude part of a file from processing (in older version of doxygen this could only be achieved using C preprocessor commands).
+Starts a conditional section that ends with a corresponding [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§ command, which is typically found in another comment block. The main purpose of this pair of commands is to (conditionally) exclude part of a file from processing (in older version of doxygen this could only be achieved using C preprocessor commands).
 
-The section between ```\cond``` and [\endcond] can be included by adding its section label to the ENABLED_SECTIONS configuration option. If the section label is omitted, the section will be excluded from processing unconditionally. The section label can be a logical expression build of section labels, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ```\cond (!LABEL1 && LABEL2)```.
+The section between ```\cond``` and [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§ can be included by adding its section label to the ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ configuration option. If the section label is omitted, the section will be excluded from processing unconditionally. The section label can be a logical expression build of section labels, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ```\cond (!LABEL1 && LABEL2)```.
 
-For conditional sections within a comment block one should use a [\if] ... [\endif] block. When using ```\cond``` and the condition is not satisfied the current comment block is ended and everything until the matching [\endcond] is removed and a new command block is started there.
+For conditional sections within a comment block one should use a [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§ ... [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§ block. When using ```\cond``` and the condition is not satisfied the current comment block is ended and everything until the matching [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§ is removed and a new command block is started there.
 
 Conditional sections can be nested. In this case a nested section will only be shown if it and its containing section are included.
 
@@ -1093,11 +1141,11 @@ Here is an example showing the commands in action:
    
    /// @endcond
 
-```The output will be different depending on whether or not ENABLED_SECTIONS contains ```TEST```, or ```DEV```
+```The output will be different depending on whether or not ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ contains ```TEST```, or ```DEV```
 
-See also: commands [\if], [\ifnot], [\else], [\elseif], [\endif], [\endcond], and ENABLED_SECTIONS.
+See also: commands [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, [\else]§https://www.doxygen.nl/manual/commands.html#cmdelse§, [\elseif]§https://www.doxygen.nl/manual/commands.html#cmdelseif§, [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§, [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§, and ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§.
 
-!Note:! Due to the moment of parsing the ```\cond``` and [\endcond] commands cannot be used in ALIASES.
+!Note:! Due to the moment of parsing the ```\cond``` and [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§ commands cannot be used in ALIASES§https://www.doxygen.nl/manual/config.html#cfg_aliases§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1106,7 +1154,7 @@ Command: copyright
 Parameters: { copyright description }
 Anchor: cmdcopyright  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcopyright
 Help text:
-Starts a paragraph where the copyright of an entity can be described. This paragraph will be indented. The text of the paragraph has no special internal structure. See section [\author] for an example.
+Starts a paragraph where the copyright of an entity can be described. This paragraph will be indented. The text of the paragraph has no special internal structure. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1115,7 +1163,7 @@ Command: date
 Parameters: { date description }
 Anchor: cmddate  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddate
 Help text:
-Starts a paragraph where one or more dates may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\date``` commands will be joined into a single paragraph. Each date description will start on a new line. Alternatively, one ```\date``` command may mention several dates. The ```\date``` command ends when a blank line or some other sectioning command is encountered. See section [\author] for an example.
+Starts a paragraph where one or more dates may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\date``` commands will be joined into a single paragraph. Each date description will start on a new line. Alternatively, one ```\date``` command may mention several dates. The ```\date``` command ends when a blank line or some other sectioning command is encountered. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1205,7 +1253,7 @@ Starts a paragraph indicating that this documentation block belongs to a depreca
 
 The description will also add an item to a separate Deprecated list and the two instances of the description will be cross-referenced. Each item in the Deprecated list will be preceded by a header that indicates the origin of the item.
 
-The Deprecated list and the corresponding entries can be disabled by setting the GENERATE_DEPRECATEDLIST to ```NO```.
+The Deprecated list and the corresponding entries can be disabled by setting the GENERATE_DEPRECATEDLIST§https://www.doxygen.nl/manual/config.html#cfg_generate_deprecatedlist§ to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1214,7 +1262,7 @@ Command: details
 Parameters: { detailed description }
 Anchor: cmddetails  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddetails
 Help text:
-Just like [\brief] starts a brief description, ```\details``` starts the detailed description. You can also start a new paragraph (blank line) then the ```\details``` command is not needed.
+Just like [\brief]§https://www.doxygen.nl/manual/commands.html#cmdbrief§ starts a brief description, ```\details``` starts the detailed description. You can also start a new paragraph (blank line) then the ```\details``` command is not needed.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1223,7 +1271,7 @@ Command: noop
 Parameters: ( text to be ignored )
 Anchor: cmdnoop  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdnoop
 Help text:
-All the text, including the command, till the end of the line is ignored. The command will most commonly be used in combination with ALIASES to ignore not supported commands that are present for e.g. other processing tools.
+All the text, including the command, till the end of the line is ignored. The command will most commonly be used in combination with ALIASES§https://www.doxygen.nl/manual/config.html#cfg_aliases§ to ignore not supported commands that are present for e.g. other processing tools.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1232,7 +1280,7 @@ Command: raisewarning
 Parameters: ( text to be shown as warning )
 Anchor: cmdraisewarning  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdraisewarning
 Help text:
-All the text, excluding the command, till the end of the line is literally shown as a documentation warning. The text, including the command, is removed from the output. The command will most commonly be used in combination with ALIASES to show a specific warning.
+All the text, excluding the command, till the end of the line is literally shown as a documentation warning. The text, including the command, is removed from the output. The command will most commonly be used in combination with ALIASES§https://www.doxygen.nl/manual/config.html#cfg_aliases§ to show a specific warning.
 Example: ```
    \raisewarning My specific warnning
    
@@ -1256,9 +1304,9 @@ Command: else
 Parameters: 
 Anchor: cmdelse  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdelse
 Help text:
-Starts a conditional section if the previous conditional section was not enabled. The previous section should have been started with a [\if], [\ifnot], or [\elseif] command.
+Starts a conditional section if the previous conditional section was not enabled. The previous section should have been started with a [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, or [\elseif]§https://www.doxygen.nl/manual/commands.html#cmdelseif§ command.
 
-See also: commands [\if], [\ifnot], [\elseif], [\endif.]
+See also: commands [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, [\elseif]§https://www.doxygen.nl/manual/commands.html#cmdelseif§, [\endif.]§https://www.doxygen.nl/manual/commands.html#cmdendif§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1267,9 +1315,9 @@ Command: elseif
 Parameters: (section-label)
 Anchor: cmdelseif  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdelseif
 Help text:
-Starts a conditional documentation section if the previous section was not enabled. A conditional section is disabled by default. To enable it you must put the section-label after the ENABLED_SECTIONS tag in the configuration file. The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT). Conditional blocks can be nested. A nested section is only enabled if all enclosing sections are enabled as well.
+Starts a conditional documentation section if the previous section was not enabled. A conditional section is disabled by default. To enable it you must put the section-label after the ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ tag in the configuration file. The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT). Conditional blocks can be nested. A nested section is only enabled if all enclosing sections are enabled as well.
 
-See also: commands [\if], [\ifnot], [\else], [\endif.]
+See also: commands [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, [\else]§https://www.doxygen.nl/manual/commands.html#cmdelse§, [\endif.]§https://www.doxygen.nl/manual/commands.html#cmdendif§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1278,11 +1326,11 @@ Command: endcond
 Parameters: 
 Anchor: cmdendcond  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendcond
 Help text:
-Ends a conditional section that was started by [\cond].
+Ends a conditional section that was started by [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§.
 
-See also: command [\cond].
+See also: command [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§.
 
-!Note:! Due to the moment of parsing the ```\endcond``` and [\cond] commands cannot be used in ALIASES.
+!Note:! Due to the moment of parsing the ```\endcond``` and [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§ commands cannot be used in ALIASES§https://www.doxygen.nl/manual/config.html#cfg_aliases§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1291,9 +1339,9 @@ Command: endif
 Parameters: 
 Anchor: cmdendif  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendif
 Help text:
-Ends a conditional section that was started by [\if] or [\ifnot] For each [\if] or [\ifnot] one and only one matching [\endif] must follow.
+Ends a conditional section that was started by [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§ or [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§ For each [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§ or [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§ one and only one matching [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§ must follow.
 
-See also: commands [\if], [\ifnot], [\else], [\elseif.]
+See also: commands [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, [\else]§https://www.doxygen.nl/manual/commands.html#cmdelse§, [\elseif.]§https://www.doxygen.nl/manual/commands.html#cmdelseif§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1302,7 +1350,7 @@ Command: exception
 Parameters: <exception-object> { exception description }
 Anchor: cmdexception  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdexception
 Help text:
-Starts an exception description for an exception object with name <exception-object>. Followed by a description of the exception. The existence of the exception object is not checked. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\exception``` commands will be joined into a single paragraph. Each exception description will start on a new line. The ```\exception``` description ends when a blank line or some other sectioning command is encountered. See section [\fn] for an example.
+Starts an exception description for an exception object with name <exception-object>. Followed by a description of the exception. The existence of the exception object is not checked. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\exception``` commands will be joined into a single paragraph. Each exception description will start on a new line. The ```\exception``` description ends when a blank line or some other sectioning command is encountered. See section [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1311,13 +1359,13 @@ Command: if
 Parameters: (section-label)
 Anchor: cmdif  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdif
 Help text:
-Starts a conditional documentation section. The section ends with a matching [\endif] command. A conditional section is disabled by default. To enable it you must put the section-label after the ENABLED_SECTIONS tag in the configuration file.
+Starts a conditional documentation section. The section ends with a matching [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§ command. A conditional section is disabled by default. To enable it you must put the section-label after the ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ tag in the configuration file.
 
 The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ```\if (!LABEL1 && LABEL2)```.
 
 Conditional blocks can be nested. A nested section is only enabled if all enclosing sections are enabled as well.
 
-The ```\if``` and corresponding [\endif] have to be in the same comment block. When a conditional block needs to span more than one comment block one has to use [\cond] ... [\endcond].
+The ```\if``` and corresponding [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§ have to be in the same comment block. When a conditional block needs to span more than one comment block one has to use [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§ ... [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§.
 
 Example: ```
      /*! Unconditionally shown documentation.
@@ -1359,9 +1407,9 @@ Where the following aliases are defined in the configuration file:
               "dutch=\if dutch" \
               "enddutch=\endif"
 
-```and ENABLED_SECTIONS can be used to enable either ```english``` or ```dutch```.
+```and ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ can be used to enable either ```english``` or ```dutch```.
 
-See also: commands [\endif], [\ifnot], [\else], [\elseif], [\cond], [\endcond], and ENABLED_SECTIONS.
+See also: commands [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§, [\ifnot]§https://www.doxygen.nl/manual/commands.html#cmdifnot§, [\else]§https://www.doxygen.nl/manual/commands.html#cmdelse§, [\elseif]§https://www.doxygen.nl/manual/commands.html#cmdelseif§, [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§, [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§, and ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1370,9 +1418,9 @@ Command: ifnot
 Parameters: (section-label)
 Anchor: cmdifnot  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdifnot
 Help text:
-Starts a conditional documentation section. The section ends with a matching [\endif] command. This conditional section is enabled by default. To disable it you must put the section-label after the ENABLED_SECTIONS tag in the configuration file. The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT).
+Starts a conditional documentation section. The section ends with a matching [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§ command. This conditional section is enabled by default. To disable it you must put the section-label after the ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§ tag in the configuration file. The section label can be a logical expression build of section names, round brackets, && (AND), || (OR) and ! (NOT).
 
-See also: commands [\endif], [\if], [\else], and [\elseif], [\cond], [\endcond], and ENABLED_SECTIONS.
+See also: commands [\endif]§https://www.doxygen.nl/manual/commands.html#cmdendif§, [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§, [\else]§https://www.doxygen.nl/manual/commands.html#cmdelse§, and [\elseif]§https://www.doxygen.nl/manual/commands.html#cmdelseif§, [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§, [\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§, and ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1390,7 +1438,7 @@ Command: note
 Parameters: { text }
 Anchor: cmdnote  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdnote
 Help text:
-Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\note``` commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one ```\note``` command may mention several notes. The ```\note``` command ends when a blank line or some other sectioning command is encountered. See section [\par] for an example.
+Starts a paragraph where a note can be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\note``` commands will be joined into a single paragraph. Each note description will start on a new line. Alternatively, one ```\note``` command may mention several notes. The ```\note``` command ends when a blank line or some other sectioning command is encountered. See section [\par]§https://www.doxygen.nl/manual/commands.html#cmdpar§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1401,7 +1449,7 @@ Anchor: cmdpar  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdp
 Help text:
 If a paragraph title is given this command starts a paragraph with a user defined heading. The heading extends until the end of the line. The paragraph following the command will be indented.
 
-If no paragraph title is given this command will start a new paragraph. This will also work inside other paragraph commands (like [\param] or [\warning]) without ending that command.
+If no paragraph title is given this command will start a new paragraph. This will also work inside other paragraph commands (like [\param]§https://www.doxygen.nl/manual/commands.html#cmdparam§ or [\warning]§https://www.doxygen.nl/manual/commands.html#cmdwarning§) without ending that command.
 
 The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. The ```\par``` command ends when a blank line or some other sectioning command is encountered.
 
@@ -1425,7 +1473,11 @@ Example: ```
     * More normal text. 
     */
     
-   class Par_Test {};```
+   class Par_Test {};
+
+```  
+  Click here§https://www.doxygen.nl/manual/examples/par/html/class_par___test.html§
+  for the corresponding HTML documentation that is generated by doxygen.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1449,7 +1501,7 @@ The ```\param``` command has an optional attribute, ```dir```, specifying the di
 
 ```The parameter description is a paragraph with no special internal structure. All visual enhancement commands may be used inside the paragraph.
 
-Multiple adjacent ```\param``` commands will be joined into a single paragraph. Each parameter description will start on a new line. The ```\param``` description ends when a blank line or some other sectioning command is encountered. See section [\fn] for an example.
+Multiple adjacent ```\param``` commands will be joined into a single paragraph. Each parameter description will start on a new line. The ```\param``` description ends when a blank line or some other sectioning command is encountered. See section [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§ for an example.
 
 Note that you can also document multiple parameters with a single ```\param``` command using a comma separated list. Here is an example:
 
@@ -1471,7 +1523,7 @@ Command: parblock
 Parameters: 
 Anchor: cmdparblock  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdparblock
 Help text:
-For commands that expect a single paragraph as argument (such as [\par], [\param] and [\warning]), the [\parblock] command allows to start a description that covers multiple paragraphs, which then ends with [\endparblock].
+For commands that expect a single paragraph as argument (such as [\par]§https://www.doxygen.nl/manual/commands.html#cmdpar§, [\param]§https://www.doxygen.nl/manual/commands.html#cmdparam§ and [\warning]§https://www.doxygen.nl/manual/commands.html#cmdwarning§), the [\parblock]§https://www.doxygen.nl/manual/commands.html#cmdparblock§ command allows to start a description that covers multiple paragraphs, which then ends with [\endparblock]§https://www.doxygen.nl/manual/commands.html#cmdendparblock§.
 
 Example:
 ```
@@ -1485,7 +1537,7 @@ Example:
     *  Rest of the comment block continues.
     */
 
-```Note that the ```\parblock``` command may also appear directly after [\param]'s first argument.
+```Note that the ```\parblock``` command may also appear directly after [\param]§https://www.doxygen.nl/manual/commands.html#cmdparam§'s first argument.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1494,7 +1546,7 @@ Command: endparblock
 Parameters: 
 Anchor: cmdendparblock  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendparblock
 Help text:
-This ends a block of paragraphs started with [\parblock].
+This ends a block of paragraphs started with [\parblock]§https://www.doxygen.nl/manual/commands.html#cmdparblock§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1505,7 +1557,7 @@ Anchor: cmdtparam  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#c
 Help text:
 Starts a template parameter for a class or function template parameter with name <template-parameter-name>, followed by a description of the template parameter.
 
-Otherwise similar to [\param].
+Otherwise similar to [\param]§https://www.doxygen.nl/manual/commands.html#cmdparam§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1541,7 +1593,7 @@ Command: remarks
 Parameters: { remark text }
 Anchor: cmdremarks  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdremarks
 Help text:
-Equivalent to [\remark].
+Equivalent to [\remark]§https://www.doxygen.nl/manual/commands.html#cmdremark§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1550,7 +1602,7 @@ Command: result
 Parameters: { description of the result value }
 Anchor: cmdresult  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdresult
 Help text:
-Equivalent to [\return].
+Equivalent to [\return]§https://www.doxygen.nl/manual/commands.html#cmdreturn§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1559,7 +1611,7 @@ Command: return
 Parameters: { description of the return value }
 Anchor: cmdreturn  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdreturn
 Help text:
-Starts a return value description for a function. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\return``` commands will be joined into a single paragraph. The ```\return``` description ends when a blank line or some other sectioning command is encountered. See section [\fn] for an example.
+Starts a return value description for a function. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\return``` commands will be joined into a single paragraph. The ```\return``` description ends when a blank line or some other sectioning command is encountered. See section [\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1568,7 +1620,7 @@ Command: returns
 Parameters: { description of the return value }
 Anchor: cmdreturns  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdreturns
 Help text:
-Equivalent to [\return].
+Equivalent to [\return]§https://www.doxygen.nl/manual/commands.html#cmdreturn§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1588,9 +1640,9 @@ Anchor: cmdsa  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsa
 Help text:
 Starts a paragraph where one or more cross-references to classes, functions, methods, variables, files or URL may be specified. Two names joined by either ```::``` or ```#``` are understood as referring to a class and one of its members. One of several overloaded methods or constructors may be selected by including a parenthesized list of argument types after the method name.
 
-Synonymous to [\see].
+Synonymous to [\see]§https://www.doxygen.nl/manual/commands.html#cmdsee§.
 
-See also: command autolink for information on how to create links to objects.
+See also: command autolink§https://www.doxygen.nl/manual/autolink.html§ for information on how to create links to objects.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1599,7 +1651,7 @@ Command: see
 Parameters: { references }
 Anchor: cmdsee  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsee
 Help text:
-Equivalent to [\sa]. Introduced for compatibility with Javadoc.
+Equivalent to [\sa]§https://www.doxygen.nl/manual/commands.html#cmdsa§. Introduced for compatibility with Javadoc.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1608,7 +1660,7 @@ Command: short
 Parameters: { short description }
 Anchor: cmdshort  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshort
 Help text:
-Equivalent to [\brief].
+Equivalent to [\brief]§https://www.doxygen.nl/manual/commands.html#cmdbrief§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1630,7 +1682,7 @@ Starts a paragraph where one or more test cases can be described. The paragraph 
 
 The description will also add an item to a separate Test list and the two instances of the description will be cross-referenced. Each item in the Test list will be preceded by a header that indicates the origin of the item.
 
-The Test list and the corresponding entries can be disabled by setting the GENERATE_TESTLIST to ```NO```.
+The Test list and the corresponding entries can be disabled by setting the GENERATE_TESTLIST§https://www.doxygen.nl/manual/config.html#cfg_generate_testlist§ to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1639,11 +1691,11 @@ Command: throw
 Parameters: <exception-object> { exception description }
 Anchor: cmdthrow  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdthrow
 Help text:
-Synonymous [\exception].
+Synonymous [\exception]§https://www.doxygen.nl/manual/commands.html#cmdexception§.
 
-Note: the command [\throws] is a synonym for this command.
+Note: the command [\throws]§https://www.doxygen.nl/manual/commands.html#cmdthrows§ is a synonym for this command.
 
-See also: command [\exception]
+See also: command [\exception]§https://www.doxygen.nl/manual/commands.html#cmdexception§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1652,7 +1704,7 @@ Command: throws
 Parameters: <exception-object> { exception description }
 Anchor: cmdthrows  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdthrows
 Help text:
-Equivalent to [\throw].
+Equivalent to [\throw]§https://www.doxygen.nl/manual/commands.html#cmdthrow§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1665,7 +1717,7 @@ Starts a paragraph where one or more todo items are described. The paragraph wil
 
 The description will also add an item to a separate Todo list and the two instances of the description will be cross-referenced. Each item in the Todo list will be preceded by a header that indicates the origin of the item.
 
-The Todo list and the corresponding entries can be disabled by setting the GENERATE_TODOLIST to ```NO```.
+The Todo list and the corresponding entries can be disabled by setting the GENERATE_TODOLIST§https://www.doxygen.nl/manual/config.html#cfg_generate_todolist§ to ```NO```.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1674,7 +1726,7 @@ Command: version
 Parameters: { version number }
 Anchor: cmdversion  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdversion
 Help text:
-Starts a paragraph where one or more version strings may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\version``` commands will be joined into a single paragraph. Each version description will start on a new line. Alternatively, one ```\version``` command may mention several version strings. The \version command ends when a blank line or some other sectioning command is encountered. See section [\author] for an example.
+Starts a paragraph where one or more version strings may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\version``` commands will be joined into a single paragraph. Each version description will start on a new line. Alternatively, one ```\version``` command may mention several version strings. The \version command ends when a blank line or some other sectioning command is encountered. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1683,7 +1735,7 @@ Command: warning
 Parameters: { warning message }
 Anchor: cmdwarning  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdwarning
 Help text:
-Starts a paragraph where one or more warning messages may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\warning``` commands will be joined into a single paragraph. Each warning description will start on a new line. Alternatively, one ```\warning``` command may mention several warnings. The ```\warning``` command ends when a blank line or some other sectioning command is encountered. See section [\author] for an example.
+Starts a paragraph where one or more warning messages may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ```\warning``` commands will be joined into a single paragraph. Each warning description will start on a new line. Alternatively, one ```\warning``` command may mention several warnings. The ```\warning``` command ends when a blank line or some other sectioning command is encountered. See section [\author]§https://www.doxygen.nl/manual/commands.html#cmdauthor§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1692,7 +1744,7 @@ Command: xrefitem
 Parameters: <key> "heading" "list title" { text }
 Anchor: cmdxrefitem  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdxrefitem
 Help text:
-This command is a generalization of commands such as [\todo] and [\bug]. It can be used to create user-defined text sections which are automatically cross-referenced between the place of occurrence and a related page, which will be generated. On the related page all sections of the same type will be collected.
+This command is a generalization of commands such as [\todo]§https://www.doxygen.nl/manual/commands.html#cmdtodo§ and [\bug]§https://www.doxygen.nl/manual/commands.html#cmdbug§. It can be used to create user-defined text sections which are automatically cross-referenced between the place of occurrence and a related page, which will be generated. On the related page all sections of the same type will be collected.
 
 The first argument <key> is an identifier uniquely representing the type of the section. The second argument is a quoted string representing the heading of the section under which text passed as the fourth argument is put. The third argument (list title) is used as the title for the related page containing all items with the same key. The second and third string argument cannot contain a newline. The keys ```"todo"```, ```"test"```, ```"bug"``` and ```"deprecated"``` are predefined.
 
@@ -1700,13 +1752,13 @@ To get an idea on how to use the ```\xrefitem``` command and what its effect is,
 ```
    \xrefitem todo "Todo" "Todo List" 
 
-```Since it is very tedious and error-prone to repeat the first three parameters of the command for each section, the command is meant to be used in combination with the ALIASES option in the configuration file. To define a new command ```\reminder```, for instance, one should add the following line to the configuration file:
+```Since it is very tedious and error-prone to repeat the first three parameters of the command for each section, the command is meant to be used in combination with the ALIASES§https://www.doxygen.nl/manual/config.html#cfg_aliases§ option in the configuration file. To define a new command ```\reminder```, for instance, one should add the following line to the configuration file:
 ```
    ALIASES += "reminder=\xrefitem reminders \"Reminder\" \"Reminders\"" 
 
 ```Note the use of escaped quotes for the second and third argument of the ```\xrefitem``` command.
 
-In case parameter "(heading)" is the empty string no heading is generated. This can be useful when used in combination with the [\page] command e.g.
+In case parameter "(heading)" is the empty string no heading is generated. This can be useful when used in combination with the [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§ command e.g.
 ```
    /** @page my_errors My Errors
     *  @brief Errors page
@@ -1742,9 +1794,9 @@ Command: anchor
 Parameters: <word>
 Anchor: cmdanchor  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdanchor
 Help text:
-This command places an invisible, named anchor into the documentation to which you can refer with the [\ref] command.
+This command places an invisible, named anchor into the documentation to which you can refer with the [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§ command.
 
-See also: command [\ref].
+See also: command [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1753,7 +1805,7 @@ Command: cite
 Parameters: <label>
 Anchor: cmdcite  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcite
 Help text:
-Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in CITE_BIB_FILES. For the LaTeX output the formatting of the reference in the text can be configured with LATEX_BIB_STYLE. For other output formats a fixed representation is used. Note that using this command requires the ```bibtex``` tool to be present in the search path.
+Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in CITE_BIB_FILES§https://www.doxygen.nl/manual/config.html#cfg_cite_bib_files§. For the LaTeX output the formatting of the reference in the text can be configured with LATEX_BIB_STYLE§https://www.doxygen.nl/manual/config.html#cfg_latex_bib_style§. For other output formats a fixed representation is used. Note that using this command requires the ```bibtex``` tool to be present in the search path.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1762,9 +1814,9 @@ Command: endlink
 Parameters: 
 Anchor: cmdendlink  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendlink
 Help text:
-This command ends a link that is started with the [\link] command.
+This command ends a link that is started with the [\link]§https://www.doxygen.nl/manual/commands.html#cmdlink§ command.
 
-See also: command [\link].
+See also: command [\link]§https://www.doxygen.nl/manual/commands.html#cmdlink§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1775,9 +1827,9 @@ Anchor: cmdlink  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmd
 Help text:
 The links that are automatically generated by doxygen always have the name of the object they point to as link-text.
 
-The ```\link``` command can be used to create a link to an object (a file, class, or member) with a user specified link-text. The link command should end with an [\endlink] command. All text between the ```\link``` and [\endlink] commands serves as text for a link to the <link-object> specified as the first argument of ```\link```.
+The ```\link``` command can be used to create a link to an object (a file, class, or member) with a user specified link-text. The link command should end with an [\endlink]§https://www.doxygen.nl/manual/commands.html#cmdendlink§ command. All text between the ```\link``` and [\endlink]§https://www.doxygen.nl/manual/commands.html#cmdendlink§ commands serves as text for a link to the <link-object> specified as the first argument of ```\link```.
 
-See also: Command autolink for more information on automatically generated links and valid link-objects.
+See also: Command autolink§https://www.doxygen.nl/manual/autolink.html§ for more information on automatically generated links and valid link-objects.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1788,7 +1840,7 @@ Anchor: cmdref  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdr
 Help text:
 Creates a reference to a named section, subsection, page or anchor. For HTML documentation the reference command will generate a link to the section. For a section or subsection the title of the section will be used as the text of the link. For an anchor the optional text between quotes will be used or <name> if no text is specified. For LaTeX documentation the reference command will generate a section number for sections or the text followed by a page number if <name> refers to an anchor.
 
-See also: Command [\page] for an example of the ```\ref``` command.
+See also: Command [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§ for an example of the ```\ref``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1797,7 +1849,7 @@ Command: refitem
 Parameters: <name>
 Anchor: cmdrefitem  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrefitem
 Help text:
-Just like the [\ref] command, this command creates a reference to a named section, but this reference appears in a list that is started by [\secreflist] and ends with [\endsecreflist]. An example of such a list can be seen at the top of the page.
+Just like the [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§ command, this command creates a reference to a named section, but this reference appears in a list that is started by [\secreflist]§https://www.doxygen.nl/manual/commands.html#cmdsecreflist§ and ends with [\endsecreflist]§https://www.doxygen.nl/manual/commands.html#cmdendsecreflist§. An example of such a list can be seen at the top of the page§https://www.doxygen.nl/manual/commands.html#showsecreflist§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1806,7 +1858,7 @@ Command: secreflist
 Parameters: 
 Anchor: cmdsecreflist  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsecreflist
 Help text:
-Starts an index list of item, created with [\refitem] that each link to a named section.
+Starts an index list of item, created with [\refitem]§https://www.doxygen.nl/manual/commands.html#cmdrefitem§ that each link to a named section.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1815,7 +1867,7 @@ Command: endsecreflist
 Parameters: 
 Anchor: cmdendsecreflist  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendsecreflist
 Help text:
-End an index list started with [\secreflist].
+End an index list started with [\secreflist]§https://www.doxygen.nl/manual/commands.html#cmdsecreflist§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1824,13 +1876,13 @@ Command: subpage
 Parameters: <name> ["(text)"]
 Anchor: cmdsubpage  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsubpage
 Help text:
-This command can be used to create a hierarchy of pages. The same structure can be made using the [\defgroup] and [\ingroup] commands, but for pages the ```\subpage``` command is often more convenient. The main page (see [\mainpage]) is typically the root of hierarchy.
+This command can be used to create a hierarchy of pages. The same structure can be made using the [\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§ and [\ingroup]§https://www.doxygen.nl/manual/commands.html#cmdingroup§ commands, but for pages the ```\subpage``` command is often more convenient. The main page (see [\mainpage]§https://www.doxygen.nl/manual/commands.html#cmdmainpage§) is typically the root of hierarchy.
 
-This command behaves similar as [\ref] in the sense that it creates a reference to a page labeled <name> with the optional link text as specified in the second argument.
+This command behaves similar as [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§ in the sense that it creates a reference to a page labeled <name> with the optional link text as specified in the second argument.
 
-It differs from the [\ref] command in that it only works for pages, and creates a parent-child relation between pages, where the child page (or sub page) is identified by label <name>.
+It differs from the [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§ command in that it only works for pages, and creates a parent-child relation between pages, where the child page (or sub page) is identified by label <name>.
 
-See the [\section] and [\subsection] commands if you want to add structure without creating multiple pages.
+See the [\section]§https://www.doxygen.nl/manual/commands.html#cmdsection§ and [\subsection]§https://www.doxygen.nl/manual/commands.html#cmdsubsection§ commands if you want to add structure without creating multiple pages.
 
 !Note:! Each page can be the sub page 
 of only one other page and no cyclic relations are allowed, i.e. the 
@@ -1883,7 +1935,7 @@ Creates a section with name <section-name>. The title of the section should be s
 
 !!!Warning:!!! This command only works inside related page documentation and *not* in other documentation blocks!
 
-See also: Command [\page] for an example of the ```\section``` command.
+See also: Command [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§ for an example of the ```\section``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1896,7 +1948,7 @@ Creates a subsection with name <subsection-name>. The title of the subsection sh
 
 !!!Warning:!!! This command only works inside a section of a related page documentation block and *not* in other documentation blocks!
 
-See also: Command [\page] for an example of the ```\subsection``` command.
+See also: Command [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§ for an example of the ```\subsection``` command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1909,7 +1961,7 @@ Creates a subsubsection with name <subsubsection-name>. The title of the subsubs
 
 !!!Warning:!!! This command only works inside a subsection of a related page documentation block and *not* in other documentation blocks!
 
-See also: Command [\page] for an example of the [\section] command and [\subsection] command.
+See also: Command [\page]§https://www.doxygen.nl/manual/commands.html#cmdpage§ for an example of the [\section]§https://www.doxygen.nl/manual/commands.html#cmdsection§ command and [\subsection]§https://www.doxygen.nl/manual/commands.html#cmdsubsection§ command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1929,13 +1981,13 @@ Command: dontinclude
 Parameters: ['{lineno}'] <file-name>
 Anchor: cmddontinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddontinclude
 Help text:
-This command can be used to parse a source file without actually verbatim including it in the documentation (as the [\include] command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+This command can be used to parse a source file without actually verbatim including it in the documentation (as the [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
 You can add option ```{lineno}``` to enable line numbers for the included code if desired.
 
 The class and member declarations and definitions inside the code fragment are 'remembered' during the parsing of the comment block that contained the ```\dontinclude``` command.
 
-For line by line descriptions of source files, one or more lines of the example can be displayed using the [\line], [\skip], [\skipline], and [\until] commands. An internal pointer is used for these commands. The ```\dontinclude``` command sets the pointer to the first line of the example.
+For line by line descriptions of source files, one or more lines of the example can be displayed using the [\line]§https://www.doxygen.nl/manual/commands.html#cmdline§, [\skip]§https://www.doxygen.nl/manual/commands.html#cmdskip§, [\skipline]§https://www.doxygen.nl/manual/commands.html#cmdskipline§, and [\until]§https://www.doxygen.nl/manual/commands.html#cmduntil§ commands. An internal pointer is used for these commands. The ```\dontinclude``` command sets the pointer to the first line of the example.
 
 Example: ```
     
@@ -1966,9 +2018,14 @@ Example: ```
    {
      Include_Test t;
      t.example();
-   }```
+   }
 
-See also: commands [\line], [\skip], [\skipline], [\until], and [\include].
+```  
+  Click here§https://www.doxygen.nl/manual/examples/include/html/pag_example.html§
+  for the corresponding HTML documentation that is generated by doxygen.
+   
+
+See also: commands [\line]§https://www.doxygen.nl/manual/commands.html#cmdline§, [\skip]§https://www.doxygen.nl/manual/commands.html#cmdskip§, [\skipline]§https://www.doxygen.nl/manual/commands.html#cmdskipline§, [\until]§https://www.doxygen.nl/manual/commands.html#cmduntil§, and [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -1977,27 +2034,27 @@ Command: include
 Parameters: ['{'option'}'] <file-name>
 Anchor: cmdinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinclude
 Help text:
-This command can be used to include a source file as a block of code. The command takes the name of an include file as an argument. Source files or directories can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+This command can be used to include a source file as a block of code. The command takes the name of an include file as an argument. Source files or directories can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH tag, you can include part of the absolute path to disambiguate it.
+If <file-name> itself is not unique for the set of example files specified by the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag, you can include part of the absolute path to disambiguate it.
 
-Using the ```\include``` command is equivalent to inserting the file into the documentation block and surrounding it with [\code] and [\endcode] commands.
+Using the ```\include``` command is equivalent to inserting the file into the documentation block and surrounding it with [\code]§https://www.doxygen.nl/manual/commands.html#cmdcode§ and [\endcode]§https://www.doxygen.nl/manual/commands.html#cmdendcode§ commands.
 
 The main purpose of the ```\include``` command is to avoid code duplication in case of example blocks that consist of multiple source and header files.
 
-For a line by line description of a source files use the [\dontinclude] command in combination with the [\line], [\skip], [\skipline], and [\until] commands.
+For a line by line description of a source files use the [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ command in combination with the [\line]§https://www.doxygen.nl/manual/commands.html#cmdline§, [\skip]§https://www.doxygen.nl/manual/commands.html#cmdskip§, [\skipline]§https://www.doxygen.nl/manual/commands.html#cmdskipline§, and [\until]§https://www.doxygen.nl/manual/commands.html#cmduntil§ commands.
 
-Alternatively, the [\snippet] command can be used to include only a fragment of a source file. For this to work the fragment has to be marked.
+Alternatively, the [\snippet]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§ command can be used to include only a fragment of a source file. For this to work the fragment has to be marked.
 
 !Note:! Doxygen's special commands do not work inside blocks of code. It is allowed to nest C-style comments inside a code block though.
 
 The ```option``` can either be ```lineno``` or ```doc```. The ```option``` ```lineno``` can be used to enable line numbers for the included code if desired. The ```option``` ```doc``` can be used to treat the file as documentation rather than code.
 
 !Note:!
-	When using the ```{doc}``` option, some commands like [\cond] and [\if] don't work with this command due to the moment of parsing.
+	When using the ```{doc}``` option, some commands like [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§ and [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§ don't work with this command due to the moment of parsing.
 	The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
-See also: commands [\example], [\dontinclude], [\verbatim], [\includedoc], and [\snippet].
+See also: commands [\example]§https://www.doxygen.nl/manual/commands.html#cmdexample§, [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§, [\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§, [\includedoc]§https://www.doxygen.nl/manual/commands.html#cmdincludedoc§, and [\snippet]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2006,9 +2063,9 @@ Command: includelineno
 Parameters: <file-name>
 Anchor: cmdincludelineno  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdincludelineno
 Help text:
-This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\include{lineno}]
+This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\include{lineno}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§
 
-See also: commands [\include{lineno}].
+See also: commands [\include{lineno}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2017,9 +2074,9 @@ Command: includedoc
 Parameters: <file-name>
 Anchor: cmdincludedoc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdincludedoc
 Help text:
-This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\include{doc}]
+This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§
 
-See also: command [\include{doc}].
+See also: command [\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2028,11 +2085,11 @@ Command: line
 Parameters: ( pattern )
 Anchor: cmdline  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdline
 Help text:
-This command searches line by line through the example that was last included using [\include] or [\dontinclude] until it finds a non-blank line. If that line contains the specified pattern, it is written to the output.
+This command searches line by line through the example that was last included using [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ or [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ until it finds a non-blank line. If that line contains the specified pattern, it is written to the output.
 
 The internal pointer that is used to keep track of the current line in the example, is set to the start of the line following the non-blank line that was found (or to the end of the example if no such line could be found).
 
-See section [\dontinclude] for an example.
+See section [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2041,11 +2098,11 @@ Command: skip
 Parameters: ( pattern )
 Anchor: cmdskip  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdskip
 Help text:
-This command searches line by line through the example that was last included using [\include] or [\dontinclude] until it finds a line that contains the specified pattern.
+This command searches line by line through the example that was last included using [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ or [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ until it finds a line that contains the specified pattern.
 
 The internal pointer that is used to keep track of the current line in the example, is set to the start of the line that contains the specified pattern (or to the end of the example if the pattern could not be found).
 
-See section [\dontinclude] for an example.
+See section [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2054,7 +2111,7 @@ Command: skipline
 Parameters: ( pattern )
 Anchor: cmdskipline  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdskipline
 Help text:
-This command searches line by line through the example that was last included using [\include] or [\dontinclude] until it finds a line that contains the specified pattern. It then writes the line to the output.
+This command searches line by line through the example that was last included using [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ or [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ until it finds a line that contains the specified pattern. It then writes the line to the output.
 
 The internal pointer that is used to keep track of the current line in the example, is set to the start of the line following the line that is written (or to the end of the example if the pattern could not be found).
 
@@ -2067,7 +2124,7 @@ Note: The command: ```
 
 ```
 
-See section [\dontinclude] for an example.
+See section [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2076,9 +2133,9 @@ Command: snippet
 Parameters: ['{'option'}'] <file-name> ( block_id )
 Anchor: cmdsnippet  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsnippet
 Help text:
-Where the [\include] command can be used to include a complete file as source code, this command can be used to quote only a fragment of a source file. In case ```this``` is used as <file-name> the current file is taken as file to take the snippet from.
+Where the [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ command can be used to include a complete file as source code, this command can be used to quote only a fragment of a source file. In case ```this``` is used as <file-name> the current file is taken as file to take the snippet from.
 
-For example, the putting the following command in the documentation, references a snippet in file ```example.cpp``` residing in a subdirectory which should be pointed to by EXAMPLE_PATH.
+For example, the putting the following command in the documentation, references a snippet in file ```example.cpp``` residing in a subdirectory which should be pointed to by EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§.
 
 ```     \snippet snippets/example.cpp Adding a resource
 
@@ -2103,10 +2160,10 @@ For example, the putting the following command in the documentation, references 
 The ```option``` can either be ```lineno``` or ```doc```. The ```option``` ```lineno``` can be used to enable line numbers for the included code if desired. The ```option``` ```doc``` can be used to treat the file as documentation rather than code.
 
 !Note:!
-	When using the ```{doc}``` option, some commands like [\cond] and [\if] don't work with this command due to the moment of parsing.
+	When using the ```{doc}``` option, some commands like [\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§ and [\if]§https://www.doxygen.nl/manual/commands.html#cmdif§ don't work with this command due to the moment of parsing.
 	The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
-see section [\dontinclude] for an alternative way to include fragments of a source file that does not require markers.
+see section [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ for an alternative way to include fragments of a source file that does not require markers.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2115,9 +2172,9 @@ Command: snippetlineno
 Parameters: <file-name> ( block_id )
 Anchor: cmdsnippetlineno  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsnippetlineno
 Help text:
-This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\snippet{lineno}]
+This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\snippet{lineno}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§
 
-See also: commands [\snippet{lineno}]
+See also: commands [\snippet{lineno}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2126,9 +2183,9 @@ Command: snippetdoc
 Parameters: <file-name> ( block_id )
 Anchor: cmdsnippetdoc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsnippetdoc
 Help text:
-This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\snippet{doc}]
+This command is obsolete and is still supported for backward compatibility reasons, it works the same way as [\snippet{doc}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§
 
-See also: command [\snippet{doc}] and [\include{doc}].
+See also: command [\snippet{doc}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§ and [\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2137,11 +2194,11 @@ Command: until
 Parameters: ( pattern )
 Anchor: cmduntil  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmduntil
 Help text:
-This command writes all lines of the example that was last included using [\include] or [\dontinclude] to the output, until it finds a line containing the specified pattern. The line containing the pattern will be written as well.
+This command writes all lines of the example that was last included using [\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§ or [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ to the output, until it finds a line containing the specified pattern. The line containing the pattern will be written as well.
 
 The internal pointer that is used to keep track of the current line in the example, is set to the start of the line following last written line (or to the end of the example if the pattern could not be found).
 
-See section [\dontinclude] for an example.
+See section [\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2150,9 +2207,9 @@ Command: verbinclude
 Parameters: <file-name>
 Anchor: cmdverbinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdverbinclude
 Help text:
-This command includes the contents of the file <file-name> verbatim in the documentation. The command is equivalent to pasting the contents of the file in the documentation and placing [\verbatim] and [\endverbatim] commands around it.
+This command includes the contents of the file <file-name> verbatim in the documentation. The command is equivalent to pasting the contents of the file in the documentation and placing [\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§ and [\endverbatim]§https://www.doxygen.nl/manual/commands.html#cmdendverbatim§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2161,13 +2218,13 @@ Command: htmlinclude
 Parameters: ["[block]"] <file-name>
 Anchor: cmdhtmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude
 Help text:
-This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\htmlonly] and [\endhtmlonly] commands around it.
+This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ and [\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§ commands around it.
 
-Normally the contents of the file indicated by [\htmlinclude] is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlinclude[block] to make doxygen end the current paragraph and restart after the file is included.
+Normally the contents of the file indicated by [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§ is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlinclude[block] to make doxygen end the current paragraph and restart after the file is included.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\htmlonly], [\latexinclude], [\rtfinclude], [\maninclude], [\docbookinclude] and [\xmlinclude].
+See also: command [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§, [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§, [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§, [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§, [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§ and [\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2176,11 +2233,11 @@ Command: latexinclude
 Parameters: <file-name>
 Anchor: cmdlatexinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdlatexinclude
 Help text:
-This command includes the contents of the file <file-name> as is in the LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\latexonly] and [\endlatexonly] commands around it.
+This command includes the contents of the file <file-name> as is in the LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§ and [\endlatexonly]§https://www.doxygen.nl/manual/commands.html#cmdendlatexonly§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\latexonly], [\htmlinclude], [\rtfinclude], [\maninclude], [\docbookinclude] and [\xmlinclude].
+See also: command [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§, [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§, [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§, [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§ and [\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2189,11 +2246,11 @@ Command: rtfinclude
 Parameters: <file-name>
 Anchor: cmdrtfinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrtfinclude
 Help text:
-This command includes the contents of the file <file-name> as is in the RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\rtfonly] and [\endrtfonly] commands around it.
+This command includes the contents of the file <file-name> as is in the RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§ and [\endrtfonly]§https://www.doxygen.nl/manual/commands.html#cmdendrtfonly§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\rtfonly], [\htmlinclude], [\latexinclude], [\maninclude], [\docbookinclude] and [\xmlinclude].
+See also: command [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§, [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§, [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§, [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§ and [\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2202,11 +2259,11 @@ Command: maninclude
 Parameters: <file-name>
 Anchor: cmdmaninclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmaninclude
 Help text:
-This command includes the contents of the file <file-name> as is in the MAN documentation and tagged with ```<manonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\manonly] and [\endmanonly] commands around it.
+This command includes the contents of the file <file-name> as is in the MAN documentation and tagged with ```<manonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§ and [\endmanonly]§https://www.doxygen.nl/manual/commands.html#cmdendmanonly§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\manonly], [\htmlinclude], [\latexinclude], [\rtfinclude], [\docbookinclude] and [\xmlinclude].
+See also: command [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§, [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§, [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§, [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§ and [\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2215,11 +2272,11 @@ Command: docbookinclude
 Parameters: <file-name>
 Anchor: cmddocbookinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddocbookinclude
 Help text:
-This command includes the contents of the file <file-name> as is in the DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\docbookonly] and [\enddocbookonly] commands around it.
+This command includes the contents of the file <file-name> as is in the DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§ and [\enddocbookonly]§https://www.doxygen.nl/manual/commands.html#cmdenddocbookonly§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\docbookonly], [\htmlinclude], [\latexinclude], [\rtfinclude], [\maninclude] and [\xmlinclude].
+See also: command [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§, [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§, [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§, [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§, [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§ and [\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2228,11 +2285,11 @@ Command: xmlinclude
 Parameters: <file-name>
 Anchor: cmdxmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdxmlinclude
 Help text:
-This command includes contents of the file <file-name> as is in the XML documentation. The command is equivalent to pasting the contents of the file in the documentation and placing [\xmlonly] and [\endxmlonly] commands around it.
+This command includes contents of the file <file-name> as is in the XML documentation. The command is equivalent to pasting the contents of the file in the documentation and placing [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§ and [\endxmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendxmlonly§ commands around it.
 
-Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH tag of doxygen's configuration file.
+Files or directories that doxygen should look for can be specified using the EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§ tag of doxygen's configuration file.
 
-See also: command [\xmlonly], [\htmlinclude], [\latexinclude], [\rtfinclude], [\maninclude] and [\docbookinclude].
+See also: command [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§, [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§, [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§, [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§ and [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2250,7 +2307,7 @@ Example: ```
 
  ... the *x* and *y* coordinates are used to ...
 
-Equivalent to [\e] and [\em]. To emphasize multiple words use <em>multiple words</em>.
+Equivalent to [\e]§https://www.doxygen.nl/manual/commands.html#cmde§ and [\em]§https://www.doxygen.nl/manual/commands.html#cmdem§. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2280,7 +2337,7 @@ Example: Typing: ```
 
 Note: For nested lists, HTML commands should be used.
 
-Equivalent to [\li]
+Equivalent to [\li]§https://www.doxygen.nl/manual/commands.html#cmdli§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2307,7 +2364,7 @@ Example: Typing: ```
 
  ... This function returns ```void``` and not ```int``` ...
 
-Equivalent to [\p]. To have multiple words in typewriter font use <tt>multiple words</tt>.
+Equivalent to [\p]§https://www.doxygen.nl/manual/commands.html#cmdp§. To have multiple words in typewriter font use <tt>multiple words</tt>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2341,7 +2398,7 @@ If it is unclear from the context which language is meant (for instance the comm
      echo "This is a shell script"
      \endcode
 
-```See also: command [\endcode] and command [\verbatim].
+```See also: command [\endcode]§https://www.doxygen.nl/manual/commands.html#cmdendcode§ and command [\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2373,7 +2430,7 @@ Note that ```\copydoc foo()``` is roughly equivalent to doing:
      \brief \copybrief foo()
      \details \copydetails foo()
 
-```See [\copybrief] and [\copydetails] for copying only the brief or detailed part of the comment block.
+```See [\copybrief]§https://www.doxygen.nl/manual/commands.html#cmdcopybrief§ and [\copydetails]§https://www.doxygen.nl/manual/commands.html#cmdcopydetails§ for copying only the brief or detailed part of the comment block.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2382,7 +2439,7 @@ Command: copybrief
 Parameters: <link-object>
 Anchor: cmdcopybrief  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcopybrief
 Help text:
-Works in a similar way as [\copydoc] but will only copy the brief description, not the detailed documentation.
+Works in a similar way as [\copydoc]§https://www.doxygen.nl/manual/commands.html#cmdcopydoc§ but will only copy the brief description, not the detailed documentation.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2391,7 +2448,7 @@ Command: copydetails
 Parameters: <link-object>
 Anchor: cmdcopydetails  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcopydetails
 Help text:
-Works in a similar way as [\copydoc] but will only copy the detailed documentation, not the brief description.
+Works in a similar way as [\copydoc]§https://www.doxygen.nl/manual/commands.html#cmdcopydoc§ but will only copy the detailed documentation, not the brief description.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2400,9 +2457,9 @@ Command: docbookonly
 Parameters: 
 Anchor: cmddocbookonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddocbookonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The block ends with a [\enddocbookonly] command.
+Starts a block of text that only will be verbatim included in the generated DocBook documentation and tagged with ```<docbookonly>``` in the generated XML output. The block ends with a [\enddocbookonly]§https://www.doxygen.nl/manual/commands.html#cmdenddocbookonly§ command.
 
-See also: command [\manonly], [\latexonly], [\rtfonly], [\xmlonly], [\htmlonly] and [\docbookinclude].
+See also: command [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ and [\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2411,17 +2468,17 @@ Command: dot
 Parameters: ["caption"] [<sizeindication>=<size>]
 Anchor: cmddot  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddot
 Help text:
-Starts a text fragment which should contain a valid description of a dot graph. The text fragment ends with [\enddot]. Doxygen will pass the text on to dot and include the resulting image (and image map) into the output.
+Starts a text fragment which should contain a valid description of a dot graph. The text fragment ends with [\enddot]§https://www.doxygen.nl/manual/commands.html#cmdenddot§. Doxygen will pass the text on to dot and include the resulting image (and image map) into the output.
 
 The first argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 
-The nodes of a graph can be made clickable by using the URL attribute. By using the command [\ref] inside the URL value you can conveniently link to an item inside doxygen. Here is an example:
+The nodes of a graph can be made clickable by using the URL attribute. By using the command [\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§ inside the URL value you can conveniently link to an item inside doxygen. Here is an example:
 
 !Note:!
-	usage of this command requires that HAVE_DOT is set to ```YES```
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
+	usage of this command requires that HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§ is set to ```YES```
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§ tag is set to ```NO```.
 
 ```   /*! class B */
    class B {};
@@ -2453,11 +2510,11 @@ Anchor: cmdemoji  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cm
 Help text:
 This command will produce an emoji character given its name.
 
-The supported names are the ones also supported by GitHub and listed here https://gist.github.com/rxaviers/7360908
+The supported names are the ones also supported by GitHub and listed here https://gist.github.com/rxaviers/7360908§https://gist.github.com/rxaviers/7360908§
 
 You can use the name with or without colons, i.e. ```\emoji smile``` is the same as writing ```\emoji :smile:```. When an emoji is not supported the name with by places in the text with in between colons, i.e. ```\emoji unsupported``` will produce ```:unsupported:``` in the output. Doxygen will also give a warning message.
 
-See also the emoji support page for details.
+See also the emoji support page§https://www.doxygen.nl/manual/emojisup.html§ for details.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2466,16 +2523,16 @@ Command: msc
 Parameters: ["caption"] [<sizeindication>=<size>]
 Anchor: cmdmsc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmsc
 Help text:
-Starts a text fragment which should contain a valid description of a message sequence chart. See http://www.mcternan.me.uk/mscgen/ for examples. The text fragment ends with [\endmsc].
+Starts a text fragment which should contain a valid description of a message sequence chart. See http://www.mcternan.me.uk/mscgen/§http://www.mcternan.me.uk/mscgen/§ for examples. The text fragment ends with [\endmsc]§https://www.doxygen.nl/manual/commands.html#cmdendmsc§.
 
 The first argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 
 !Note:!
-	The text fragment should only include the part of the message sequence chart that is within the ```msc {...}``` block (this is different from [\mscfile]).
+	The text fragment should only include the part of the message sequence chart that is within the ```msc {...}``` block (this is different from [\mscfile]§https://www.doxygen.nl/manual/commands.html#cmdmscfile§).
 	mscgen is now built in into doxygen
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§ tag is set to ```NO```.
 
 Here is an example of the use of the ```\msc``` command.
 ```
@@ -2509,7 +2566,7 @@ Here is an example of the use of the ```\msc``` command.
     void Command(int commandId);
    };
 
-```See also: command [\mscfile].
+```See also: command [\mscfile]§https://www.doxygen.nl/manual/commands.html#cmdmscfile§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2518,10 +2575,10 @@ Command: startuml
 Parameters: ['{'option[,option]'}'] ["caption"] [<sizeindication>=<size>]
 Anchor: cmdstartuml  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdstartuml
 Help text:
-Starts a text fragment which should contain a valid description of a PlantUML diagram. See https://plantuml.com/ for examples. The text fragment ends with [\enduml].
+Starts a text fragment which should contain a valid description of a PlantUML diagram. See https://plantuml.com/§https://plantuml.com/§ for examples. The text fragment ends with [\enduml]§https://www.doxygen.nl/manual/commands.html#cmdenduml§.
 
 !Note:!
-	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ```jar``` files, for details see the PlantUML documentation. This also is valid for the ```<engine>```s ```latex``` and ```math```. The location of the PlantUML file should be specified using PLANTUML_JAR_PATH. The other jar files should also reside in this directory.
+	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ```jar``` files, for details see the PlantUML documentation. This also is valid for the ```<engine>```s ```latex``` and ```math```. The location of the PlantUML file should be specified using PLANTUML_JAR_PATH§https://www.doxygen.nl/manual/config.html#cfg_plantuml_jar_path§. The other jar files should also reside in this directory.
 	The use of the ```<engine>``` ```ditaa``` is not possible in LaTeX as PlantUML only supports the ```png``` format and doxygen requires, temporary, ```eps``` output.
 
 Not all diagrams can be created with the PlantUML ```@startuml``` command but need another PlantUML ```@start...``` command. This will look like ```@start<engine>``` where currently supported are the following ```<engine>```s: ```uml```, ```bpm```, ```wire```, ```dot```, ```ditaa```, ```salt```, ```math```, ```latex```, ```gantt```, ```mindmap```, ```wbs```, ```yaml```, ```creole```, ```json```, ```flow```, ```board``` and ```git```. By default the ```<engine>``` is ```uml```. The ```<engine>``` can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ```<engine>``` can be specified and also the filename can only be specified once.
@@ -2536,13 +2593,13 @@ The first argument is optional and is for compatibility with running PlantUML as
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 
 !Note:!
 	doxygen does not support the Plantuml commands like ```@startjson```, by design, directly but the support can be accomplished, by the user, by adding to the doxygen settings file: ```
      ALIASES += startjson=@startuml{json}
      ALIASES += endjson=@enduml```
-	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP tag is set to ```NO```.
+	doxygen creates a temporary file that is automatically removed unless the DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§ tag is set to ```NO```.
 
 Here is an example of the use of the ```\startuml``` command.
 ```
@@ -2583,15 +2640,15 @@ Anchor: cmddotfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 Inserts an image generated by dot from <file> into the documentation.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the DOTFILE_DIRS tag. If the dot file is found it will be used as an input file to the dot tool. The resulting image will be put into the correct output directory. If the dot file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the DOTFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_dotfile_dirs§ tag. If the dot file is found it will be used as an input file to the dot tool. The resulting image will be put into the correct output directory. If the dot file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 
-!Note:! usage of this command requires that HAVE_DOT is set to ```YES```
+!Note:! usage of this command requires that HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§ is set to ```YES```
 
-See also: command [\dot].
+See also: command [\dot]§https://www.doxygen.nl/manual/commands.html#cmddot§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2600,17 +2657,17 @@ Command: mscfile
 Parameters: <file> ["caption"] [<sizeindication>=<size>]
 Anchor: cmdmscfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmscfile
 Help text:
-Inserts an image generated by mscgen from <file> into the documentation. See http://www.mcternan.me.uk/mscgen/ for examples.
+Inserts an image generated by mscgen from <file> into the documentation. See http://www.mcternan.me.uk/mscgen/§http://www.mcternan.me.uk/mscgen/§ for examples.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the MSCFILE_DIRS tag. If the msc file is found it will be used as an input file to the built in mscgen tool. The resulting image will be put into the correct output directory. If the msc file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the MSCFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_mscfile_dirs§ tag. If the msc file is found it will be used as an input file to the built in mscgen tool. The resulting image will be put into the correct output directory. If the msc file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 
-!Note:! The text fragment should include the part message of the sequence chart as well as the starting ```msc {``` and ending ```}``` (this is different from [\msc]).
+!Note:! The text fragment should include the part message of the sequence chart as well as the starting ```msc {``` and ending ```}``` (this is different from [\msc]§https://www.doxygen.nl/manual/commands.html#cmdmsc§).
 
-See also: command [\msc].
+See also: command [\msc]§https://www.doxygen.nl/manual/commands.html#cmdmsc§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2621,11 +2678,11 @@ Anchor: cmddiafile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 Inserts an image made in dia from <file> into the documentation.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the DIAFILE_DIRS tag. If the dia file is found it will be used as an input file dia. The resulting image will be put into the correct output directory. If the dia file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the DIAFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_diafile_dirs§ tag. If the dia file is found it will be used as an input file dia. The resulting image will be put into the correct output directory. If the dia file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
-The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication with the [\image] command.
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§ with the [\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§ command.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2643,7 +2700,7 @@ Example: Typing: ```
 
  ... this is a *really* good example ...
 
-Equivalent to [\a] and [\em]. To emphasize multiple words use <em>multiple words</em>.
+Equivalent to [\a]§https://www.doxygen.nl/manual/commands.html#cmda§ and [\em]§https://www.doxygen.nl/manual/commands.html#cmdem§. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2661,7 +2718,7 @@ Example: Typing: ```
 
  ... this is a *really* good example ...
 
-Equivalent to [\a] and [\e]. To emphasize multiple words use <em>multiple words</em>.
+Equivalent to [\a]§https://www.doxygen.nl/manual/commands.html#cmda§ and [\e]§https://www.doxygen.nl/manual/commands.html#cmde§. To emphasize multiple words use <em>multiple words</em>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2671,7 +2728,7 @@ Parameters:
 Anchor: cmdendcode  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendcode
 Help text:
 Ends a block of code.
-See also: command [\code]
+See also: command [\code]§https://www.doxygen.nl/manual/commands.html#cmdcode§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2680,9 +2737,9 @@ Command: enddocbookonly
 Parameters: 
 Anchor: cmdenddocbookonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdenddocbookonly
 Help text:
-Ends a block of text that was started with a [\docbookonly] command.
+Ends a block of text that was started with a [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§ command.
 
-See also: command [\docbookonly].
+See also: command [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2691,7 +2748,7 @@ Command: enddot
 Parameters: 
 Anchor: cmdenddot  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdenddot
 Help text:
-Ends a block that was started with [\dot].
+Ends a block that was started with [\dot]§https://www.doxygen.nl/manual/commands.html#cmddot§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2700,7 +2757,7 @@ Command: endmsc
 Parameters: 
 Anchor: cmdendmsc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendmsc
 Help text:
-Ends a block that was started with [\msc].
+Ends a block that was started with [\msc]§https://www.doxygen.nl/manual/commands.html#cmdmsc§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2709,7 +2766,7 @@ Command: enduml
 Parameters: 
 Anchor: cmdenduml  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdenduml
 Help text:
-Ends a block that was started with [\startuml].
+Ends a block that was started with [\startuml]§https://www.doxygen.nl/manual/commands.html#cmdstartuml§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2718,9 +2775,9 @@ Command: endhtmlonly
 Parameters: 
 Anchor: cmdendhtmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly
 Help text:
-Ends a block of text that was started with a [\htmlonly] command.
+Ends a block of text that was started with a [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ command.
 
-See also: command [\htmlonly].
+See also: command [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2729,9 +2786,9 @@ Command: endlatexonly
 Parameters: 
 Anchor: cmdendlatexonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendlatexonly
 Help text:
-Ends a block of text that was started with a [\latexonly] command.
+Ends a block of text that was started with a [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§ command.
 
-See also: command [\latexonly].
+See also: command [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2740,9 +2797,9 @@ Command: endmanonly
 Parameters: 
 Anchor: cmdendmanonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendmanonly
 Help text:
-Ends a block of text that was started with a [\manonly] command.
+Ends a block of text that was started with a [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§ command.
 
-See also: command [\manonly].
+See also: command [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2751,9 +2808,9 @@ Command: endrtfonly
 Parameters: 
 Anchor: cmdendrtfonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendrtfonly
 Help text:
-Ends a block of text that was started with a [\rtfonly] command.
+Ends a block of text that was started with a [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§ command.
 
-See also: command [\rtfonly].
+See also: command [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2762,9 +2819,9 @@ Command: endverbatim
 Parameters: 
 Anchor: cmdendverbatim  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendverbatim
 Help text:
-Ends a block of text that was started with a [\verbatim] command.
+Ends a block of text that was started with a [\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§ command.
 
-See also: command [\verbatim].
+See also: command [\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2773,9 +2830,9 @@ Command: endxmlonly
 Parameters: 
 Anchor: cmdendxmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendxmlonly
 Help text:
-Ends a block of text that was started with a [\xmlonly] command.
+Ends a block of text that was started with a [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§ command.
 
-See also: command [\xmlonly].
+See also: command [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2785,7 +2842,7 @@ Parameters:
 Anchor: cmdfdollar  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfdollar
 Help text:
 Marks the start and end of an in-text formula.
-See also: command formulas for an example.
+See also: command formulas§https://www.doxygen.nl/manual/formulas.html§ for an example.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2794,8 +2851,8 @@ Command: f(
 Parameters: 
 Anchor: cmdfrndopen  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfrndopen
 Help text:
-Marks the start of an in-text formula, but contrary to [\f$] it will not explicitly open the math-mode in LaTeX.
-See also: command [\f)] and command formulas.
+Marks the start of an in-text formula, but contrary to [\f$]§https://www.doxygen.nl/manual/commands.html#cmdfdollar§ it will not explicitly open the math-mode in LaTeX.
+See also: command [\f)]§https://www.doxygen.nl/manual/commands.html#cmdfrndclose§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2804,8 +2861,8 @@ Command: f)
 Parameters: 
 Anchor: cmdfrndclose  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfrndclose
 Help text:
-Marks the end of an in-text formula started with [\f(].
-See also: command [\f(] and command formulas.
+Marks the end of an in-text formula started with [\f(]§https://www.doxygen.nl/manual/commands.html#cmdfrndopen§.
+See also: command [\f(]§https://www.doxygen.nl/manual/commands.html#cmdfrndopen§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2815,7 +2872,7 @@ Parameters:
 Anchor: cmdfbropen  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfbropen
 Help text:
 Marks the start of a long formula that is displayed centered on a separate line.
-See also: command [\f]] and command formulas.
+See also: command [\f]]§https://www.doxygen.nl/manual/commands.html#cmdfbrclose§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2825,7 +2882,7 @@ Parameters:
 Anchor: cmdfbrclose  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfbrclose
 Help text:
 Marks the end of a long formula that is displayed centered on a separate line.
-See also: command [\f[] and command formulas.
+See also: command [\f[]§https://www.doxygen.nl/manual/commands.html#cmdfbropen§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2838,7 +2895,7 @@ Marks the start of a formula that is in a specific environment.
 
 !Note:! The second ```{``` is optional and is only to help editors (such as ```Vim```) to do proper syntax highlighting by making the number of opening and closing braces the same.
 
-See also: command [\f}] and command formulas.
+See also: command [\f}]§https://www.doxygen.nl/manual/commands.html#cmdfcurlyclose§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2848,7 +2905,7 @@ Parameters:
 Anchor: cmdfcurlyclose  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdfcurlyclose
 Help text:
 Marks the end of a formula that is in a specific environment.
-See also: command [\f{] and command formulas.
+See also: command [\f{]§https://www.doxygen.nl/manual/commands.html#cmdfcurlyopen§ and command formulas§https://www.doxygen.nl/manual/formulas.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2857,15 +2914,15 @@ Command: htmlonly
 Parameters: ["[block]"]
 Anchor: cmdhtmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhtmlonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The block ends with a [\endhtmlonly] command.
+Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with ```<htmlonly>``` in the generated XML output. The block ends with a [\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§ command.
 
 This command can be used to include HTML code that is too complex for doxygen (i.e. applets, java-scripts, and HTML tags that require specific attributes).
 
-Normally the contents between [\htmlonly] and [\endhtmlonly] is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlonly[block] to make doxygen end the current paragraph and restart it after \endhtmlonly.
+Normally the contents between [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ and [\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§ is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlonly[block] to make doxygen end the current paragraph and restart it after \endhtmlonly.
 
 !Note:! environment variables (like $(HOME) ) are resolved inside a HTML-only block.
 
-See also: command [\manonly], [\latexonly], [\rtfonly], [\xmlonly], [\docbookonly], and [\htmlinclude].
+See also: command [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§, and [\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2878,7 +2935,7 @@ Inserts an image into the documentation. This command is format specific, so if 
 
 The first argument specifies the output format in which the image should be embedded. Currently, the following values are supported: ```html```, ```latex```, ```docbook```, ```rtf``` and ```xml```.
 
-The second argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the IMAGE_PATH tag. If the image is found it will be copied to the correct output directory. If the image name contains spaces you'll have to put quotes ("...") around the name. You can also specify an absolute URL instead of a file name, but then doxygen does not copy the image nor check its existence.
+The second argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the IMAGE_PATH§https://www.doxygen.nl/manual/config.html#cfg_image_path§ tag. If the image is found it will be copied to the correct output directory. If the image name contains spaces you'll have to put quotes ("...") around the name. You can also specify an absolute URL instead of a file name, but then doxygen does not copy the image nor check its existence.
 
 The third argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified on a single line and between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
@@ -2911,13 +2968,13 @@ Command: latexonly
 Parameters: 
 Anchor: cmdlatexonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdlatexonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The block ends with a [\endlatexonly] command.
+Starts a block of text that only will be verbatim included in the generated LaTeX documentation and tagged with ```<latexonly>``` in the generated XML output. The block ends with a [\endlatexonly]§https://www.doxygen.nl/manual/commands.html#cmdendlatexonly§ command.
 
-This command can be used to include LaTeX code that is too complex for doxygen (i.e. images, formulas, special characters). You can use the [\htmlonly] and [\endhtmlonly] pair to provide a proper HTML alternative.
+This command can be used to include LaTeX code that is too complex for doxygen (i.e. images, formulas, special characters). You can use the [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ and [\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§ pair to provide a proper HTML alternative.
 
 Note: environment variables (like $(HOME) ) are resolved inside a LaTeX-only block.
 
-See also: commands [\rtfonly], [\xmlonly], [\manonly], [\htmlonly], [\docbookonly], and [\latexinclude].
+See also: commands [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§, [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§, and [\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2926,11 +2983,11 @@ Command: manonly
 Parameters: 
 Anchor: cmdmanonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmanonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated MAN documentation and tagged with ```<manonly>``` in the generated XML output. The block ends with a [\endmanonly] command.
+Starts a block of text that only will be verbatim included in the generated MAN documentation and tagged with ```<manonly>``` in the generated XML output. The block ends with a [\endmanonly]§https://www.doxygen.nl/manual/commands.html#cmdendmanonly§ command.
 
-This command can be used to include groff code directly into MAN pages. You can use the [\htmlonly] and [\endhtmlonly] and [\latexonly] and [\endlatexonly] pairs to provide proper HTML and LaTeX alternatives.
+This command can be used to include groff code directly into MAN pages. You can use the [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§ and [\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§ and [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§ and [\endlatexonly]§https://www.doxygen.nl/manual/commands.html#cmdendlatexonly§ pairs to provide proper HTML and LaTeX alternatives.
 
-See also: commands [\htmlonly], [\xmlonly], [\rtfonly], [\latexonly], [\docbookonly] and [\maninclude].
+See also: commands [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§, [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§ and [\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2960,7 +3017,7 @@ Example: Typing: ```
 
 Note: For nested lists, HTML commands should be used.
 
-Equivalent to [\arg]
+Equivalent to [\arg]§https://www.doxygen.nl/manual/commands.html#cmdarg§
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2987,7 +3044,7 @@ Example: ```
 
  ... the ```x``` and ```y``` coordinates are used to ...
 
-Equivalent to [\c]. To have multiple words in typewriter font use <tt>multiple words</tt>.
+Equivalent to [\c]§https://www.doxygen.nl/manual/commands.html#cmdc§. To have multiple words in typewriter font use <tt>multiple words</tt>.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -2996,13 +3053,13 @@ Command: rtfonly
 Parameters: 
 Anchor: cmdrtfonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrtfonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The block ends with a [\endrtfonly] command.
+Starts a block of text that only will be verbatim included in the generated RTF documentation and tagged with ```<rtfonly>``` in the generated XML output. The block ends with a [\endrtfonly]§https://www.doxygen.nl/manual/commands.html#cmdendrtfonly§ command.
 
 This command can be used to include RTF code that is too complex for doxygen.
 
 Note: environment variables (like $(HOME) ) are resolved inside a RTF-only block.
 
-See also: commands [\manonly], [\xmlonly], [\latexonly], [\htmlonly], [\docbookonly] and [\rtfinclude].
+See also: commands [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§, [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§, [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§ and [\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -3011,11 +3068,11 @@ Command: verbatim
 Parameters: 
 Anchor: cmdverbatim  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdverbatim
 Help text:
-Starts a block of text that will be verbatim included in the documentation. The block should end with a [\endverbatim] command. All commands are disabled in a verbatim block.
+Starts a block of text that will be verbatim included in the documentation. The block should end with a [\endverbatim]§https://www.doxygen.nl/manual/commands.html#cmdendverbatim§ command. All commands are disabled in a verbatim block.
 
-!!!Warning:!!! Make sure you include a [\endverbatim] command for each ```\verbatim``` command or the parser will get confused!
+!!!Warning:!!! Make sure you include a [\endverbatim]§https://www.doxygen.nl/manual/commands.html#cmdendverbatim§ command for each ```\verbatim``` command or the parser will get confused!
 
-See also: commands [\code], [\endverbatim] and [\verbinclude].
+See also: commands [\code]§https://www.doxygen.nl/manual/commands.html#cmdcode§, [\endverbatim]§https://www.doxygen.nl/manual/commands.html#cmdendverbatim§ and [\verbinclude]§https://www.doxygen.nl/manual/commands.html#cmdverbinclude§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -3024,11 +3081,11 @@ Command: xmlonly
 Parameters: 
 Anchor: cmdxmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdxmlonly
 Help text:
-Starts a block of text that only will be verbatim included in the generated XML output. The block ends with a [\endxmlonly] command.
+Starts a block of text that only will be verbatim included in the generated XML output. The block ends with a [\endxmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendxmlonly§ command.
 
 This command can be used to include custom XML tags.
 
-See also: commands [\manonly], [\rtfonly], [\latexonly], [\htmlonly], and [\docbookonly].
+See also: commands [\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§, [\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§, [\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§, [\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§, and [\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -3055,7 +3112,7 @@ Command: ~
 Parameters: [LanguageId]
 Anchor: cmdtilde  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdtilde
 Help text:
-This command enables/disables a language specific filter. This can be used to put documentation for different language into one comment block and use the OUTPUT_LANGUAGE tag to filter out only a specific language. Use ```\~language_id``` to enable output for a specific language only and ```\~``` to enable output for all languages (this is also the default mode).
+This command enables/disables a language specific filter. This can be used to put documentation for different language into one comment block and use the OUTPUT_LANGUAGE§https://www.doxygen.nl/manual/config.html#cfg_output_language§ tag to filter out only a specific language. Use ```\~language_id``` to enable output for a specific language only and ```\~``` to enable output for all languages (this is also the default mode).
 
 Example:
 ```
@@ -3133,7 +3190,7 @@ Command: .
 Parameters: 
 Anchor: cmdchardot  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdchardot
 Help text:
-This command writes a dot (```.```) to the output. This can be useful to prevent ending a brief description when JAVADOC_AUTOBRIEF is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.
+This command writes a dot (```.```) to the output. This can be useful to prevent ending a brief description when JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§ is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
@@ -3179,6 +3236,9 @@ Parameters:
 Anchor: cmdmdash  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmdash
 Help text:
 This command writes three dashes (---) to the output. This allows writing three consecutive dashes to the output instead of one m-dash character (—).
+
+
+Go to the next§https://www.doxygen.nl/manual/htmlcmds.html§ section or return to the index§https://www.doxygen.nl/manual/index.html§.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 

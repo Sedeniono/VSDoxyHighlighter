@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.Text.Adornments;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Documents;
 
 namespace VSDoxyHighlighter
 {
@@ -45,10 +47,10 @@ namespace VSDoxyHighlighter
     /// - If the first item is a OtherTypesEnum, then we convert it to a ClassificationEnum taking
     ///   into account the user settings.
     /// </summary>
-    public readonly (object, string)[] Description;
+    public readonly (object type, string text, string hyperlink)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, string anchor, (object, string)[] description)
+    public DoxygenHelpPageCommand(string command, string parameters, string anchor, (object type, string text, string hyperlink)[] description)
     {
       Command = command;
       Parameters = parameters;
@@ -120,23 +122,16 @@ namespace VSDoxyHighlighter
       }
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
-      // If desired, add a clickable hyperlink to the only documentation.
+      // If desired, add a clickable hyperlink to the online documentation.
       if (showHyperlinks) {
         string hyperlink = $"{cOnlineDocumentationLink}#{helpPageInfo.Anchor}";
-        runs.AddRange(ClassifiedTextElement.CreateHyperlink(
-            text: "Click HERE to open the online documentation.",
-            tooltip: $"Opens \"{hyperlink}\" in your browser.",
-            navigationAction: () => {
-              // https://stackoverflow.com/a/61035650/3740047
-              Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
-            })
-          .Runs);
+        runs.AddRange(GetHyperlinkElement("Click HERE to open the online documentation.", hyperlink).Runs);
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
       }
 
       // Add the whole description.
       foreach (var descriptionFragment in helpPageInfo.Description) {
-        AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, runs);
+        AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, showHyperlinks, runs);
       }
 
       return new ClassifiedTextElement(runs);
@@ -145,27 +140,48 @@ namespace VSDoxyHighlighter
 
     private static void AddTextRunsForDescriptionFragment(
       CommentParser commentParser,
-      (object, string) descriptionFragment, // Compare DoxygenHelpPageCommand
+      (object type, string text, string hyperlink) descriptionFragment,
+      bool showHyperlinks,
       List<ClassifiedTextRun> outputList)
     {
-      if (descriptionFragment.Item1 is ClassificationEnum classification) {
-        // Use the given classification as-is.
-        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.Item2));
+      // Let hyperlinks override every other possible classification, in case we want to show them.
+      if (showHyperlinks && descriptionFragment.hyperlink != "") {
+        outputList.AddRange(GetHyperlinkElement(descriptionFragment.text, descriptionFragment.hyperlink).Runs);
         return;
       }
 
-      if (descriptionFragment.Item1 is DoxygenHelpPageCommand.OtherTypesEnum otherType) {
+      // If we got a very specific classification, use it.
+      if (descriptionFragment.type is ClassificationEnum classification) {
+        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.text));
+        return;
+      }
+
+      // If we need to figure out the classification by parsing the text, do it now.
+      if (descriptionFragment.type is DoxygenHelpPageCommand.OtherTypesEnum otherType) {
         switch (otherType) {
           case DoxygenHelpPageCommand.OtherTypesEnum.Command:
-            ClassificationEnum classificationForOther = commentParser.GetClassificationForCommand(descriptionFragment.Item2);
-            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.Item2));
+            ClassificationEnum classificationForOther = commentParser.GetClassificationForCommand(descriptionFragment.text);
+            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.text));
             return;
           default:
             throw new VSDoxyHighlighterException($"Unknown value for DoxygenHelpPageCommand.OtherTypesEnum: {otherType}");
         }
       }
 
-      outputList.AddRange(ClassifiedTextElement.CreatePlainText(descriptionFragment.Item2).Runs);
+      // Ordinary plain text.
+      outputList.AddRange(ClassifiedTextElement.CreatePlainText(descriptionFragment.text).Runs);
+    }
+
+
+    private static ClassifiedTextElement GetHyperlinkElement(string shownText, string hyperlink) 
+    {
+      return ClassifiedTextElement.CreateHyperlink(
+        text: shownText,
+        tooltip: $"Opens \"{hyperlink}\" in your browser.",
+        navigationAction: () => {
+          // https://stackoverflow.com/a/61035650/3740047
+          Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
+        });
     }
 
 

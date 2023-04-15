@@ -23,9 +23,10 @@ class FragmentType(Enum):
 class Fragment:
     """ Represents a piece of text from the Doxygen help text of a certain type.
         The whole help text is then a list of fragments."""
-    def __init__(self, type: FragmentType, content: str):
+    def __init__(self, type: FragmentType, content: str, hyperlink: str = ""):
         self.type = type
         self.content = content
+        self.hyperlink = hyperlink
 
 
 class ParsedCommand:
@@ -47,7 +48,7 @@ class ParsedCommand:
         # Variants with escaped characters that are suitable to be written into a C# source file.
         self.escaped_command = escape_characters(self.command)
         self.escaped_parameters = escape_characters(self.parameters)
-        self.escaped_help_text = [Fragment(f.type, escape_characters(f.content)) for f in self.help_text]
+        self.escaped_help_text = [Fragment(f.type, escape_characters(f.content), f.hyperlink) for f in self.help_text]
 
 
 def escape_characters(raw_string: str):
@@ -172,9 +173,10 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
         see_also_fragments = parse_all_children(tag.contents[1:], decorator)
 
         for idx in range(0, len(see_also_fragments)):
-            # The documentation often has something like "See also: Section \page for an example"
-            # which reads weird in the Visual Studio tooltip, since one cannot click there. So 
-            # replace "section" with "command". But not the \section command itself.
+            # The documentation often has something like "See also: Section \page for an example" which reads weird in
+            # the Visual Studio autocomplete tooltips, since one cannot click there. So replace "section" with "command". 
+            # But not the \section command itself. (Well, the quick info boxes actually support hyperlinks, but the 
+            # autocomplete boxes do not; so simply always replace the "section".)
             see_also_fragments[idx].content = re.sub(r"\b(?<!\\)section\b", "command", see_also_fragments[idx].content)
             see_also_fragments[idx].content = re.sub(r"\b(?<!\\)Section\b", "Command", see_also_fragments[idx].content)
             see_also_fragments[idx].content = re.sub(r"\b(?<!\\)sections\b", "commands", see_also_fragments[idx].content)
@@ -265,6 +267,7 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
         return parse_table(tag)
 
     elif tag.name == "img":
+        # In the whole help page text, only one kind of image appears: Namely the LaTeX logo.
         if "LaTeX" in tag["alt"]:
             return [Fragment(FragmentType.Text, "LaTeX")]
         else:
@@ -272,9 +275,30 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
     elif tag.name == "a":
         fragments = parse_all_children(tag.children, decorator)
+        if "href" in tag.attrs:
+            hyperlink = tag["href"]
+            if not isinstance(hyperlink, str):
+                raise Exception("Unexpected type for hyperlink")
+            if hyperlink == "":
+                raise Exception("Empty hyperlink")
+            if not hyperlink.startswith("http"):
+                raise Exception("Hyperlink does not start with http")
+            orig_fragments = fragments
+            fragments: list[Fragment] = []
+            for f in orig_fragments:
+                if f.hyperlink != "":
+                    raise Exception("Found nested hyperlink")
+                fragments.append(Fragment(f.type, f.content, hyperlink))
+        elif "id" in tag.attrs and "name" in tag.attrs:
+            pass
+        elif "class" in tag.attrs and "anchor" in tag["class"] and "id" in tag.attrs:
+            pass # Some anchor for other hyperlinks; ignore it.
+        else:
+            raise Exception("Unexpected <a> tag")
+
         # In case the hyperlink points to a Doxygen command, extract it as such.
         if len(fragments) == 1 and len(fragments[0].content) > 0 and fragments[0].content[0] == "\\":
-            return [Fragment(FragmentType.Command, fragments[0].content)]
+            return [Fragment(FragmentType.Command, fragments[0].content, fragments[0].hyperlink)]
         else:
             return fragments
 
@@ -356,15 +380,16 @@ def merge_fragments(fragments: list[Fragment]) -> list[Fragment]:
     if len(fragments) == 0:
         return []
 
-    # Merge successive elements of the same type
-    new_list = [Fragment(fragments[0].type, fragments[0].content)]
+    # Merge successive elements of the same type.
+    # Note: We want to deep-copy the fragments, so as not to modify the input fragments.
+    new_list = [Fragment(fragments[0].type, fragments[0].content, fragments[0].hyperlink)]
     for f in fragments[1:]:
-        if f.type == new_list[-1].type:
+        if f.type == new_list[-1].type and f.hyperlink == new_list[-1].hyperlink:
             new_list[-1].content += f.content
         else:
-            new_list.append(Fragment(f.type, f.content))
+            new_list.append(Fragment(f.type, f.content, f.hyperlink))
 
-    # Strip elements with empty content
+    # Remove elements with empty content
     new_list = [f for f in new_list if len(f.content) > 0]
     return new_list
 
@@ -373,7 +398,7 @@ def lstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fr
     """Basically applies str.lstrip() to the start of the fragment list."""
     stripped = fragments
     while len(stripped) > 0:
-        new_stripped = [Fragment(stripped[0].type, stripped[0].content.lstrip(to_strip))]
+        new_stripped = [Fragment(stripped[0].type, stripped[0].content.lstrip(to_strip), stripped[0].hyperlink)]
         new_stripped.extend(stripped[1:])
         new_stripped = merge_fragments(new_stripped)
         if len(stripped) == len(new_stripped):
@@ -387,7 +412,7 @@ def rstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fr
     stripped = fragments
     while len(stripped) > 0:
         new_stripped = stripped[0:-1]
-        new_stripped.append(Fragment(stripped[-1].type, stripped[-1].content.rstrip(to_strip)))
+        new_stripped.append(Fragment(stripped[-1].type, stripped[-1].content.rstrip(to_strip), stripped[-1].hyperlink))
         new_stripped = merge_fragments(new_stripped)
         if len(stripped) == len(new_stripped):
             return new_stripped
@@ -418,9 +443,9 @@ def generate_text_for_csharp_file(commands: list[ParsedCommand]) -> str:
         parameters_padding = " " * (max_parameters_len - len(cmd.escaped_parameters))
         anchor_padding = " " * (max_anchor_len - len(cmd.anchor))
 
-        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{cmd.anchor}",{anchor_padding} new (object, string)[]{{ '
+        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{cmd.anchor}",{anchor_padding} new (object, string, string)[]{{ '
         for fragment in cmd.escaped_help_text:
-            s += f'({map_fragment_type_to_csharp_type(fragment.type)}, "{fragment.content}"), '
+            s += f'({map_fragment_type_to_csharp_type(fragment.type)}, "{fragment.content}", "{fragment.hyperlink}"), '
         s += "}),\n"
 
     s += "    };\n"
@@ -477,6 +502,10 @@ def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
             s += f"[{f.content}]"
         else:
             raise Exception("Unknown FragmentType")
+
+        if f.hyperlink != "":
+            s += f"§{f.hyperlink}§"
+
     return s
 
 
