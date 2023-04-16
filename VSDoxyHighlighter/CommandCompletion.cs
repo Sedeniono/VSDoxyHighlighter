@@ -33,7 +33,8 @@ namespace VSDoxyHighlighter
     private Dictionary<ITextView, CommentCommandCompletionSource> mCache = new Dictionary<ITextView, CommentCommandCompletionSource>();
 
     /// <summary>
-    /// More or less salled by VS whenever the user created a new view of some document and starts typing in there.
+    /// More or less called by VS whenever the user created a new view of some document and starts typing 
+    /// in there for the first time.
     /// </summary>
     public IAsyncCompletionSource GetOrCreate(ITextView textView)
     {
@@ -50,6 +51,7 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Defines when the autocomplete box should appear as well as its content.
+  /// Note: The instance is reused for every autocomplete operation in the same text view.
   /// Based on https://github.com/microsoft/VSSDK-Extensibility-Samples/tree/master/AsyncCompletion
   /// </summary>
   class CommentCommandCompletionSource : IAsyncCompletionSource
@@ -58,9 +60,10 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      // We don't subscribe to change events of the options or the parser: A CommentCommandCompletionSource is
-      // only relevent while a specific autocomplete box is shown. Every autocomplete box gets its own instance.
-      // The user cannot really change the settings while keeping such a box open.
+      // We don't subscribe to change events of the options or the parser: Attempting to change the content
+      // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
+      // change the settings in the options page while a box/tooltip is shown. But even if, the box/tooltip is
+      // so short lived that doing anything special (like closing the box/tooltip) is simply not worth the effort.
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }

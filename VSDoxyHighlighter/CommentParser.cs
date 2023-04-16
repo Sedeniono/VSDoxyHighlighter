@@ -240,7 +240,6 @@ namespace VSDoxyHighlighter
       // NOTE: The order in which the regexes are created and added here should not matter.
 
       // `inline code`
-      // Note: Right at the start to overwrite all others.
       matchers.Add(new FragmentMatcher
       {
         re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),

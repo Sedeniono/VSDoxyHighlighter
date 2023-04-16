@@ -42,6 +42,7 @@ namespace VSDoxyHighlighter
   /// <summary>
   /// Responsible for providing the information that gets displayed in the quick info tool tip while
   /// the user hovers with the mouse over a specific piece of text.
+  /// Note: The instance is reused for every quick info in the same text buffer.
   /// Based on https://github.com/microsoft/VSSDK-Extensibility-Samples/tree/master/AsyncQuickInfo
   /// </summary>
   internal sealed class CommentCommandAsyncQuickInfoSource : IAsyncQuickInfoSource
@@ -52,9 +53,10 @@ namespace VSDoxyHighlighter
 
       mTextBuffer = textBuffer;
 
-      // We don't subscribe to change events of the options or the parser: A CommentCommandAsyncQuickInfoSource is
-      // only relevent while a specific quick info box is shown. Every quick info box gets its own instance.
-      // The user cannot really change the settings while keeping such a box open.
+      // We don't subscribe to change events of the options or the parser: Attempting to change the content
+      // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
+      // change the settings in the options page while a box/tooltip is shown. But even if, the box/tooltip is
+      // so short lived that doing anything special (like closing the box/tooltip) is simply not worth the effort.
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }
@@ -136,8 +138,13 @@ namespace VSDoxyHighlighter
           if (group.StartIndex <= triggerPoint.Position && triggerPoint.Position <= group.EndIndex && group.Fragments.Count > 0) {
             // Only the first fragment can contain the Doxygen command.
             FormattedFragment fragmentWithCommand = group.Fragments[0];
+
+            // Note that "potentialCmdWithSlashOrAt" might also contain a markdown fragment. In this case, we do not find any
+            // help page command. We could in principle do some special stuff like show a link to the Doxygen markdown help
+            // page, but this is probably more distracting than useful to the user.
             string potentialCmdWithSlashOrAt = triggerPoint.Snapshot.GetText(
               fragmentWithCommand.StartIndex, fragmentWithCommand.EndIndex - fragmentWithCommand.StartIndex + 1);
+
             DoxygenHelpPageCommand helpPageCmd = TryFindHelpPageCommand(potentialCmdWithSlashOrAt);
             if (helpPageCmd != null) {
               return (helpPageCmd, group);
