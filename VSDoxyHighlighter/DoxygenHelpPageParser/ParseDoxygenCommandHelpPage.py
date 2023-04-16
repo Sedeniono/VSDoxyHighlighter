@@ -385,19 +385,24 @@ def merge_fragments(fragments: list[Fragment]) -> list[Fragment]:
     # Merge successive elements of the same type.
     # Note: We want to deep-copy the fragments, so as not to modify the input fragments.
     new_list = [Fragment(fragments[0].type, fragments[0].content, fragments[0].hyperlink)]
-    for f in fragments[1:]:
+    for idx in range(1, len(fragments)):
+        f = fragments[idx]
         do_merge = (
             f.type == new_list[-1].type 
             and f.hyperlink == new_list[-1].hyperlink
             # Special handling of the "Click here for the corresponding HTML documentation...": We want to keep
             # it separate, since we will want to filter it out from the tooltips in Visual Studio in case hyperlinks
             # are not shown (i.e. for the autocomplete box, but no the quick info box), because if the user cannot
-            # click on the links, it makes no sense to show this message.
-            # So: Do not merge the line breaks before the "Click" fragment into the "Click" fragment. Also, only
-            # merge the line breaks after the "for the corresponding HTML documentation" fragment with it, but not
-            # actual text. That way we still get a nice layout if we filter out the three "Click", "here" and
-            # "for the corresponding..." fragments.
-            and "Click " not in f.content
+            # click on the links, it makes no sense to show this message. So: 
+            # 1) Do not merge the line breaks before the "Click" fragment into the "Click" fragment.
+            # 2) But merge the line breaks after the "for the corresponding HTML documentation" fragment with 
+            #    that fragment.
+            # That way we get a nice layout if we filter out the three "Click", "here" and "for the corresponding..."
+            # fragments.
+            and not ("Click " in f.content 
+                     and idx + 2 < len(fragments) 
+                     and "here" in fragments[idx+1].content 
+                     and "for the corresponding HTML documentation" in fragments[idx+2].content)
             and ("for the corresponding HTML documentation" not in new_list[-1].content or f.content.strip() == ""))
 
         if do_merge:
