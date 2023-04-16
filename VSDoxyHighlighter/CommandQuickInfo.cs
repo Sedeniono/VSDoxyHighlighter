@@ -92,16 +92,14 @@ namespace VSDoxyHighlighter
       // hundreds of times in every second.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-      (DoxygenHelpPageCommand helpPageInfo, FormattedFragmentGroup fragmentGroup) = TryGetHelpPageInfoForTriggerPoint(triggerPoint.Value);
+      (DoxygenHelpPageCommand helpPageCmdInfo, FormattedFragmentGroup fragmentGroup) = TryGetHelpPageCommandInfoForTriggerPoint(triggerPoint.Value);
 
-      if (fragmentGroup != null && helpPageInfo != null) {
-        // TODO: Retain hyperlinks and "Click here"?
-        // TODO: What about markdown?
-
+      if (fragmentGroup != null && helpPageCmdInfo != null) {
         // Only the first fragment can contain the Doxygen command.
         ClassificationEnum commandClassification = fragmentGroup.Fragments[0].Classification;
+
         var description = AllDoxygenHelpPageCommands.ConstructDescription(
-          mCommentParser, helpPageInfo, commandClassification, showHyperlinks: true);
+          mCommentParser, helpPageCmdInfo, commandClassification, showHyperlinks: true);
 
         // If the user moves away with the mouse from this tracking span, the quick info vanishes.
         var spanWhereQuickInfoIsValid = mTextBuffer.CurrentSnapshot.CreateTrackingSpan(
@@ -116,7 +114,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private (DoxygenHelpPageCommand helpPageInfo, FormattedFragmentGroup fragmentGroup) TryGetHelpPageInfoForTriggerPoint(SnapshotPoint triggerPoint)
+    private (DoxygenHelpPageCommand helpPageCmdInfo, FormattedFragmentGroup fragmentGroup) TryGetHelpPageCommandInfoForTriggerPoint(SnapshotPoint triggerPoint)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 

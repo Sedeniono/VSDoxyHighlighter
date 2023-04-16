@@ -79,12 +79,12 @@ namespace VSDoxyHighlighter
     /// </summary>
     public static ClassifiedTextElement ConstructDescription(
       CommentParser commentParser, 
-      DoxygenHelpPageCommand helpPageInfo,
+      DoxygenHelpPageCommand helpPageCmdInfo,
       bool showHyperlinks)
     {
-      string cmdWithSlash = "\\" + helpPageInfo.Command;
+      string cmdWithSlash = "\\" + helpPageCmdInfo.Command;
       ClassificationEnum commandClassification = commentParser.GetClassificationForCommand(cmdWithSlash);
-      return ConstructDescription(commentParser, helpPageInfo, commandClassification, showHyperlinks);
+      return ConstructDescription(commentParser, helpPageCmdInfo, commandClassification, showHyperlinks);
     }
 
 
@@ -95,20 +95,20 @@ namespace VSDoxyHighlighter
     /// </summary>
     public static ClassifiedTextElement ConstructDescription(
       CommentParser commentParser,
-      DoxygenHelpPageCommand helpPageInfo,
+      DoxygenHelpPageCommand helpPageCmdInfo,
       ClassificationEnum commandClassification,
       bool showHyperlinks)
     {
       var runs = new List<ClassifiedTextRun>();
 
       // Add a line with the actual command.
-      string cmdWithSlash = "\\" + helpPageInfo.Command;
+      string cmdWithSlash = "\\" + helpPageCmdInfo.Command;
       runs.AddRange(ClassifiedTextElement.CreatePlainText("Info for command: ").Runs);
       runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[commandClassification], cmdWithSlash));
 
       // Add a line with the command's parameters.
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\nCommand parameters: ").Runs);
-      if (helpPageInfo.Parameters == "") {
+      if (helpPageCmdInfo.Parameters == "") {
         runs.AddRange(ClassifiedTextElement.CreatePlainText("No parameters").Runs);
       }
       else {
@@ -117,36 +117,36 @@ namespace VSDoxyHighlighter
         // would be nice, but this is hard. The help text cannot be simply parsed with our usual CommentParser,
         // since the help text follows different rules (it uses "[", "<", etc to indicate the semantic of each
         // parameter). So for now we do not attempt this.
-        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], helpPageInfo.Parameters));
+        runs.Add(new ClassifiedTextRun(ClassificationIDs.ToID[ClassificationEnum.Parameter2], helpPageCmdInfo.Parameters));
       }
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
       // If desired, add a clickable hyperlink to the online documentation.
       if (showHyperlinks) {
-        string hyperlink = $"{cOnlineDocumentationLink}#{helpPageInfo.Anchor}";
+        string hyperlink = $"{cOnlineDocumentationLink}#{helpPageCmdInfo.Anchor}";
         runs.AddRange(GetHyperlinkElement("Click HERE to open the online documentation.", hyperlink).Runs);
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
       }
 
       // Add the whole description.
       if (showHyperlinks) {
-        foreach (var descriptionFragment in helpPageInfo.Description) {
+        foreach (var descriptionFragment in helpPageCmdInfo.Description) {
           AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, showHyperlinks, runs);
         }
       }
       else {
         int idx = 0;
-        while (idx < helpPageInfo.Description.Length) {
+        while (idx < helpPageCmdInfo.Description.Length) {
           // Without hyperlinks, the "Click here for the corresponding HTML documentation" sentence makes no sense,
           // since the user cannot click anywhere. So don't show it.
-          if (idx + 2 < helpPageInfo.Description.Length
-              && helpPageInfo.Description[idx].text.Contains("Click") 
-              && helpPageInfo.Description[idx + 1].text.Contains("here")
-              && helpPageInfo.Description[idx + 2].text.Contains("for the corresponding HTML")) {
+          if (idx + 2 < helpPageCmdInfo.Description.Length
+              && helpPageCmdInfo.Description[idx].text.Contains("Click") 
+              && helpPageCmdInfo.Description[idx + 1].text.Contains("here")
+              && helpPageCmdInfo.Description[idx + 2].text.Contains("for the corresponding HTML")) {
             idx += 3;
           }
           else {
-            AddTextRunsForDescriptionFragment(commentParser, helpPageInfo.Description[idx], showHyperlinks, runs);
+            AddTextRunsForDescriptionFragment(commentParser, helpPageCmdInfo.Description[idx], showHyperlinks, runs);
             ++idx;
           }
         }
