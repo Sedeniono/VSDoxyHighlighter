@@ -483,13 +483,14 @@ def generate_debug_dump(commands: list[ParsedCommand]) -> str:
         s += f"Parameters: {cmd.parameters}\n"
         s += f"Anchor: {cmd.anchor}  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#{cmd.anchor}\n"
         s += f"Help text:\n{fragment_list_to_string_for_debug(cmd.help_text)}\n"
-        s += "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n\n"
+        s += "------------------------------------\n\n\n"
     return s
 
 
 def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
     s = ""
     for f in fragments:
+        s += "<"
         if f.type == FragmentType.Text:
             s += f.content
         elif f.type == FragmentType.Code:
@@ -507,6 +508,8 @@ def fragment_list_to_string_for_debug(fragments: list[Fragment]) -> str:
 
         if f.hyperlink != "":
             s += f"§{f.hyperlink}§"
+
+        s += ">"
 
     return s
 
