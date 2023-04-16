@@ -154,12 +154,19 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
     elif tag.name == "p":
         # Note that we pass in a decorator so that every string in the paragraph gets stripped of the newline.
-        # (Newlines between paragraphs are kept!)
+        # (Newlines between paragraphs are still kept!)
         fragments = parse_all_children(tag.children, lambda x: decorator(x).replace("\n", ""))
         fragments = strip_fragments(merge_fragments(fragments), " ")
-        if len(fragments) > 0:
-            if tag.next_sibling.name != "ul":
-                fragments.append(Fragment(FragmentType.Text, "\n"))
+
+        if len(fragments) > 0 and tag.next_sibling.name != "ul":
+            fragments.append(Fragment(FragmentType.Text, "\n"))
+        
+        # Replace the double space before "for" in the "Click here   for the corresponding HTML documentation..." 
+        # sentences with a single space.
+        for f in fragments:
+            if f.content.startswith("  for the corresponding HTML documentation"):
+                f.content = f.content[1:]
+
         return fragments
 
     elif tag.name == "code":
