@@ -13,6 +13,7 @@
 - [Features](#features)
   - [Syntax highlighting](#syntax-highlighting)
   - [IntelliSense (autocomplete while typing)](#intellisense-autocomplete-while-typing)
+  - [Quick info](#quick-info)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
 - [Configuration](#configuration)
   - [Fonts and colors](#fonts-and-colors)
@@ -26,7 +27,7 @@
 
 # Introduction
 
-VSDoxyHighlighter is an extension for Visual Studio 2022 to provide **syntax highlighting** and **IntelliSense** (autocomplete while typing) for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.  
+VSDoxyHighlighter is an extension for Visual Studio 2022 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.  
 Note that Visual Studio Code is **not** supported.
 
 
@@ -80,6 +81,18 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - IntelliSense can be disabled entirely in the VSDoxyHighlighter options.
 
 
+## Quick info
+![Example QuickInfo](Pictures/ExampleQuickInfo.gif)
+
+Hovering with the mouse over Doxygen commands or one of their parameters will display the documentation from the [Doxygen help page](https://www.doxygen.nl/manual/commands.html) as a tooltip.
+
+The quick info box also includes a direct hyperlink to the online documentation: Clicking on "`Click HERE to open the online documentation`" will open the webpage in your default browser.
+Moreover, cross references to other webpages and commands are also preserved as clickable hyperlinks.
+Remark: The clickable hyperlinks are not included in the tooltips shown in the IntelliSense autocomplete box because Visual Studio does not support hyperlinks there.
+
+As for the other features, the quick info will only appear in comment types (`/*`, `/**`, etc.) that have been enabled in the VSDoxyHighlighter options.
+This feature can be disabled in the VSDoxyHighlighter options.
+
 
 ## Not yet supported and future ideas
 - Special highlighting of text in "environments" such as `\code` or `\f$`. Note that rendering of latex formulas is not planned, especially since there are already extensions available (e.g. ["TeX Comments"](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1305558.VsTeXCommentsExtension2022) or ["InteractiveComments"](https://marketplace.visualstudio.com/items?itemName=ArchitectSoft.InteractiveCommentsVS2022)).
@@ -89,7 +102,6 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - Generating a whole comment block automatically is currently not planned: 
   - Visual Studio 16.6 and above support this out-of-the-box, compare [this blog post](https://devblogs.microsoft.com/cppblog/doxygen-and-xml-doc-comment-support/).
   - There are also extensions available that allow a more fine grained control over the generated comment, e.g. ["Doxygen Comments"](https://marketplace.visualstudio.com/items?itemName=FinnGegenmantel.doxygenComments) or ["DoxygenComments"](https://marketplace.visualstudio.com/items?itemName=NickKhrapov.DoxygenComments2022) (yes, these two extensions have almost the same name).
-- Show a help text while hovering over Doxygen commands.
 - Allow adding custom commands.
 
 
