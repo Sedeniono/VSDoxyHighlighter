@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Documents;
 
 namespace VSDoxyHighlighter
 {
@@ -130,8 +129,27 @@ namespace VSDoxyHighlighter
       }
 
       // Add the whole description.
-      foreach (var descriptionFragment in helpPageInfo.Description) {
-        AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, showHyperlinks, runs);
+      if (showHyperlinks) {
+        foreach (var descriptionFragment in helpPageInfo.Description) {
+          AddTextRunsForDescriptionFragment(commentParser, descriptionFragment, showHyperlinks, runs);
+        }
+      }
+      else {
+        int idx = 0;
+        while (idx < helpPageInfo.Description.Length) {
+          // Without hyperlinks, the "Click here for the corresponding HTML documentation" sentence makes no sense,
+          // since the user cannot click anywhere. So don't show it.
+          if (idx + 2 < helpPageInfo.Description.Length
+              && helpPageInfo.Description[idx].text.Contains("Click") 
+              && helpPageInfo.Description[idx + 1].text.Contains("here")
+              && helpPageInfo.Description[idx + 2].text.Contains("for the corresponding HTML")) {
+            idx += 3;
+          }
+          else {
+            AddTextRunsForDescriptionFragment(commentParser, helpPageInfo.Description[idx], showHyperlinks, runs);
+            ++idx;
+          }
+        }
       }
 
       return new ClassifiedTextElement(runs);
