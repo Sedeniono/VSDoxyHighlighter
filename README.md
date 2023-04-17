@@ -13,7 +13,7 @@
 - [Features](#features)
   - [Syntax highlighting](#syntax-highlighting)
   - [IntelliSense (autocomplete while typing)](#intellisense-autocomplete-while-typing)
-  - [Quick info](#quick-info)
+  - [Quick info tooltips](#quick-info-tooltips)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
 - [Configuration](#configuration)
   - [Fonts and colors](#fonts-and-colors)
@@ -81,7 +81,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - IntelliSense can be disabled entirely in the VSDoxyHighlighter options.
 
 
-## Quick info
+## Quick info tooltips
 ![Example QuickInfo](Pictures/ExampleQuickInfo.gif)
 
 Hovering with the mouse over Doxygen commands or one of their parameters will display the documentation from the [Doxygen help page](https://www.doxygen.nl/manual/commands.html) as a tooltip.
@@ -90,7 +90,7 @@ The quick info box also includes a direct hyperlink to the online documentation:
 Moreover, cross references to other webpages and commands are also preserved as clickable hyperlinks.
 Remark: The clickable hyperlinks are not included in the tooltips shown in the IntelliSense autocomplete box because Visual Studio does not support hyperlinks there.
 
-As for the other features, the quick info will only appear in comment types (`/*`, `/**`, etc.) that have been enabled in the VSDoxyHighlighter options.
+As for the other features, the quick info tooltip will only appear in comment types (`/*`, `/**`, etc.) that have been enabled in the VSDoxyHighlighter options.
 This feature can be disabled in the VSDoxyHighlighter options.
 
 
