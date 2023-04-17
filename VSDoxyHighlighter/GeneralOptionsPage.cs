@@ -172,7 +172,7 @@ namespace VSDoxyHighlighter
     public bool EnableAutocomplete { get; set; } = true;
 
     [Category(FeaturesSubCategory)]
-    [DisplayName("Enable quick info")]
+    [DisplayName("Enable quick info tooltips")]
     [Description("If enabled, hovering over a Doxygen command will display the help text of that command. "
       + "Note that with the settings below you can define in which comment types the quick info is enabled.")]
     public bool EnableQuickInfo { get; set; } = true;
@@ -181,7 +181,7 @@ namespace VSDoxyHighlighter
     // Comment types
 
     // "\t" does not get printed, and is a hack to get the category to appear second in the property grid.
-    public const string CommentTypesSubCategory = "\tTypes of comments with highlighting and autocomplete";
+    public const string CommentTypesSubCategory = "\tTypes of comments with highlighting, autocomplete and quick infos";
 
     [Category(CommentTypesSubCategory)]
     [DisplayName("Enable in \"//\"")]
