@@ -138,19 +138,7 @@ namespace VSDoxyHighlighter
       //     somehow already have solved this task. The "somewhere" is in the tagger named "Microsoft.VisualC.CppColorer".
       //     Therefore, we get a reference to that tagger, and ask it to decompose the given span for us. We only keep
       //     those spans that were classified as comments. This is the idea from https://stackoverflow.com/q/19060596/3740047
-      //     Note that all of this is a hack since the VS tagger is not really exposed via a proper API. 
-      //     An alternative might be to use the IClassifierAggregatorService (https://stackoverflow.com/a/29311144/3740047).
-      //     I have not really tried it, but I fear that calling GetClassifier() calls our code, and thus we might end up with
-      //     an infinite recursion. Of course, there would be ways to bypass this problem (if it really does occur). But
-      //     the approach with the dedicated tagger seems favorable since it limits the request to only that specific tagger,
-      //     and does not involve all the other existing taggers. Additionally, it seems as if Visual Studio does not cache
-      //     the classifications anywhere, meaning IClassifierAggregatorService computes every classification again on-the-fly,
-      //     even if they had been computed before and could be reused in principle. Therefore, the more extensions use the
-      //     IClassifierAggregatorService, the more expensive it potentially becomes.
-      //     Also note that there is EnvDTE.FileCodeModel (and there is even a VCFileCodeModel), which apparently is supposed
-      //     to provide an API to the source code. However, it does not seem to know anything at all about comments. Attempting
-      //     to call FileCodeModel.CodeElementFromPoint() with a location in a comment does not yield any result for any value
-      //     in the vsCMElement enum. Also compare e.g. https://stackoverflow.com/q/34222467/3740047.
+      //     Note that all of this is a hack since the VS tagger is not really exposed via a proper API.
       //
       // ==> There are basically two disadvantages with this approach: First, we cannot really write automated tests for it
       //     because we would need to have a running Visual Studio instance. Second, it is a hack and thus might break without
@@ -158,8 +146,31 @@ namespace VSDoxyHighlighter
       //     ridiculous.
       //
       // ==> We not only need to know whether some token is in a comment, but also how that comment was started. Doxygen
-      //     does not read "//" and "/*" comments, only "///", "/**", etc. Unfortunately, the VS tagger does not provide
-      //     us with that information directly. Thus, the logic becomes again a bit more complicated, see IdentifyCommentType().
+      //     does not read "//" and "/*" comments, only "///", "/**", etc. So we want to allow the user to disable the features
+      //     of the extension in specific comment types. Unfortunately, the VS tagger does not provide us with the comment type
+      //     directly. (Well, to be precise, it does make the distinction between "///"-style XML comments and other comments,
+      //     but we need to distinguish the other comments types, too.) Thus, the logic becomes again a bit more complicated,
+      //     see IdentifyCommentType().
+      // 
+      // ==> Apparent alternatives to exploiting the "Microsoft.VisualC.CppColorer" tagger, but that do not work:
+      //     1) An alternative might be to use the IClassifierAggregatorService (https://stackoverflow.com/a/29311144/3740047).
+      //        I have not really tried it, but I suspect that calling GetClassifier() calls our code, and thus we might end up with
+      //        an infinite recursion. Of course, there would be ways to bypass this problem (if it really does occur). But
+      //        the approach with the dedicated tagger seems favorable since it limits the request to only that specific tagger,
+      //        and does not involve all the other existing taggers. Additionally, it seems as if Visual Studio does not cache
+      //        the classifications anywhere, meaning IClassifierAggregatorService computes every classification again on-the-fly,
+      //        even if they had been computed before and could be reused in principle. Therefore, the more extensions use the
+      //        IClassifierAggregatorService, the more expensive it potentially becomes. And in the end, we would still need to
+      //        figure out the comment type manually from the returned classifications, exactly the same way we do it using the
+      //        "Microsoft.VisualC.CppColorer" tagger. So we gain nothing substantial by using IClassifierAggregatorService.
+      //     2) Also note that there is EnvDTE.FileCodeModel (and there is even a VCFileCodeModel), which apparently is supposed
+      //        to provide an API to the source code. However, it does not seem to know anything at all about comments. Attempting
+      //        to call FileCodeModel.CodeElementFromPoint() with a location in a comment does not yield any result for any value
+      //        in the vsCMElement enum. Also compare e.g. https://stackoverflow.com/q/34222467/3740047.
+      //     3) Furthermore, there is ITextStructureNavigator.GetSpanOfEnclosing(). The documentation of it sounds as if it
+      //        might return the entire span of a comment (e.g. everything between "/*" and "*/") if given a point in a comment
+      //        or a comment line. But it does not. It seems to return a span of the whole line and, if the line break is included,
+      //        also including the next line. But not the whole comment. So this is useless for our purpose.
 
       IEnumerable<ITagSpan<IClassificationTag>> vsCppTags 
         = mVSCppColorer.TryGetTags(new NormalizedSnapshotSpanCollection(spanToCheck.Snapshot, spanToCheck.Span));
