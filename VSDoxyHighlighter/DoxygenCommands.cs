@@ -304,9 +304,9 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            @"f$", @"f(", @"f)", @"f[", @"f]", @"f}",
-            @"@", @"&", @"$", @"#", @"<", @">", @"%", @".", @"=", @"::", @"|",
-            @"---", @"--", @"{", @"}"
+            "f$", "f(", "f)", "f[", "f]", "f}",
+            "@", "&", "$", "#", "<", ">", "%", ".", "=", "::", "|",
+            "---", "--", "{", "}"
           },
           CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
           new ClassificationEnum[] { ClassificationEnum.Command }
