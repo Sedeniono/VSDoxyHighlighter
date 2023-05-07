@@ -345,6 +345,7 @@ New line \n
 \n  
 \n
 Some mail\@address.com
+Some @@ at
 \~
 \~english
 \~ english not formatted due to space
@@ -361,9 +362,21 @@ Some\::thing
   \|
 Some\--word
 Some\---word
+Some\----word (only 3 "-" should be highlighted)
 \{
 \}
 Foo @{ text @} foo
+some "\"quoted@"" string
+\\
+some\\text
+some @\ more text
+\\cite label ("cite label" should NOT be highlighted)
+@\cite label ("cite label" should NOT be highlighted)
+\\\cite label ("cite label" SHOULD be highlighted)
+@\\cite label ("cite label" SHOULD be highlighted)
+\\\\cite label ("cite label" should NOT be highlighted)
+@\\\cite label ("cite label" should NOT be highlighted)
+\section cmdthrows \\cite label (the "\\cite label" should be a parameter of \section)
 */
 
 

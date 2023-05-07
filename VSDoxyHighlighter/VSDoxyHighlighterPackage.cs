@@ -104,7 +104,7 @@ namespace VSDoxyHighlighter
 
         var errorCode = vsShell.LoadPackage(ref PackageGuid, out IVsPackage loadedPackage);
         if (errorCode != Microsoft.VisualStudio.VSConstants.S_OK) {
-          string errorMessage = $"VSDoxyHighlighter: Failed to load package. Error code: 0x{errorCode:X}.";
+          string errorMessage = $"VSDoxyHighlighter: Failed to load package. Error code: 0x{errorCode:X} = {errorCode}.";
           ActivityLog.LogError("VSDoxyHighlighter", errorMessage);
           InfoBar.ShowMessage(KnownMonikers.StatusError, errorMessage);
           throw new VSDoxyHighlighterException(errorMessage);

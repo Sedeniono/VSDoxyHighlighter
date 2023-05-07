@@ -103,6 +103,21 @@ namespace VSDoxyHighlighter
     }
 
 
+    /// <summary>
+    /// Given the commands as parsed from the Visual Studio configuration file, checks them for errors. If an error
+    /// is found, an exception is thrown. Also amends the parsed information in case our extension got to know new
+    /// commands.
+    /// </summary>
+    public static void ValidateAndAmendCommandsParsedFromConfig(List<DoxygenCommandInConfig> parsed) 
+    {
+      ValidateParsedFromString(parsed);
+      AmendParsedWithDefaults(parsed);
+    }
+
+
+    //-----------------------------------------------------------------------------------
+    // Private non-static helpers and members
+
     private void OnSettingsChanged(object sender, EventArgs e)
     {
       InitCommands();
@@ -235,9 +250,18 @@ namespace VSDoxyHighlighter
         }
       }
 
-      // Sort the commands to make it easier for the user to find a specific command in the options dialog.
-      // We put all the non-letter commands (\~, \<, etc.) at the end, and otherwise sort alphabetically.
-      int CompareConfigs(DoxygenCommandInConfig c1, DoxygenCommandInConfig c2) 
+      SortConfigList(result);
+      return result;
+    }
+
+
+    /// <summary>
+    /// Sorts the commands to make it easier for the user to find a specific command in the options dialog.
+    /// We put all the non-letter commands (\~, \<, etc.) at the end, and otherwise sort alphabetically.
+    /// </summary>
+    private static void SortConfigList(List<DoxygenCommandInConfig> toSort) 
+    {
+      int CompareConfigs(DoxygenCommandInConfig c1, DoxygenCommandInConfig c2)
       {
         bool isLetter1 = char.IsLetter(c1.Command[0]);
         bool isLetter2 = char.IsLetter(c2.Command[0]);
@@ -252,8 +276,56 @@ namespace VSDoxyHighlighter
         }
       }
 
-      result.Sort(CompareConfigs);
-      return result;
+      toSort.Sort(CompareConfigs);
+    }
+
+
+    private static void ValidateParsedFromString(IEnumerable<DoxygenCommandInConfig> parsed)
+    {
+      foreach (DoxygenCommandInConfig cmd in parsed) {
+        if (!IsKnownDefaultCommand(cmd.Command)) {
+          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' is not known.");
+        }
+
+        if (!Enum.IsDefined(typeof(ClassificationEnum), cmd.CommandClassification)) {
+          throw new VSDoxyHighlighterException(
+            $"Command classification converted from string to enum resulted in an invalid enum value '{cmd.CommandClassification}' for command '{cmd.Command}'.");
+        }
+
+        // Note: Length 0 is allowed, but not null.
+        if (cmd.ParametersClassifications == null) {
+          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' has no parameter classifications.");
+        }
+
+        for (int paramClsifIdx = 0; paramClsifIdx < cmd.ParametersClassifications.Length; ++paramClsifIdx) {
+          ClassificationEnum paramClsif = cmd.ParametersClassifications[paramClsifIdx];
+          if (!Enum.IsDefined(typeof(ClassificationEnum), paramClsif)) {
+            throw new VSDoxyHighlighterException(
+              $"Parameter classification {paramClsifIdx + 1} converted from string to enum resulted in an invalid enum value '{paramClsif}' for command '{cmd.Command}'.");
+          }
+        }
+      }
+    }
+
+
+    /// <summary>
+    /// When we add new Doxygen commands to the extension, we need to amend the data that we read from the
+    /// config file with these new commands. This is done by this function.
+    /// </summary>
+    private static void AmendParsedWithDefaults(List<DoxygenCommandInConfig> parsed)
+    {
+      // Minor performance optimization: No need to search if there are all commands. (The user cannot add new commands.)
+      if (parsed.Count == DefaultCommandsInConfig.Count) {
+        return;
+      }
+
+      foreach (DoxygenCommandInConfig defaultCmd in DefaultCommandsInConfig) {
+        if (!parsed.Any(parsedCmd => parsedCmd.Command == defaultCmd.Command)) {
+          parsed.Add(defaultCmd);
+        }
+      }
+
+      SortConfigList(parsed);
     }
 
 
@@ -305,7 +377,7 @@ namespace VSDoxyHighlighter
         new DoxygenCommandGroup(
           new List<string> {
             "f$", "f(", "f)", "f[", "f]", "f}",
-            "@", "&", "$", "#", "<", ">", "%", ".", "=", "::", "|",
+            "\\", "@", "&", "$", "#", "<", ">", "%", "\"", ".", "=", "::", "|",
             "---", "--", "{", "}"
           },
           CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,

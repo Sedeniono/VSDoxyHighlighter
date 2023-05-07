@@ -819,6 +819,8 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\f]", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\f{eqnarray*}{", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\f}", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\f{eqnarray*}", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\f}", ClassificationEnum.Command),
@@ -858,6 +860,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\n", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\@", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@@", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\~", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\~english", ClassificationEnum.Command),
@@ -879,10 +882,32 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\|", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\--", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\---", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\---", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\{", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\}", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"@{", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"@}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("\\\"", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("@\"", ClassificationEnum.Command),
+
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\cite exc
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\cite exc
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\section", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"cmdthrows", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\\cite label (the ""\\cite label"" should be a parameter of \section)", ClassificationEnum.Title),
 
 
         // --- Additional stuff ---

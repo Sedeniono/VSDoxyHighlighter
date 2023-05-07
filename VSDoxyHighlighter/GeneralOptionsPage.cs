@@ -270,7 +270,7 @@ namespace VSDoxyHighlighter
 
             var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
             var commands = (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
-            ValidateParsedFromString(commands);
+            DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(commands);
             return commands;
           }
           catch (Exception ex) {
@@ -303,34 +303,6 @@ namespace VSDoxyHighlighter
       }
       else {
         return base.ConvertTo(context, culture, value, destinationType);
-      }
-    }
-
-
-    private static void ValidateParsedFromString(IEnumerable<DoxygenCommandInConfig> parsed)
-    {
-      foreach (DoxygenCommandInConfig cmd in parsed) {
-        if (!DoxygenCommands.IsKnownDefaultCommand(cmd.Command)) {
-          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' is not known.");
-        }
-
-        if (!Enum.IsDefined(typeof(ClassificationEnum), cmd.CommandClassification)) {
-          throw new VSDoxyHighlighterException(
-            $"Command classification converted from string to enum resulted in an invalid enum value '{cmd.CommandClassification}' for command '{cmd.Command}'.");
-        }
-
-        // Note: Length 0 is allowed, but not null.
-        if (cmd.ParametersClassifications == null) {
-          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' has no parameter classifications.");
-        }
-
-        for (int paramClsifIdx = 0; paramClsifIdx < cmd.ParametersClassifications.Length; ++paramClsifIdx) {
-          ClassificationEnum paramClsif = cmd.ParametersClassifications[paramClsifIdx];
-          if (!Enum.IsDefined(typeof(ClassificationEnum), paramClsif)) {
-            throw new VSDoxyHighlighterException(
-              $"Parameter classification {paramClsifIdx+1} converted from string to enum resulted in an invalid enum value '{paramClsif}' for command '{cmd.Command}'.");
-          }
-        }
       }
     }
 
