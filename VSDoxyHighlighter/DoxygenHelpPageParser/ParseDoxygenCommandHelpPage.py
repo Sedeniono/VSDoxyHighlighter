@@ -11,6 +11,9 @@ from enum import Enum
 from typing import Union
 
 
+ONLINE_COMMAND_HELP_LINK = "https://www.doxygen.nl/manual/commands.html"
+
+
 class FragmentType(Enum):
     Text = 1
     Code = 2
@@ -471,7 +474,7 @@ def generate_text_for_csharp_file(commands: list[ParsedCommand]) -> str:
         parameters_padding = " " * (max_parameters_len - len(cmd.escaped_parameters))
         anchor_padding = " " * (max_anchor_len - len(cmd.anchor))
 
-        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{cmd.anchor}",{anchor_padding} new (object, string, string)[]{{ '
+        s += f'      new DoxygenHelpPageCommand("{cmd.escaped_command}",{command_padding} "{cmd.escaped_parameters}",{parameters_padding} "{ONLINE_COMMAND_HELP_LINK}#{cmd.anchor}",{anchor_padding} new (object, string, string)[]{{ '
         for fragment in cmd.escaped_help_text:
             s += f'({map_fragment_type_to_csharp_type(fragment.type)}, "{fragment.content}", "{fragment.hyperlink}"), '
         s += "}),\n"

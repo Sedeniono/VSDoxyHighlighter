@@ -33,10 +33,9 @@ namespace VSDoxyHighlighter
     public readonly string Parameters;
 
     /// <summary>
-    /// The html anchor for the command. I.e. appending this anchor "https://www.doxygen.nl/manual/commands.html#"
-    /// results in a hyperlink to the online documentation.
+    /// The Hyperlink linking to the online documentation of the command.
     /// </summary>
-    public readonly string Anchor;
+    public readonly string Hyperlink;
 
     /// <summary>
     /// The description of the Doxygen command: The string is just the concatenation of the 
@@ -49,11 +48,11 @@ namespace VSDoxyHighlighter
     public readonly (object type, string text, string hyperlink)[] Description;
 
 
-    public DoxygenHelpPageCommand(string command, string parameters, string anchor, (object type, string text, string hyperlink)[] description)
+    public DoxygenHelpPageCommand(string command, string parameters, string hyperlink, (object type, string text, string hyperlink)[] description)
     {
       Command = command;
       Parameters = parameters;
-      Anchor = anchor;
+      Hyperlink = hyperlink;
       Description = description;
     }
   }
@@ -69,8 +68,6 @@ namespace VSDoxyHighlighter
     /// All the Doxygen commands, as extracted from the official help page and amended for use in the extension.
     /// </summary>
     public static readonly List<DoxygenHelpPageCommand> cAmendedDoxygenCommands;
-
-    private static readonly string cOnlineDocumentationLink = "https://www.doxygen.nl/manual/commands.html";
 
 
     /// <summary>
@@ -122,9 +119,8 @@ namespace VSDoxyHighlighter
       runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
 
       // If desired, add a clickable hyperlink to the online documentation.
-      if (showHyperlinks) {
-        string hyperlink = $"{cOnlineDocumentationLink}#{helpPageCmdInfo.Anchor}";
-        runs.AddRange(GetHyperlinkElement("Click HERE to open the online documentation.", hyperlink).Runs);
+      if (showHyperlinks && helpPageCmdInfo.Hyperlink != "") {
+        runs.AddRange(GetHyperlinkElement("Click HERE to open the online documentation.", helpPageCmdInfo.Hyperlink).Runs);
         runs.AddRange(ClassifiedTextElement.CreatePlainText("\n\n").Runs);
       }
 
@@ -211,6 +207,7 @@ namespace VSDoxyHighlighter
         "brief", "details", "note", "warning", "param", "tparam", "returns", "return",
         "throws", "throw", "sa", "see", "ref", "p", "c", "a", "ingroup",
       };
+
       cAmendedDoxygenCommands =
         DoxygenCommandsGeneratedFromHelpPage.cCommands.OrderBy(cmd => {
           int idx = speciallyOrderedCommands.IndexOf(cmd.Command);
@@ -251,6 +248,13 @@ namespace VSDoxyHighlighter
       foreach (string extension in CommentParser.cCodeFileExtensions.Reverse()) {
         InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
       }
+
+      // For some reason, the "@{" and "@}" commands are not listed on the Doxygen help page with all commands,
+      // but only at https://www.doxygen.nl/manual/grouping.html. Hence, our Python generation script did could not
+      // automatically add them. So we add them here manually. As a side note, "\{" and "\}" (i.e. the versions with
+      // slash instead of @) are not explained in the documentation, but they actually work.
+      cAmendedDoxygenCommands.Add(new DoxygenHelpPageCommand("{", "", "https://www.doxygen.nl/manual/grouping.html", new (object, string, string)[] { (null, "Opening marker for grouping members of commands such as ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\addtogroup", "https://www.doxygen.nl/manual/commands.html#cmdaddtogroup"), (null, " or ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\defgroup", "https://www.doxygen.nl/manual/commands.html#cmddefgroup"), (null, ".", "") }));
+      cAmendedDoxygenCommands.Add(new DoxygenHelpPageCommand("}", "", "https://www.doxygen.nl/manual/grouping.html", new (object, string, string)[] { (null, "Closing marker for grouping members of commands such as ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\addtogroup", "https://www.doxygen.nl/manual/commands.html#cmdaddtogroup"), (null, " or ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\defgroup", "https://www.doxygen.nl/manual/commands.html#cmddefgroup"), (null, ".", "") }));
     }
 
 
@@ -261,7 +265,7 @@ namespace VSDoxyHighlighter
         throw new VSDoxyHighlighterException($"Command '{originalCommand}' not found in list of Doxygen commands.");
       }
       DoxygenHelpPageCommand original = cAmendedDoxygenCommands[idx];
-      commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Anchor, original.Description));
+      commands.Insert(idx + 1, new DoxygenHelpPageCommand(newCommand, original.Parameters, original.Hyperlink, original.Description));
     }
   }
 }
