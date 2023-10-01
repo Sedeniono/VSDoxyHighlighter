@@ -294,7 +294,7 @@ namespace VSDoxyHighlighter
 
         // Note: Length 0 is allowed, but not null.
         if (cmd.ParametersClassifications == null) {
-          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' has no parameter classifications.");
+          throw new VSDoxyHighlighterException($"Command '{cmd.Command}' has a null parameter classification.");
         }
 
         for (int paramClsifIdx = 0; paramClsifIdx < cmd.ParametersClassifications.Length; ++paramClsifIdx) {
