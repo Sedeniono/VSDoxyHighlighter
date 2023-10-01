@@ -342,8 +342,14 @@ namespace VSDoxyHighlighter
               "invariant", "parblock", "endparblock", "post", "pre", "remark", "remarks",
               "since", "test", "version", "callgraph",
               "hidecallgraph", "callergraph", "hidecallergraph", "showrefby", "hiderefby",
-              "showrefs", "hiderefs", "endinternal",
-              "hideinitializer", "internal", "nosubgrouping", "private",
+              "showrefs", "hiderefs",
+              "showinlinesource", "hideinlinesource", "includegraph", "hideincludegraph",
+              "includedbygraph", "hideincludedbygraph", "directorygraph", "hidedirectorygraph",
+              "collaborationgraph", "hidecollaborationgraph",
+              "inheritancegraph", "inheritancegraph{NO}", "inheritancegraph{YES}",
+              "inheritancegraph{TEXT}", "inheritancegraph{GRAPH}", "inheritancegraph{BUILTIN}",
+              "hideinheritancegraph", "groupgraph", "hidegroupgraph",
+              "endinternal", "hideinitializer", "internal", "nosubgrouping", "private",
               "privatesection", "protected", "protectedsection", "public", "publicsection",
               "pure", "showinitializer", "static",
               "addindex", "secreflist", "endsecreflist", "tableofcontents",
@@ -423,7 +429,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "param", "tparam", "param[in]", "param[out]", "param[in,out]",
             "concept", "def", "enum", "extends", "implements",
-            "memberof", "namespace", "package", "relates", "related",
+            "memberof", "module", "namespace", "package", "relates", "related",
             "relatesalso", "relatedalso", "retval"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
@@ -475,6 +481,14 @@ namespace VSDoxyHighlighter
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "doxyconfig"
+          },
+          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(

@@ -570,6 +570,8 @@ def extract_and_convert_doxygen_commands_from_html(html_filename: str, output_cs
 if __name__ == "__main__":
     main_folder = os.path.dirname(os.path.abspath(__file__))
     extract_and_convert_doxygen_commands_from_html(
-        html_filename=os.path.join(main_folder, "testInput.htm"),
+        # The input html file is https://www.doxygen.nl/manual/commands.html
+        # (simply saved via a browser).
+        html_filename=os.path.join(main_folder, "testInput1.9.8.htm"),
         output_csharp_filename=os.path.join(main_folder, "DoxygenCommandsGeneratedFromHelpPage.cs"),
         output_debug_dump_filename=os.path.join(main_folder, "GeneratedDebugDump.txt"))

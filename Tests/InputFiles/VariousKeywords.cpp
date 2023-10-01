@@ -11,6 +11,25 @@
 \hiderefby
 \showrefs
 \hiderefs
+@showinlinesource
+@hideinlinesource
+\includegraph
+@hideincludegraph
+@includedbygraph
+\hideincludedbygraph
+\directorygraph
+\hidedirectorygraph
+\collaborationgraph
+\hidecollaborationgraph
+\inheritancegraph
+\inheritancegraph{NO}
+@inheritancegraph{YES}
+\inheritancegraph{TEXT}
+\inheritancegraph{GRAPH}
+\inheritancegraph{BUILTIN}
+\hideinheritancegraph
+\groupgraph
+\hidegroupgraph
 text \qualifier quali single word should be matched
 text \qualifier "SOMEQUALI text" quote should be matched
 text\qualifier "Another" quote should be matched
@@ -70,6 +89,8 @@ Some text \lineinfo more text
 \internal
 \mainpage My Personal Index Page
 \memberof _some_name
+\module
+@module my_module
 \name
 \name some group title
 \namespace nested::space
@@ -299,6 +320,7 @@ Some text \emoji :smile: more text \emoji left_luggage
 \dotfile
 \mscfile file_name.msc "test" width=200cm
 \diafile "path\with space\file_name.dia" width=200cm
+... Project name = \doxyconfig PROJECT_NAME ...
 this is a \e really good example
 this is a \em x good example
 \htmlonly

@@ -185,6 +185,28 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\showrefs", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\hiderefs", ClassificationEnum.Command),
 
+        new Utils.FormattedFragmentText(@"@showinlinesource", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@hideinlinesource", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\includegraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@hideincludegraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@includedbygraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\hideincludedbygraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\directorygraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\hidedirectorygraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\collaborationgraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\hidecollaborationgraph", ClassificationEnum.Command),
+        
+        new Utils.FormattedFragmentText(@"\inheritancegraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\inheritancegraph{NO}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@inheritancegraph{YES}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\inheritancegraph{TEXT}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\inheritancegraph{GRAPH}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\inheritancegraph{BUILTIN}", ClassificationEnum.Command),
+
+        new Utils.FormattedFragmentText(@"\hideinheritancegraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\groupgraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\hidegroupgraph", ClassificationEnum.Command),
+
         new Utils.FormattedFragmentText(@"\qualifier", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"quali", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\qualifier", ClassificationEnum.Command),
@@ -314,6 +336,10 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\memberof", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"_some_name", ClassificationEnum.Parameter1),
+
+        new Utils.FormattedFragmentText(@"\module", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@module", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"my_module", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\name", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\name", ClassificationEnum.Command),
@@ -785,6 +811,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\diafile", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"""path\with space\file_name.dia""", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"width=200cm", ClassificationEnum.Parameter1),
+
+        new Utils.FormattedFragmentText(@"\doxyconfig", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"PROJECT_NAME", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\e", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"really", ClassificationEnum.EmphasisMinor),
