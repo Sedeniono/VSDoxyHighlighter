@@ -245,6 +245,12 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline,anchor:YOUR_ID}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline}");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{BUILTIN}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{GRAPH}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{TEXT}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{YES}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{NO}");
+
       foreach (string extension in CommentParser.cCodeFileExtensions.Reverse()) {
         InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
       }
