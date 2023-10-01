@@ -219,7 +219,7 @@ namespace VSDoxyHighlighter
       // Note that when inserting multiple additional variations for one command, they must be listed here
       // in reverse order than how they should appear, since we always insert them directly after the
       // original command.
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlonly", "[block]");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlonly", "htmlonly[block]");
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{full}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{directory}");
