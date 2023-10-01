@@ -253,6 +253,14 @@ Some text \refitem some_name more text
 \snippet snippets/example.cpp Adding a resource
 \snippet{lineno} snippets/example.cpp resource
 \snippet{doc} example.cpp resource
+\snippet{trimleft} example.cpp resource
+\snippet{local} example.cpp resource
+\snippet{lineno,local} example.cpp resource
+\snippet{doc,local} example.cpp resource
+\snippet{trimleft,local} example.cpp resource
+\snippet{local,lineno} example.cpp resource
+\snippet{local,doc} example.cpp resource
+\snippet{local,trimleft} example.cpp resource
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp resource
 \verbinclude some dir\include_test.cpp

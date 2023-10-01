@@ -535,7 +535,10 @@ namespace VSDoxyHighlighter
           new List<string> {
             "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
             "section", "subsection", "subsubsection", "paragraph",
-            "snippet", "snippet{lineno}", "snippet{doc}", "snippetlineno", "snippetdoc"
+            "snippet", "snippet{lineno}", "snippet{doc}", "snippet{trimleft}", "snippet{local}",
+            "snippet{lineno,local}", "snippet{doc,local}", "snippet{trimleft,local}",
+            "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
+            "snippetlineno", "snippetdoc"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }

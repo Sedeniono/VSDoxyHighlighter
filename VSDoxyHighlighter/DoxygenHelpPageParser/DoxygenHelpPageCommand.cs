@@ -242,6 +242,11 @@ namespace VSDoxyHighlighter
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlinclude", "htmlinclude[block]");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{trimleft,local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{doc,local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{lineno,local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{trimleft}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{doc}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{lineno}");
 
