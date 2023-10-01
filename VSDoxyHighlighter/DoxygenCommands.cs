@@ -450,7 +450,9 @@ namespace VSDoxyHighlighter
             "property", "typedef", "var",
             "elseif", "if", "ifnot",
             "dontinclude", "dontinclude{lineno}",
-            "include", "include{lineno}", "include{doc}", "includelineno", "includedoc",
+            "include", "include{lineno}", "include{doc}", "include{local}",
+            "include{lineno,local}", "include{doc,local}", "include{local,lineno}", "include{local,doc}",
+            "includelineno", "includedoc",
             "line", "skip", "skipline", "until",
             "verbinclude", "htmlinclude", "htmlinclude[block]", "latexinclude",
             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"

@@ -233,8 +233,12 @@ namespace VSDoxyHighlighter
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "example", "example{lineno}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "dontinclude", "dontinclude{lineno}");
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{lineno}");
+
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{doc,local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{lineno,local}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{local}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{doc}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{lineno}");
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlinclude", "htmlinclude[block]");
 

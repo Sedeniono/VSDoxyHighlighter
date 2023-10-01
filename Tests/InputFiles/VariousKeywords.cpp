@@ -239,6 +239,11 @@ Some text \refitem some_name more text
 \include include_test.cpp
 \include{lineno} some dir\include_test.cpp
 \include{doc} "some dir\include_test.cpp"
+\include{local} "some dir\include_test.cpp"
+\include{lineno,local} include_test.cpp
+\include{doc,local} include_test.cpp
+\include{local,lineno} include_test.cpp
+\include{local,doc} include_test.cpp
 \includelineno  include_test.cpp
 \includedoc   include_test.cpp
 \line example();
