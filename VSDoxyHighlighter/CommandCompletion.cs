@@ -41,7 +41,7 @@ namespace VSDoxyHighlighter
       if (mCache.TryGetValue(textView, out var itemSource))
         return itemSource;
 
-      var source = new CommentCommandCompletionSource();
+      var source = new CommentCommandCompletionSource(textView);
       textView.Closed += (o, e) => mCache.Remove(textView);
       mCache.Add(textView, source);
       return source;
@@ -56,9 +56,11 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentCommandCompletionSource : IAsyncCompletionSource
   {
-    public CommentCommandCompletionSource() 
+    public CommentCommandCompletionSource(ITextView textView) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      mCppFileSemantics = new VisualStudioCppFileSemanticsFromCache(textView.TextBuffer);
 
       // We don't subscribe to change events of the options or the parser: Attempting to change the content
       // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
@@ -91,8 +93,8 @@ namespace VSDoxyHighlighter
 
       for (int pos = triggerLocation.Position - 1; pos >= 0; --pos) {
         char c = snapshot.GetText(pos, 1)[0];
-        // Check whether we hit the start of a text fragment that might be doxygen command.
-        if (c == '\\' || c == '@') {
+        // Check whether we hit the start of a text fragment that might be a doxygen command or a parameter.
+        if (c == '\\' || c == '@' || c == ' ' || c == '\t') {
           // Also check whether it is actually inside of a comment. Since this is the more expensive check,
           // it is performed afterwards.
           if (IsLocationInEnabledCommentType(triggerLocation)) {
@@ -103,14 +105,11 @@ namespace VSDoxyHighlighter
             // 2) More importantly, Visual Studio closes the autocomplete box if the user backspaces till
             //    the "\" or "@" is removed. If we included the "\" or "@" in the applicableToSpan, VS does not close it for some reason.
             SnapshotSpan applicableToSpan = new SnapshotSpan(snapshot, pos + 1, triggerLocation.Position - pos - 1);
-            return new CompletionStartData(
-              CompletionParticipation.ProvidesItems,
-              applicableToSpan);
+            return new CompletionStartData(CompletionParticipation.ProvidesItems, applicableToSpan);
           }
         }
-        // We stop looking at the beginning of the line or at a whitespace; we only support the autocompletion
-        // of the actual commands at the moment, not of their arguments.
-        else if (c == '\n' || c == '\r' ||c == ' ' || c == '\t') {
+        // We stop looking at the beginning of the line.
+        else if (c == '\n' || c == '\r') {
           return CompletionStartData.DoesNotParticipateInCompletion;
         }
       }
@@ -123,20 +122,21 @@ namespace VSDoxyHighlighter
     /// Called by VS once per completion session on a background thread to fetch the set of all completion 
     /// items available at the given location.
     /// </summary>
-    public /*async*/ Task<CompletionContext> GetCompletionContextAsync(
+    public async Task<CompletionContext> GetCompletionContextAsync(
       IAsyncCompletionSession session, 
       CompletionTrigger trigger, 
       SnapshotPoint triggerLocation, 
       SnapshotSpan applicableToSpan, 
-      CancellationToken token)
+      CancellationToken cancellationToken)
     {
       if (!mGeneralOptions.EnableAutocomplete) {
-        return Task.FromResult(CompletionContext.Empty);
+        return CompletionContext.Empty;
       }
 
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
       if (applicableToSpan.Start.Position > 0) {
-        char startChar = applicableToSpan.Start.Subtract(1).GetChar();
+        SnapshotPoint startPoint = applicableToSpan.Start.Subtract(1);
+        char startChar = startPoint.GetChar();
         if (startChar == '\\' || startChar == '@') {
           int numCommands = DoxygenCommandsGeneratedFromHelpPage.cCommands.Length;
           int curCommandNumber = 1;
@@ -161,7 +161,7 @@ namespace VSDoxyHighlighter
               automationText: cmd.Command,
               attributeIcons: ImmutableArray<ImageElement>.Empty);
 
-            // Add a reference to the DoxygenHelpPageCommand to the item so that we access it in GetDescriptionAsync().
+            // Add a reference to the DoxygenHelpPageCommand to the item so that we can access it in GetDescriptionAsync().
             item.Properties.AddProperty(typeof(DoxygenHelpPageCommand), cmd);
 
             itemsBuilder.Add(item);
@@ -169,9 +169,46 @@ namespace VSDoxyHighlighter
             ++curCommandNumber;
           }
         }
+        else if (startChar == ' ' || startChar == '\t') {
+          ITextSnapshotLine line = startPoint.GetContainingLine();
+          string lineBeforeCompletionStart = line.GetText().Substring(0, startPoint - line.Start).TrimEnd();
+          int commandStartIdx = lineBeforeCompletionStart.LastIndexOfAny(new char[] { '@', '\\' });
+          if (commandStartIdx >= 0) {
+            string command = lineBeforeCompletionStart.Substring(commandStartIdx + 1);
+            if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
+              // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
+              await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+              
+              FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+              if (info != null) {
+                int numParams = info.ParameterNames.Count;
+                int curParamNumber = 1;
+                foreach (string paramName in info.ParameterNames) {
+                  var item = new CompletionItem(
+                    displayText: paramName,
+                    source: this,
+                    icon: cParamImage,
+                    filters: ImmutableArray<CompletionFilter>.Empty,
+                    suffix: string.Empty,                 // TODO: Maybe show the variable type?
+                    insertText: paramName,
+                    // As above: Ensure we keep the order
+                    sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+                    filterText: paramName,
+                    automationText: paramName,
+                    attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+                  itemsBuilder.Add(item);
+                  ++curParamNumber;
+
+                  // TODO: Maybe as quick info show the name of the function?
+                }
+              }
+            }
+          }
+        }
       }
 
-      return Task.FromResult(new CompletionContext(itemsBuilder.ToImmutable(), null));
+      return new CompletionContext(itemsBuilder.ToImmutable(), null);
     }
 
 
@@ -186,7 +223,6 @@ namespace VSDoxyHighlighter
         return Task.FromResult<object>(description);
       }
 
-      Debug.Assert(false);
       return Task.FromResult<object>("");
     }
 
@@ -215,9 +251,11 @@ namespace VSDoxyHighlighter
     // For now, we simply use an existing Visual Studio image to show in the autocomplete box.
     // http://glyphlist.azurewebsites.net/knownmonikers/
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
+    private static ImageElement cParamImage = new ImageElement(KnownMonikers.Parameter.ToImageId(), "Doxygen parameter");
 
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;
+    private readonly IVisualStudioCppFileSemantics mCppFileSemantics;
   }
 
 
