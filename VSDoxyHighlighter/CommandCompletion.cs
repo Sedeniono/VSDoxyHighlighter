@@ -325,11 +325,12 @@ namespace VSDoxyHighlighter
     }
 
 
-    // For now, we simply use an existing Visual Studio image to show in the autocomplete box.
     // http://glyphlist.azurewebsites.net/knownmonikers/
+    // https://github.com/madskristensen/KnownMonikersExplorer
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
+    // Image for parameter and template parameter: These should be the images shown by VS's own IntelliSense in C++.
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
-    private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.Template.ToImageId(), "Doxygen template parameter");
+    private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
 
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;
