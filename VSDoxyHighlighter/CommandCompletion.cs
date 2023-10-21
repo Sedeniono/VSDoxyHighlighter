@@ -93,7 +93,7 @@ namespace VSDoxyHighlighter
 
       for (int pos = triggerLocation.Position - 1; pos >= 0; --pos) {
         char c = snapshot.GetText(pos, 1)[0];
-        // Check whether we hit the start of a text fragment that might be a doxygen command or a parameter.
+        // Check whether we hit the start of a text fragment that might be a doxygen command (\ or @) or a parameter (space or tab).
         if (c == '\\' || c == '@' || c == ' ' || c == '\t') {
           // Also check whether it is actually inside of a comment. Since this is the more expensive check,
           // it is performed afterwards.
@@ -133,82 +133,27 @@ namespace VSDoxyHighlighter
         return CompletionContext.Empty;
       }
 
-      var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+      ImmutableArray<CompletionItem>.Builder itemsBuilder = null;
       if (applicableToSpan.Start.Position > 0) {
         SnapshotPoint startPoint = applicableToSpan.Start.Subtract(1);
         char startChar = startPoint.GetChar();
+        // '\' and '@' start a command.
         if (startChar == '\\' || startChar == '@') {
-          int numCommands = DoxygenCommandsGeneratedFromHelpPage.cCommands.Length;
-          int curCommandNumber = 1;
-
-          // TODO: Cache the items? There can only be two versions, one with @ and one with "\"?
-          foreach (DoxygenHelpPageCommand cmd in AllDoxygenHelpPageCommands.cAmendedDoxygenCommands) {
-            var item = new CompletionItem(
-              // Add the "\" or "@" since it is not actually part of the autocompleted command, because
-              // the applicableToSpan does not cover it. See InitializeCompletion() for the reason.
-              displayText: startChar + cmd.Command,
-              source: this,
-              icon: cCompletionImage,
-              filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: cmd.Parameters,
-              insertText: cmd.Command,
-              // sortText: Sorting is done using Enumerable.OrderBy, which apparently calls String.CompareTo(),
-              // which is doing a case-sensitive and culture-sensitive comparison using the current culture.
-              // But we want to keep the sorting of our list of commands. Padding with 0 to the left to get
-              // e.g. 11 to be sorted after 1.
-              sortText: curCommandNumber.ToString().PadLeft(numCommands, '0'),
-              filterText: cmd.Command,
-              automationText: cmd.Command,
-              attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-            // Add a reference to the DoxygenHelpPageCommand to the item so that we can access it in GetDescriptionAsync().
-            item.Properties.AddProperty(typeof(DoxygenHelpPageCommand), cmd);
-
-            itemsBuilder.Add(item);
-
-            ++curCommandNumber;
-          }
+          itemsBuilder = PopulateAutcompleteBoxWithCommands(startChar);
         }
+        // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
+        // support autocompletion of the parameter, and if yes, populate the autocomplete box with possible parameter values.
         else if (startChar == ' ' || startChar == '\t') {
-          ITextSnapshotLine line = startPoint.GetContainingLine();
-          string lineBeforeCompletionStart = line.GetText().Substring(0, startPoint - line.Start).TrimEnd();
-          int commandStartIdx = lineBeforeCompletionStart.LastIndexOfAny(new char[] { '@', '\\' });
-          if (commandStartIdx >= 0) {
-            string command = lineBeforeCompletionStart.Substring(commandStartIdx + 1);
-            if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
-              // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
-              await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-              
-              FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-              if (info != null) {
-                int numParams = info.ParameterNames.Count;
-                int curParamNumber = 1;
-                foreach (string paramName in info.ParameterNames) {
-                  var item = new CompletionItem(
-                    displayText: paramName,
-                    source: this,
-                    icon: cParamImage,
-                    filters: ImmutableArray<CompletionFilter>.Empty,
-                    suffix: string.Empty,                 // TODO: Maybe show the variable type?
-                    insertText: paramName,
-                    // As above: Ensure we keep the order
-                    sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-                    filterText: paramName,
-                    automationText: paramName,
-                    attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-                  itemsBuilder.Add(item);
-                  ++curParamNumber;
-
-                  // TODO: Maybe as quick info show the name of the function?
-                }
-              }
-            }
-          }
+          itemsBuilder = await PopulateAutocompleteBoxForParameterAsync(startPoint, cancellationToken);
         }
       }
 
-      return new CompletionContext(itemsBuilder.ToImmutable(), null);
+      if (itemsBuilder != null) {
+        return new CompletionContext(itemsBuilder.ToImmutable(), null);
+      }
+      else {
+        return CompletionContext.Empty;
+      }
     }
 
 
@@ -245,6 +190,92 @@ namespace VSDoxyHighlighter
       }
 
       return false;
+    }
+
+
+    private ImmutableArray<CompletionItem>.Builder PopulateAutcompleteBoxWithCommands(char startChar)
+    {
+      var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+
+      int numCommands = DoxygenCommandsGeneratedFromHelpPage.cCommands.Length;
+      int curCommandNumber = 1;
+
+      foreach (DoxygenHelpPageCommand cmd in AllDoxygenHelpPageCommands.cAmendedDoxygenCommands) {
+        var item = new CompletionItem(
+          // Add the "\" or "@" since it is not actually part of the autocompleted command, because
+          // the applicableToSpan does not cover it. See InitializeCompletion() for the reason.
+          displayText: startChar + cmd.Command,
+          source: this,
+          icon: cCompletionImage,
+          filters: ImmutableArray<CompletionFilter>.Empty,
+          suffix: cmd.Parameters,
+          insertText: cmd.Command,
+          // sortText: Sorting is done using Enumerable.OrderBy, which apparently calls String.CompareTo(),
+          // which is doing a case-sensitive and culture-sensitive comparison using the current culture.
+          // But we want to keep the sorting of our list of commands. Padding with 0 to the left to get
+          // e.g. 11 to be sorted after 1.
+          sortText: curCommandNumber.ToString().PadLeft(numCommands, '0'),
+          filterText: cmd.Command,
+          automationText: cmd.Command,
+          attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+        // Add a reference to the DoxygenHelpPageCommand to the item so that we can access it in GetDescriptionAsync().
+        item.Properties.AddProperty(typeof(DoxygenHelpPageCommand), cmd);
+
+        itemsBuilder.Add(item);
+        ++curCommandNumber;
+      }
+
+      return itemsBuilder;
+    }
+
+
+    private async Task<ImmutableArray<CompletionItem>.Builder> PopulateAutocompleteBoxForParameterAsync(
+        SnapshotPoint startPoint, CancellationToken cancellationToken)
+    {
+      // TODO: Add option page to disable the parameter completion. Reason: It requires quite a bunch of semantic infos,
+      // and getting them might be expensive. So we want the user to disable the feature.
+
+      ImmutableArray<CompletionItem>.Builder itemsBuilder = null;
+
+      ITextSnapshotLine line = startPoint.GetContainingLine();
+      string lineBeforeCompletionStart = line.GetText().Substring(0, startPoint - line.Start).TrimEnd();
+      int commandStartIdx = lineBeforeCompletionStart.LastIndexOfAny(new char[] { '@', '\\' });
+      if (commandStartIdx >= 0) {
+        string command = lineBeforeCompletionStart.Substring(commandStartIdx + 1);
+        if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
+          // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
+          await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+          FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+          if (info != null) {
+            itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+            int numParams = info.ParameterNames.Count;
+            int curParamNumber = 1;
+            foreach (string paramName in info.ParameterNames) {
+              var item = new CompletionItem(
+                displayText: paramName,
+                source: this,
+                icon: cParamImage,
+                filters: ImmutableArray<CompletionFilter>.Empty,
+                suffix: string.Empty,                 // TODO: Maybe show the variable type?
+                insertText: paramName,
+                // As above: Ensure we keep the order
+                sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+                filterText: paramName,
+                automationText: paramName,
+                attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+              itemsBuilder.Add(item);
+              ++curParamNumber;
+
+              // TODO: Maybe as quick info show the name of the function?
+            }
+          }
+        }
+      }
+
+      return itemsBuilder;
     }
 
 
