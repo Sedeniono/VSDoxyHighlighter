@@ -29,6 +29,9 @@ namespace VSDoxyHighlighter
   /// </summary>
   interface IVisualStudioCppFileSemantics
   {
+    /// <summary>
+    /// If a function is coming after the given 'point' in the file, returns information about that function.
+    /// </summary>
     FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point);
   }
 
@@ -63,7 +66,9 @@ namespace VSDoxyHighlighter
   /// </summary>
   class VisualStudioCppFileSemanticsFromCache : IVisualStudioCppFileSemantics 
   {
-    // Same as Microsoft.VisualStudio.CppSvc.Internal.SemanticTokenKind
+    /// <summary>
+    /// Same as the VS internal enum Microsoft.VisualStudio.CppSvc.Internal.SemanticTokenKind
+    /// </summary>
     private enum SemanticTokenKind
     {
       cppNone = 1,
@@ -106,7 +111,9 @@ namespace VSDoxyHighlighter
     }
 
 
-    // More or less the same as Microsoft.VisualStudio.VC.SemanticTokensCache.SemanticToken.
+    /// <summary>
+    /// More or less the same as the internal VS class Microsoft.VisualStudio.VC.SemanticTokensCache.SemanticToken. 
+    /// </summary>
     private class SemanticToken
     {
       public SemanticTokenKind SemanticTokenKind { get; set; }
@@ -119,6 +126,11 @@ namespace VSDoxyHighlighter
     }
 
 
+    /// <summary>
+    /// Wrapper around the Visual Studio SemanticsTokenCache, exposing its functions (or at least those that we need) 
+    /// to  the extension code. It encapsulates the reflection magic which is necessary because we don't want to have
+    /// explicit dependencies to VS internals.
+    /// </summary>
     private class VSSemanticsTokenCache
     {
       public VSSemanticsTokenCache(object semanticsTokenCache)
@@ -168,8 +180,8 @@ namespace VSDoxyHighlighter
         }
 
         // 'kind' is the enum Microsoft.VisualStudio.CppSvc.Internal.SemanticTokenKind. We map it to our
-        // own SemanticTokenKind via string instead by number in case the VS enum changed in a later version
-        // of VS. It is more robust that way.
+        // own SemanticTokenKind via string instead by number in case the VS enum changes in a later version
+        // of VS. It is hopefully more robust that way.
         string kindStr = kind.ToString();
         if (!Enum.TryParse(kindStr, out SemanticTokenKind kindEnum)) {
           Debug.Assert(false);

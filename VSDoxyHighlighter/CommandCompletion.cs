@@ -238,44 +238,55 @@ namespace VSDoxyHighlighter
 
       ImmutableArray<CompletionItem>.Builder itemsBuilder = null;
 
-      ITextSnapshotLine line = startPoint.GetContainingLine();
-      string lineBeforeCompletionStart = line.GetText().Substring(0, startPoint - line.Start).TrimEnd();
-      int commandStartIdx = lineBeforeCompletionStart.LastIndexOfAny(new char[] { '@', '\\' });
-      if (commandStartIdx >= 0) {
-        string command = lineBeforeCompletionStart.Substring(commandStartIdx + 1);
-        if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
-          // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
-          await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+      string command = TryGetDoxygenCommandBeforeWhitespace(startPoint);
+      if (command == null) {
+        return itemsBuilder;
+      }
 
-          FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-          if (info != null) {
-            itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-            int numParams = info.ParameterNames.Count;
-            int curParamNumber = 1;
-            foreach (string paramName in info.ParameterNames) {
-              var item = new CompletionItem(
-                displayText: paramName,
-                source: this,
-                icon: cParamImage,
-                filters: ImmutableArray<CompletionFilter>.Empty,
-                suffix: string.Empty,                 // TODO: Maybe show the variable type?
-                insertText: paramName,
-                // As above: Ensure we keep the order
-                sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-                filterText: paramName,
-                automationText: paramName,
-                attributeIcons: ImmutableArray<ImageElement>.Empty);
+      if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
+        // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-              itemsBuilder.Add(item);
-              ++curParamNumber;
+        FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        if (info != null) {
+          itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+          int numParams = info.ParameterNames.Count;
+          int curParamNumber = 1;
+          foreach (string paramName in info.ParameterNames) {
+            var item = new CompletionItem(
+              displayText: paramName,
+              source: this,
+              icon: cParamImage,
+              filters: ImmutableArray<CompletionFilter>.Empty,
+              suffix: string.Empty,                 // TODO: Maybe show the variable type?
+              insertText: paramName,
+              // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
+              sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+              filterText: paramName,
+              automationText: paramName,
+              attributeIcons: ImmutableArray<ImageElement>.Empty);
 
-              // TODO: Maybe as quick info show the name of the function?
-            }
+            itemsBuilder.Add(item);
+            ++curParamNumber;
+
+            // TODO: Maybe as quick info show the name of the function?
           }
         }
       }
 
       return itemsBuilder;
+    }
+
+
+    private string TryGetDoxygenCommandBeforeWhitespace(SnapshotPoint whitespacePoint) 
+    {
+      ITextSnapshotLine line = whitespacePoint.GetContainingLine();
+      string lineBeforeCompletionStart = line.GetText().Substring(0, whitespacePoint - line.Start).TrimEnd();
+      int commandStartIdx = lineBeforeCompletionStart.LastIndexOfAny(new char[] { '@', '\\' });
+      if (commandStartIdx >= 0) {
+        return lineBeforeCompletionStart.Substring(commandStartIdx + 1);
+      }
+      return null;
     }
 
 
