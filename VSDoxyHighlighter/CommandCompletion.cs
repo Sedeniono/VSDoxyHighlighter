@@ -16,6 +16,7 @@ using System.Linq;
 using System.Diagnostics;
 using static Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
 using System.Windows.Documents;
+using System.IO.IsolatedStorage;
 
 namespace VSDoxyHighlighter
 {
@@ -243,12 +244,16 @@ namespace VSDoxyHighlighter
         return itemsBuilder;
       }
 
+      // TODO: NTTP are skipped in the SemanticsTokenCache. Amend with FileCodeModel?
+      // TODO: What about unnamed parameters?
+      // TODO: Check default arguments (in templates and in parameters)
+      // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
         // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        if (info != null) {
+        if (info != null && info.ParameterNames.Count > 0) {
           itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
           int numParams = info.ParameterNames.Count;
           int curParamNumber = 1;
@@ -258,7 +263,37 @@ namespace VSDoxyHighlighter
               source: this,
               icon: cParamImage,
               filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: string.Empty,                 // TODO: Maybe show the variable type?
+              suffix: info.FunctionName,
+              insertText: paramName,
+              // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
+              sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+              filterText: paramName,
+              automationText: paramName,
+              attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+            itemsBuilder.Add(item);
+            ++curParamNumber;
+
+            // TODO: Maybe as quick info show the name of the function?
+          }
+        }
+      }
+      else if (command == "tparam") {
+        // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+        FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        if (info != null && info.TemplateParameterNames.Count > 0) {
+          itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+          int numParams = info.TemplateParameterNames.Count;
+          int curParamNumber = 1;
+          foreach (string paramName in info.TemplateParameterNames) {
+            var item = new CompletionItem(
+              displayText: paramName,
+              source: this,
+              icon: cTemplateParamImage,
+              filters: ImmutableArray<CompletionFilter>.Empty,
+              suffix: info.FunctionName,
               insertText: paramName,
               // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
               sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
@@ -293,7 +328,8 @@ namespace VSDoxyHighlighter
     // For now, we simply use an existing Visual Studio image to show in the autocomplete box.
     // http://glyphlist.azurewebsites.net/knownmonikers/
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
-    private static ImageElement cParamImage = new ImageElement(KnownMonikers.Parameter.ToImageId(), "Doxygen parameter");
+    private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
+    private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.Template.ToImageId(), "Doxygen template parameter");
 
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;

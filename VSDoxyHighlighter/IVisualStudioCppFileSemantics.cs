@@ -14,7 +14,7 @@ namespace VSDoxyHighlighter
 {
   class FunctionInfo 
   {
-    public string Name { get; set; }
+    public string FunctionName { get; set; }
     public List<string> ParameterNames { get; set; }
     public List<string> TemplateParameterNames { get; set; }
   }
@@ -63,6 +63,9 @@ namespace VSDoxyHighlighter
   /// The best place I could find to somehow get the semantic infos from the C++ parsing thread is via a property
   /// of a text buffer, which has the type 'SemanticTokensCache'. Every time the file changes, it gets updated. 
   /// There we do not have any threading issues, and it knows about global function declarations.
+  /// 
+  /// Caveat: The SemanticTokensCache does not know about non-type template parameters (NTTP) (for example an
+  /// integer as template argument). Also, for parameters etc it does not store the actual type.
   /// </summary>
   class VisualStudioCppFileSemanticsFromCache : IVisualStudioCppFileSemantics 
   {
@@ -114,6 +117,7 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// More or less the same as the internal VS class Microsoft.VisualStudio.VC.SemanticTokensCache.SemanticToken. 
     /// </summary>
+    [DebuggerDisplay("Kind={SemanticTokenKind}, Span={Span}")]
     private class SemanticToken
     {
       public SemanticTokenKind SemanticTokenKind { get; set; }
@@ -226,6 +230,8 @@ namespace VSDoxyHighlighter
         new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));
       var tokens = vsCache.GetTokens(span);
 
+      List<SemanticToken> tokensBeforeThatAreCppTypes = null;
+
       var enumerator = tokens.GetEnumerator();
       while (enumerator.MoveNext()) { 
         var token = enumerator.Current;
@@ -233,19 +239,30 @@ namespace VSDoxyHighlighter
           continue;
         }
 
-        // TODO: Must skip cppType if a cppFunctionTemplate comes...
-        if (!IsFunction(token.SemanticTokenKind)) {
+        // Template parameters of template functions come before. So we need to skip and remember them.
+        // Note: The SemanticTokenCache does not know about non-type template parameters unfortunately.
+        if (token.SemanticTokenKind == SemanticTokenKind.cppType) {
+          if (tokensBeforeThatAreCppTypes == null) {
+            tokensBeforeThatAreCppTypes = new List<SemanticToken>();
+          }
+          tokensBeforeThatAreCppTypes.Add(token);
           continue;
         }
+
+        if (!IsFunction(token.SemanticTokenKind)) {
+          break;
+        }
         
-        return GetFunctionInfoFromFunctionToken(tokens, enumerator);
+        return GetFunctionInfoFromFunctionToken(enumerator, tokensBeforeThatAreCppTypes);
       }
 
       return null;
     }
 
 
-    private FunctionInfo GetFunctionInfoFromFunctionToken(IEnumerable<SemanticToken> allTokens, IEnumerator<SemanticToken> tokenIter) 
+    private FunctionInfo GetFunctionInfoFromFunctionToken(
+        IEnumerator<SemanticToken> tokenIter, 
+        IEnumerable<SemanticToken> tokensBeforeThatAreCppTypes) 
     {
       SemanticTokenKind functionKind = tokenIter.Current.SemanticTokenKind;
       Debug.Assert(IsFunction(functionKind));
@@ -259,9 +276,16 @@ namespace VSDoxyHighlighter
         parameterNames.Add(tokenIter.Current.Span.GetText());
       }
 
-      // TODO: Get template parameters of function. They come before.
+      // The tokens of type 'cppType' coming directly before a function are the template parameters of that function.
       var templateNames = new List<string>();
-      return new FunctionInfo { Name = functionName, ParameterNames = parameterNames, TemplateParameterNames = templateNames };
+      if (tokensBeforeThatAreCppTypes != null) {
+        foreach (var templateParam in tokensBeforeThatAreCppTypes) {
+          Debug.Assert(templateParam.SemanticTokenKind == SemanticTokenKind.cppType);
+          templateNames.Add(templateParam.Span.GetText());
+        }
+      }
+
+      return new FunctionInfo { FunctionName = functionName, ParameterNames = parameterNames, TemplateParameterNames = templateNames };
     }
 
 
