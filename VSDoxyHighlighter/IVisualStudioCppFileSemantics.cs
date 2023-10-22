@@ -270,10 +270,16 @@ namespace VSDoxyHighlighter
 
       var parameterNames = new List<string>();
       while (tokenIter.MoveNext()) {
-        if (tokenIter.Current.SemanticTokenKind != SemanticTokenKind.cppParameter) {
+        SemanticToken token = tokenIter.Current;
+        // 'cppType' appears for parameters whose type is a template argument, and also for class declarations in
+        // the parameter list (e.g. `void foo(class MyClass c);`). So we need to skip them.
+        if (token.SemanticTokenKind == SemanticTokenKind.cppType) {
+          continue;
+        }
+        if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
           break;
         }
-        parameterNames.Add(tokenIter.Current.Span.GetText());
+        parameterNames.Add(token.Span.GetText());
       }
 
       // The tokens of type 'cppType' coming directly before a function are the template parameters of that function.
