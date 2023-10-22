@@ -248,14 +248,16 @@ namespace VSDoxyHighlighter
       // TODO: What about unnamed parameters?
       // TODO: Check default arguments (in templates and in parameters)
       // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
+      // TODO: \param for macros
+
       if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
         // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        if (info != null && info.ParameterNames.Count > 0) {
+        if (info != null && info.ParameterNames.Count() > 0) {
           itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-          int numParams = info.ParameterNames.Count;
+          int numParams = info.ParameterNames.Count();
           int curParamNumber = 1;
           foreach (string paramName in info.ParameterNames) {
             var item = new CompletionItem(
@@ -282,18 +284,36 @@ namespace VSDoxyHighlighter
         // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-        FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        if (info != null && info.TemplateParameterNames.Count > 0) {
+        IEnumerable<string> templateParameterNames = null;
+        string elementName = null;
+
+        FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        if (funcInfo != null) {
+          if (funcInfo.TemplateParameterNames.Count() > 0) {
+            templateParameterNames = funcInfo.TemplateParameterNames;
+            elementName = funcInfo.FunctionName;
+          }
+        }
+        else { 
+          ClassInfo clsInfo = mCppFileSemantics.TryGetClassInfoIfNextIsATemplateClass(startPoint);
+          if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) { 
+            templateParameterNames = clsInfo.TemplateParameterNames;
+            elementName = clsInfo.ClassName;
+          }
+        }
+
+        if (templateParameterNames != null) {
+          Debug.Assert(elementName != null);
           itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-          int numParams = info.TemplateParameterNames.Count;
+          int numParams = templateParameterNames.Count();
           int curParamNumber = 1;
-          foreach (string paramName in info.TemplateParameterNames) {
+          foreach (string paramName in templateParameterNames) {
             var item = new CompletionItem(
               displayText: paramName,
               source: this,
               icon: cTemplateParamImage,
               filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: info.FunctionName,
+              suffix: elementName,
               insertText: paramName,
               // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
               sortText: curParamNumber.ToString().PadLeft(numParams, '0'),

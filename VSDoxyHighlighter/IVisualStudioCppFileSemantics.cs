@@ -15,8 +15,14 @@ namespace VSDoxyHighlighter
   class FunctionInfo 
   {
     public string FunctionName { get; set; }
-    public List<string> ParameterNames { get; set; }
-    public List<string> TemplateParameterNames { get; set; }
+    public IEnumerable<string> ParameterNames { get; set; }
+    public IEnumerable<string> TemplateParameterNames { get; set; }
+  }
+
+  class ClassInfo 
+  {
+    public string ClassName { get; set; }
+    public IEnumerable<string> TemplateParameterNames { get; set; }
   }
 
 
@@ -30,9 +36,14 @@ namespace VSDoxyHighlighter
   interface IVisualStudioCppFileSemantics
   {
     /// <summary>
-    /// If a function is coming after the given 'point' in the file, returns information about that function.
+    /// If the next C++ element after the given 'point' in the file is a function, returns information about that function.
     /// </summary>
     FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point);
+
+    /// <summary>
+    /// If the next C++ element after the given 'point' in the file is a **template** class or struct, returns information about that class/struct.
+    /// </summary>
+    ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point);
   }
 
 
@@ -127,6 +138,7 @@ namespace VSDoxyHighlighter
       public int Start => Span.Start.Position;
       public int Length => Span.Length;
       public int End => Start + Length;
+      public string Text => Span.GetText();
     }
 
 
@@ -218,23 +230,15 @@ namespace VSDoxyHighlighter
     public FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
-
-      var vsCache = FindVSSemanticsTokenCache();
-      if (vsCache == null) {
+      var tokens = GetTokensAfter(point);
+      if (tokens == null) {
         return null;
       }
 
-      // Get (lazily) the tokens starting at 'point' till the end of the file.
-      // Span from 'point' to the end of the file.
-      var span = new NormalizedSnapshotSpanCollection(
-        new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));
-      var tokens = vsCache.GetTokens(span);
-
       List<SemanticToken> tokensBeforeThatAreCppTypes = null;
-
       var enumerator = tokens.GetEnumerator();
-      while (enumerator.MoveNext()) { 
-        var token = enumerator.Current;
+      while (enumerator.MoveNext()) {
+        SemanticToken token = enumerator.Current;
         if (token == null) {
           continue;
         }
@@ -260,13 +264,67 @@ namespace VSDoxyHighlighter
     }
 
 
+    public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      var tokens = GetTokensAfter(point);
+      if (tokens == null) {
+        return null;
+      }
+
+      List<SemanticToken> tokensBeforeThatAreCppTypes = null;
+      foreach (SemanticToken token in tokens) {
+        if (token == null) {
+          continue;
+        }
+
+        // Template parameters of template class come before. So we need to skip and remember them.
+        // Note: The SemanticTokenCache does not know about non-type template parameters unfortunately.
+        if (token.SemanticTokenKind == SemanticTokenKind.cppType) {
+          if (tokensBeforeThatAreCppTypes == null) {
+            tokensBeforeThatAreCppTypes = new List<SemanticToken>();
+          }
+          tokensBeforeThatAreCppTypes.Add(token);
+          continue;
+        }
+
+        if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
+          IEnumerable<string> templateNames = Enumerable.Empty<string>();
+          if (tokensBeforeThatAreCppTypes != null) {
+            templateNames = tokensBeforeThatAreCppTypes.Select(t => t.Text).ToList();
+          }
+          return new ClassInfo { ClassName = token.Text, TemplateParameterNames = templateNames };
+        }
+      }
+
+      return null;
+    }
+
+
+    private IEnumerable<SemanticToken> GetTokensAfter(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      var vsCache = FindVSSemanticsTokenCache();
+      if (vsCache == null) {
+        return null;
+      }
+
+      // Get (lazily) the tokens starting at 'point' till the end of the file.
+      // Span from 'point' to the end of the file.
+      var span = new NormalizedSnapshotSpanCollection(
+        new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));
+      return vsCache.GetTokens(span);
+    }
+
+
     private FunctionInfo GetFunctionInfoFromFunctionToken(
         IEnumerator<SemanticToken> tokenIter, 
         IEnumerable<SemanticToken> tokensBeforeThatAreCppTypes) 
     {
       SemanticTokenKind functionKind = tokenIter.Current.SemanticTokenKind;
       Debug.Assert(IsFunction(functionKind));
-      string functionName = tokenIter.Current.Span.GetText();
+      string functionName = tokenIter.Current.Text;
 
       var parameterNames = new List<string>();
       while (tokenIter.MoveNext()) {
@@ -279,16 +337,13 @@ namespace VSDoxyHighlighter
         if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
           break;
         }
-        parameterNames.Add(token.Span.GetText());
+        parameterNames.Add(token.Text);
       }
 
       // The tokens of type 'cppType' coming directly before a function are the template parameters of that function.
-      var templateNames = new List<string>();
+      var templateNames = Enumerable.Empty<string>();
       if (tokensBeforeThatAreCppTypes != null) {
-        foreach (var templateParam in tokensBeforeThatAreCppTypes) {
-          Debug.Assert(templateParam.SemanticTokenKind == SemanticTokenKind.cppType);
-          templateNames.Add(templateParam.Span.GetText());
-        }
+        templateNames = tokensBeforeThatAreCppTypes.Select(t => t.Text).ToList();
       }
 
       return new FunctionInfo { FunctionName = functionName, ParameterNames = parameterNames, TemplateParameterNames = templateNames };
