@@ -250,7 +250,8 @@ namespace VSDoxyHighlighter
       // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       // TODO: \param for macros
 
-      if (command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
+      if (command == "p" || command == "a" 
+          || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
         // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
