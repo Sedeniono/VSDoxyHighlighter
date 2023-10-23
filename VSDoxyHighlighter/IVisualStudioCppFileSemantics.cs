@@ -1,13 +1,16 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using EnvDTE;
+using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.VCCodeModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 
 namespace VSDoxyHighlighter
@@ -47,6 +50,174 @@ namespace VSDoxyHighlighter
   }
 
 
+  //==============================================================================
+  // SemanticsFromFileCodeModelAndCache
+  //==============================================================================
+
+  /// <summary>
+  /// Visual Studio has an official API to access semantic information about the code base: FileCodeModel. For C++,
+  /// there is also a more specific version called VCFileCodeModel. This class uses the FileCodeModel to get the
+  /// requested information.
+  /// However, the FileCodeModel is somewhat arcane and buggy: It does not know anything about global function/class
+  /// declarations. Moreover, we can only query it to give the code element a very specific text point, rather than
+  /// a span of text. Actually, we could also get all code elements and manually figure out the interesting pieces.
+  /// But for long files I am afraid that this is very slow.
+  /// The SemanticTokenCache (see VisualStudioCppFileSemanticsFromCache), on the other hand, seems to support efficient
+  /// querying and knows about global declarations. Unfortunatly, it does not know about non-type template parameters.
+  /// So, the ide of SemanticsFromFileCodeModelAndCache is the following: First, get information about the interesting
+  /// semantic piece from VisualStudioCppFileSemanticsFromCache. Then use its location information to query the
+  /// FileCodeModel, and amend the semantic piece with information from FileCodeModel.
+  /// </summary>
+  class SemanticsFromFileCodeModelAndCache : IVisualStudioCppFileSemantics
+  {
+    public SemanticsFromFileCodeModelAndCache(IVsEditorAdaptersFactoryService adapterService, ITextBuffer textBuffer)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      mTextBuffer = textBuffer;
+      mSemanticCache = new VisualStudioCppFileSemanticsFromCache(textBuffer);
+
+      // As far as I understand, Microsoft.VisualStudio.Text.ITextBuffer and similar classes are the "new" .NET managed classes.
+      // On the other hand, the stuff in the EnvDTE namespace (e.g. EnvDTE.Document and EnvDTE.TextDocument) represent 'old' classes,
+      // predating the .NET implementations. They are always COM interfaces. However, they are still relevant for certain things.
+      // Things like IVsTextBuffer seem to be wrappers/adapters around the old classes. We can get from a "new world" object
+      // (such as ITextBuffer) to the adapter via the IVsEditorAdaptersFactoryService service, resulting in e.g. a IVsTextBuffer.
+      // (I think that service is just getting some object from ITextBuffer.Properties.) Digging through decompiled VS .NET code,
+      // from the adapter we get to the "old world" object via IExtensibleObject. Note that the documentation of IExtensibleObject
+      // states that it is Microsoft internal. We ignore this warning here. The only valid arguments to
+      // IExtensibleObject.GetAutomationObject() seem to be "Document" (giving an EnvDTE.Document) and "TextDocument" (giving
+      // an EnvDTE.TextDocument).
+      //
+      // In our case here we are interested in the "FileCodeModel" which is only accessible in the 'old' world, specifically
+      // via "EnvDTE.Document". There is one "FileCodeModel" per "Document.ProjectItem" in the solution.
+      if (adapterService != null) {
+        IVsTextBuffer vsTextBuffer = adapterService.GetBufferAdapter(mTextBuffer);
+        IVsTextLines vsTextLines = vsTextBuffer as IVsTextLines;
+        IExtensibleObject extObj = vsTextBuffer as IExtensibleObject;
+        if (vsTextLines != null && extObj != null) {
+          //extObj.GetAutomationObject("TextDocument", null, out object textDocObj);
+          //EnvDTE.TextDocument textDoc = textDocObj as EnvDTE.TextDocument;
+
+          extObj.GetAutomationObject("Document", null, out object docObj);
+          EnvDTE.Document doc = docObj as EnvDTE.Document;
+
+          if (doc != null) {
+            mFileCodeModel = doc.ProjectItem.FileCodeModel;
+            if (mFileCodeModel != null) {
+              mVsTextLines = vsTextLines;
+            }
+          }
+        }
+      }
+    }
+
+
+    public FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      (var functionTokenIter, var _) = mSemanticCache.TryGetSemanticFunctionInfoIfNextIsAFunction(point);
+      if (functionTokenIter == null) {
+        // Either the next thing after 'point' is not a function, or some error occurred. In the latter case we could try
+        // to successively iterate through the following lines and query FileCodeModel for information. But in my experiments
+        // the SemanticTokenCache never failed to get function information. So we don't do such a fallback.
+        return null;
+      }
+
+      VCCodeFunction codeElement = TryGetCodeElementFor(functionTokenIter.Current) as VCCodeFunction;
+      if (codeElement == null) {
+        // Most likely we have a global function declaration. The FileCodeModel is buggy here and does not know about it.
+        // Just return the info from the SemanticTokenCache. Unfortunately it lacks information about non-type template parameters.
+        // Not much we can do here (except write a code parser ourselves...).
+        return mSemanticCache.TryGetFunctionInfoIfNextIsAFunction(point);
+      }
+
+      // If we were able to get function information from the FileCodeModel, we believe it: The SemanticTokenCache does
+      // not know about non-type template parameters, while the FileCodeModel does. Also, in my experiments the SemanticTokenCache
+      // was aware of ALL functions in the file. So no need to check whether the FileCodeModel or the SemanticTokenCache found a
+      // function which comes earlier than the other; they should be the same at this point.
+      var funcName = codeElement.Name;
+      Debug.Assert(funcName == functionTokenIter.Current.Text);
+      var parameters = new List<string>();
+      foreach (CodeElement param in codeElement.Parameters) {
+        parameters.Add(param.Name);
+      }
+      var templateParameters = new List<string>();
+      foreach (CodeElement param in codeElement.TemplateParameters) {
+        templateParameters.Add(param.Name);
+      }
+
+      return new FunctionInfo { FunctionName = funcName, ParameterNames = parameters, TemplateParameterNames = templateParameters };
+    }
+
+
+    public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point) 
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      
+      // TODO: Use CodeElement if possible.
+      return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point);
+    }
+
+
+    private bool IsFileCodeModelAvailable() 
+    {
+      return mTextBuffer != null && mVsTextLines != null && mFileCodeModel != null;
+    }
+
+
+    private CodeElement TryGetCodeElementFor(VisualStudioCppFileSemanticsFromCache.SemanticToken token)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      if (token == null || !IsFileCodeModelAvailable()) {
+        return null;
+      }
+
+      try {
+        // We can query the FileCodeModel for a CodeElement only at positions (rather than for whole spans). The most
+        // reliable thing to do seems to query the FileCodeModel for information in the middle of the elements name.
+        int posInMiddleOfFuncName = (token.Start + token.End) / 2;
+        ITextSnapshotLine funcNameLine = token.Span.Snapshot.GetLineFromPosition(posInMiddleOfFuncName);
+
+        var offsetInLine0Based = posInMiddleOfFuncName - funcNameLine.Start;
+        Debug.Assert(offsetInLine0Based >= 0);
+        var lineNumber0Based = funcNameLine.LineNumber;
+
+        // Note: IVsTextLines.CreateEditPoint() wants 0-based indices. On the other hand, TextDocument.CreateEditPoint()
+        // (which we could have also used) wants 1-based indices. The indicies stored on an EditPoint are all 1-based.
+        mVsTextLines.CreateEditPoint(lineNumber0Based, offsetInLine0Based, out object editPointObj);
+        EditPoint editPoint = editPointObj as EditPoint;
+        if (editPoint == null) {
+          return null;
+        }
+
+        var offsetInLine1Based = offsetInLine0Based + 1;
+        var lineNumber1Based = lineNumber0Based + 1;
+        Debug.Assert(editPoint.Line == lineNumber1Based);
+        Debug.Assert(editPoint.LineCharOffset == offsetInLine1Based);
+
+        // In my tests, it did not matter which value of vsCMElement we use. So we simply use the first one (vsCMElementOther).
+        return editPoint.CodeElement[vsCMElement.vsCMElementOther];
+      }
+      catch (COMException ex) {
+        // COMException happens sometimes (maybe if something is not yet fully initialized).
+        ActivityLog.LogWarning("VSDoxyHighlighter", $"COMException in 'TryGetCodeElementFor()': {ex.ToString()}");
+        return null;
+      }
+      catch (AggregateException ex) {
+        // AggregateException happens sometimes (maybe if something is not yet fully initialized).
+        ActivityLog.LogWarning("VSDoxyHighlighter", $"COMException in 'TryGetCodeElementFor()': {ex.ToString()}");
+        return null;
+      }
+    }
+
+
+    private readonly ITextBuffer mTextBuffer;
+    private readonly IVsTextLines mVsTextLines = null;
+    private readonly FileCodeModel mFileCodeModel = null;
+    private readonly VisualStudioCppFileSemanticsFromCache mSemanticCache;
+  }
 
 
   //==============================================================================
@@ -83,7 +254,7 @@ namespace VSDoxyHighlighter
     /// <summary>
     /// Same as the VS internal enum Microsoft.VisualStudio.CppSvc.Internal.SemanticTokenKind
     /// </summary>
-    private enum SemanticTokenKind
+    public enum SemanticTokenKind
     {
       cppNone = 1,
       cppMacro,
@@ -129,7 +300,7 @@ namespace VSDoxyHighlighter
     /// More or less the same as the internal VS class Microsoft.VisualStudio.VC.SemanticTokensCache.SemanticToken. 
     /// </summary>
     [DebuggerDisplay("Kind={SemanticTokenKind}, Span={Span}")]
-    private class SemanticToken
+    public class SemanticToken
     {
       public SemanticTokenKind SemanticTokenKind { get; set; }
       public SnapshotSpan Span { get; set; }
@@ -230,13 +401,27 @@ namespace VSDoxyHighlighter
     public FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      (IEnumerator<SemanticToken> functionTokenIter, IEnumerable<SemanticToken> templateParameters)
+        = TryGetSemanticFunctionInfoIfNextIsAFunction(point);
+      if (functionTokenIter == null) {
+        return null;
+      }
+      return GetFunctionInfoFromFunctionToken(functionTokenIter, templateParameters);
+    }
+
+
+    public (IEnumerator<SemanticToken> functionTokenIter, IEnumerable<SemanticToken> templateParameters) 
+        TryGetSemanticFunctionInfoIfNextIsAFunction(SnapshotPoint point) 
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var tokens = GetTokensAfter(point);
       if (tokens == null) {
-        return null;
+        return (null, null);
       }
 
       List<SemanticToken> tokensBeforeThatAreCppTypes = null;
-      var enumerator = tokens.GetEnumerator();
+      IEnumerator<SemanticToken> enumerator = tokens.GetEnumerator();
       while (enumerator.MoveNext()) {
         SemanticToken token = enumerator.Current;
         if (token == null) {
@@ -256,11 +441,11 @@ namespace VSDoxyHighlighter
         if (!IsFunction(token.SemanticTokenKind)) {
           break;
         }
-        
-        return GetFunctionInfoFromFunctionToken(enumerator, tokensBeforeThatAreCppTypes);
+
+        return (enumerator, tokensBeforeThatAreCppTypes);
       }
 
-      return null;
+      return (null, null);
     }
 
 

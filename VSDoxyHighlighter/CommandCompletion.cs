@@ -14,9 +14,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
-using static Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
-using System.Windows.Documents;
-using System.IO.IsolatedStorage;
+using Microsoft.VisualStudio.Editor;
+
 
 namespace VSDoxyHighlighter
 {
@@ -32,6 +31,9 @@ namespace VSDoxyHighlighter
   class CommentCommandCompletionSourceProvider : IAsyncCompletionSourceProvider
   {
     private Dictionary<ITextView, CommentCommandCompletionSource> mCache = new Dictionary<ITextView, CommentCommandCompletionSource>();
+    
+    [Import]
+    private IVsEditorAdaptersFactoryService mAdapterService = null;
 
     /// <summary>
     /// More or less called by VS whenever the user created a new view of some document and starts typing 
@@ -39,10 +41,11 @@ namespace VSDoxyHighlighter
     /// </summary>
     public IAsyncCompletionSource GetOrCreate(ITextView textView)
     {
-      if (mCache.TryGetValue(textView, out var itemSource))
+      if (mCache.TryGetValue(textView, out var itemSource)) {
         return itemSource;
+      }
 
-      var source = new CommentCommandCompletionSource(textView);
+      var source = new CommentCommandCompletionSource(mAdapterService, textView);
       textView.Closed += (o, e) => mCache.Remove(textView);
       mCache.Add(textView, source);
       return source;
@@ -57,11 +60,11 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentCommandCompletionSource : IAsyncCompletionSource
   {
-    public CommentCommandCompletionSource(ITextView textView) 
+    public CommentCommandCompletionSource(IVsEditorAdaptersFactoryService adapterService, ITextView textView) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      mCppFileSemantics = new VisualStudioCppFileSemanticsFromCache(textView.TextBuffer);
+      mCppFileSemantics = new SemanticsFromFileCodeModelAndCache(adapterService, textView.TextBuffer);
 
       // We don't subscribe to change events of the options or the parser: Attempting to change the content
       // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
@@ -244,9 +247,7 @@ namespace VSDoxyHighlighter
         return itemsBuilder;
       }
 
-      // TODO: NTTP are skipped in the SemanticsTokenCache. Amend with FileCodeModel?
-      // TODO: What about unnamed parameters?
-      // TODO: Check default arguments (in templates and in parameters)
+      // TODO: Add to readme: Doesn't work for NTTP template arguments in global function declerations.
       // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       // TODO: \param for macros
 

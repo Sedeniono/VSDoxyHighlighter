@@ -1,20 +1,10 @@
 ﻿using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Utilities;
-using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using System.Threading;
-using Microsoft.VisualStudio.Core.Imaging;
-using Microsoft.VisualStudio.Imaging;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Windows.Shapes;
 using Microsoft.VisualStudio.Shell;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter
 {
