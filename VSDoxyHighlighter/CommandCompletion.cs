@@ -237,116 +237,61 @@ namespace VSDoxyHighlighter
     private async Task<ImmutableArray<CompletionItem>.Builder> PopulateAutocompleteBoxForParameterAsync(
         SnapshotPoint startPoint, CancellationToken cancellationToken)
     {
-      // TODO: Add option page to disable the parameter completion. Reason: It requires quite a bunch of semantic infos,
-      // and getting them might be expensive. So we want the user to disable the feature.
-
-      ImmutableArray<CompletionItem>.Builder itemsBuilder = null;
-
       string command = TryGetDoxygenCommandBeforeWhitespace(startPoint);
       if (command == null) {
-        return itemsBuilder;
+        return null;
       }
 
+      // TODO: Add option page to disable the parameter completion. Reason: It requires quite a bunch of semantic infos,
+      // and getting them might be expensive. So we want the user to disable the feature.
       // TODO: Add to readme: Doesn't work for NTTP template arguments in global function declerations.
       // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       // TODO: \param for macros
 
+      IEnumerable<string> elementsToShow = null;
+      string parentName = null;
+
       if (command == "p" || command == "a" 
           || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
-        // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
+        // Need to switch to main thread because querying the FileCodeModel etc. only works on the main thread.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        
-        IEnumerable<string> parameterNames = null;
-        string elementName = null;
-        
         FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         if (funcInfo != null) {
-          parameterNames = funcInfo.ParameterNames;
-          elementName = funcInfo.FunctionName;
+          elementsToShow = funcInfo.ParameterNames;
+          parentName = funcInfo.FunctionName;
         }
         else {
           MacroInfo macroInfo = mCppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
           if (macroInfo != null) {
-            parameterNames = macroInfo.Parameters;
-            elementName = macroInfo.MacroName;
-          }
-        }
-
-        if (parameterNames != null && parameterNames.Count() > 0) {
-          itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-          int numParams = parameterNames.Count();
-          int curParamNumber = 1;
-          foreach (string paramName in parameterNames) {
-            var item = new CompletionItem(
-              displayText: paramName,
-              source: this,
-              icon: cParamImage,
-              filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: elementName,
-              insertText: paramName,
-              // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
-              sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-              filterText: paramName,
-              automationText: paramName,
-              attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-            itemsBuilder.Add(item);
-            ++curParamNumber;
-
-            // TODO: Maybe as quick info show the name of the function?
+            elementsToShow = macroInfo.Parameters;
+            parentName = macroInfo.MacroName;
           }
         }
       }
       else if (command == "tparam") {
-        // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-        IEnumerable<string> templateParameterNames = null;
-        string elementName = null;
-
         FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         if (funcInfo != null) {
           if (funcInfo.TemplateParameterNames.Count() > 0) {
-            templateParameterNames = funcInfo.TemplateParameterNames;
-            elementName = funcInfo.FunctionName;
+            elementsToShow = funcInfo.TemplateParameterNames;
+            parentName = funcInfo.FunctionName;
           }
         }
         else { 
           ClassInfo clsInfo = mCppFileSemantics.TryGetClassInfoIfNextIsATemplateClass(startPoint);
-          if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) { 
-            templateParameterNames = clsInfo.TemplateParameterNames;
-            elementName = clsInfo.ClassName;
-          }
-        }
-
-        if (templateParameterNames != null) {
-          Debug.Assert(elementName != null);
-          itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-          int numParams = templateParameterNames.Count();
-          int curParamNumber = 1;
-          foreach (string paramName in templateParameterNames) {
-            var item = new CompletionItem(
-              displayText: paramName,
-              source: this,
-              icon: cTemplateParamImage,
-              filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: elementName,
-              insertText: paramName,
-              // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
-              sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-              filterText: paramName,
-              automationText: paramName,
-              attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-            itemsBuilder.Add(item);
-            ++curParamNumber;
-
-            // TODO: Maybe as quick info show the name of the function?
+          if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) {
+            elementsToShow = clsInfo.TemplateParameterNames;
+            parentName = clsInfo.ClassName;
           }
         }
       }
 
-      return itemsBuilder;
+      if (elementsToShow != null && elementsToShow.Count() > 0) {
+        Debug.Assert(parentName != null);
+        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, cParamImage);
+      }
+
+      return null;
     }
 
 
@@ -359,6 +304,35 @@ namespace VSDoxyHighlighter
         return lineBeforeCompletionStart.Substring(commandStartIdx + 1);
       }
       return null;
+    }
+
+
+    private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForCommandParameter(
+      IEnumerable<string> elementsToShow,
+      string parentElementName,
+      ImageElement icon) 
+    {
+      var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+      int numParams = elementsToShow.Count();
+      int curParamNumber = 1;
+      foreach (string elem in elementsToShow) {
+        var item = new CompletionItem(
+          displayText: elem,
+          source: this,
+          icon: icon,
+          filters: ImmutableArray<CompletionFilter>.Empty,
+          suffix: parentElementName,
+          insertText: elem,
+          // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
+          sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+          filterText: elem,
+          automationText: elem,
+          attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+        itemsBuilder.Add(item);
+        ++curParamNumber;
+      }
+      return itemsBuilder;
     }
 
 

@@ -50,7 +50,7 @@ namespace VSDoxyHighlighter
     FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point);
 
     /// <summary>
-    /// If the next C++ element after the given 'point' in the file is a **template** class or struct, returns information about that class/struct.
+    /// If the next C++ element after the given 'point' in the file is a **template** class, struct or using, returns information about it.
     /// </summary>
     ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point);
 
