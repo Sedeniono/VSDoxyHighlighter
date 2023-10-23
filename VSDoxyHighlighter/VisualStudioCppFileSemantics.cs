@@ -40,7 +40,7 @@ namespace VSDoxyHighlighter
   //==============================================================================
 
   /// <summary>
-  /// Wraps access to Visual Studio components that have knowledge of the semantic elements in a certain C/C++ file.
+  /// Interface for classes that wrap access to Visual Studio components that have knowledge of the semantic elements in a certain C/C++ file.
   /// </summary>
   interface IVisualStudioCppFileSemantics
   {
@@ -62,32 +62,32 @@ namespace VSDoxyHighlighter
 
 
   //==============================================================================
-  // SemanticsFromFileCodeModelAndCache
+  // CppFileSemanticsFromVSCodeModelAndCache
   //==============================================================================
 
   /// <summary>
-  /// Visual Studio has an official API to access semantic information about the code base: FileCodeModel. For C++,
-  /// there is also a more specific version called VCFileCodeModel. This class uses the FileCodeModel to get the
-  /// requested information.
+  /// Visual Studio has an official API to access semantic information about the code base in a file: FileCodeModel. 
+  /// For C++, there is also a more specific version called VCFileCodeModel. This class uses the FileCodeModel to 
+  /// get the requested information.
   /// However, the FileCodeModel is somewhat arcane and buggy: It does not know anything about global function/class
   /// declarations. Moreover, we can only query it to give the code element a very specific text point, rather than
   /// a span of text. Actually, we could also get all code elements and manually figure out the interesting pieces.
   /// But for long files I am afraid that this is very slow.
-  /// The SemanticTokenCache (see VisualStudioCppFileSemanticsFromCache), on the other hand, seems to support efficient
+  /// The SemanticTokenCache (see CppFileSemanticsFromSemanticTokensCache), on the other hand, seems to support efficient
   /// querying and knows about global declarations. Unfortunatly, it does not know about non-type template parameters
   /// or macro parameters. So, the idea of SemanticsFromFileCodeModelAndCache is the following: First, get information 
-  /// about the interesting semantic piece from VisualStudioCppFileSemanticsFromCache. This especially includes position
+  /// about the interesting semantic piece from CppFileSemanticsFromSemanticTokensCache. This especially includes position
   /// information. Then use the position information to query the FileCodeModel, and amend the semantic piece with 
   /// information from FileCodeModel.
   /// </summary>
-  class SemanticsFromFileCodeModelAndCache : IVisualStudioCppFileSemantics
+  class CppFileSemanticsFromVSCodeModelAndCache : IVisualStudioCppFileSemantics
   {
-    public SemanticsFromFileCodeModelAndCache(IVsEditorAdaptersFactoryService adapterService, ITextBuffer textBuffer)
+    public CppFileSemanticsFromVSCodeModelAndCache(IVsEditorAdaptersFactoryService adapterService, ITextBuffer textBuffer)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
       mTextBuffer = textBuffer;
-      mSemanticCache = new VisualStudioCppFileSemanticsFromCache(textBuffer);
+      mSemanticCache = new CppFileSemanticsFromSemanticTokensCache(textBuffer);
 
       // As far as I understand, Microsoft.VisualStudio.Text.ITextBuffer and similar classes are the "new" .NET managed classes.
       // On the other hand, the stuff in the EnvDTE namespace (e.g. EnvDTE.Document and EnvDTE.TextDocument) represent 'old' classes,
@@ -242,7 +242,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private CodeElement TryGetCodeElementFor(VisualStudioCppFileSemanticsFromCache.SemanticToken token)
+    private CodeElement TryGetCodeElementFor(CppFileSemanticsFromSemanticTokensCache.SemanticToken token)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -292,12 +292,12 @@ namespace VSDoxyHighlighter
     private readonly ITextBuffer mTextBuffer;
     private readonly IVsTextLines mVsTextLines = null;
     private readonly FileCodeModel mFileCodeModel = null;
-    private readonly VisualStudioCppFileSemanticsFromCache mSemanticCache;
+    private readonly CppFileSemanticsFromSemanticTokensCache mSemanticCache;
   }
 
 
   //==============================================================================
-  // VisualStudioCppFileSemanticsFromCache
+  // CppFileSemanticsFromSemanticTokensCache
   //==============================================================================
 
   /// <summary>
@@ -325,7 +325,7 @@ namespace VSDoxyHighlighter
   /// Caveat: The SemanticTokensCache does not know about non-type template parameters (NTTP) (for example an
   /// integer as template argument). Also, for parameters etc it does not store the actual type.
   /// </summary>
-  class VisualStudioCppFileSemanticsFromCache : IVisualStudioCppFileSemantics 
+  class CppFileSemanticsFromSemanticTokensCache : IVisualStudioCppFileSemantics 
   {
     /// <summary>
     /// Same as the VS internal enum Microsoft.VisualStudio.CppSvc.Internal.SemanticTokenKind
@@ -461,7 +461,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    public VisualStudioCppFileSemanticsFromCache(ITextBuffer textBuffer) 
+    public CppFileSemanticsFromSemanticTokensCache(ITextBuffer textBuffer) 
     { 
       mTextBuffer = textBuffer;
       InitializeLazily();

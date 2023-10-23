@@ -64,7 +64,7 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      mCppFileSemantics = new SemanticsFromFileCodeModelAndCache(adapterService, textView.TextBuffer);
+      mCppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(adapterService, textView.TextBuffer);
 
       // We don't subscribe to change events of the options or the parser: Attempting to change the content
       // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
