@@ -154,9 +154,41 @@ namespace VSDoxyHighlighter
     public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
-      
-      // TODO: Use CodeElement if possible.
-      return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point);
+
+      // Note: Structure and reasoning the same as in TryGetFunctionInfoIfNextIsAFunction().
+      // Especially: Prefer the FileCodeModel information since it contains information about non-type template parameters.
+
+      (var classToken, _) = mSemanticCache.TryGetSemanticClassInfoIfNextIsATemplateClass(point);
+      if (classToken == null) {
+        return null;
+      }
+
+      CodeElement codeElement = TryGetCodeElementFor(classToken);
+      if (codeElement == null) { 
+        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point); 
+      }
+
+      string className = codeElement.Name;
+      Debug.Assert(className == classToken.Text);
+
+      CodeElements templateParameters = null;
+      if (codeElement is VCCodeClass cls) {
+        templateParameters = cls.TemplateParameters;
+      }
+      else if (codeElement is VCCodeStruct st) { 
+        templateParameters = st.TemplateParameters;
+      }
+
+      if (templateParameters == null) {
+        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point);
+      }
+
+      var templateParameterNames = new List<string>();
+      foreach (CodeElement param in templateParameters) {
+        templateParameterNames.Add(param.Name);
+      }
+
+      return new ClassInfo { ClassName = className, TemplateParameterNames = templateParameterNames };
     }
 
 
@@ -452,9 +484,27 @@ namespace VSDoxyHighlighter
     public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      (SemanticToken classToken, IEnumerable<SemanticToken> templateParameters) = TryGetSemanticClassInfoIfNextIsATemplateClass(point);
+      if (classToken == null) {
+        return null;
+      }
+
+      IEnumerable<string> templateNames = Enumerable.Empty<string>();
+      if (templateParameters != null) {
+        templateNames = templateParameters.Select(t => t.Text).ToList();
+      }
+      return new ClassInfo { ClassName = classToken.Text, TemplateParameterNames = templateNames };
+    }
+
+
+    public (SemanticToken classToken, IEnumerable<SemanticToken> templateParameters)
+        TryGetSemanticClassInfoIfNextIsATemplateClass(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var tokens = GetTokensAfter(point);
       if (tokens == null) {
-        return null;
+        return (null, null);
       }
 
       List<SemanticToken> tokensBeforeThatAreCppTypes = null;
@@ -474,15 +524,11 @@ namespace VSDoxyHighlighter
         }
 
         if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
-          IEnumerable<string> templateNames = Enumerable.Empty<string>();
-          if (tokensBeforeThatAreCppTypes != null) {
-            templateNames = tokensBeforeThatAreCppTypes.Select(t => t.Text).ToList();
-          }
-          return new ClassInfo { ClassName = token.Text, TemplateParameterNames = templateNames };
+          return (token, tokensBeforeThatAreCppTypes);
         }
       }
 
-      return null;
+      return (null, null);
     }
 
 
