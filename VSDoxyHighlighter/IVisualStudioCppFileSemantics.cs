@@ -175,8 +175,11 @@ namespace VSDoxyHighlighter
       if (codeElement is VCCodeClass cls) {
         templateParameters = cls.TemplateParameters;
       }
-      else if (codeElement is VCCodeStruct st) { 
+      else if (codeElement is VCCodeStruct st) {
         templateParameters = st.TemplateParameters;
+      }
+      else if (codeElement is VCCodeUsingAlias us) {
+        templateParameters = us.TemplateParameters;
       }
 
       if (templateParameters == null) {
