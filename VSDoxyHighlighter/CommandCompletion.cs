@@ -255,19 +255,34 @@ namespace VSDoxyHighlighter
           || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
         // TODO: Make TryGetFunctionInfoIfNextIsAFunction async instead. I.e. put as much as possible in non-UI-thread-code.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        
+        IEnumerable<string> parameterNames = null;
+        string elementName = null;
+        
+        FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        if (funcInfo != null) {
+          parameterNames = funcInfo.ParameterNames;
+          elementName = funcInfo.FunctionName;
+        }
+        else {
+          MacroInfo macroInfo = mCppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
+          if (macroInfo != null) {
+            parameterNames = macroInfo.Parameters;
+            elementName = macroInfo.MacroName;
+          }
+        }
 
-        FunctionInfo info = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        if (info != null && info.ParameterNames.Count() > 0) {
+        if (parameterNames != null && parameterNames.Count() > 0) {
           itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-          int numParams = info.ParameterNames.Count();
+          int numParams = parameterNames.Count();
           int curParamNumber = 1;
-          foreach (string paramName in info.ParameterNames) {
+          foreach (string paramName in parameterNames) {
             var item = new CompletionItem(
               displayText: paramName,
               source: this,
               icon: cParamImage,
               filters: ImmutableArray<CompletionFilter>.Empty,
-              suffix: info.FunctionName,
+              suffix: elementName,
               insertText: paramName,
               // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
               sortText: curParamNumber.ToString().PadLeft(numParams, '0'),

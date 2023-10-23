@@ -28,6 +28,12 @@ namespace VSDoxyHighlighter
     public IEnumerable<string> TemplateParameterNames { get; set; }
   }
 
+  class MacroInfo 
+  {
+    public string MacroName { get; set; }
+    public IEnumerable<string> Parameters { get; set; }
+  }
+
 
   //==============================================================================
   // IVisualStudioCppFileSemantics
@@ -47,6 +53,11 @@ namespace VSDoxyHighlighter
     /// If the next C++ element after the given 'point' in the file is a **template** class or struct, returns information about that class/struct.
     /// </summary>
     ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point);
+
+    /// <summary>
+    /// If the next C++ element after the given 'point' in the file is a #define, returns information about it.
+    /// </summary>
+    MacroInfo TryGetMacroInfoIfNextIsAMacro(SnapshotPoint point);
   }
 
 
@@ -63,10 +74,11 @@ namespace VSDoxyHighlighter
   /// a span of text. Actually, we could also get all code elements and manually figure out the interesting pieces.
   /// But for long files I am afraid that this is very slow.
   /// The SemanticTokenCache (see VisualStudioCppFileSemanticsFromCache), on the other hand, seems to support efficient
-  /// querying and knows about global declarations. Unfortunatly, it does not know about non-type template parameters.
-  /// So, the ide of SemanticsFromFileCodeModelAndCache is the following: First, get information about the interesting
-  /// semantic piece from VisualStudioCppFileSemanticsFromCache. Then use its location information to query the
-  /// FileCodeModel, and amend the semantic piece with information from FileCodeModel.
+  /// querying and knows about global declarations. Unfortunatly, it does not know about non-type template parameters
+  /// or macro parameters. So, the idea of SemanticsFromFileCodeModelAndCache is the following: First, get information 
+  /// about the interesting semantic piece from VisualStudioCppFileSemanticsFromCache. This especially includes position
+  /// information. Then use the position information to query the FileCodeModel, and amend the semantic piece with 
+  /// information from FileCodeModel.
   /// </summary>
   class SemanticsFromFileCodeModelAndCache : IVisualStudioCppFileSemantics
   {
@@ -136,7 +148,7 @@ namespace VSDoxyHighlighter
       // not know about non-type template parameters, while the FileCodeModel does. Also, in my experiments the SemanticTokenCache
       // was aware of ALL functions in the file. So no need to check whether the FileCodeModel or the SemanticTokenCache found a
       // function which comes earlier than the other; they should be the same at this point.
-      var funcName = codeElement.Name;
+      string funcName = codeElement.Name;
       Debug.Assert(funcName == functionTokenIter.Current.Text);
       var parameters = new List<string>();
       foreach (CodeElement param in codeElement.Parameters) {
@@ -192,6 +204,35 @@ namespace VSDoxyHighlighter
       }
 
       return new ClassInfo { ClassName = className, TemplateParameterNames = templateParameterNames };
+    }
+
+
+    public MacroInfo TryGetMacroInfoIfNextIsAMacro(SnapshotPoint point) 
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      // Note: Structure and reasoning the same as in TryGetFunctionInfoIfNextIsAFunction().
+      // Especially: Prefer the FileCodeModel information since it contains information about macro parameters.
+
+      var macroToken = mSemanticCache.TryGetSemanticMacroInfoIfNextIsAMacro(point);
+      if (macroToken == null) {
+        return null;
+      }
+
+      VCCodeMacro codeElement = TryGetCodeElementFor(macroToken) as VCCodeMacro;
+      if (codeElement == null) {
+        return mSemanticCache.TryGetMacroInfoIfNextIsAMacro(point);
+      }
+
+      string macroName = codeElement.Name;
+      Debug.Assert(macroName == macroToken.Text);
+
+      var parameters = new List<string>();
+      foreach (CodeElement param in codeElement.Parameters) {
+        parameters.Add(param.Name);
+      }
+
+      return new MacroInfo { MacroName = macroName, Parameters = parameters };
     }
 
 
@@ -532,6 +573,34 @@ namespace VSDoxyHighlighter
       }
 
       return (null, null);
+    }
+
+
+    public MacroInfo TryGetMacroInfoIfNextIsAMacro(SnapshotPoint point) 
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      SemanticToken token = TryGetSemanticMacroInfoIfNextIsAMacro(point);
+      if (token != null) {
+        // The SemanticTokenCache doesn't know anything about the macro parameters, unfortunately.
+        return new MacroInfo { MacroName = token.Text, Parameters = Enumerable.Empty<string>() };
+      }
+      return null;
+    }
+
+
+    public SemanticToken TryGetSemanticMacroInfoIfNextIsAMacro(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      var tokens = GetTokensAfter(point);
+      if (tokens == null) {
+        return null;
+      }
+      foreach (SemanticToken token in tokens) {
+        if (token != null && token.SemanticTokenKind == SemanticTokenKind.cppMacro) { 
+          return token;
+        }
+      }
+      return null;
     }
 
 
