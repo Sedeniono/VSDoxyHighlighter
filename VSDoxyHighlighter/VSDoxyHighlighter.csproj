@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="CommentExtractor.cs" />
     <Compile Include="VisualStudioCppColorer.cs" />
+    <Compile Include="VisualStudioOldNewMapper.cs" />
     <Compile Include="VSDoxyHighlighterException.cs" />
     <Compile Include="VSDoxyHighlighterPackage.cs" />
   </ItemGroup>

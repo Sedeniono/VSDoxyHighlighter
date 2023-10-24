@@ -61,6 +61,7 @@ namespace VSDoxyHighlighter
   }
 
 
+
   //==============================================================================
   // CppFileSemanticsFromVSCodeModelAndCache
   //==============================================================================
@@ -89,38 +90,11 @@ namespace VSDoxyHighlighter
       mTextBuffer = textBuffer;
       mSemanticCache = new CppFileSemanticsFromSemanticTokensCache(textBuffer);
 
-      // As far as I understand, Microsoft.VisualStudio.Text.ITextBuffer and similar classes are the "new" .NET managed classes.
-      // On the other hand, the stuff in the EnvDTE namespace (e.g. EnvDTE.Document and EnvDTE.TextDocument) represent 'old' classes,
-      // predating the .NET implementations. They are always COM interfaces. However, they are still relevant for certain things.
-      // Things like IVsTextBuffer seem to be wrappers/adapters around the old classes. We can get from a "new world" object
-      // (such as ITextBuffer) to the adapter via the IVsEditorAdaptersFactoryService service, resulting in e.g. a IVsTextBuffer.
-      // (I think that service is just getting some object from ITextBuffer.Properties.) Digging through decompiled VS .NET code,
-      // from the adapter we get to the "old world" object via IExtensibleObject. Note that the documentation of IExtensibleObject
-      // states that it is Microsoft internal. We ignore this warning here. The only valid arguments to
-      // IExtensibleObject.GetAutomationObject() seem to be "Document" (giving an EnvDTE.Document) and "TextDocument" (giving
-      // an EnvDTE.TextDocument).
-      //
       // In our case here we are interested in the "FileCodeModel" which is only accessible in the 'old' world, specifically
       // via "EnvDTE.Document". There is one "FileCodeModel" per "Document.ProjectItem" in the solution.
-      if (adapterService != null) {
-        IVsTextBuffer vsTextBuffer = adapterService.GetBufferAdapter(mTextBuffer);
-        IVsTextLines vsTextLines = vsTextBuffer as IVsTextLines;
-        IExtensibleObject extObj = vsTextBuffer as IExtensibleObject;
-        if (vsTextLines != null && extObj != null) {
-          //extObj.GetAutomationObject("TextDocument", null, out object textDocObj);
-          //EnvDTE.TextDocument textDoc = textDocObj as EnvDTE.TextDocument;
-
-          extObj.GetAutomationObject("Document", null, out object docObj);
-          EnvDTE.Document doc = docObj as EnvDTE.Document;
-
-          if (doc != null) {
-            mFileCodeModel = doc.ProjectItem.FileCodeModel;
-            if (mFileCodeModel != null) {
-              mVsTextLines = vsTextLines;
-            }
-          }
-        }
-      }
+      var newOldMapper = new VisualStudioNewToOldTextBufferMapper(adapterService, textBuffer);
+      mFileCodeModel = newOldMapper.Document?.ProjectItem?.FileCodeModel;
+      mVsTextLines = newOldMapper.VsTextLines;
     }
 
 
