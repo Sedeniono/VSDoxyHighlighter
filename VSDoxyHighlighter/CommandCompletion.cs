@@ -15,7 +15,8 @@ using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Editor;
-
+using EnvDTE;
+using Microsoft.VisualStudio.VCCodeModel;
 
 namespace VSDoxyHighlighter
 {
@@ -297,6 +298,30 @@ namespace VSDoxyHighlighter
         return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, icon);
       }
 
+      // TODO: The same thing for unions and structs, except that different properties need to be accessed.
+      if (command == "class") {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        var newToOldMapper = new VisualStudioNewToOldTextBufferMapper(mAdapterService, mTextView.TextBuffer);
+        // We only show classes in the current project. This is done for performance reasons, and because I guess that
+        // it will be very rare that someone writes documentation for some class in another project.
+        VCCodeModel cm = newToOldMapper.Document?.ProjectItem?.ContainingProject?.CodeModel as VCCodeModel;
+        if (cm != null) {
+          //string s = "";
+          //s += $"name='{elem.Name}', kind='{elem.Kind}', isCodeType={elem.IsCodeType}, fullName='{elem.FullName}'\n";
+
+          var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
+
+          // TODO: What about classes in structs?
+          // TODO: Filter duplicates? Or instead show that they actually from different lines?
+          AddClassesToItemsRecursive(itemsBuilder, cm.Classes, "");
+          AddClassesInNamespacesToItemsRecursive(itemsBuilder, cm.Namespaces, "");
+
+          // TODO: Tooltip: Top of the body? Precise location? Full declaration?
+          // Line would be: cls.StartPoint.Line
+          return itemsBuilder;
+        }
+      }
+
       return null;
     }
 
@@ -342,18 +367,69 @@ namespace VSDoxyHighlighter
     }
 
 
+    private void AddClassesToItemsRecursive(
+      ImmutableArray<CompletionItem>.Builder itemsBuilder, 
+      CodeElements classes, 
+      string containingNamespace)
+    {
+      if (containingNamespace != "") {
+        containingNamespace += "::";
+      }
+      foreach (CodeElement elem in classes) {
+        if (elem is VCCodeClass cls) {
+          string elemName = containingNamespace + cls.Name;
+          var item = new CompletionItem(
+            displayText: elemName,
+            source: this,
+            icon: cClassImage,
+            filters: ImmutableArray<CompletionFilter>.Empty,
+            // TODO: Do we really want to show the file (performance)??????
+            suffix: cls.File,
+            insertText: elemName,
+            sortText: elemName,
+            filterText: elemName,
+            automationText: elemName,
+            attributeIcons: ImmutableArray<ImageElement>.Empty);
+
+          itemsBuilder.Add(item);
+
+          AddClassesToItemsRecursive(itemsBuilder, cls.Classes, elemName);
+        }
+      }
+    }
+
+
+    private void AddClassesInNamespacesToItemsRecursive(
+      ImmutableArray<CompletionItem>.Builder itemsBuilder,
+      CodeElements namespaces,
+      string containingNamespace)
+    {
+      if (containingNamespace != "") {
+        containingNamespace += "::";
+      }
+      foreach (CodeElement elem in namespaces) {
+        if (elem is VCCodeNamespace ns) {
+          string nsName = ns.Name;
+          string nestedNsName = nsName != "`anonymous-namespace'" ? containingNamespace + nsName : containingNamespace;
+          AddClassesToItemsRecursive(itemsBuilder, ns.Classes, nestedNsName);
+          AddClassesInNamespacesToItemsRecursive(itemsBuilder, ns.Namespaces, nestedNsName);
+        }
+      }
+    }
+
+
     // http://glyphlist.azurewebsites.net/knownmonikers/
     // https://github.com/madskristensen/KnownMonikersExplorer
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
     // Image for parameter and template parameter: These should be the images shown by VS's own IntelliSense in C++.
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
+    private static ImageElement cClassImage = new ImageElement(KnownMonikers.Class.ToImageId(), "Doxygen class");
 
     private readonly ITextView mTextView;
     private readonly IVsEditorAdaptersFactoryService mAdapterService;
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;
-    private readonly IVisualStudioCppFileSemantics mCppFileSemantics;
   }
 
 
