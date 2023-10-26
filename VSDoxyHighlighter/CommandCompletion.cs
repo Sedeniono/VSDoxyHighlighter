@@ -64,7 +64,8 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      mCppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(adapterService, textView.TextBuffer);
+      mTextView = textView;
+      mAdapterService = adapterService;
 
       // We don't subscribe to change events of the options or the parser: Attempting to change the content
       // of a shown box/tooltip if the user changes some settings makes no sense since the user cannot really
@@ -250,18 +251,21 @@ namespace VSDoxyHighlighter
 
       IEnumerable<string> elementsToShow = null;
       string parentName = null;
+      ImageElement icon = null;
 
       if (command == "p" || command == "a" 
           || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
         // Need to switch to main thread because querying the FileCodeModel etc. only works on the main thread.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
+        FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        icon = cParamImage;
         if (funcInfo != null) {
           elementsToShow = funcInfo.ParameterNames;
           parentName = funcInfo.FunctionName;
         }
         else {
-          MacroInfo macroInfo = mCppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
+          MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
           if (macroInfo != null) {
             elementsToShow = macroInfo.Parameters;
             parentName = macroInfo.MacroName;
@@ -270,7 +274,9 @@ namespace VSDoxyHighlighter
       }
       else if (command == "tparam") {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        FunctionInfo funcInfo = mCppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
+        FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+        icon = cTemplateParamImage;
         if (funcInfo != null) {
           if (funcInfo.TemplateParameterNames.Count() > 0) {
             elementsToShow = funcInfo.TemplateParameterNames;
@@ -278,7 +284,7 @@ namespace VSDoxyHighlighter
           }
         }
         else { 
-          ClassInfo clsInfo = mCppFileSemantics.TryGetClassInfoIfNextIsATemplateClass(startPoint);
+          ClassInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClass(startPoint);
           if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) {
             elementsToShow = clsInfo.TemplateParameterNames;
             parentName = clsInfo.ClassName;
@@ -288,7 +294,7 @@ namespace VSDoxyHighlighter
 
       if (elementsToShow != null && elementsToShow.Count() > 0) {
         Debug.Assert(parentName != null);
-        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, cParamImage);
+        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, icon);
       }
 
       return null;
@@ -343,6 +349,8 @@ namespace VSDoxyHighlighter
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
 
+    private readonly ITextView mTextView;
+    private readonly IVsEditorAdaptersFactoryService mAdapterService;
     private readonly IGeneralOptions mGeneralOptions;
     private readonly CommentParser mCommentParser;
     private readonly IVisualStudioCppFileSemantics mCppFileSemantics;
