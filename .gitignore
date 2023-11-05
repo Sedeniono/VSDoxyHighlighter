@@ -395,3 +395,4 @@ FodyWeavers.xsd
 PrivateNotes.txt
 VSDoxyHighlighter/DoxygenHelpPageParser/test*
 FileCodeModelTest.txt
+AllClassesDump*
