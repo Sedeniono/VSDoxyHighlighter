@@ -424,9 +424,9 @@ namespace VSDoxyHighlighter
     /// to the extension code. It encapsulates the reflection magic which is necessary because we don't want to have
     /// explicit dependencies to VS internals.
     /// </summary>
-    private class VSSemanticsTokenCache
+    private class VSSemanticTokensCache
     {
-      public VSSemanticsTokenCache(object semanticsTokenCache)
+      public VSSemanticTokensCache(object semanticsTokenCache)
       {
         mSemanticsTokenCache = semanticsTokenCache;
         Debug.Assert(mSemanticsTokenCache != null);
@@ -697,23 +697,23 @@ namespace VSDoxyHighlighter
     }
 
 
-    private VSSemanticsTokenCache FindVSSemanticsTokenCache() 
+    private VSSemanticTokensCache FindVSSemanticsTokenCache() 
     {
-      if (mVSSemanticsTokenCache == null) {
+      if (mVSSemanticTokensCache == null) {
         string name = "Microsoft.VisualStudio.VC.SemanticTokensCache".ToUpper();
         foreach (var kvp in mTextBuffer.Properties.PropertyList) {
           if (kvp.Key.ToString().ToUpper() == name) {
-            mVSSemanticsTokenCache = new VSSemanticsTokenCache(kvp.Value);
+            mVSSemanticTokensCache = new VSSemanticTokensCache(kvp.Value);
             break;
           }
         }
       }
 
-      return mVSSemanticsTokenCache;
+      return mVSSemanticTokensCache;
     }
 
 
     private readonly ITextBuffer mTextBuffer;
-    private VSSemanticsTokenCache mVSSemanticsTokenCache;
+    private VSSemanticTokensCache mVSSemanticTokensCache;
   }
 }
