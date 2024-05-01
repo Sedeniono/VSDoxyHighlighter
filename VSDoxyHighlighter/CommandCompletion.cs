@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Editor;
+using System;
 
 
 namespace VSDoxyHighlighter
@@ -149,7 +150,12 @@ namespace VSDoxyHighlighter
         // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
         // support autocompletion of the parameter, and if yes, populate the autocomplete box with possible parameter values.
         else if (startChar == ' ' || startChar == '\t') {
-          itemsBuilder = await PopulateAutocompleteBoxForParameterAsync(startPoint, cancellationToken);
+          try {
+            itemsBuilder = await PopulateAutocompleteBoxForParameterAsync(startPoint, cancellationToken);
+          }
+          catch (Exception ex) {
+            ActivityLog.LogError("VSDoxyHighlighter", $"Exception occurred while checking for parameter completion: {ex}");
+          }
         }
       }
 
@@ -247,8 +253,6 @@ namespace VSDoxyHighlighter
       // and getting them might be expensive. So we want the user to disable the feature.
       // TODO: Add to readme: Doesn't work for NTTP template arguments in global function declerations.
       // TODO: Make \param and \tparam more intelligent (suggest the next param first)
-      // TODO: Check for IsZombie everywhere?
-      // TODO: Catch COMExceptions
       // TODO: Support \class, \def, etc: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       // TODO: Idea for "global" lists (\class, \def, etc): Use the filters-functionality of the autocomplete box (e.g. only in file; only in current namespace)
       // TODO: Performance. Especially because every VS access is necessarily on the main thread due to COM stuff.
