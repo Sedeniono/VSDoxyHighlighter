@@ -279,33 +279,34 @@ namespace VSDoxyHighlighter
         icon = cParamImage;
         if (funcInfo != null) {
           elementsToShow = funcInfo.ParameterNames;
-          parentName = funcInfo.FunctionName;
+          parentName = $"Function: {funcInfo.FunctionName}";
         }
         else {
           MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
           if (macroInfo != null) {
             elementsToShow = macroInfo.Parameters;
-            parentName = macroInfo.MacroName;
+            parentName = $"Macro: {macroInfo.MacroName}";
           }
         }
       }
       else if (command == "tparam") {
         // As above: Switch to the main thread for the CodeModel, especially because of performance.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
         var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         icon = cTemplateParamImage;
         if (funcInfo != null) {
           if (funcInfo.TemplateParameterNames.Count() > 0) {
             elementsToShow = funcInfo.TemplateParameterNames;
-            parentName = funcInfo.FunctionName;
+            parentName = $"Function: {funcInfo.FunctionName}";
           }
         }
         else { 
-          ClassInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
+          ClassOrAliasInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
           if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) {
             elementsToShow = clsInfo.TemplateParameterNames;
-            parentName = clsInfo.ClassName;
+            parentName = $"{clsInfo.Type}: {clsInfo.ClassName}";
           }
         }
       }

@@ -22,9 +22,10 @@ namespace VSDoxyHighlighter
     public IEnumerable<string> TemplateParameterNames { get; set; }
   }
 
-  class ClassInfo 
+  class ClassOrAliasInfo 
   {
     public string ClassName { get; set; }
+    public string Type { get; set; } // "Class", "Struct" or "Alias"
     public IEnumerable<string> TemplateParameterNames { get; set; }
   }
 
@@ -58,7 +59,7 @@ namespace VSDoxyHighlighter
     /// Note: It is implementation defined what is returned if 'point' is not a point before the start of the class. I.e. 'point' should be
     /// a point before the class's 'template' keyword (if it is a template class) or the 'class'/'struct'/'using' keyword (for non-template cases).
     /// </summary>
-    ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point);
+    ClassOrAliasInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point);
 
     /// <summary>
     /// If the next C++ element after the given 'point' in the file (ignoring comments) is a #define, returns information about it.
@@ -74,21 +75,40 @@ namespace VSDoxyHighlighter
   //==============================================================================
 
   /// <summary>
-  /// Visual Studio has an official API to access semantic information about the code base in a file: FileCodeModel. 
-  /// For C++, there is also a more specific version called VCFileCodeModel. This class uses the FileCodeModel to 
-  /// get the requested information if possible, and otherwise uses an alternative source, as outlined next.
+  /// A class that is used to retrieve information about the next C++ element that comes after some text point (where
+  /// the text point is typically some point in a comment).
   /// 
-  /// The FileCodeModel is somewhat arcane and buggy: It does not know anything about global function/class
-  /// declarations. Moreover, we can only query it to give the code element a very specific text point, rather than
-  /// a span of text. Actually, we could also get all code elements and manually figure out the interesting pieces.
-  /// But for long files I am afraid that this is very slow.
-  /// The SemanticTokensCache (see CppFileSemanticsFromSemanticTokensCache) of Visual Studio (an internal VS class), 
-  /// on the other hand, seems to support efficient querying and knows about global declarations. Unfortunatly, it does 
-  /// not know about non-type template parameters or macro parameters. 
-  /// So, the idea of SemanticsFromFileCodeModelAndCache is the following: First, get information  about the interesting
-  /// semantic piece from CppFileSemanticsFromSemanticTokensCache. This especially includes position information. Then 
-  /// use the position information to query the FileCodeModel, and amend the semantic piece with information from FileCodeModel
-  /// when necessary.
+  /// Visual Studio has an official API to access semantic information about the code base in a file: FileCodeModel. 
+  /// For C++, there is also a more specific version called VCFileCodeModel. The FileCodeModel can be used to get the
+  /// desired information. Unfortunately, the FileCodeModel is somewhat arcane to use and buggy:
+  /// - We can query the FileCodeModel to give the code element only at a very specific text point, rather than a whole
+  ///   span of text. So there is no direct way to ask it for all code elements in a span (rather than a point). Or
+  ///   for the C++ element that comes after a given text point. We would need to manually step through the text buffer
+  ///   and query the FileCodeModel each time, until we hit something that it knows. Alternatively, we could also get 
+  ///   **all** classes/functions/etc. in a file and create a map of locations from this. But for long files I am afraid 
+  ///   that this is slow. After all, all we want is the next C++ piece after a given point.
+  /// - The FileCodeModel does not know anything about global function/class declarations. It knows only about definitions.
+  ///   In other words, using a text point that is in the middle of the function name of a function declaration and asking
+  ///   the FileCodeModel.CodeElementFromPoint() about information, it returns none.
+  /// 
+  /// On the other hand, Visual Studio clearly knows semantic information, including declarations. The objects that know
+  /// it are, however, not accessible via a documented API. But we can still access one nevertheless: the SemanticTokensCache.
+  /// We expose it via the dedicated CppFileSemanticsFromSemanticTokensCache class. For more information, see there. It knows
+  /// about global function/class declaration. Moreover, it knows the span of the semantic C++ elements. But besides being an
+  /// internal VS implementation details, it also does not provide 100% of the information that we need:
+  /// - The SemanticTokensCache does not know about non-type template parameters.
+  /// - It also does not know about macro parameters.
+  /// 
+  /// So, the idea of CppFileSemanticsFromVSCodeModelAndCache is to use both sources as information. We first query the
+  /// SemanticTokensCache for the next C++ elements. This especially gives us the span of the element. Using the middle point
+  /// of the span, we can then query the FileCodeModel for that text point. If the FileCodeModel returns information, we 
+  /// believe the FileCodeModel (because it knows about non-type template parameters and macro parameters; also, it knows
+  /// additional things that we might want to know about in the future). If the FileCodeModel does not know anything, we simply
+  /// use the (limited) information available from the SemanticTokensCache. With this combination, we get efficient lookup
+  /// of the next C++ element and support decelarations as good as possible. The only thing that does not work at all are
+  /// non-type template parameters in function/class declarations.
+  /// 
+  /// Note: An alternative would have been to write a custom parser. But that is of course quite hard for C++.
   /// </summary>
   class CppFileSemanticsFromVSCodeModelAndCache : IVisualStudioCppFileSemantics
   {
@@ -135,18 +155,24 @@ namespace VSDoxyHighlighter
       Debug.Assert(funcName == functionTokenIter.Current.Text);
       var parameters = new List<string>();
       foreach (CodeElement param in codeElement.Parameters) {
-        parameters.Add(param.Name);
+        string name = param.Name.Trim();
+        if (name != "") {
+          parameters.Add(name);
+        }
       }
       var templateParameters = new List<string>();
       foreach (CodeElement param in codeElement.TemplateParameters) {
-        templateParameters.Add(param.Name);
+        string name = param.Name.Trim();
+        if (name != "") {
+          templateParameters.Add(param.Name);
+        }
       }
 
       return new FunctionInfo { FunctionName = funcName, ParameterNames = parameters, TemplateParameterNames = templateParameters };
     }
 
 
-    public ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point) 
+    public ClassOrAliasInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -166,15 +192,19 @@ namespace VSDoxyHighlighter
       string className = codeElement.Name;
       Debug.Assert(className == classToken.Text);
 
+      string type = "Unknown";
       CodeElements templateParameters = null;
       if (codeElement is VCCodeClass cls) {
         templateParameters = cls.TemplateParameters;
+        type = "Class";
       }
       else if (codeElement is VCCodeStruct st) {
         templateParameters = st.TemplateParameters;
+        type = "Struct";
       }
       else if (codeElement is VCCodeUsingAlias us) {
         templateParameters = us.TemplateParameters;
+        type = "Alias";
       }
 
       if (templateParameters == null) {
@@ -186,7 +216,7 @@ namespace VSDoxyHighlighter
         templateParameterNames.Add(param.Name);
       }
 
-      return new ClassInfo { ClassName = className, TemplateParameterNames = templateParameterNames };
+      return new ClassOrAliasInfo { ClassName = className, Type = type, TemplateParameterNames = templateParameterNames };
     }
 
 
@@ -212,7 +242,10 @@ namespace VSDoxyHighlighter
 
       var parameters = new List<string>();
       foreach (CodeElement param in codeElement.Parameters) {
-        parameters.Add(param.Name);
+        string name = param.Name.Trim();
+        if (name != "") {
+          parameters.Add(param.Name);
+        }
       }
 
       return new MacroInfo { MacroName = macroName, Parameters = parameters };
@@ -334,7 +367,7 @@ namespace VSDoxyHighlighter
       cppStaticMemberField,
       cppProperty,
       cppEvent,
-      cppClassTemplate,
+      cppClassTemplate, // Also structs and templated using alias.
       cppGenericType,
       cppFunctionTemplate,
       cppNamespace,
@@ -513,7 +546,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    public ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point)
+    public ClassOrAliasInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -526,7 +559,7 @@ namespace VSDoxyHighlighter
       if (templateParameters != null) {
         templateNames = templateParameters.Select(t => t.Text).ToList();
       }
-      return new ClassInfo { ClassName = classToken.Text, TemplateParameterNames = templateNames };
+      return new ClassOrAliasInfo { ClassName = classToken.Text, Type = "Class", TemplateParameterNames = templateNames };
     }
 
 
@@ -555,8 +588,13 @@ namespace VSDoxyHighlighter
           continue;
         }
 
+        // cppClassTemplate: Also structs and templated using alias.
         if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
           return (token, tokensBeforeThatAreCppTypes);
+        }
+
+        if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
+          break;
         }
       }
 
@@ -584,9 +622,13 @@ namespace VSDoxyHighlighter
         return null;
       }
       foreach (SemanticToken token in tokens) {
-        if (token != null && token.SemanticTokenKind == SemanticTokenKind.cppMacro) { 
+        if (token == null) { 
+          continue; 
+        }
+        if (token.SemanticTokenKind == SemanticTokenKind.cppMacro) { 
           return token;
         }
+        break;
       }
       return null;
     }
