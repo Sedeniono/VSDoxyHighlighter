@@ -601,7 +601,8 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      // Get (lazily) the tokens starting at 'point' till the end of the file.
+      // Get an enumerator for the tokens starting at 'point' till the end of the file. They are retriveved lazily ('yield'),
+      // so it is not a performance issue that we try to get all of them till the end of the file.
       // Span from 'point' to the end of the file.
       var span = new NormalizedSnapshotSpanCollection(
         new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));

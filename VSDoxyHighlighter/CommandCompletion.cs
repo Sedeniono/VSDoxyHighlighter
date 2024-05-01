@@ -316,17 +316,17 @@ namespace VSDoxyHighlighter
       // TODO: Add option page to disable the parameter completion. Reason: It requires quite a bunch of semantic infos,
       // and getting them might be expensive. So we want the user to disable the feature.
       // TODO: Add to readme: Doesn't work for NTTP template arguments in global function declerations.
-      // TODO: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
       // TODO: Make \param and \tparam more intelligent (suggest the next param first)
-      // TODO: \exception idea: scan the definition for throws
-      // TODO: Idea for "global" lists: Add filters (only in file; only in current namespace)
       // TODO: Check for IsZombie everywhere?
       // TODO: Catch COMExceptions
+      // TODO: Support \class, \def, etc: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
+      // TODO: Idea for "global" lists (\class, \def, etc): Use the filters-functionality of the autocomplete box (e.g. only in file; only in current namespace)
       // TODO: Performance. Especially because every VS access is necessarily on the main thread due to COM stuff.
       //       Querying the cancellationToken from the main thread is useless; it never gets set.
       //       But maybe we can somehow temporarily switch away from the main thread between COM queries, so that the message loop etc runs?
-      //       But before doing this, check with LLVM code base, if necessary.
+      //       But before doing this, check with LLVM code base (as a real world example), if necessary.
       //       Or: Implement in native C++ code; maybe it helps?
+      // TODO: \exception idea: scan the definition for throws
 
       IEnumerable<string> elementsToShow = null;
       string parentName = null;
@@ -334,11 +334,16 @@ namespace VSDoxyHighlighter
 
       if (command == "p" || command == "a" 
           || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
-        // Need to switch to main thread for the CodeModel. Well, actually after we have got the CodeModel on the
+        // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
         // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
-        // switch to the main thread happens. However, this happens for every single access of the CodeModel, which
-        // results in very bad performance. So switch once at the beginning.
+        // switch to the main thread happens (i.e. a message into the message loop of the main thread gets posted,
+        // which then is executed, and is returned to us). This happens because CodeModel is implemented in native
+        // code, and in this case the runtime does this automatic marshalling. However, this would happen for every
+        // single access of the CodeModel, which results in very bad performance. So switch once at the beginning.
+        // Compare https://devblogs.microsoft.com/premier-developer/asynchronous-and-multithreaded-programming-within-vs-using-the-joinabletaskfactory/#a-small-history-lesson-in-com-thread-marshaling
+        // and https://github.com/dotnet/project-system/issues/924.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
         var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         icon = cParamImage;
@@ -355,7 +360,7 @@ namespace VSDoxyHighlighter
         }
       }
       else if (command == "tparam") {
-        // As above: Switch to the main thread for the CodeModel.
+        // As above: Switch to the main thread for the CodeModel, especially because of performance.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
         var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
@@ -382,7 +387,7 @@ namespace VSDoxyHighlighter
 
       // TODO: The same thing for unions and structs, except that different properties need to be accessed.
       if (command == "class") {
-        // As above: Switch to the main thread for the CodeModel.
+        // As above: Switch to the main thread for the CodeModel, especially because of performance.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         var newToOldMapper = new VisualStudioNewToOldTextBufferMapper(mAdapterService, mTextView.TextBuffer);
@@ -402,7 +407,13 @@ namespace VSDoxyHighlighter
           //      handle them. Instead, just show the 'Name' once.
 
 #if true
-          // Try via CodeModel
+          // Get classes via CodeModel.
+          // Note that there is also an alternative way to get all classes, namely via IVsObjectManager2. This is an interface
+          // that is used to populate the class view in Visual Studio. For an example on how to call it, see e.g.
+          // https://github.com/EWSoftware/SHFB/blob/2201c42a9dea11b6855b7a6287f1c0f088da251b/SHFB/Source/VSIX_Shared/GoToDefinition/CodeEntitySearcher.cs#L46
+          // Unfortunately, it is not faster than the CodeModel way. Also it seems that it is not intended to be called
+          // from extensions; instead, extensions should implement the IVsObjectManager2 interface.
+          // Moreover, the C# definition of IVsObjectList2::GetText() is broken (https://stackoverflow.com/q/77404509/3740047).
           AddClassesToItemsRecursive(itemsBuilder, cm.Classes, "");
           AddClassesInNamespacesToItemsRecursive(itemsBuilder, cm.Namespaces, "");
 #else
