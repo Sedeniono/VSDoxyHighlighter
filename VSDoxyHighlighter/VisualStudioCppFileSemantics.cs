@@ -367,7 +367,7 @@ namespace VSDoxyHighlighter
       cppStaticMemberField,
       cppProperty,
       cppEvent,
-      cppClassTemplate, // Also structs and templated using alias.
+      cppClassTemplate, // Also structs and templated-using-alias.
       cppGenericType,
       cppFunctionTemplate,
       cppNamespace,
@@ -532,14 +532,14 @@ namespace VSDoxyHighlighter
             tokensBeforeThatAreCppTypes = new List<SemanticToken>();
           }
           tokensBeforeThatAreCppTypes.Add(token);
-          continue;
         }
-
-        if (!IsFunction(token.SemanticTokenKind)) {
-          break;
+        else {
+          if (IsFunction(token.SemanticTokenKind)) {
+            return (enumerator, tokensBeforeThatAreCppTypes);
+          }
+          // Stop if hit anything that cannot be part of a function.
+          return (null, null);
         }
-
-        return (enumerator, tokensBeforeThatAreCppTypes);
       }
 
       return (null, null);
@@ -585,16 +585,14 @@ namespace VSDoxyHighlighter
             tokensBeforeThatAreCppTypes = new List<SemanticToken>();
           }
           tokensBeforeThatAreCppTypes.Add(token);
-          continue;
         }
-
-        // cppClassTemplate: Also structs and templated using alias.
-        if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
-          return (token, tokensBeforeThatAreCppTypes);
-        }
-
-        if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
-          break;
+        else {
+          // cppClassTemplate: Also structs and templated-using-alias.
+          if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
+            return (token, tokensBeforeThatAreCppTypes);
+          }
+          // Stop if hit anything that cannot be part of a class/struct/templated-using-alias.
+          return (null, null);
         }
       }
 
@@ -628,7 +626,8 @@ namespace VSDoxyHighlighter
         if (token.SemanticTokenKind == SemanticTokenKind.cppMacro) { 
           return token;
         }
-        break;
+        // Stop if hit anything that cannot be part of a macro.
+        return null;
       }
       return null;
     }
