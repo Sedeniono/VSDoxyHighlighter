@@ -41,21 +41,28 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Interface for classes that wrap access to Visual Studio components that have knowledge of the semantic elements in a certain C/C++ file.
+  /// The functions are intended to be called from within a comment, in order to figure out what C++ element comes after the comment.
+  /// Usage in other contexts might not work as expected.
   /// </summary>
   interface IVisualStudioCppFileSemantics
   {
     /// <summary>
-    /// If the next C++ element after the given 'point' in the file is a function, returns information about that function.
+    /// If the next C++ element after the given 'point' in the file (ignoring comments) is a function, returns information about that function.
+    /// Note: It is implementation defined what is returned if 'point' is not a point before the start of the function. I.e. 'point' should be
+    /// a point before the function's 'template' keyword (if it is a template function) or return value (if it is a non-template function).
     /// </summary>
     FunctionInfo TryGetFunctionInfoIfNextIsAFunction(SnapshotPoint point);
 
     /// <summary>
-    /// If the next C++ element after the given 'point' in the file is a **template** class, struct or using, returns information about it.
+    /// If the next C++ element after the given 'point' in the file (ignoring comments) is a **template** class, struct or using, returns information about it.
+    /// Note: It is implementation defined what is returned if 'point' is not a point before the start of the class. I.e. 'point' should be
+    /// a point before the class's 'template' keyword (if it is a template class) or the 'class'/'struct'/'using' keyword (for non-template cases).
     /// </summary>
-    ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point);
+    ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point);
 
     /// <summary>
-    /// If the next C++ element after the given 'point' in the file is a #define, returns information about it.
+    /// If the next C++ element after the given 'point' in the file (ignoring comments) is a #define, returns information about it.
+    /// Note: It is implementation defined what is returned if 'point' is not a point before the '#define'.
     /// </summary>
     MacroInfo TryGetMacroInfoIfNextIsAMacro(SnapshotPoint point);
   }
@@ -69,17 +76,19 @@ namespace VSDoxyHighlighter
   /// <summary>
   /// Visual Studio has an official API to access semantic information about the code base in a file: FileCodeModel. 
   /// For C++, there is also a more specific version called VCFileCodeModel. This class uses the FileCodeModel to 
-  /// get the requested information.
-  /// However, the FileCodeModel is somewhat arcane and buggy: It does not know anything about global function/class
+  /// get the requested information if possible, and otherwise uses an alternative source, as outlined next.
+  /// 
+  /// The FileCodeModel is somewhat arcane and buggy: It does not know anything about global function/class
   /// declarations. Moreover, we can only query it to give the code element a very specific text point, rather than
   /// a span of text. Actually, we could also get all code elements and manually figure out the interesting pieces.
   /// But for long files I am afraid that this is very slow.
-  /// The SemanticTokenCache (see CppFileSemanticsFromSemanticTokensCache), on the other hand, seems to support efficient
-  /// querying and knows about global declarations. Unfortunatly, it does not know about non-type template parameters
-  /// or macro parameters. So, the idea of SemanticsFromFileCodeModelAndCache is the following: First, get information 
-  /// about the interesting semantic piece from CppFileSemanticsFromSemanticTokensCache. This especially includes position
-  /// information. Then use the position information to query the FileCodeModel, and amend the semantic piece with 
-  /// information from FileCodeModel.
+  /// The SemanticTokensCache (see CppFileSemanticsFromSemanticTokensCache) of Visual Studio (an internal VS class), 
+  /// on the other hand, seems to support efficient querying and knows about global declarations. Unfortunatly, it does 
+  /// not know about non-type template parameters or macro parameters. 
+  /// So, the idea of SemanticsFromFileCodeModelAndCache is the following: First, get information  about the interesting
+  /// semantic piece from CppFileSemanticsFromSemanticTokensCache. This especially includes position information. Then 
+  /// use the position information to query the FileCodeModel, and amend the semantic piece with information from FileCodeModel
+  /// when necessary.
   /// </summary>
   class CppFileSemanticsFromVSCodeModelAndCache : IVisualStudioCppFileSemantics
   {
@@ -137,7 +146,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point) 
+    public ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -151,7 +160,7 @@ namespace VSDoxyHighlighter
 
       CodeElement codeElement = TryGetCodeElementFor(classToken);
       if (codeElement == null) { 
-        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point); 
+        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClassOrAlias(point); 
       }
 
       string className = codeElement.Name;
@@ -169,7 +178,7 @@ namespace VSDoxyHighlighter
       }
 
       if (templateParameters == null) {
-        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClass(point);
+        return mSemanticCache.TryGetClassInfoIfNextIsATemplateClassOrAlias(point);
       }
 
       var templateParameterNames = new List<string>();
@@ -227,12 +236,12 @@ namespace VSDoxyHighlighter
       try {
         // We can query the FileCodeModel for a CodeElement only at positions (rather than for whole spans). The most
         // reliable thing to do seems to query the FileCodeModel for information in the middle of the elements name.
-        int posInMiddleOfFuncName = (token.Start + token.End) / 2;
-        ITextSnapshotLine funcNameLine = token.Span.Snapshot.GetLineFromPosition(posInMiddleOfFuncName);
+        int posInMiddleOfElemName = (token.Start + token.End) / 2;
+        ITextSnapshotLine lineContainingElem = token.Span.Snapshot.GetLineFromPosition(posInMiddleOfElemName);
 
-        var offsetInLine0Based = posInMiddleOfFuncName - funcNameLine.Start;
+        var offsetInLine0Based = posInMiddleOfElemName - lineContainingElem.Start;
         Debug.Assert(offsetInLine0Based >= 0);
-        var lineNumber0Based = funcNameLine.LineNumber;
+        var lineNumber0Based = lineContainingElem.LineNumber;
 
         // Note: IVsTextLines.CreateEditPoint() wants 0-based indices. On the other hand, TextDocument.CreateEditPoint()
         // (which we could have also used) wants 1-based indices. The indicies stored on an EditPoint are all 1-based.
@@ -290,14 +299,17 @@ namespace VSDoxyHighlighter
   /// a COM handle for a specific C++ parsing thread. When calling any function on it, we get a RPC_E_WRONG_THREAD
   /// exception. The COM handle lives in a (so called) apartment which we cannot simply access. Basically, VS has
   /// a C++ parsing thread running, which then makes appropriate direct calls to IntelliSense or sets certain
-  /// variables that are then later accessed by the main thread.
+  /// variables that are then later accessed by the main thread. To use IVCCodeStoreManager directly, we would 
+  /// somehow need to execute code on the C++ parsing thread, which we can't.
   /// 
   /// The best place I could find to somehow get the semantic infos from the C++ parsing thread is via a property
   /// of a text buffer, which has the type 'SemanticTokensCache'. Every time the file changes, it gets updated. 
-  /// There we do not have any threading issues, and it knows about global function declarations.
+  /// There we do not have any threading issues, and it knows about global function declarations. In other words,
+  /// the 'SemanticTokensCache' is updated regularly by the C++ parsing thread, and we can use the information
+  /// on the 'SemanticTokensCache'.
   /// 
   /// Caveat: The SemanticTokensCache does not know about non-type template parameters (NTTP) (for example an
-  /// integer as template argument). Also, for parameters etc it does not store the actual type.
+  /// integer as template argument). Also, for parameters etc. it does not store the actual type.
   /// </summary>
   class CppFileSemanticsFromSemanticTokensCache : IVisualStudioCppFileSemantics 
   {
@@ -365,7 +377,7 @@ namespace VSDoxyHighlighter
 
     /// <summary>
     /// Wrapper around the Visual Studio SemanticsTokenCache, exposing its functions (or at least those that we need) 
-    /// to  the extension code. It encapsulates the reflection magic which is necessary because we don't want to have
+    /// to the extension code. It encapsulates the reflection magic which is necessary because we don't want to have
     /// explicit dependencies to VS internals.
     /// </summary>
     private class VSSemanticsTokenCache
@@ -374,9 +386,7 @@ namespace VSDoxyHighlighter
       {
         mSemanticsTokenCache = semanticsTokenCache;
         Debug.Assert(mSemanticsTokenCache != null);
-        if (mSemanticsTokenCache != null) {
-          mGetTokensMethod = mSemanticsTokenCache.GetType().GetMethod("GetTokens");
-        }
+        mGetTokensMethod = mSemanticsTokenCache?.GetType().GetMethod("GetTokens");
       }
 
       public IEnumerable<SemanticToken> GetTokens(NormalizedSnapshotSpanCollection spans)
@@ -388,15 +398,19 @@ namespace VSDoxyHighlighter
         int outVersion = 0;
         object[] args = new object[] { spans, outVersion };
         IEnumerable allTokens = mGetTokensMethod.Invoke(mSemanticsTokenCache, args) as IEnumerable;
-        foreach (object token in allTokens) {
-          if (token != null) {
-            yield return GetSemanticTokenInfo(token);
+        if (allTokens != null) {
+          foreach (object token in allTokens) {
+            if (token != null) {
+              yield return GetSemanticTokenInfo(token);
+            }
           }
         }
       }
 
       private SemanticToken GetSemanticTokenInfo(object semanticToken)
       {
+        Debug.Assert(semanticToken != null);
+
         if (mKindGetter == null || mSpanGetter == null) {
           // semanticTokenType == class Microsoft.VisualStudio.VC.SemanticTokensCache.SemanticToken
           var semanticTokenType = semanticToken.GetType();
@@ -499,7 +513,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    public ClassInfo TryGetClassInfoIfNextIsATemplateClass(SnapshotPoint point)
+    public ClassInfo TryGetClassInfoIfNextIsATemplateClassOrAlias(SnapshotPoint point)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 

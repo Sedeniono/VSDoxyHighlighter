@@ -326,6 +326,7 @@ namespace VSDoxyHighlighter
       //       Querying the cancellationToken from the main thread is useless; it never gets set.
       //       But maybe we can somehow temporarily switch away from the main thread between COM queries, so that the message loop etc runs?
       //       But before doing this, check with LLVM code base, if necessary.
+      //       Or: Implement in native C++ code; maybe it helps?
 
       IEnumerable<string> elementsToShow = null;
       string parentName = null;
@@ -333,7 +334,10 @@ namespace VSDoxyHighlighter
 
       if (command == "p" || command == "a" 
           || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
-        // Need to switch to main thread because querying the FileCodeModel etc. only works on the main thread.
+        // Need to switch to main thread for the CodeModel. Well, actually after we have got the CodeModel on the
+        // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
+        // switch to the main thread happens. However, this happens for every single access of the CodeModel, which
+        // results in very bad performance. So switch once at the beginning.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
         var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
@@ -351,6 +355,7 @@ namespace VSDoxyHighlighter
         }
       }
       else if (command == "tparam") {
+        // As above: Switch to the main thread for the CodeModel.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
         var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
@@ -362,7 +367,7 @@ namespace VSDoxyHighlighter
           }
         }
         else { 
-          ClassInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClass(startPoint);
+          ClassInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
           if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) {
             elementsToShow = clsInfo.TemplateParameterNames;
             parentName = clsInfo.ClassName;
@@ -377,7 +382,9 @@ namespace VSDoxyHighlighter
 
       // TODO: The same thing for unions and structs, except that different properties need to be accessed.
       if (command == "class") {
+        // As above: Switch to the main thread for the CodeModel.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
         var newToOldMapper = new VisualStudioNewToOldTextBufferMapper(mAdapterService, mTextView.TextBuffer);
         // We only show classes in the current project. This is done for performance reasons, and because I guess that
         // it will be very rare that someone writes documentation for some class in another project.
@@ -394,7 +401,7 @@ namespace VSDoxyHighlighter
           //      Reconstructing that info is hard. => Probably: Don't attempt to show specializations right now, although doxygen can
           //      handle them. Instead, just show the 'Name' once.
 
-#if false
+#if true
           // Try via CodeModel
           AddClassesToItemsRecursive(itemsBuilder, cm.Classes, "");
           AddClassesInNamespacesToItemsRecursive(itemsBuilder, cm.Namespaces, "");
@@ -593,8 +600,9 @@ namespace VSDoxyHighlighter
 
     public IAsyncCompletionCommitManager GetOrCreate(ITextView textView)
     {
-      if (mCache.TryGetValue(textView, out var itemSource))
+      if (mCache.TryGetValue(textView, out var itemSource)) {
         return itemSource;
+      }
 
       var manager = new CommentCommandCompletionCommitManager();
       textView.Closed += (o, e) => mCache.Remove(textView);

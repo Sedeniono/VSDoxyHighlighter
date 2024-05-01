@@ -265,9 +265,9 @@ namespace VSDoxyHighlighter
       }
 
       // For some reason, the "@{" and "@}" commands are not listed on the Doxygen help page with all commands,
-      // but only at https://www.doxygen.nl/manual/grouping.html. Hence, our Python generation script did could not
+      // but only at https://www.doxygen.nl/manual/grouping.html. Hence, our Python generation script did not
       // automatically add them. So we add them here manually. As a side note, "\{" and "\}" (i.e. the versions with
-      // slash instead of @) are not explained in the documentation, but they actually work.
+      // slash instead of @) are not explained in the documentation at all, but they actually work.
       cAmendedDoxygenCommands.Add(new DoxygenHelpPageCommand("{", "", "https://www.doxygen.nl/manual/grouping.html", new (object, string, string)[] { (null, "Opening marker for grouping members of commands such as ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\addtogroup", "https://www.doxygen.nl/manual/commands.html#cmdaddtogroup"), (null, " or ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\defgroup", "https://www.doxygen.nl/manual/commands.html#cmddefgroup"), (null, ".", "") }));
       cAmendedDoxygenCommands.Add(new DoxygenHelpPageCommand("}", "", "https://www.doxygen.nl/manual/grouping.html", new (object, string, string)[] { (null, "Closing marker for grouping members of commands such as ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\addtogroup", "https://www.doxygen.nl/manual/commands.html#cmdaddtogroup"), (null, " or ", ""), (DoxygenHelpPageCommand.OtherTypesEnum.Command, "\\defgroup", "https://www.doxygen.nl/manual/commands.html#cmddefgroup"), (null, ".", "") }));
     }
