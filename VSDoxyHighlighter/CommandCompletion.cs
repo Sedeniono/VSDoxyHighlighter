@@ -15,11 +15,6 @@ using Microsoft.VisualStudio.Imaging;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Editor;
-using EnvDTE;
-using Microsoft.VisualStudio.VCCodeModel;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio;
-using System;
 
 
 namespace VSDoxyHighlighter
@@ -58,66 +53,6 @@ namespace VSDoxyHighlighter
   }
 
 
-  struct VsObjectList 
-  {
-    public VsObjectList(IVsObjectList2 list) 
-    {
-      mList = list;
-      Count = 0;
-      if (mList?.GetItemCount(out uint count) == VSConstants.S_OK) {
-        Count = count;
-      }
-    }
-
-    public uint Count { get; private set; }
-
-    public string GetName(uint idx)
-    { 
-      if (mList?.GetProperty(idx, (int)_VSOBJLISTELEMPROPID.VSOBJLISTELEMPROPID_FULLNAME, out object nameObj) == VSConstants.S_OK) {
-        return nameObj as string;
-      }
-      return null;
-    }
-
-    public VsObjectList? GetChildren(uint idx, _LIB_LISTTYPE childrenType) 
-    {
-      if (mList?.GetList2(idx, (uint)childrenType, (uint)_LIB_LISTFLAGS.LLF_DONTUPDATELIST, null, out IVsObjectList2 children)
-            == VSConstants.S_OK && children != null) {
-        return new VsObjectList(children);
-      }
-      return null;
-    }
-
-    private readonly IVsObjectList2 mList;
-  }
-
-
-  class VsObjectManager 
-  {
-    public VsObjectManager(IVsObjectManager2 objectManager) 
-    {
-      objectManager?.FindLibrary(new Guid(BrowseLibraryGuids80.VC), out mLibrary);
-      mSearchCriteria = new[] { new VSOBSEARCHCRITERIA2() };
-    }
-
-    public VsObjectList? Classes
-    {
-      get {
-        if (mLibrary?.GetList2(
-              (uint)_LIB_LISTTYPE.LLT_CLASSES,
-              (uint)_LIB_LISTFLAGS.LLF_DONTUPDATELIST,
-              mSearchCriteria, out var list) == VSConstants.S_OK) {
-          return new VsObjectList(list);
-        }
-        return null;
-      }
-    }
-
-    private readonly IVsLibrary2 mLibrary = null;
-    private readonly VSOBSEARCHCRITERIA2[] mSearchCriteria;
-  }
-
-
   /// <summary>
   /// Defines when the autocomplete box should appear as well as its content.
   /// Note: The instance is reused for every autocomplete operation in the same text view.
@@ -125,14 +60,9 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentCommandCompletionSource : IAsyncCompletionSource
   {
-    private IVsObjectManager2 mObjectManager2 = null;
-
-
     public CommentCommandCompletionSource(IVsEditorAdaptersFactoryService adapterService, ITextView textView) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
-
-      mObjectManager2 = VSDoxyHighlighterPackage.GetGlobalService(typeof(SVsObjectManager)) as IVsObjectManager2;
 
       mTextView = textView;
       mAdapterService = adapterService;
@@ -385,68 +315,6 @@ namespace VSDoxyHighlighter
         return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, icon);
       }
 
-      // TODO: The same thing for unions and structs, except that different properties need to be accessed.
-      if (command == "class") {
-        // As above: Switch to the main thread for the CodeModel, especially because of performance.
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-        var newToOldMapper = new VisualStudioNewToOldTextBufferMapper(mAdapterService, mTextView.TextBuffer);
-        // We only show classes in the current project. This is done for performance reasons, and because I guess that
-        // it will be very rare that someone writes documentation for some class in another project.
-        VCCodeModel cm = newToOldMapper.Document?.ProjectItem?.ContainingProject?.CodeModel as VCCodeModel;
-        if (cm != null) {
-          var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-
-          Stopwatch sw = Stopwatch.StartNew();
-
-          // TODO: What about classes in structs?
-          // TODO: Filter duplicates?
-          //    - Sometimes they are indeed duplicates.
-          //    - Sometimes they are actually specializations. But VCCodeClass does not expose the info if something is a specialization.
-          //      Reconstructing that info is hard. => Probably: Don't attempt to show specializations right now, although doxygen can
-          //      handle them. Instead, just show the 'Name' once.
-
-#if true
-          // Get classes via CodeModel.
-          // Note that there is also an alternative way to get all classes, namely via IVsObjectManager2. This is an interface
-          // that is used to populate the class view in Visual Studio. For an example on how to call it, see e.g.
-          // https://github.com/EWSoftware/SHFB/blob/2201c42a9dea11b6855b7a6287f1c0f088da251b/SHFB/Source/VSIX_Shared/GoToDefinition/CodeEntitySearcher.cs#L46
-          // Unfortunately, it is not faster than the CodeModel way. Also it seems that it is not intended to be called
-          // from extensions; instead, extensions should implement the IVsObjectManager2 interface.
-          // Moreover, the C# definition of IVsObjectList2::GetText() is broken (https://stackoverflow.com/q/77404509/3740047).
-          AddClassesToItemsRecursive(itemsBuilder, cm.Classes, "");
-          AddClassesInNamespacesToItemsRecursive(itemsBuilder, cm.Namespaces, "");
-#else
-          // Try via IVsObjectManager2, to see if it is faster. Result: It is not faster.
-          // https://github.com/EWSoftware/SHFB/blob/2201c42a9dea11b6855b7a6287f1c0f088da251b/SHFB/Source/VSIX_Shared/GoToDefinition/CodeEntitySearcher.cs#L46
-          // Note: The C# definition of IVsObjectList2::GetText() is broken (https://stackoverflow.com/q/77404509/3740047).
-          var objectManager = new VsObjectManager(mObjectManager2);
-          AddClassesToItemsRecursive(itemsBuilder, objectManager.Classes, "");
-          // TODO: Find in namespaces
-#endif
-
-
-          sw.Stop();
-
-          itemsBuilder.Add(new CompletionItem(
-            displayText: $"_Took {sw.Elapsed.TotalSeconds}s for {itemsBuilder.Count} items",
-            source: this,
-            icon: icon,
-            filters: ImmutableArray<CompletionFilter>.Empty,
-            suffix: "",
-            insertText: "__",
-            // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
-            sortText: " ",
-            filterText: "__",
-            automationText: "__",
-            attributeIcons: ImmutableArray<ImageElement>.Empty));
-
-          // TODO: Tooltip: Top of the body? Precise location? Full declaration?
-          // Line would be: cls.StartPoint.Line
-          return itemsBuilder;
-        }
-      }
-
       return null;
     }
 
@@ -492,103 +360,12 @@ namespace VSDoxyHighlighter
     }
 
 
-    private void AddClassesToItemsRecursive(
-      ImmutableArray<CompletionItem>.Builder itemsBuilder, 
-      CodeElements classes, 
-      string containingNamespace)
-    {
-      if (containingNamespace != "") {
-        containingNamespace += "::";
-      }
-      foreach (CodeElement elem in classes) {
-        if (elem is VCCodeClass cls) {
-          string elemName = containingNamespace + cls.Name;
-          var item = new CompletionItem(
-            displayText: elemName,
-            source: this,
-            icon: cClassImage,
-            filters: ImmutableArray<CompletionFilter>.Empty,
-            // TODO: Do we really want to show the file (performance)??????
-            suffix: default,
-            //suffix: $"{cls.File} => {cls.StartPoint.Line}",
-            insertText: elemName,
-            sortText: elemName,
-            filterText: elemName,
-            automationText: elemName,
-            attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-          itemsBuilder.Add(item);
-
-          AddClassesToItemsRecursive(itemsBuilder, cls.Classes, elemName);
-        }
-      }
-    }
-
-
-    private void AddClassesInNamespacesToItemsRecursive(
-      ImmutableArray<CompletionItem>.Builder itemsBuilder,
-      CodeElements namespaces,
-      string containingNamespace)
-    {
-      if (containingNamespace != "") {
-        containingNamespace += "::";
-      }
-      foreach (CodeElement elem in namespaces) {
-        if (elem is VCCodeNamespace ns) {
-          string nsName = ns.Name;
-          string nestedNsName = nsName != "`anonymous-namespace'" ? containingNamespace + nsName : containingNamespace;
-          AddClassesToItemsRecursive(itemsBuilder, ns.Classes, nestedNsName);
-          AddClassesInNamespacesToItemsRecursive(itemsBuilder, ns.Namespaces, nestedNsName);
-        }
-      }
-    }
-
-
-    private void AddClassesToItemsRecursive(
-      ImmutableArray<CompletionItem>.Builder itemsBuilder,
-      VsObjectList? classes,
-      string containingNamespace)
-    {
-      if (!classes.HasValue) {
-        return;
-      }
-      if (containingNamespace != "") {
-        containingNamespace += "::";
-      }
-      var unpackedClasses = classes.Value;
-      for (uint idx = 0; idx < unpackedClasses.Count; ++idx) {
-        string elemName = unpackedClasses.GetName(idx);
-        if (elemName != null) {
-          elemName = containingNamespace + elemName;
-          var item = new CompletionItem(
-              displayText: elemName,
-              source: this,
-              icon: cClassImage,
-              filters: ImmutableArray<CompletionFilter>.Empty,
-              // TODO: Do we really want to show the file (performance)??????
-              suffix: default,
-              //suffix: $"{cls.File} => {cls.StartPoint.Line}",
-              insertText: elemName,
-              sortText: elemName,
-              filterText: elemName,
-              automationText: elemName,
-              attributeIcons: ImmutableArray<ImageElement>.Empty);
-
-          itemsBuilder.Add(item);
-
-          AddClassesToItemsRecursive(itemsBuilder, unpackedClasses.GetChildren(idx, _LIB_LISTTYPE.LLT_CLASSES), elemName);
-        }
-      }
-    }
-
-
     // http://glyphlist.azurewebsites.net/knownmonikers/
     // https://github.com/madskristensen/KnownMonikersExplorer
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
     // Image for parameter and template parameter: These should be the images shown by VS's own IntelliSense in C++.
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
-    private static ImageElement cClassImage = new ImageElement(KnownMonikers.Class.ToImageId(), "Doxygen class");
 
     private readonly ITextView mTextView;
     private readonly IVsEditorAdaptersFactoryService mAdapterService;
