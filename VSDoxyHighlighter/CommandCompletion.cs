@@ -258,8 +258,8 @@ namespace VSDoxyHighlighter
       //       Or: Implement in native C++ code; maybe it helps?
       // TODO: \exception idea: scan the definition for throws
 
-      IEnumerable<string> elementsToShow = null;
-      string parentName = null;
+      IEnumerable<(string name, string type)> elementsToShow = null;
+      string parentInfo = null;
       ImageElement icon = null;
 
       if (command == "p" || command == "a" 
@@ -278,14 +278,14 @@ namespace VSDoxyHighlighter
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         icon = cParamImage;
         if (funcInfo != null) {
-          elementsToShow = funcInfo.ParameterNames;
-          parentName = $"Function: {funcInfo.FunctionName}";
+          elementsToShow = funcInfo.Parameters.Select(p => (p.Name, p.Type));
+          parentInfo = $"Function: {funcInfo.FunctionName}";
         }
         else {
           MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
           if (macroInfo != null) {
-            elementsToShow = macroInfo.Parameters;
-            parentName = $"Macro: {macroInfo.MacroName}";
+            elementsToShow = macroInfo.Parameters.Select(p => (p, "")); ;
+            parentInfo = $"Macro: {macroInfo.MacroName}";
           }
         }
       }
@@ -297,23 +297,23 @@ namespace VSDoxyHighlighter
         FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
         icon = cTemplateParamImage;
         if (funcInfo != null) {
-          if (funcInfo.TemplateParameterNames.Count() > 0) {
-            elementsToShow = funcInfo.TemplateParameterNames;
-            parentName = $"Function: {funcInfo.FunctionName}";
+          if (funcInfo.TemplateParameters.Count() > 0) {
+            elementsToShow = funcInfo.TemplateParameters.Select(p => (p, ""));
+            parentInfo = $"Function: {funcInfo.FunctionName}";
           }
         }
         else { 
           ClassOrAliasInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
-          if (clsInfo != null && clsInfo.TemplateParameterNames.Count() > 0) {
-            elementsToShow = clsInfo.TemplateParameterNames;
-            parentName = $"{clsInfo.Type}: {clsInfo.ClassName}";
+          if (clsInfo != null && clsInfo.TemplateParameters.Count() > 0) {
+            elementsToShow = clsInfo.TemplateParameters.Select(p => (p, ""));
+            parentInfo = $"{clsInfo.Type}: {clsInfo.ClassName}";
           }
         }
       }
 
       if (elementsToShow != null && elementsToShow.Count() > 0) {
-        Debug.Assert(parentName != null);
-        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentName, icon);
+        Debug.Assert(parentInfo != null);
+        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentInfo, icon);
       }
 
       return null;
@@ -333,25 +333,29 @@ namespace VSDoxyHighlighter
 
 
     private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForCommandParameter(
-      IEnumerable<string> elementsToShow,
-      string parentElementName,
+      IEnumerable<(string name, string suffix)> elementsToShow,
+      string parentInfo,
       ImageElement icon) 
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
       int numParams = elementsToShow.Count();
       int curParamNumber = 1;
-      foreach (string elem in elementsToShow) {
+      foreach ((string name, string type) in elementsToShow) {
+        string suffix = type != null && type != ""
+          ? $"Type: {type}. {parentInfo}"
+          : parentInfo;
+
         var item = new CompletionItem(
-          displayText: elem,
+          displayText: name,
           source: this,
           icon: icon,
           filters: ImmutableArray<CompletionFilter>.Empty,
-          suffix: parentElementName,
-          insertText: elem,
+          suffix: suffix,
+          insertText: name,
           // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
           sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-          filterText: elem,
-          automationText: elem,
+          filterText: name,
+          automationText: name,
           attributeIcons: ImmutableArray<ImageElement>.Empty);
 
         itemsBuilder.Add(item);

@@ -15,18 +15,25 @@ using System.Runtime.InteropServices;
 
 namespace VSDoxyHighlighter
 {
+  class ParameterInfo 
+  {
+    public string Name { get; set; }
+    // Can be null if the type is not known.
+    public string Type { get; set; }
+  }
+
   class FunctionInfo 
   {
     public string FunctionName { get; set; }
-    public IEnumerable<string> ParameterNames { get; set; }
-    public IEnumerable<string> TemplateParameterNames { get; set; }
+    public IEnumerable<ParameterInfo> Parameters { get; set; }
+    public IEnumerable<string> TemplateParameters { get; set; }
   }
 
   class ClassOrAliasInfo 
   {
     public string ClassName { get; set; }
     public string Type { get; set; } // "Class", "Struct" or "Alias"
-    public IEnumerable<string> TemplateParameterNames { get; set; }
+    public IEnumerable<string> TemplateParameters { get; set; }
   }
 
   class MacroInfo 
@@ -153,22 +160,23 @@ namespace VSDoxyHighlighter
       // function which comes earlier than the other; they should be the same at this point.
       string funcName = codeElement.Name;
       Debug.Assert(funcName == functionTokenIter.Current.Text);
-      var parameters = new List<string>();
+      var parameters = new List<ParameterInfo>();
       foreach (CodeElement param in codeElement.Parameters) {
         string name = param.Name.Trim();
         if (name != "") {
-          parameters.Add(name);
+          string type = (param as VCCodeParameter)?.TypeString;
+          parameters.Add(new ParameterInfo { Name = name, Type = type});
         }
       }
       var templateParameters = new List<string>();
       foreach (CodeElement param in codeElement.TemplateParameters) {
         string name = param.Name.Trim();
         if (name != "") {
-          templateParameters.Add(param.Name);
+          templateParameters.Add(name);
         }
       }
 
-      return new FunctionInfo { FunctionName = funcName, ParameterNames = parameters, TemplateParameterNames = templateParameters };
+      return new FunctionInfo { FunctionName = funcName, Parameters = parameters, TemplateParameters = templateParameters };
     }
 
 
@@ -211,12 +219,15 @@ namespace VSDoxyHighlighter
         return mSemanticCache.TryGetClassInfoIfNextIsATemplateClassOrAlias(point);
       }
 
-      var templateParameterNames = new List<string>();
+      var templateParametersInfo = new List<string>();
       foreach (CodeElement param in templateParameters) {
-        templateParameterNames.Add(param.Name);
+        string name = param.Name.Trim();
+        if (name != "") {
+          templateParametersInfo.Add(name);
+        }
       }
 
-      return new ClassOrAliasInfo { ClassName = className, Type = type, TemplateParameterNames = templateParameterNames };
+      return new ClassOrAliasInfo { ClassName = className, Type = type, TemplateParameters = templateParametersInfo };
     }
 
 
@@ -559,7 +570,7 @@ namespace VSDoxyHighlighter
       if (templateParameters != null) {
         templateNames = templateParameters.Select(t => t.Text).ToList();
       }
-      return new ClassOrAliasInfo { ClassName = classToken.Text, Type = "Class", TemplateParameterNames = templateNames };
+      return new ClassOrAliasInfo { ClassName = classToken.Text, Type = "Class", TemplateParameters = templateNames };
     }
 
 
@@ -659,7 +670,7 @@ namespace VSDoxyHighlighter
       Debug.Assert(IsFunction(functionKind));
       string functionName = tokenIter.Current.Text;
 
-      var parameterNames = new List<string>();
+      var parameters = new List<ParameterInfo>();
       while (tokenIter.MoveNext()) {
         SemanticToken token = tokenIter.Current;
         // 'cppType' appears for parameters whose type is a template argument, and also for class declarations in
@@ -668,18 +679,21 @@ namespace VSDoxyHighlighter
           continue;
         }
         if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
+          // Reached end of parameter list.
           break;
         }
-        parameterNames.Add(token.Text);
+        // Unfortunately, the SemanticTokensCache does not directly give access to the parameter's type. We would
+        // need to extract it ourselves. For now we simply don't show it.
+        parameters.Add(new ParameterInfo { Name = token.Text, Type = null });
       }
 
       // The tokens of type 'cppType' coming directly before a function are the template parameters of that function.
-      var templateNames = Enumerable.Empty<string>();
+      var templateParameters = Enumerable.Empty<string>();
       if (tokensBeforeThatAreCppTypes != null) {
-        templateNames = tokensBeforeThatAreCppTypes.Select(t => t.Text).ToList();
+        templateParameters = tokensBeforeThatAreCppTypes.Select(t => t.Text).ToList();
       }
 
-      return new FunctionInfo { FunctionName = functionName, ParameterNames = parameterNames, TemplateParameterNames = templateNames };
+      return new FunctionInfo { FunctionName = functionName, Parameters = parameters, TemplateParameters = templateParameters };
     }
 
 
