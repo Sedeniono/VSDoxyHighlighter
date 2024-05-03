@@ -86,6 +86,9 @@ namespace VSDoxyHighlighter
     bool EnableAutocomplete { get; }
     bool EnableQuickInfo { get; }
 
+    bool EnableFunctionAndMacroParameterAutocomplete { get; }
+    bool EnableTemplateParameterAutocomplete { get; }
+
     List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 
     event EventHandler SettingsChanged;
@@ -156,7 +159,7 @@ namespace VSDoxyHighlighter
     // Flags to enable/disable the main features of the extension
 
     // "\t" does not get printed, and is a hack to get the category to appear first in the property grid.
-    public const string FeaturesSubCategory = "\tFeatures";
+    public const string FeaturesSubCategory = "\t\tMajor features (detailed configuration in later sections)";
 
     [Category(FeaturesSubCategory)]
     [DisplayName("Enable highlighting")]
@@ -168,7 +171,8 @@ namespace VSDoxyHighlighter
     [DisplayName("Enable IntelliSense")]
     [Description("Enables the autocomplete of commands while typing in comments (\"IntelliSense\"): "
       + "When enabled and you type a \"\\\" or \"@\" in a comment, a list of all Doxygen commands appears. "
-      + "Note that with the settings below you can define in which comment types the autocomplete is enabled.")]
+      + "Some specific commands support autocompletion for their arguments (see corresponding detailed configuration below). "
+      + "Also note that with the settings below you can define in which comment types the autocomplete is enabled.")]
     public bool EnableAutocomplete { get; set; } = true;
 
     [Category(FeaturesSubCategory)]
@@ -181,7 +185,7 @@ namespace VSDoxyHighlighter
     // Comment types
 
     // "\t" does not get printed, and is a hack to get the category to appear second in the property grid.
-    public const string CommentTypesSubCategory = "\tTypes of comments with highlighting, autocomplete and quick infos";
+    public const string CommentTypesSubCategory = "\t\tTypes of comments with highlighting, autocomplete and quick infos";
 
     [Category(CommentTypesSubCategory)]
     [DisplayName("Enable in \"//\"")]
@@ -215,6 +219,23 @@ namespace VSDoxyHighlighter
     [Description("Enables the extension in comments starting with \"/*!\".")]
     public bool EnableInSlashStarExclamation { get; set; } = true;
 
+    //----------------
+    // Autocomplete detailed configuration
+
+    // "\t" does not get printed, and is a hack to get the category to appear in the desired place in the property grid.
+    public const string AutocompleteSubCategory = "\tIntelliSense detailed configuration";
+
+    [Category(AutocompleteSubCategory)]
+    [DisplayName("Autocomplete of function/macro parameters")]
+    [Description("If enabled, the extension lists the parameters of the next function or macro when typing after the Doxygen "
+      + "commands \"\\param\", \"\\p\" and \"\\a\". Works only if \"Enable IntelliSense\" is enabled above.")]
+    public bool EnableFunctionAndMacroParameterAutocomplete { get; set; } = true;
+
+    [Category(AutocompleteSubCategory)]
+    [DisplayName("Autocomplete of template parameters")]
+    [Description("If enabled, the extension lists the parameters of the next class, struct, function or alias template (templated \"using\") "
+      + "when typing after the Doxygen command \"\\tparam\". Works only if \"Enable IntelliSense\" is enabled above.")]
+    public bool EnableTemplateParameterAutocomplete { get; set; } = true;
 
     //----------------
     // Commands configuration

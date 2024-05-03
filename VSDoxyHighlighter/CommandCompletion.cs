@@ -149,7 +149,7 @@ namespace VSDoxyHighlighter
         }
         // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
         // support autocompletion of the parameter, and if yes, populate the autocomplete box with possible parameter values.
-        else if (startChar == ' ' || startChar == '\t') {
+        else if (AnyAdvancedAutocompleteEnabled() && (startChar == ' ' || startChar == '\t')) {
           try {
             itemsBuilder = await PopulateAutocompleteBoxForParameterAsync(startPoint, cancellationToken);
           }
@@ -266,8 +266,9 @@ namespace VSDoxyHighlighter
       string parentInfo = null;
       ImageElement icon = null;
 
-      if (command == "p" || command == "a" 
-          || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]") {
+      if (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete
+          && (command == "p" || command == "a" 
+              || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]")) {
         // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
         // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
         // switch to the main thread happens (i.e. a message into the message loop of the main thread gets posted,
@@ -293,7 +294,8 @@ namespace VSDoxyHighlighter
           }
         }
       }
-      else if (command == "tparam") {
+      else if (mGeneralOptions.EnableTemplateParameterAutocomplete 
+               && command == "tparam") {
         // As above: Switch to the main thread for the CodeModel, especially because of performance.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
@@ -366,6 +368,13 @@ namespace VSDoxyHighlighter
         ++curParamNumber;
       }
       return itemsBuilder;
+    }
+
+
+    private bool AnyAdvancedAutocompleteEnabled() 
+    {
+      return mGeneralOptions.EnableAutocomplete
+        && (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete || mGeneralOptions.EnableTemplateParameterAutocomplete);
     }
 
 
