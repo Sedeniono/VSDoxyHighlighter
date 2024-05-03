@@ -1,15 +1,14 @@
-﻿using EnvDTE;
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.OLE.Interop;
+﻿using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -173,13 +172,23 @@ namespace VSDoxyHighlighter
       + "When enabled and you type a \"\\\" or \"@\" in a comment, a list of all Doxygen commands appears. "
       + "Some specific commands support autocompletion for their arguments (see corresponding detailed configuration below). "
       + "Also note that with the settings below you can define in which comment types the autocomplete is enabled.")]
-    public bool EnableAutocomplete { get; set; } = true;
+    public bool EnableAutocomplete {
+      get { return mEnableAutocomplete; }
+      set {
+        mEnableAutocomplete = value;
+        ChangeReadOnlyAttributeFor(nameof(EnableFunctionAndMacroParameterAutocomplete), !mEnableAutocomplete);
+        ChangeReadOnlyAttributeFor(nameof(EnableTemplateParameterAutocomplete), !mEnableAutocomplete);
+      }
+    }
 
+    private bool mEnableAutocomplete = true;
+    
     [Category(FeaturesSubCategory)]
     [DisplayName("Enable quick info tooltips")]
     [Description("If enabled, hovering over a Doxygen command will display the help text of that command. "
       + "Note that with the settings below you can define in which comment types the quick info is enabled.")]
     public bool EnableQuickInfo { get; set; } = true;
+
 
     //----------------
     // Comment types
@@ -219,6 +228,7 @@ namespace VSDoxyHighlighter
     [Description("Enables the extension in comments starting with \"/*!\".")]
     public bool EnableInSlashStarExclamation { get; set; } = true;
 
+
     //----------------
     // Autocomplete detailed configuration
 
@@ -229,13 +239,16 @@ namespace VSDoxyHighlighter
     [DisplayName("Autocomplete of function/macro parameters")]
     [Description("If enabled, the extension lists the parameters of the next function or macro when typing after the Doxygen "
       + "commands \"\\param\", \"\\p\" and \"\\a\". Works only if \"Enable IntelliSense\" is enabled above.")]
+    [ReadOnly(false)] // Required so that ChangeReadOnlyAttributeFor() works correctly.
     public bool EnableFunctionAndMacroParameterAutocomplete { get; set; } = true;
 
     [Category(AutocompleteSubCategory)]
     [DisplayName("Autocomplete of template parameters")]
     [Description("If enabled, the extension lists the parameters of the next class, struct, function or alias template (templated \"using\") "
       + "when typing after the Doxygen command \"\\tparam\". Works only if \"Enable IntelliSense\" is enabled above.")]
+    [ReadOnly(false)] // Required so that ChangeReadOnlyAttributeFor() works correctly.
     public bool EnableTemplateParameterAutocomplete { get; set; } = true;
+
 
     //----------------
     // Commands configuration
@@ -250,6 +263,28 @@ namespace VSDoxyHighlighter
     [TypeConverter(typeof(DoxygenCommandInConfigListSerialization))]
     [Editor(typeof(FixedElementsCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
     public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; set; } = DoxygenCommands.DefaultCommandsInConfig;
+
+
+    //----------------
+    // Helpers
+
+    /// <summary>
+    /// Used to dynamically enable or disable some property in the options dialog depending on another property.
+    /// </summary>
+    private void ChangeReadOnlyAttributeFor(string property, bool isReadOnly)
+    {
+      // Based on https://stackoverflow.com/a/74010994/3740047
+      PropertyDescriptor descriptor = TypeDescriptor.GetProperties(GetType())[property];
+      Debug.Assert(descriptor != null);
+      ReadOnlyAttribute attribute = descriptor?.Attributes[typeof(ReadOnlyAttribute)] as ReadOnlyAttribute;
+      Debug.Assert(attribute != null);
+      FieldInfo fieldToChange = attribute?.GetType().GetField(
+        "isReadOnly",
+        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+      Debug.Assert(fieldToChange != null);
+      fieldToChange?.SetValue(attribute, isReadOnly);
+    }
+
   }
 
 
