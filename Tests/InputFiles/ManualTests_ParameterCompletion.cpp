@@ -29,6 +29,9 @@ void funcDefWithDefaultArgs(const int i = 42, double d = 43.0) { }
 /// @param
 void funcDeclWithInlineClassDecl(class InlClassDecl param);
 
+/// @param
+void funcDefWithInlineClassDecl(class InlClassDecl & param) { }
+
 /// @param[in]
 /// @tparam
 template <class templateParam, int vTempl>
@@ -43,7 +46,7 @@ int templateFunctionDefinition(double var, int iiiii, int arr[], double volatile
 template <int iTempl>
 void templateFunctionDeclaration(int d);
 
-/// @tparam
+/// @tparam 
 /// @param[in]
 /// @param[out]
 /// @param[in,out]
@@ -91,7 +94,7 @@ class TemplateClass
 
   /// @param
   /// @tparam
-  template <class U>
+  template <class >
   int templateMemberFunc(U);
 
   /// @param
@@ -116,12 +119,14 @@ struct TemplateStruct
 {
 };
 
-/// @tparam 
+/// @param
+/// @tparam
 struct NonTemplateStruct
 {
 };
 
 
+// NOTE: 'i' and 'test' are not seen.
 /// @tparam
 template <typename templArg, auto i, int test, typename another>
 struct TemplateStructDecl;

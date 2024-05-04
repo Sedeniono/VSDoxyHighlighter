@@ -138,12 +138,27 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      (var functionTokenIter, var _) = mSemanticCache.TryGetSemanticFunctionInfoIfNextIsAFunction(point);
+      (var functionTokenIter, var templateParameterTokens) = mSemanticCache.TryGetSemanticFunctionInfoIfNextIsAFunction(point);
       if (functionTokenIter == null) {
         // Either the next thing after 'point' is not a function, or some error occurred. In the latter case we could try
         // to successively iterate through the following lines and query FileCodeModel for information. But in my experiments
         // the SemanticTokenCache never failed to get function information. So we don't do such a fallback.
         return null;
+      }
+
+      // The SemanticTokensCache interprets all 'SemanticTokenKind.cppType' elements as template parameters because
+      // it doesn't have sufficient information. When we have e.g. a non-templated struct and the user types '@param'
+      // above it, the non-templated struct is therefore seen as a template parameter. To fix this, we query the
+      // FileCodeModel here whether the assumed template parameter is actually one.
+      if (templateParameterTokens != null) {
+        foreach (var paramToken in templateParameterTokens) {
+          CodeElement paramCodeElement = TryGetCodeElementFor(paramToken);
+          // Note that the FileCodeModel returns null for template parameters. (The check for vsCMElementParameter is
+          // just an educated guess in case the FileCodeModel gets ever improved.)
+          if (paramCodeElement != null && paramCodeElement.Kind != vsCMElement.vsCMElementParameter) {
+            return null; // SemanticTokensCache was wrong. The next element after 'point' is not a function.
+          }
+        }
       }
 
       VCCodeFunction codeElement = TryGetCodeElementFor(functionTokenIter.Current) as VCCodeFunction;
@@ -187,13 +202,31 @@ namespace VSDoxyHighlighter
       // Note: Structure and reasoning the same as in TryGetFunctionInfoIfNextIsAFunction().
       // Especially: Prefer the FileCodeModel information since it contains information about non-type template parameters.
 
-      (var classToken, _) = mSemanticCache.TryGetSemanticClassInfoIfNextIsATemplateClass(point);
+      (var classToken, var templateParameterTokens) = mSemanticCache.TryGetSemanticClassInfoIfNextIsATemplateClass(point);
       if (classToken == null) {
         return null;
       }
 
+      // The SemanticTokensCache interprets all 'SemanticTokenKind.cppType' elements as template parameters because
+      // it doesn't have sufficient information. When we have e.g. a non-templated struct and the user types '@tparam'
+      // above it, the non-templated struct is therefore seen as a template parameter. To fix this, we query the
+      // FileCodeModel here whether the assumed template parameter is actually one.
+      if (templateParameterTokens != null) {
+        foreach (var paramToken in templateParameterTokens) {
+          CodeElement paramCodeElement = TryGetCodeElementFor(paramToken);
+          // Note that the FileCodeModel returns null for template parameters. (The check for vsCMElementParameter is
+          // just an educated guess in case the FileCodeModel gets ever improved.)
+          if (paramCodeElement != null && paramCodeElement.Kind != vsCMElement.vsCMElementParameter) {
+            return null; // SemanticTokensCache was wrong. The next element after 'point' is not a class/alias.
+          }
+        }
+      }
+
       CodeElement codeElement = TryGetCodeElementFor(classToken);
-      if (codeElement == null) { 
+      if (codeElement == null) {
+        // Most likely we have a global class declaration. The FileCodeModel is buggy here and does not know about it.
+        // Just return the info from the SemanticTokenCache. Unfortunately it lacks information about non-type template parameters.
+        // Not much we can do here (except write a code parser ourselves...).
         return mSemanticCache.TryGetClassInfoIfNextIsATemplateClassOrAlias(point); 
       }
 
