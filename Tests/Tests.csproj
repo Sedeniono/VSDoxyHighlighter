@@ -74,6 +74,9 @@
     <Content Include="InputFiles\ManualTests_DoxygenCommands.cpp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="InputFiles\ManualTests_ParameterCompletion.cpp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="InputFiles\Markdown_DoubleStar.cpp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
