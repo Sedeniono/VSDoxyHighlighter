@@ -338,10 +338,8 @@ namespace VSDoxyHighlighter
           icon = cParamImage
         };
         if (preselectAfterPrevious) {
-          FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, paramCommands);
-          if (group != null && group.Fragments.Count == 2) {
-            result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
-          }
+          result.elementBeforeElementToPreselect 
+            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, paramCommands);
         }
         return result;
       }
@@ -354,10 +352,8 @@ namespace VSDoxyHighlighter
           icon = cParamImage
         };
         if (preselectAfterPrevious) {
-          FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, paramCommands);
-          if (group != null && group.Fragments.Count == 2) {
-            result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
-          }
+          result.elementBeforeElementToPreselect
+            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, paramCommands);
         }
         return result;
       }
@@ -385,10 +381,8 @@ namespace VSDoxyHighlighter
           };
 
           if (preselectAfterPrevious) {
-            FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
-            if (group != null && group.Fragments.Count == 2) {
-              result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
-            }
+            result.elementBeforeElementToPreselect
+              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
           }
 
           return result;
@@ -403,7 +397,13 @@ namespace VSDoxyHighlighter
             elementsToShow = clsInfo.TemplateParameters.Select(p => (p, "")),
             parentInfo = $"{clsInfo.Type}: {clsInfo.ClassName}",
             icon = cTemplateParamImage
-          };
+          }; 
+
+          if (preselectAfterPrevious) {
+            result.elementBeforeElementToPreselect
+              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
+          }
+
           return result;
         }
         return null;
@@ -458,8 +458,22 @@ namespace VSDoxyHighlighter
     }
 
 
+    private string TryFindParameterOfPreviousDoxygenCommandWithOneParameter(
+      IVisualStudioCppFileSemantics cppFileSemantics,
+      SnapshotPoint point,
+      string[] doxygenCmds)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      FormattedFragmentGroup group = TryFindPreviousDoxygenCommandOnLinesBeforePoint(cppFileSemantics, point, doxygenCmds);
+      if (group != null && group.Fragments.Count == 2) {
+        return group.Fragments[1].GetText(point.Snapshot);
+      }
+      return null;
+    }
+
+
     // Given a text point, tries to find the next Doxygen command before that point which is in the given array 'doxygenCmds'.
-    private FormattedFragmentGroup TryFindDoxygenCommandOnLinesBeforePoint(
+    private FormattedFragmentGroup TryFindPreviousDoxygenCommandOnLinesBeforePoint(
       IVisualStudioCppFileSemantics cppFileSemantics, 
       SnapshotPoint point, 
       string[] doxygenCmds)
