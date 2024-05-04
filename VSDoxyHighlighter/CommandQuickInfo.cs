@@ -115,7 +115,7 @@ namespace VSDoxyHighlighter
 
         ITextSnapshotLine line = triggerPoint.GetContainingLine();
 
-        // We use the extent **including** the linear break characters (\r\n) because CommentClassifier.GetClassificationSpans()
+        // We use the extent **including** the line break characters (\r\n) because CommentClassifier.GetClassificationSpans()
         // is called by Visual Studio typically with lines including them, meaning that the CommentClassifier caches lines
         // including the line break characters. So, by including them here, too, the ParseSpan() method can more likely simply
         // return already cached information.
