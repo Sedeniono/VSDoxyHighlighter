@@ -73,6 +73,14 @@ namespace VSDoxyHighlighter
     /// Note: It is implementation defined what is returned if 'point' is not a point before the '#define'.
     /// </summary>
     MacroInfo TryGetMacroInfoIfNextIsAMacro(SnapshotPoint point);
+
+    /// <summary>
+    /// Tries to find the next C++ element (variable, function, class, etc.) **before** the given "point", but at most "withinNumLinesBefore" before.
+    /// The limit "withinNumLinesBefore" is necessary because this is a potentially expensive operation.
+    /// Returns the end position of the found C++ element (offset from the start of the buffer), or the start position of the line indicated
+    /// by "withinNumLinesBefore".
+    /// </summary>
+    int TryGetEndPositionOfCppElementBefore(SnapshotPoint point, uint withinNumLinesBefore);
   }
 
 
@@ -293,6 +301,13 @@ namespace VSDoxyHighlighter
       }
 
       return new MacroInfo { MacroName = macroName, Parameters = parameters };
+    }
+
+
+    public int TryGetEndPositionOfCppElementBefore(SnapshotPoint point, uint withinNumLinesBefore)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      return mSemanticCache.TryGetEndPositionOfCppElementBefore(point, withinNumLinesBefore);
     }
 
 
@@ -677,7 +692,42 @@ namespace VSDoxyHighlighter
     }
 
 
+    public int TryGetEndPositionOfCppElementBefore(SnapshotPoint point, uint withinNumLinesBefore)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      int searchStartLineNumber0Based = Math.Max(0, point.GetContainingLineNumber() - (int)withinNumLinesBefore);
+      SnapshotPoint searchStartPoint = point.Snapshot.GetLineFromLineNumber(searchStartLineNumber0Based).Start;
+      var tokens = GetTokensIn(new SnapshotSpan(searchStartPoint, point));
+      if (tokens != null) {
+        // Note: The following line is potentially expensive because it retrieves all tokens in the span, stores them
+        // and then returns them reversed. So the 'yield' mechanism underlying GetTokensAfter() is useless. Unfortunately,
+        // the SemanticTokensCache does not provide a reverse enumerator. This is the reason for the 'withinNumLinesBefore'
+        // parameter, so that the number of retrieved tokens is limited. 
+        var reversedTokens = tokens.Reverse();
+        SemanticToken nearestTokenBeforePoint = reversedTokens.FirstOrDefault();
+        if (nearestTokenBeforePoint != null) {
+          Debug.Assert(nearestTokenBeforePoint.End <= point.Position);
+          return nearestTokenBeforePoint.End;
+        }
+      }
+
+      return searchStartPoint.Position;
+    }
+
+
     private IEnumerable<SemanticToken> GetTokensAfter(SnapshotPoint point)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      // Get an enumerator for the tokens starting at 'point' till the end of the file. They are retriveved lazily ('yield'),
+      // so it is not a performance issue that we try to get all of them till the end of the file. As long as we don't try
+      // to retrieve all of them.
+      return GetTokensIn(new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));
+    }
+
+
+    private IEnumerable<SemanticToken> GetTokensIn(SnapshotSpan span)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -686,12 +736,8 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      // Get an enumerator for the tokens starting at 'point' till the end of the file. They are retriveved lazily ('yield'),
-      // so it is not a performance issue that we try to get all of them till the end of the file.
-      // Span from 'point' to the end of the file.
-      var span = new NormalizedSnapshotSpanCollection(
-        new SnapshotSpan(mTextBuffer.CurrentSnapshot, point.Position, mTextBuffer.CurrentSnapshot.Length - point.Position));
-      return vsCache.GetTokens(span);
+      var spanCollection = new NormalizedSnapshotSpanCollection(span);
+      return vsCache.GetTokens(spanCollection);
     }
 
 

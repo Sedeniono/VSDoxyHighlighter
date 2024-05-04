@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Text;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -82,6 +83,11 @@ namespace VSDoxyHighlighter
     public override int GetHashCode()
     {
       return Tuple.Create(StartIndex, Length, Classification).GetHashCode();
+    }
+
+    public string GetText(ITextSnapshot snapshot)
+    {
+      return snapshot.GetText(StartIndex, Length);
     }
   }
 

@@ -22,9 +22,10 @@ void funcDeclarationWithUnnamedParams(int, double);
 /// @param
 void funcDeclWithDefaultArgs(const int i = 42, double d = 43.0);
 
+/// @param someInt
 /// @param
 /// @tparam
-void funcDefWithDefaultArgs(const int i = 42, double d = 43.0) { }
+void funcDefWithDefaultArgs(const int someInt = 42, double someDouble = 43.0) { }
 
 /// @param
 void funcDeclWithInlineClassDecl(class InlClassDecl param);
@@ -46,10 +47,14 @@ int templateFunctionDefinition(double var, int iiiii, int arr[], double volatile
 template <int iTempl>
 void templateFunctionDeclaration(int d);
 
-/// @tparam 
-/// @param[in]
-/// @param[out]
-/// @param[in,out]
+/// @tparam tParam2 some description
+/// @tparam tParam3 more description
+/// @param[in] param2 desc
+/// test
+/// test @p
+/// @param[out] param3
+/// 
+/// @param[in,out] param10
 /// @a
 /// @p
 ///
@@ -133,7 +138,9 @@ struct TemplateStructDecl;
 
 
 /// @tparam
-/// @param
+/// @param y
+/// @param zzzzz
+/// @param x
 #define SOME_MACRO(x, y, zzzzz) x
 
 /// @param

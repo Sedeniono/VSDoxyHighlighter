@@ -148,10 +148,10 @@ namespace VSDoxyHighlighter
           itemsBuilder = PopulateAutcompleteBoxWithCommands(startChar);
         }
         // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
-        // support autocompletion of the parameter, and if yes, populate the autocomplete box with possible parameter values.
+        // support autocompletion of the command's parameter, and if yes, populate the autocomplete box with possible parameter values.
         else if (AnyAdvancedAutocompleteEnabled() && (startChar == ' ' || startChar == '\t')) {
           try {
-            itemsBuilder = await PopulateAutocompleteBoxForParameterAsync(startPoint, cancellationToken);
+            itemsBuilder = await PopulateAutocompleteBoxForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
           }
           catch (Exception ex) {
             ActivityLog.LogError("VSDoxyHighlighter", $"Exception occurred while checking for parameter completion: {ex}");
@@ -241,92 +241,68 @@ namespace VSDoxyHighlighter
     }
 
 
-    private async Task<ImmutableArray<CompletionItem>.Builder> PopulateAutocompleteBoxForParameterAsync(
+    private async Task<ImmutableArray<CompletionItem>.Builder> PopulateAutocompleteBoxForParameterOfDoxygenCommandAsync(
         SnapshotPoint startPoint, CancellationToken cancellationToken)
     {
+      AutocompleteInfoForParameterOfDoxygenCommand? infos = await TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
+      if (infos != null && infos.Value.elementsToShow.Count() > 0) {
+        return CreateAutocompleteItemsForParameterOfDoxygenCommand(infos.Value);
+      }
+      return null;
+    }
+
+
+    private struct AutocompleteInfoForParameterOfDoxygenCommand
+    {
+      public IEnumerable<(string name, string type)> elementsToShow;
+      
+      // E.g. the function or class name.
+      public string parentInfo;
+      
+      // If an element in 'elementsToShow' matches this string, the next one after that will be preselected.
+      // This is used to make writing parameter documentation more convenient. For example, if one is successively documenting
+      // the function parameters with '@param', the autocomplete box will preselect the most likely next parameter one wants
+      // to insert, i.e. the one which comes next after the previously documented parameter.
+      public string elementBeforeElementToPreselect;
+      
+      public ImageElement icon;
+    }
+
+
+    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(
+      SnapshotPoint startPoint, CancellationToken cancellationToken)
+    {
+      // Get the Doxygen command without the "\" or "@".
       string command = TryGetDoxygenCommandBeforeWhitespace(startPoint);
       if (command == null) {
         return null;
       }
 
-      // TODO: Add option page to disable the parameter completion. Reason: It requires quite a bunch of semantic infos,
-      // and getting them might be expensive. So we want the user to disable the feature.
-      // TODO: Add to readme: Doesn't work for NTTP template arguments in global function declerations.
-      // TODO: Make \param and \tparam more intelligent (suggest the next param first)
-      // TODO: Support \class, \def, etc: Can we provide a list of all classes/structs, namespaces, functions, macros, etc. for the corresponding doxygen commands?
-      // TODO: Idea for "global" lists (\class, \def, etc): Use the filters-functionality of the autocomplete box (e.g. only in file; only in current namespace)
-      // TODO: Performance. Especially because every VS access is necessarily on the main thread due to COM stuff.
-      //       Querying the cancellationToken from the main thread is useless; it never gets set.
-      //       But maybe we can somehow temporarily switch away from the main thread between COM queries, so that the message loop etc runs?
-      //       But before doing this, check with LLVM code base (as a real world example), if necessary.
-      //       Or: Implement in native C++ code; maybe it helps?
-      // TODO: \exception idea: scan the definition for throws
-
-      IEnumerable<(string name, string type)> elementsToShow = null;
-      string parentInfo = null;
-      ImageElement icon = null;
-
-      if (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete
-          && (command == "p" || command == "a" 
-              || command == "param" || command == "param[in]" || command == "param[out]" || command == "param[in,out]")) {
-        // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
-        // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
-        // switch to the main thread happens (i.e. a message into the message loop of the main thread gets posted,
-        // which then is executed, and is returned to us). This happens because CodeModel is implemented in native
-        // code, and in this case the runtime does this automatic marshalling. However, this would happen for every
-        // single access of the CodeModel, which results in very bad performance. So switch once at the beginning.
-        // Compare https://devblogs.microsoft.com/premier-developer/asynchronous-and-multithreaded-programming-within-vs-using-the-joinabletaskfactory/#a-small-history-lesson-in-com-thread-marshaling
-        // and https://github.com/dotnet/project-system/issues/924.
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-        var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
-        FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        icon = cParamImage;
-        if (funcInfo != null) {
-          elementsToShow = funcInfo.Parameters.Select(p => (p.Name, p.Type));
-          parentInfo = $"Function: {funcInfo.FunctionName}";
+      if (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete) {
+        // Autocompletion for Doxygen command parameters that document C++ parameters.
+        if (cCmdsToDocumentParam.Contains(command)) {
+          return await TryGetAutocompleteInfosForParamCommandAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
         }
-        else {
-          MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
-          if (macroInfo != null) {
-            elementsToShow = macroInfo.Parameters.Select(p => (p, "")); ;
-            parentInfo = $"Macro: {macroInfo.MacroName}";
-          }
-        }
-      }
-      else if (mGeneralOptions.EnableTemplateParameterAutocomplete 
-               && command == "tparam") {
-        // As above: Switch to the main thread for the CodeModel, especially because of performance.
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-        var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
-        FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
-        icon = cTemplateParamImage;
-        if (funcInfo != null) {
-          if (funcInfo.TemplateParameters.Count() > 0) {
-            elementsToShow = funcInfo.TemplateParameters.Select(p => (p, ""));
-            parentInfo = $"Function: {funcInfo.FunctionName}";
-          }
-        }
-        else { 
-          ClassOrAliasInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
-          if (clsInfo != null && clsInfo.TemplateParameters.Count() > 0) {
-            elementsToShow = clsInfo.TemplateParameters.Select(p => (p, ""));
-            parentInfo = $"{clsInfo.Type}: {clsInfo.ClassName}";
-          }
+        // Autocompletion for Doxygen command parameters that refer to C++ parameters in the running text.
+        if (cCmdsToReferToParam.Contains(command)) {
+          // Note: preselectAfterPrevious = false. We cannot sensibly guess which function parameter the user wants to preselect for "@p" and "@a".
+          return await TryGetAutocompleteInfosForParamCommandAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
         }
       }
 
-      if (elementsToShow != null && elementsToShow.Count() > 0) {
-        Debug.Assert(parentInfo != null);
-        return CreateAutocompleteItemsForCommandParameter(elementsToShow, parentInfo, icon);
+      if (mGeneralOptions.EnableTemplateParameterAutocomplete) {
+        // Autocompletion for Doxygen command parameters that document C++ template parameters.
+        if (cCmdsToDocumentTParam.Contains(command)) {
+          return await TryGetAutocompleteInfosForTParamCommandAsync(startPoint, preselectAfterPrevious: true, cancellationToken);
+        }
       }
 
       return null;
     }
 
 
-    private string TryGetDoxygenCommandBeforeWhitespace(SnapshotPoint whitespacePoint) 
+    private string TryGetDoxygenCommandBeforeWhitespace(SnapshotPoint whitespacePoint)
     {
       ITextSnapshotLine line = whitespacePoint.GetContainingLine();
       string lineBeforeCompletionStart = line.GetText().Substring(0, whitespacePoint - line.Start).TrimEnd();
@@ -338,23 +314,121 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForCommandParameter(
-      IEnumerable<(string name, string suffix)> elementsToShow,
-      string parentInfo,
-      ImageElement icon) 
+    // Gets parameter information for the Doxygen commands '@param', '@p' and '@a'.
+    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForParamCommandAsync(
+      SnapshotPoint startPoint, string[] paramCommands, bool preselectAfterPrevious, CancellationToken cancellationToken) 
+    {
+      // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
+      // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
+      // switch to the main thread happens (i.e. a message into the message loop of the main thread gets posted,
+      // which then is executed, and is returned to us). This happens because CodeModel is implemented in native
+      // code, and in this case the runtime does this automatic marshalling. However, this would happen for every
+      // single access of the CodeModel, which results in very bad performance. So switch once at the beginning.
+      // Compare https://devblogs.microsoft.com/premier-developer/asynchronous-and-multithreaded-programming-within-vs-using-the-joinabletaskfactory/#a-small-history-lesson-in-com-thread-marshaling
+      // and https://github.com/dotnet/project-system/issues/924.
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+      var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
+
+      FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+      if (funcInfo != null) {
+        var result = new AutocompleteInfoForParameterOfDoxygenCommand {
+          elementsToShow = funcInfo.Parameters.Select(p => (p.Name, p.Type)),
+          parentInfo = $"Function: {funcInfo.FunctionName}",
+          icon = cParamImage
+        };
+        if (preselectAfterPrevious) {
+          FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, paramCommands);
+          if (group != null && group.Fragments.Count == 2) {
+            result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
+          }
+        }
+        return result;
+      }
+      
+      MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
+      if (macroInfo != null) {
+        var result = new AutocompleteInfoForParameterOfDoxygenCommand { 
+          elementsToShow = macroInfo.Parameters.Select(p => (p, "")),
+          parentInfo = $"Macro: {macroInfo.MacroName}",
+          icon = cParamImage
+        };
+        if (preselectAfterPrevious) {
+          FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, paramCommands);
+          if (group != null && group.Fragments.Count == 2) {
+            result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
+          }
+        }
+        return result;
+      }
+
+      return null;
+    }
+
+
+    // Gets parameter information for the Doxygen command '@tparam'.
+    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForTParamCommandAsync(
+      SnapshotPoint startPoint, bool preselectAfterPrevious, CancellationToken cancellationToken)
+    {
+      // As in TryGetAutocompleteInfosForParamCommandAsync(): Switch to the main thread for the FileCodeModel, especially because of performance.
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+      var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
+
+      FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
+      if (funcInfo != null) {
+        if (funcInfo.TemplateParameters.Count() > 0) {
+          var result = new AutocompleteInfoForParameterOfDoxygenCommand {
+            elementsToShow = funcInfo.TemplateParameters.Select(p => (p, "")),
+            parentInfo = $"Function: {funcInfo.FunctionName}",
+            icon = cTemplateParamImage
+          };
+
+          if (preselectAfterPrevious) {
+            FormattedFragmentGroup group = TryFindDoxygenCommandOnLinesBeforePoint(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
+            if (group != null && group.Fragments.Count == 2) {
+              result.elementBeforeElementToPreselect = group.Fragments[1].GetText(startPoint.Snapshot);
+            }
+          }
+
+          return result;
+        }
+        return null;
+      }
+
+      ClassOrAliasInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
+      if (clsInfo != null) {
+        if (clsInfo.TemplateParameters.Count() > 0) {
+          var result = new AutocompleteInfoForParameterOfDoxygenCommand {
+            elementsToShow = clsInfo.TemplateParameters.Select(p => (p, "")),
+            parentInfo = $"{clsInfo.Type}: {clsInfo.ClassName}",
+            icon = cTemplateParamImage
+          };
+          return result;
+        }
+        return null;
+      }
+
+      return null;
+    }
+
+
+    private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForParameterOfDoxygenCommand(
+      AutocompleteInfoForParameterOfDoxygenCommand infos)
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-      int numParams = elementsToShow.Count();
+      int numParams = infos.elementsToShow.Count();
       int curParamNumber = 1;
-      foreach ((string name, string type) in elementsToShow) {
+      bool preselected = false;
+      foreach ((string name, string type) in infos.elementsToShow) {
         string suffix = type != null && type != ""
-          ? $"Type: {type}. {parentInfo}"
-          : parentInfo;
+          ? $"Type: {type}. {infos.parentInfo}"
+          : infos.parentInfo;
 
         var item = new CompletionItem(
           displayText: name,
           source: this,
-          icon: icon,
+          icon: infos.icon,
           filters: ImmutableArray<CompletionFilter>.Empty,
           suffix: suffix,
           insertText: name,
@@ -362,11 +436,17 @@ namespace VSDoxyHighlighter
           sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
           filterText: name,
           automationText: name,
-          attributeIcons: ImmutableArray<ImageElement>.Empty);
+          attributeIcons: ImmutableArray<ImageElement>.Empty,
+          commitCharacters: default,
+          applicableToSpan: default,
+          isCommittedAsSnippet: false,
+          isPreselected: preselected);
 
         itemsBuilder.Add(item);
         ++curParamNumber;
+        preselected = name == infos.elementBeforeElementToPreselect;
       }
+
       return itemsBuilder;
     }
 
@@ -378,12 +458,72 @@ namespace VSDoxyHighlighter
     }
 
 
+    // Given a text point, tries to find the next Doxygen command before that point which is in the given array 'doxygenCmds'.
+    private FormattedFragmentGroup TryFindDoxygenCommandOnLinesBeforePoint(
+      IVisualStudioCppFileSemantics cppFileSemantics, 
+      SnapshotPoint point, 
+      string[] doxygenCmds)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      // The task is to find the next Doxygen command in 'doxygenCmds' that comes before 'point. So we need to iterate backward
+      // until we either find it or leave the current comment section. But how do we detect that we leave the current comment
+      // section? I.e. when do we give up on searching backwards? In principle, the CommentClassifier found the start of the
+      // comment, because it figured out the type of the comment ('//', '///', '/*', etc.). Problem: This is useless here,
+      // because we don't need the start of the comment but rather the start of a whole comment section that the user perceives
+      // as 'one unit'. A '///' comment starts before the '/'. But of course there can be comment lines above, all of them
+      // indicated by '///'. So what we would need is the union of all comments that are separated by whitespaces only. Or,
+      // put another way, we need to find the first C++ element before 'point' that is not a comment. This is what
+      // TryGetEndPositionOfCppElementBefore() does. We then can search backward between that C++ element and 'point'.
+      //
+      // Unfortunately, the way the semantic information is exposed by Visual Studio, in general we cannot find the C++ element
+      // before 'point' without getting **ALL** C++ elements till the start of the file. See the implementation notes in
+      // TryGetEndPositionOfCppElementBefore(). Thus we need to implement some cutoff, indicated by cNumLinesBackwards.
+      // 30 lines back seems like a reasonable upper bound; who writes longer parameter descriptions?
+      const int cNumLinesBackwards = 30;
+      int backwardsSearchStopPosition = cppFileSemantics.TryGetEndPositionOfCppElementBefore(point, cNumLinesBackwards);
+      Debug.Assert(backwardsSearchStopPosition <= point.Position);
+
+      var snapshot = point.Snapshot;
+      int backwardsSearchLineNumStop = snapshot.GetLineFromPosition(backwardsSearchStopPosition).LineNumber;
+
+      if (snapshot.TextBuffer.Properties.TryGetProperty(
+          typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+        // We assume only one Doxygen command per line.
+        for (int lineNum = point.GetContainingLineNumber() - 1; lineNum >= backwardsSearchLineNumStop; --lineNum) {
+          ITextSnapshotLine line = snapshot.GetLineFromLineNumber(lineNum);
+
+          // We use the extent **including** the line break characters (\r\n) because CommentClassifier.GetClassificationSpans()
+          // is called by Visual Studio typically with lines including them, meaning that the CommentClassifier caches lines
+          // including the line break characters. So, by including them here, too, the ParseSpan() method can more likely simply
+          // return already cached information.
+          var foundFragmentGroups = commentClassifier.ParseSpan(line.ExtentIncludingLineBreak);
+
+          foreach (FormattedFragmentGroup group in foundFragmentGroups.Reverse()) {
+            if (group.Fragments.Count > 0) {
+              string classifiedCommand = group.Fragments[0].GetText(snapshot);
+              if (classifiedCommand.Length > 1 && doxygenCmds.Contains(classifiedCommand.Substring(1))) {
+                return group;
+              }
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+
     // http://glyphlist.azurewebsites.net/knownmonikers/
     // https://github.com/madskristensen/KnownMonikersExplorer
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
     // Image for parameter and template parameter: These should be the images shown by VS's own IntelliSense in C++.
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
+
+    private static readonly string[] cCmdsToDocumentParam = new string[] { "param", "param[in]", "param[out]", "param[in,out]" };
+    private static readonly string[] cCmdsToReferToParam = new string[] { "p", "a" };
+    private static readonly string[] cCmdsToDocumentTParam = new string[] { "tparam" };
 
     private readonly ITextView mTextView;
     private readonly IVsEditorAdaptersFactoryService mAdapterService;
