@@ -11,8 +11,9 @@ namespace VSDoxyHighlighter.Tests
     public bool EnableAutocomplete { get; } = true;
     public bool EnableQuickInfo { get; } = true;
 
-    public bool EnableFunctionAndMacroParameterAutocomplete { get; } = true;
-    public bool EnableTemplateParameterAutocomplete { get; } = true;
+    public bool EnableParameterAutocompleteFor_param { get; } = true;
+    public bool EnableParameterAutocompleteFor_tparam { get; } = true;
+    public bool EnableParameterAutocompleteFor_p_a { get; } = true;
 
     public List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 

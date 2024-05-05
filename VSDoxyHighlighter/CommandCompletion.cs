@@ -278,35 +278,37 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      if (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete) {
-        // Autocompletion for Doxygen command parameters that document C++ parameters.
-        if (cCmdsToDocumentParam.Contains(command)) {
+      if (cCmdsToDocumentParam.Contains(command)) {
+        if (mGeneralOptions.EnableParameterAutocompleteFor_param) {
           var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
           return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
         }
+        return null;
       }
 
-      if (mGeneralOptions.EnableTemplateParameterAutocomplete) {
-        // Autocompletion for Doxygen command parameters that document C++ template parameters.
-        if (cCmdsToDocumentTParam.Contains(command)) {
+      if (cCmdsToDocumentTParam.Contains(command)) {
+        if (mGeneralOptions.EnableParameterAutocompleteFor_tparam) {
           var infos = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentTParam, preselectAfterPrevious: true, cancellationToken);
           return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
         }
+        return null;
       }
 
-      // Autocompletion for Doxygen command parameters that refer to C++ parameters in the running text.
-      if (cCmdsToReferToParam.Contains(command)) {
-        // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user wants to preselect for "@p" and "@a".
-        var normalParamsInfo = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
-        var templateParamsInfo = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
-        var result = new List<AutocompleteInfoForParameterOfDoxygenCommand>();
-        if (normalParamsInfo.HasValue) { 
-          result.Add(normalParamsInfo.Value);
+      if (mGeneralOptions.EnableParameterAutocompleteFor_p_a) {
+        if (cCmdsToReferToParam.Contains(command)) {
+          // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user wants to preselect for "@p" and "@a".
+          var normalParamsInfo = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
+          var templateParamsInfo = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
+          var result = new List<AutocompleteInfoForParameterOfDoxygenCommand>();
+          if (normalParamsInfo.HasValue) {
+            result.Add(normalParamsInfo.Value);
+          }
+          if (templateParamsInfo.HasValue) {
+            result.Add(templateParamsInfo.Value);
+          }
+          return result;
         }
-        if (templateParamsInfo.HasValue) { 
-          result.Add(templateParamsInfo.Value);
-        }
-        return result;
+        return null;
       }
 
       return null;
@@ -465,7 +467,8 @@ namespace VSDoxyHighlighter
     private bool AnyAdvancedAutocompleteEnabled() 
     {
       return mGeneralOptions.EnableAutocomplete
-        && (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete || mGeneralOptions.EnableTemplateParameterAutocomplete);
+        && (mGeneralOptions.EnableParameterAutocompleteFor_param || mGeneralOptions.EnableParameterAutocompleteFor_tparam
+            || mGeneralOptions.EnableParameterAutocompleteFor_p_a);
     }
 
 

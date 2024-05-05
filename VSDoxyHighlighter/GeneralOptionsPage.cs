@@ -85,8 +85,9 @@ namespace VSDoxyHighlighter
     bool EnableAutocomplete { get; }
     bool EnableQuickInfo { get; }
 
-    bool EnableFunctionAndMacroParameterAutocomplete { get; }
-    bool EnableTemplateParameterAutocomplete { get; }
+    bool EnableParameterAutocompleteFor_param { get; }
+    bool EnableParameterAutocompleteFor_tparam { get; }
+    bool EnableParameterAutocompleteFor_p_a { get; }
 
     List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 
@@ -176,8 +177,9 @@ namespace VSDoxyHighlighter
       get { return mEnableAutocomplete; }
       set {
         mEnableAutocomplete = value;
-        ChangeReadOnlyAttributeFor(nameof(EnableFunctionAndMacroParameterAutocomplete), !mEnableAutocomplete);
-        ChangeReadOnlyAttributeFor(nameof(EnableTemplateParameterAutocomplete), !mEnableAutocomplete);
+        ChangeReadOnlyAttributeFor(nameof(EnableParameterAutocompleteFor_param), !mEnableAutocomplete);
+        ChangeReadOnlyAttributeFor(nameof(EnableParameterAutocompleteFor_tparam), !mEnableAutocomplete);
+        ChangeReadOnlyAttributeFor(nameof(EnableParameterAutocompleteFor_p_a), !mEnableAutocomplete);
       }
     }
 
@@ -236,18 +238,25 @@ namespace VSDoxyHighlighter
     public const string AutocompleteSubCategory = "\tIntelliSense detailed configuration";
 
     [Category(AutocompleteSubCategory)]
-    [DisplayName("Autocomplete of function/macro parameters")]
+    [DisplayName("Autocomplete arguments for \"\\param\"")]
     [Description("If enabled, the extension lists the parameters of the next function or macro when typing after the Doxygen "
-      + "commands \"\\param\", \"\\p\" and \"\\a\". Works only if \"Enable IntelliSense\" is enabled above.")]
+      + "command \"\\param\". Works only if \"Enable IntelliSense\" is enabled above.")]
     [ReadOnly(false)] // Required so that ChangeReadOnlyAttributeFor() works correctly.
-    public bool EnableFunctionAndMacroParameterAutocomplete { get; set; } = true;
+    public bool EnableParameterAutocompleteFor_param { get; set; } = true;
 
     [Category(AutocompleteSubCategory)]
-    [DisplayName("Autocomplete of template parameters")]
-    [Description("If enabled, the extension lists the parameters of the next class, struct, function or alias template (templated \"using\") "
+    [DisplayName("Autocomplete arguments for \"\\tparam\"")]
+    [Description("If enabled, the extension lists the template parameters of the next class, struct, function or alias template (templated \"using\") "
       + "when typing after the Doxygen command \"\\tparam\". Works only if \"Enable IntelliSense\" is enabled above.")]
     [ReadOnly(false)] // Required so that ChangeReadOnlyAttributeFor() works correctly.
-    public bool EnableTemplateParameterAutocomplete { get; set; } = true;
+    public bool EnableParameterAutocompleteFor_tparam { get; set; } = true;
+
+    [Category(AutocompleteSubCategory)]
+    [DisplayName("Autocomplete arguments for \"\\p\" and \"\\a\"")]
+    [Description("If enabled, the extension lists the parameters and template parameters of the function, macro, class, struct or alias template (templated \"using\") "
+      + "when typing after the Doxygen commands \"\\p\" or \"\\a\". Works only if \"Enable IntelliSense\" is enabled above.")]
+    [ReadOnly(false)] // Required so that ChangeReadOnlyAttributeFor() works correctly.
+    public bool EnableParameterAutocompleteFor_p_a { get; set; } = true;
 
 
     //----------------
