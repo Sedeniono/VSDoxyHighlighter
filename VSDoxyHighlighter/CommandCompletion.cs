@@ -422,8 +422,8 @@ namespace VSDoxyHighlighter
       bool preselected = false;
       foreach ((string name, string type) in infos.elementsToShow) {
         string suffix = type != null && type != ""
-          ? $"Type: {type}. {infos.parentInfo}"
-          : infos.parentInfo;
+          ? $"=> Type: {type}. {infos.parentInfo}"
+          : $"=> {infos.parentInfo}";
 
         var item = new CompletionItem(
           displayText: name,
