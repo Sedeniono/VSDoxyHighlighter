@@ -13,6 +13,8 @@
 - [Features](#features)
   - [Syntax highlighting](#syntax-highlighting)
   - [IntelliSense (autocomplete while typing)](#intellisense-autocomplete-while-typing)
+    - [Autocomplete of Doxygen commands](#autocomplete-of-doxygen-commands)
+    - [Autocomplete of arguments of Doxygen commands](#autocomplete-of-arguments-of-doxygen-commands)
   - [Quick info tooltips](#quick-info-tooltips)
   - [Not yet supported and future ideas](#not-yet-supported-and-future-ideas)
 - [Configuration](#configuration)
@@ -73,12 +75,23 @@ Especially, important messages such as warnings or notes are harder to overlook 
 
 
 ## IntelliSense (autocomplete while typing)
+
+### Autocomplete of Doxygen commands
 ![Example IntelliSense](Pictures/ExampleIntelliSense.gif)
 
 - If you type an `@` or `\` in a comment, an autocomplete box listing all Doxygen commands appears. Pressing tab, enter or space will autocomplete the currently selected command.
 - Just as for the syntax highlighting, the autocomplete box will appear only in comment types (`/*`, `/**`, etc.) which have been enabled. This can be configured in the VSDoxyHighlighter options.
 - The box shows the commands as documented on the [Doxygen help page](https://www.doxygen.nl/manual/commands.html). The help text for each command is also taken from there.
 - IntelliSense can be disabled entirely in the VSDoxyHighlighter options.
+
+
+### Autocomplete of arguments of Doxygen commands
+Additional autocompletion is provided for the arguments of the following Doxygen commands:
+  - `\param` (and its `in`/`out` variations): Lists the parameters of the next function or macro.
+  - `\tparam`: Lists the template parameters of the next template function, class, struct or alias template ("`using`").
+  - `\p`, `\a`: Lists both the "normal" parameters (if any) and the template parameters (if any) of the next function, macro, class, struct or alias template ("`using`").
+
+These can be disabled separately in the VSDoxyHighlighter options.
 
 
 ## Quick info tooltips
@@ -154,6 +167,9 @@ You can configure separately for each comment type (`/*`, `/**`, `/*!`, `//`, `/
 By default, the comment types `//` and `/*` are disabled because Doxygen does not parse those.
 
 
+
 # Known problems
 - The extension does not work in VS 2019 or earlier. There is currently no plan to support versions older than VS 2022.
 - The extension comes with two different color schemes, namely for dark and light color themes. Changing the Visual Studio theme should immediately adapt the comment colors. However, in rare cases this happens only partially (such as some bold formatting not being applied correctly). To fix this, restart Visual Studio. If the colors are still wrong, please uninstall and reinstall the extension.
+- IntelliSense for the argument completion of `\tparam`, `\p` and `\a` do not show non-type template parameters of global class/function declarations. The underlying issue is that the Visual Studio [`VCFileCodeModel`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.vccodemodel.vcfilecodemodel) does not provide any information for such declarations. To workaround this, the extension uses an alternate method to retrieve the information, which unfortunately lacks knowledge about non-type template parameters.
+- IntelliSense for the argument completion of `\param`, `\p` and `\a` might show incomplete or no type information for function parameters of global class/function declarations. The reason is the same as in the bullet point above: `VCFileCodeModel` does not provide sufficient information, and the implemented workaround is imperfect.
