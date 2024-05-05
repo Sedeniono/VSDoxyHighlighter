@@ -4,6 +4,12 @@
 // Visual Studio instance). This file thus collects various cases to get the
 // functionality at least manually.
 
+#include <functional>
+
+//============================================================================
+// Functions
+//============================================================================
+
 /// @param
 void funcDeclarationWithParam(int foo);
 
@@ -47,6 +53,7 @@ int templateFunctionDefinition(double var, int iiiii, int arr[], double volatile
 template <int iTempl>
 void templateFunctionDeclaration(int d);
 
+
 /// @tparam tParam2 some description
 /// @tparam tParam3 more description
 /// @param[in] param2 desc
@@ -54,7 +61,8 @@ void templateFunctionDeclaration(int d);
 /// test @p
 /// @param[out] param3
 /// 
-/// @param[in,out] param10
+/// @param[in,out] param9
+/// @param param10
 /// @a
 /// @p
 ///
@@ -70,12 +78,73 @@ int ManyParameters(
     int param7,
     int * param8,
     int & param9,
+    // Some comment in the middle
     int **& param10,
     int const param11,
     int const param12)
 {
   fundc();
 }
+
+
+/// @param
+bool ComplicatedParametersDef(
+    std::function<int(double, short)> func1,
+    std::function<int(long double const **,
+            size_t const,
+            bool *&)> 
+        func2WithLineBreaks,
+    decltype([](double volatile &, int){
+                return false;}
+            ) param3,
+    ...);
+
+/// @param
+bool ComplicatedParametersDef(
+    std::function<int(double, short)> func1,
+    std::function<int(long double const **,
+            size_t const,
+            bool *&)> 
+        func2WithLineBreaks,
+    decltype([](double volatile &, int){
+                return false;}
+            ) param3,
+    ...)
+{
+  return false;
+}
+
+
+/// @param
+void OnlyEllipsisDecl(...);
+
+/// @param
+void OnlyEllipsisDef(...);
+
+
+/// @tparam
+/// @param
+template <class... ArgsT>
+void ParameterPackDecl(long double var1, ArgsT &&... args);
+
+/// @tparam
+/// @param
+template <class... ArgsT>
+void ParameterPackDef(long double var1, ArgsT &&... args)
+{
+}
+
+
+/// @param
+void InvalidStuffDecl(some invalid parameter, another invalid parameter);
+
+/// @param
+void InvalidStuffDef(some invalid parameter, another invalid parameter) { }
+
+
+//============================================================================
+// Classes/structrs
+//============================================================================
 
 /**
  * @brief
@@ -106,6 +175,9 @@ class TemplateClass
   /// @tparam
   template <class U>
   int templateMemberFunc2(U u);
+
+  /// @param
+  int templateMemberFunc3WithTypename(typename templClsArg::SomeType param);
 };
 
 
@@ -138,15 +210,20 @@ struct TemplateStructDecl;
 
 
 /// @tparam
-/// @param y
-/// @param zzzzz
-/// @param x
-#define SOME_MACRO(x, y, zzzzz) x
-
-/// @param
-#define ANOTHER_MACRO
+template <class... ArgsT>
+class ClassWithParameterPackDecl;
 
 
+/// @tparam
+template <class... ArgsT>
+class ClassWithParameterPackDef
+{
+};
+
+
+//============================================================================
+// Using alias
+//============================================================================
 
 /// @tparam
 /// @param
@@ -156,3 +233,25 @@ using SomeUsing = void;
 /// @tparam
 /// @param
 using SomeSpecificUsing = SomeUsing<int, 42>;
+
+
+//============================================================================
+// Macros
+//============================================================================
+
+/// @tparam
+/// @param y
+/// @param zzzzz
+/// @param x
+#define SOME_MACRO(x, y, zzzzz) x
+
+/// @param
+#define ANOTHER_MACRO
+
+/// @param
+#define VARIADIC_MACRO(param1, ...)
+
+/// @param
+#define MACRO_WITH_LINE_BREAKS(param1, \
+    param2,\
+    param3)

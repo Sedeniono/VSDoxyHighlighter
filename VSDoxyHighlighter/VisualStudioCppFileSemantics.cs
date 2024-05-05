@@ -185,7 +185,7 @@ namespace VSDoxyHighlighter
       Debug.Assert(funcName == functionTokenIter.Current.Text);
       var parameters = new List<ParameterInfo>();
       foreach (CodeElement param in codeElement.Parameters) {
-        string name = param.Name.Trim();
+        string name = TrimAndStripEllipsis(param.Name);
         if (name != "") {
           string type = (param as VCCodeParameter)?.TypeString;
           parameters.Add(new ParameterInfo { Name = name, Type = type});
@@ -193,7 +193,7 @@ namespace VSDoxyHighlighter
       }
       var templateParameters = new List<string>();
       foreach (CodeElement param in codeElement.TemplateParameters) {
-        string name = param.Name.Trim();
+        string name = TrimAndStripEllipsis(param.Name);
         if (name != "") {
           templateParameters.Add(name);
         }
@@ -262,7 +262,7 @@ namespace VSDoxyHighlighter
 
       var templateParametersInfo = new List<string>();
       foreach (CodeElement param in templateParameters) {
-        string name = param.Name.Trim();
+        string name = TrimAndStripEllipsis(param.Name);
         if (name != "") {
           templateParametersInfo.Add(name);
         }
@@ -294,7 +294,7 @@ namespace VSDoxyHighlighter
 
       var parameters = new List<string>();
       foreach (CodeElement param in codeElement.Parameters) {
-        string name = param.Name.Trim();
+        string name = TrimAndStripEllipsis(param.Name);
         if (name != "") {
           parameters.Add(param.Name);
         }
@@ -361,6 +361,26 @@ namespace VSDoxyHighlighter
         ActivityLog.LogWarning("VSDoxyHighlighter", $"COMException in 'TryGetCodeElementFor()': {ex.ToString()}");
         return null;
       }
+    }
+
+
+    private string TrimAndStripEllipsis(string str) 
+    {
+      if (str == null) {
+        return "";
+      }
+
+      str = str.Trim();
+
+      // The names of template parameter packs and their use as function parameters retain the "...". We don't want it.
+      if (str.StartsWith("...")) { 
+        str = str.Substring(3);
+      }
+      if (str.EndsWith("...")) {
+        str = str.Substring(0, str.Length - 3);
+      }
+
+      return str;
     }
 
 
