@@ -478,7 +478,7 @@ namespace VSDoxyHighlighter
       //   \ref Class::Func()
       //   Text \ref Class.Func() some text
       //   Text \ref subsection1. The point is not part of the parameter.
-      //   \ref func(double, int) should match also match the double and int and also the parantheses.
+      //   \ref func(double, int) should match also match the double and int and also the parentheses.
       //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
@@ -487,13 +487,13 @@ namespace VSDoxyHighlighter
       //
       // https://regex101.com/r/EVJaKp/1
       // (1) matches the first parameter to \ref.
-      //    First part: Match stuff before potential parantheses
+      //    First part: Match stuff before potential parentheses
       //       (1a): Match any word character
       //       (1b): But also match "::" and ".". However, we only want to do this if afterwards whitespace comes.
       //             Otherwise, we have an ordinary punctuation character instead of a C++ indirection.
       //             I.e. match the point in "@ref Class.func" but not in "See some @ref class. More text".
-      //    Second part (1c): Match optionally available parantheses, including everything between.
-      //        To keep things simple, we do not match balanced parantheses; nesting should never happen in this context.
+      //    Second part (1c): Match optionally available parentheses, including everything between.
+      //        To keep things simple, we do not match balanced parentheses; nesting should never happen in this context.
       //        Thus, we simply take the next ")" after the opening "(".
       //    (1d) Make the whole previous match (1a+b+c) optional.
       // (2) Match everything between successive quotes, optionally.
