@@ -466,7 +466,9 @@ namespace VSDoxyHighlighter
       return kind == SemanticTokenKind.cppFunction
         || kind == SemanticTokenKind.cppMemberFunction
         || kind == SemanticTokenKind.cppStaticMemberFunction
-        || kind == SemanticTokenKind.cppFunctionTemplate;
+        || kind == SemanticTokenKind.cppFunctionTemplate
+        || kind == SemanticTokenKind.cppOperator
+        || kind == SemanticTokenKind.cppMemberOperator;
     }
 
 

@@ -209,7 +209,30 @@ class TemplateClass
 
   /// @param
   int templateMemberFunc3WithTypename(typename templClsArg::SomeType param);
+
+  /// @param
+  bool operator==(TemplateClass const & rhs);
+
+  /// @tparam
+  /// @param
+  template <class cls1, unsigned iT>
+  bool operator==(TemplateClass<cls1, iT> const & rhs) const;
+
+  /// @param
+  auto operator<=>(TemplateClass const & rhs) const = default;
 };
+
+/// @tparam
+/// @param
+template <class templClsArg, unsigned someInt>
+bool operator!=(TemplateClass<templClsArg, someInt> const & lhs, TemplateClass<templClsArg, someInt> const & rhs);
+
+/// @tparam
+/// @param
+template <class templClsArg, unsigned someInt>
+bool operator!=(TemplateClass<templClsArg, someInt> const & lhs, TemplateClass<templClsArg, someInt> const & rhs)
+{
+}
 
 
 /// @tparam
@@ -218,7 +241,19 @@ class NonTemplateClass
 {
   /// @param
   void SomeMemberFunc(int d);
+
+  /// @param
+  bool operator==(NonTemplateClass const & rhs) const;
+
+  /// @param
+  auto operator<=>(NonTemplateClass const & rhs) const = default;
 };
+
+/// @param
+bool operator!=(NonTemplateClass const & lhs, NonTemplateClass const & rhs);
+
+/// @param
+bool operator!=(NonTemplateClass const & lhs, NonTemplateClass const & rhs) { }
 
 
 /// @tparam
