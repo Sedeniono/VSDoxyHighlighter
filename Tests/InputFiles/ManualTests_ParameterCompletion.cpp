@@ -5,6 +5,7 @@
 // functionality at least manually.
 
 #include <functional>
+#include <concepts>
 
 //============================================================================
 // Functions
@@ -28,9 +29,9 @@ void funcDeclarationWithUnnamedParams(int, double);
 /// @param
 void funcDeclWithDefaultArgs(const int i = 42, double d = 43.0);
 
+/// @tparam
 /// @param someInt
 /// @param
-/// @tparam
 void funcDefWithDefaultArgs(const int someInt = 42, double someDouble = 43.0) { }
 
 /// @param
@@ -67,7 +68,9 @@ void templateFunctionDeclaration(int d);
 /// @p
 ///
 /// Some test
-template <class tParam1, int tParam2, typename tParam3, class tParam4, int tParam5, typename tParam6>
+template <class tParam1, int tParam2, 
+    typename tParam3, class tParam4, 
+    int tParam5, typename tParam6>
 int ManyParameters(
     tParam1 param1,
     int param2,
@@ -89,7 +92,7 @@ int ManyParameters(
 
 /// @param
 bool ComplicatedParametersDef(
-    std::function<int(double, short)> func1,
+    std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
             size_t const,
             bool *&)> 
@@ -101,7 +104,7 @@ bool ComplicatedParametersDef(
 
 /// @param
 bool ComplicatedParametersDef(
-    std::function<int(double, short)> func1,
+    std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
             size_t const,
             bool *&)> 
@@ -135,15 +138,43 @@ void ParameterPackDef(long double var1, ArgsT &&... args)
 }
 
 
+/// @tparam
 /// @param
-void InvalidStuffDecl(some invalid parameter, another invalid parameter);
+template <std::integral T>
+void TemplateWithConceptDecl(T const & param);
+
+/// @tparam
+/// @param
+template <std::integral T>
+void TemplateWithConceptDef(T const & param)
+{
+}
+
+
+#define INT_MACRO int
+
+/// @tparam
+/// @param
+template <INT_MACRO templateParam>
+void ParameterTypeAsMacroDecl(INT_MACRO param);
+
+/// @tparam
+/// @param
+template <INT_MACRO templateParam>
+void ParameterTypeAsMacroDecl(INT_MACRO param)
+{
+}
+
 
 /// @param
-void InvalidStuffDef(some invalid parameter, another invalid parameter) { }
+void InvalidStuffDecl(some invalid parameter, another invalid parameter 42);
+
+/// @param
+void InvalidStuffDef(some invalid parameter, another invalid parameter2 42) { }
 
 
 //============================================================================
-// Classes/structrs
+// Classes/structs
 //============================================================================
 
 /**
@@ -158,21 +189,21 @@ class TemplateClass
 {
   int m;
 
-  /// @param
   /// @tparam
+  /// @param
   bool memberFuncWithT(T tests);
 
-  /// @param
   /// @tparam
+  /// @param
   bool memberFunc2(HMODULE aValue) { }
 
-  /// @param
   /// @tparam
+  /// @param
   template <class >
   int templateMemberFunc(U);
 
-  /// @param
   /// @tparam
+  /// @param
   template <class U>
   int templateMemberFunc2(U u);
 
@@ -196,8 +227,8 @@ struct TemplateStruct
 {
 };
 
-/// @param
 /// @tparam
+/// @param
 struct NonTemplateStruct
 {
 };
@@ -205,20 +236,49 @@ struct NonTemplateStruct
 
 // NOTE: 'i' and 'test' are not seen.
 /// @tparam
+/// @param
 template <typename templArg, auto i, int test, typename another>
 struct TemplateStructDecl;
 
 
 /// @tparam
+/// @param
 template <class... ArgsT>
 class ClassWithParameterPackDecl;
 
-
 /// @tparam
+/// @param
 template <class... ArgsT>
 class ClassWithParameterPackDef
 {
 };
+
+
+/// @tparam 
+/// @param
+template <std::integral T>
+class ClassWithConceptDecl;
+
+/// @tparam
+/// @param
+template <std::integral T, class T2>
+class ClassWithConceptDef
+{
+};
+
+
+/// @tparam
+/// @param
+template <INT_MACRO templateParam>
+class ClassWithMacroDecl;
+
+/// @tparam
+/// @param
+template <INT_MACRO templateParam>
+class ClassWithMacroDef
+{
+};
+
 
 
 //============================================================================
@@ -233,6 +293,11 @@ using SomeUsing = void;
 /// @tparam
 /// @param
 using SomeSpecificUsing = SomeUsing<int, 42>;
+
+/// @tparam
+/// @param
+template <std::integral T>
+using SomeUsingWithConcept = void;
 
 
 //============================================================================
@@ -251,6 +316,7 @@ using SomeSpecificUsing = SomeUsing<int, 42>;
 /// @param
 #define VARIADIC_MACRO(param1, ...)
 
+/// @param
 /// @param
 #define MACRO_WITH_LINE_BREAKS(param1, \
     param2,\

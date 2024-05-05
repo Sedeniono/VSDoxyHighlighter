@@ -612,6 +612,15 @@ namespace VSDoxyHighlighter
           }
           tokensBeforeThatAreCppTypes.Add(token);
         }
+        // For example, if we have "template <std::integral T>", the "std" appears as cppNamespace and the "integral"
+        // as "cppClassTemplate". Ignore them. This means that we increase the chance for wrong results when the user
+        // types "@param" before something that is not a function, but this seems less like an issue than not showing
+        // information for actual functions. "cppMacro" in case the type is given by macro.
+        else if (token.SemanticTokenKind == SemanticTokenKind.cppNamespace
+                 || token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate
+                 || token.SemanticTokenKind == SemanticTokenKind.cppMacro) {
+          continue;
+        }
         else {
           if (IsFunction(token.SemanticTokenKind)) {
             return (enumerator, tokensBeforeThatAreCppTypes);
@@ -652,6 +661,7 @@ namespace VSDoxyHighlighter
       }
 
       List<SemanticToken> tokensBeforeThatAreCppTypes = null;
+      SemanticTokenKind kindBefore = SemanticTokenKind.cppNone;
       foreach (SemanticToken token in tokens) {
         if (token == null) {
           continue;
@@ -664,13 +674,23 @@ namespace VSDoxyHighlighter
             tokensBeforeThatAreCppTypes = new List<SemanticToken>();
           }
           tokensBeforeThatAreCppTypes.Add(token);
+          kindBefore = token.SemanticTokenKind;
+        }
+        // For example, if we have "template <std::integral T>", the "std" appears as cppNamespace and the "integral"
+        // as "cppClassTemplate". Ignore them. This means that we increase the chance for wrong results when the user
+        // types "@tparam" before something that is not a class/alias, but this seems less like an issue than not showing
+        // information for actual class/alias. "cppMacro" in case the type is given by macro.
+        else if (token.SemanticTokenKind == SemanticTokenKind.cppNamespace
+                 || (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate && kindBefore == SemanticTokenKind.cppNamespace)
+                 || token.SemanticTokenKind == SemanticTokenKind.cppMacro) {
+          kindBefore = token.SemanticTokenKind;
+        }
+        // cppClassTemplate: Also structs and templated-using-alias.
+        else if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
+          return (token, tokensBeforeThatAreCppTypes);
         }
         else {
-          // cppClassTemplate: Also structs and templated-using-alias.
-          if (token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate) {
-            return (token, tokensBeforeThatAreCppTypes);
-          }
-          // Stop if hit anything that cannot be part of a class/struct/templated-using-alias.
+          // Stop if hit anything else that cannot be part of a class/struct/templated-using-alias.
           return (null, null);
         }
       }
@@ -777,11 +797,20 @@ namespace VSDoxyHighlighter
         if (token.SemanticTokenKind == SemanticTokenKind.cppType) {
           continue;
         }
-        if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
+        // For example, if we have "template <std::integral T>", the "std" appears as cppNamespace and the "integral"
+        // as "cppClassTemplate". Ignore them. This means that we increase the chance for wrong results when the user
+        // types "@param" before something that is not a function, but this seems less like an issue than not showing
+        // information for actual functions. "cppMacro" in case the type is given by macro.
+        else if (token.SemanticTokenKind == SemanticTokenKind.cppNamespace
+                 || token.SemanticTokenKind == SemanticTokenKind.cppClassTemplate
+                 || token.SemanticTokenKind == SemanticTokenKind.cppMacro) {
+          continue;
+        }
+        else if (token.SemanticTokenKind != SemanticTokenKind.cppParameter) {
           // Reached end of parameter list.
           break;
         }
-        // Unfortunately, the SemanticTokensCache does not directly give access to the parameter's type. We would
+        // Unfortunately, the SemanticTokensCache does not directly give access to the parameter's type in general. We would
         // need to extract it ourselves. For now we simply don't show it.
         parameters.Add(new ParameterInfo { Name = token.Text, Type = null });
       }
