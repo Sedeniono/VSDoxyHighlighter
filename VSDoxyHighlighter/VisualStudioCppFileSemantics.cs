@@ -812,9 +812,17 @@ namespace VSDoxyHighlighter
           // Reached end of parameter list.
           break;
         }
-        // Unfortunately, the SemanticTokensCache does not directly give access to the parameter's type in general. We would
-        // need to extract it ourselves. For now we simply don't show it.
-        parameters.Add(new ParameterInfo { Name = token.Text, Type = null });
+
+        // The SemanticTokensCache does not provide information about the type the parameter (with some exceptions).
+        // We therefore use a simple heuristic to get the type. We assume that the whole type is on a single line.
+        // There are cases where this will be wrong, but in most cases it should be correct. The simple heuristic
+        // should be reasonable considering that the type will just appear in the autocomplete box as additional info.
+        ITextSnapshotLine lineContainingParameter = token.Span.Start.GetContainingLine();
+        int paramNameOffsetInLine = token.Start - lineContainingParameter.Start.Position;
+        Debug.Assert(paramNameOffsetInLine >= 0);
+        string paramType = SemanticsUtilities.ExtractTypeOfParam(lineContainingParameter.GetText().Substring(0, paramNameOffsetInLine));
+
+        parameters.Add(new ParameterInfo { Name = token.Text, Type = paramType });
       }
 
       // The tokens of type 'cppType' coming directly before a function are the template parameters of that function.
@@ -846,4 +854,102 @@ namespace VSDoxyHighlighter
     private readonly ITextBuffer mTextBuffer;
     private VSSemanticTokensCache mVSSemanticTokensCache;
   }
+
+
+  //==============================================================================
+  // Utilities
+  //==============================================================================
+
+  public static class SemanticsUtilities
+  {
+    /// <summary>
+    /// Given a line such as
+    ///    "void function(int param1, double param2)"
+    /// and the goal to get the type of e.g. "param2", this function here expects the part of the line
+    /// before "param2", i.e. it expects the string
+    ///    "void function(int param1, double "
+    /// It then tries to get the type of "param2", in this example "double". It basically searches backwards 
+    /// till the next comma, skipping over commas in nested parentheses.
+    /// 
+    /// However, this is just a simple heuristic. It breaks down in at least the following cases:
+    /// - If the type stretches over multiple lines. We simply assume that the whole type is on a single line.
+    /// - If there are C-style comments or string literals in the middle.
+    /// - In case of array parameters ("void func(int arr[])"), the "[]" is after the name, and therefore
+    ///   will not be included.
+    /// </summary>
+    public static string ExtractTypeOfParam(string lineOfParamBeforeParamName)
+    {
+      if (lineOfParamBeforeParamName == null || lineOfParamBeforeParamName.Length == 0) {
+        return null;
+      }
+
+      int? idx = lineOfParamBeforeParamName.Length - 1;
+      while (idx.HasValue && idx >= 0) {
+        int idxVal = idx.Value;
+        char c = lineOfParamBeforeParamName[idxVal];
+        // Skip over portions of the string that are enclosed in matching parentheses, brackets, etc.
+        // Note: We simply assume that there are no C-style comments "/*...*/" or string literals.
+        if (c == ')') {
+          idx = FindOpeningOfBalancedPairBackward(lineOfParamBeforeParamName, idxVal, '(');
+        }
+        else if (c == '>') {
+          idx = FindOpeningOfBalancedPairBackward(lineOfParamBeforeParamName, idxVal, '<');
+        }
+        else if (c == '}') {
+          idx = FindOpeningOfBalancedPairBackward(lineOfParamBeforeParamName, idxVal, '{');
+        }
+        else if (c == ']') {
+          idx = FindOpeningOfBalancedPairBackward(lineOfParamBeforeParamName, idxVal, '[');
+        }
+        else if (c == ',') {
+          break; // We found the end of the previous function parameter. So everything after the current index is the type.
+        }
+        else if (c == '(') {
+          break; // We found the start of the function parameter list.
+        }
+        else {
+          idx = idxVal - 1;
+        }
+      }
+
+      if (!idx.HasValue) {
+        // Unbalanced parentheses, so the type is stretching over multiple lines.
+        return null;
+      }
+
+      // We either found the comma that indicates the end of the previous parameter or the '(' that starts the function parameter list.
+      // In this case, the type of our parameter is everything afterwards.
+      // Or we hit the start of the string. In this case we take a leap of faith and assume that everything afterwards is the type. If
+      // the type stretches over multiple lines (e.g. "long \n double paramName"), we are wrong. We simply ignore this.
+      return lineOfParamBeforeParamName.Substring(Math.Max(0, idx.Value + 1)).Trim();
+    }
+
+
+    // For example, if str[closingIdx] == ')' and openingChar == '(', searches the str backwards
+    // until the openingChar is found, taking into account additional nesting. Returns the index
+    // of the character before the found opening character.
+    // Returns a negative value if none was found.
+    private static int? FindOpeningOfBalancedPairBackward(string str, int closingIdx, char openingChar)
+    {
+      char closingChar = str[closingIdx];
+      int level = 1;
+      int idx = closingIdx - 1;
+      for (; idx >= 0 && level >= 1; --idx) {
+        char c = str[idx];
+        if (c == closingChar) {
+          ++level;
+        }
+        else if (c == openingChar) {
+          --level;
+        }
+      }
+
+      if (idx < 0) {
+        return null;
+      }
+
+      return idx;
+    }
+  }
+
 }

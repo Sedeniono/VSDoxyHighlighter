@@ -54,6 +54,7 @@
     <Compile Include="DoxygenCommandsTests.cs" />
     <Compile Include="GeneralOptionsFake.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SemanticsUtilitiesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

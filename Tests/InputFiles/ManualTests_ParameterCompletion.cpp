@@ -43,7 +43,12 @@ void funcDefWithInlineClassDecl(class InlClassDecl & param) { }
 /// @param[in]
 /// @tparam
 template <class templateParam, int vTempl>
-int templateFunctionDefinition(double var, int iiiii, int arr[], double volatile const v)
+int templateFunctionDecl(double var, int iiiii, int arr[], double volatile const v);
+
+/// @param[in]
+/// @tparam
+template <class templateParam, int vTempl>
+int templateFunctionDef(double var, int iiiii, int arr[], double volatile const v)
 {
   fundc();
 }
@@ -90,7 +95,7 @@ int ManyParameters(
 }
 
 
-/// @param
+/// @param 
 bool ComplicatedParametersDef(
     std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
@@ -102,7 +107,7 @@ bool ComplicatedParametersDef(
             ) param3,
     ...);
 
-/// @param
+/// @param 
 bool ComplicatedParametersDef(
     std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
