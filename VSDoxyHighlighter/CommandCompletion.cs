@@ -244,9 +244,9 @@ namespace VSDoxyHighlighter
     private async Task<ImmutableArray<CompletionItem>.Builder> PopulateAutocompleteBoxForParameterOfDoxygenCommandAsync(
         SnapshotPoint startPoint, CancellationToken cancellationToken)
     {
-      AutocompleteInfoForParameterOfDoxygenCommand? infos = await TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
-      if (infos != null && infos.Value.elementsToShow.Count() > 0) {
-        return CreateAutocompleteItemsForParameterOfDoxygenCommand(infos.Value);
+      var infos = await TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
+      if (infos != null && infos.Count > 0) {
+        return CreateAutocompleteItemsForParameterOfDoxygenCommand(infos);
       }
       return null;
     }
@@ -269,7 +269,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(
+    private async Task<IList<AutocompleteInfoForParameterOfDoxygenCommand>> TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(
       SnapshotPoint startPoint, CancellationToken cancellationToken)
     {
       // Get the Doxygen command without the "\" or "@".
@@ -281,21 +281,32 @@ namespace VSDoxyHighlighter
       if (mGeneralOptions.EnableFunctionAndMacroParameterAutocomplete) {
         // Autocompletion for Doxygen command parameters that document C++ parameters.
         if (cCmdsToDocumentParam.Contains(command)) {
-          return await TryGetAutocompleteInfosForParamCommandAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
-        }
-
-        // Autocompletion for Doxygen command parameters that refer to C++ parameters in the running text.
-        if (cCmdsToReferToParam.Contains(command)) {
-          // Note: preselectAfterPrevious = false. We cannot sensibly guess which function parameter the user wants to preselect for "@p" and "@a".
-          return await TryGetAutocompleteInfosForParamCommandAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
+          var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
+          return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
         }
       }
 
       if (mGeneralOptions.EnableTemplateParameterAutocomplete) {
         // Autocompletion for Doxygen command parameters that document C++ template parameters.
         if (cCmdsToDocumentTParam.Contains(command)) {
-          return await TryGetAutocompleteInfosForTParamCommandAsync(startPoint, preselectAfterPrevious: true, cancellationToken);
+          var infos = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentTParam, preselectAfterPrevious: true, cancellationToken);
+          return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
         }
+      }
+
+      // Autocompletion for Doxygen command parameters that refer to C++ parameters in the running text.
+      if (cCmdsToReferToParam.Contains(command)) {
+        // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user wants to preselect for "@p" and "@a".
+        var normalParamsInfo = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
+        var templateParamsInfo = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
+        var result = new List<AutocompleteInfoForParameterOfDoxygenCommand>();
+        if (normalParamsInfo.HasValue) { 
+          result.Add(normalParamsInfo.Value);
+        }
+        if (templateParamsInfo.HasValue) { 
+          result.Add(templateParamsInfo.Value);
+        }
+        return result;
       }
 
       return null;
@@ -314,9 +325,8 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Gets parameter information for the Doxygen commands '@param', '@p' and '@a'.
-    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForParamCommandAsync(
-      SnapshotPoint startPoint, string[] paramCommands, bool preselectAfterPrevious, CancellationToken cancellationToken) 
+    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetParametersOfNextCodeElementAsync(
+      SnapshotPoint startPoint, string[] doxygenCmds, bool preselectAfterPrevious, CancellationToken cancellationToken) 
     {
       // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
       // main thread, we could access its functions/properties from any thread. Behind the scenes, an automatic
@@ -339,7 +349,7 @@ namespace VSDoxyHighlighter
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect 
-            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, paramCommands);
+            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
         }
         return result;
       }
@@ -353,7 +363,7 @@ namespace VSDoxyHighlighter
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect
-            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, paramCommands);
+            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
         }
         return result;
       }
@@ -362,11 +372,10 @@ namespace VSDoxyHighlighter
     }
 
 
-    // Gets parameter information for the Doxygen command '@tparam'.
-    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetAutocompleteInfosForTParamCommandAsync(
-      SnapshotPoint startPoint, bool preselectAfterPrevious, CancellationToken cancellationToken)
+    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetTemplateParametersOfNextCodeElementAsync(
+      SnapshotPoint startPoint, string[] doxygenCmds, bool preselectAfterPrevious, CancellationToken cancellationToken)
     {
-      // As in TryGetAutocompleteInfosForParamCommandAsync(): Switch to the main thread for the FileCodeModel, especially because of performance.
+      // As in TryGetParametersOfNextCodeElementAsync(): Switch to the main thread for the FileCodeModel, especially because of performance.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
       var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
@@ -382,7 +391,7 @@ namespace VSDoxyHighlighter
 
           if (preselectAfterPrevious) {
             result.elementBeforeElementToPreselect
-              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
+              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
           }
 
           return result;
@@ -401,7 +410,7 @@ namespace VSDoxyHighlighter
 
           if (preselectAfterPrevious) {
             result.elementBeforeElementToPreselect
-              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, cCmdsToDocumentTParam);
+              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
           }
 
           return result;
@@ -414,37 +423,39 @@ namespace VSDoxyHighlighter
 
 
     private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForParameterOfDoxygenCommand(
-      AutocompleteInfoForParameterOfDoxygenCommand infos)
+      IList<AutocompleteInfoForParameterOfDoxygenCommand> infos)
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
-      int numParams = infos.elementsToShow.Count();
+      int numParams = infos.Sum(i => i.elementsToShow.Count());
       int curParamNumber = 1;
       bool preselected = false;
-      foreach ((string name, string type) in infos.elementsToShow) {
-        string suffix = type != null && type != ""
-          ? $"=> Type: {type}. {infos.parentInfo}"
-          : $"=> {infos.parentInfo}";
+      foreach (var info in infos) {
+        foreach ((string name, string type) in info.elementsToShow) {
+          string suffix = type != null && type != ""
+            ? $"=> Type: {type}. {info.parentInfo}"
+            : $"=> {info.parentInfo}";
 
-        var item = new CompletionItem(
-          displayText: name,
-          source: this,
-          icon: infos.icon,
-          filters: ImmutableArray<CompletionFilter>.Empty,
-          suffix: suffix,
-          insertText: name,
-          // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
-          sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
-          filterText: name,
-          automationText: name,
-          attributeIcons: ImmutableArray<ImageElement>.Empty,
-          commitCharacters: default,
-          applicableToSpan: default,
-          isCommittedAsSnippet: false,
-          isPreselected: preselected);
+          var item = new CompletionItem(
+            displayText: name,
+            source: this,
+            icon: info.icon,
+            filters: ImmutableArray<CompletionFilter>.Empty,
+            suffix: suffix,
+            insertText: name,
+            // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
+            sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
+            filterText: name,
+            automationText: name,
+            attributeIcons: ImmutableArray<ImageElement>.Empty,
+            commitCharacters: default,
+            applicableToSpan: default,
+            isCommittedAsSnippet: false,
+            isPreselected: preselected);
 
-        itemsBuilder.Add(item);
-        ++curParamNumber;
-        preselected = name == infos.elementBeforeElementToPreselect;
+          itemsBuilder.Add(item);
+          ++curParamNumber;
+          preselected = name == info.elementBeforeElementToPreselect;
+        }
       }
 
       return itemsBuilder;
