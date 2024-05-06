@@ -156,15 +156,18 @@ namespace VSDoxyHighlighter
 
       // The SemanticTokensCache interprets all 'SemanticTokenKind.cppType' elements as template parameters because
       // it doesn't have sufficient information. When we have e.g. a non-templated struct and the user types '@param'
-      // above it, the non-templated struct is therefore seen as a template parameter. To fix this, we query the
-      // FileCodeModel here whether the assumed template parameter is actually one.
+      // above it, the non-templated struct is therefore seen as a template parameter. Also, return types can be
+      // 'SemanticTokenKind.cppType'. To fix this, we query the FileCodeModel here whether the assumed template parameter
+      // is one; the FileCodeModel returns a null CodeElement reference for template parameters.
       if (templateParameterTokens != null) {
         foreach (var paramToken in templateParameterTokens) {
           CodeElement paramCodeElement = TryGetCodeElementFor(paramToken);
-          // Note that the FileCodeModel returns null for template parameters. (The check for vsCMElementParameter is
-          // just an educated guess in case the FileCodeModel gets ever improved.)
-          if (paramCodeElement != null && paramCodeElement.Kind != vsCMElement.vsCMElementParameter) {
-            return null; // SemanticTokensCache was wrong. The next element after 'point' is not a function.
+          if (paramCodeElement != null) {
+            var kind = paramCodeElement.Kind;
+            if (kind != vsCMElement.vsCMElementFunction // vsCMElementFunction is returned for function return types.
+                && kind != vsCMElement.vsCMElementParameter) { // vsCMElementParameter is just a guess if the FileCodeModel ever gets fixed.
+              return null; // SemanticTokensCache was wrong. The next element after 'point' is not a function.
+            }
           }
         }
       }
@@ -420,8 +423,13 @@ namespace VSDoxyHighlighter
   /// the 'SemanticTokensCache' is updated regularly by the C++ parsing thread, and we can use the information
   /// on the 'SemanticTokensCache'.
   /// 
-  /// Caveat: The SemanticTokensCache does not know about non-type template parameters (NTTP) (for example an
-  /// integer as template argument). Also, for parameters etc. it does not store the actual type.
+  /// Caveats: The SemanticTokensCache does not know about non-type template parameters (NTTP) (for example an
+  /// integer as template argument). Also, for parameters etc. it does not store the actual type. And it is just
+  /// a 'stream' of tokens without additional semantics. For example, a SemanticTokenKind.cppType can occur for
+  /// a template parameter or a return type or a function parameter. There are many ambiguities in the infos
+  /// that the SemanticTokensCache carries. So using it comes with all sorts of cases where it doesn't work. But
+  /// it was the only way I could find to get at least somewhat decent information for global declarations without
+  /// attempting to write a custom C++ parser.
   /// </summary>
   class CppFileSemanticsFromSemanticTokensCache : IVisualStudioCppFileSemantics 
   {
@@ -607,7 +615,15 @@ namespace VSDoxyHighlighter
         }
 
         // Template parameters of template functions come before. So we need to skip and remember them.
-        // Note: The SemanticTokenCache does not know about non-type template parameters unfortunately.
+        // Note: The SemanticTokensCache does not know about non-type template parameters unfortunately.
+        // Note: If the return type of a function is a type, we get also some CppTypes before. Possibly multiple, e.g.
+        // in case of "std::pair<Type1, Type2>". So we actually get a mixture of template parameters and return types here.
+        // Unfortunately, there seems to be no simple way to distinguish them without parsing the text ourselves. The best
+        // idea might be to exploit the assumption that "point" is in a comment before the function. We can then simply check
+        // whether "template <" comes before the very first token. This isn't foolproof, however, because NTTP don't appear in
+        // the SematicTokensCache (so all sorts of weird expression might come between "template <" and the first token we see
+        // here). For now, we leave it like this; the worst thing that happens is that the return types appear in the
+        // autocomplete of "@tparam".
         if (token.SemanticTokenKind == SemanticTokenKind.cppType) {
           if (tokensBeforeThatAreCppTypes == null) {
             tokensBeforeThatAreCppTypes = new List<SemanticToken>();

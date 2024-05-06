@@ -4,8 +4,14 @@
 // Visual Studio instance). This file thus collects various cases to get the
 // functionality at least manually.
 
-#include <functional>
 #include <concepts>
+#include <functional>
+#include <optional>
+
+class SomeClass
+{
+};
+
 
 //============================================================================
 // Functions
@@ -95,8 +101,8 @@ int ManyParameters(
 }
 
 
-/// @param 
-bool ComplicatedParametersDef(
+/// @param
+[[nodiscard]] bool ComplicatedParametersDef(
     std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
             size_t const,
@@ -107,8 +113,8 @@ bool ComplicatedParametersDef(
             ) param3,
     ...);
 
-/// @param 
-bool ComplicatedParametersDef(
+/// @param
+[[nodiscard]] bool ComplicatedParametersDef(
     std::function<int(double p1, short p2)> func1,
     std::function<int(long double const **,
             size_t const,
@@ -169,6 +175,60 @@ template <INT_MACRO templateParam>
 void ParameterTypeAsMacroDecl(INT_MACRO param)
 {
 }
+
+
+/// @tparam
+/// @param
+SomeClass FuncWithReturnTypeDecl(SomeClass param1, int param2);
+
+/// @tparam
+/// @param
+SomeClass FuncWithReturnTypeDef(SomeClass param1, int param2) { }
+
+
+/// @tparam
+/// @param
+template <class T>
+SomeClass TemplateFuncWithReturnTypeDecl(SomeClass param1, int param2);
+
+/// @tparam
+/// @param
+template <class T>
+SomeClass TemplateFuncWithReturnTypeDef(SomeClass param1, int param2) { }
+
+
+/// @tparam
+/// @param 
+std::pair<SomeClass, class InlClass> FuncWithReturnType2Decl(SomeClass param1, int param2);
+
+/// @tparam
+/// @param
+std::pair<SomeClass, class InlClass> FuncWithReturnType2Def(SomeClass param1, int param2) { }
+
+
+/// @tparam
+/// @param
+constexpr int ConstExprFunc(int v) { return v; }
+
+/// @tparam
+/// @param
+void FuncDeclWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0);
+
+/// @tparam
+/// @param
+void FuncDefWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0) { }
+
+
+/// @tparam
+/// @param
+template <class T, int iT = ConstExprFunc(42)>
+void TemplFuncWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0);
+
+/// @tparam
+/// @param
+template <class T, int iT = ConstExprFunc(42)>
+void TemplFuncWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0) { }
+
 
 
 /// @param
@@ -246,6 +306,13 @@ class NonTemplateClass
 {
   /// @param
   void SomeMemberFunc(int d);
+
+  /// @param
+  [[nodiscard]] virtual bool SomeVirtualMemberFunc(double d) override;
+
+  /// @tparam
+  /// @param
+  TemplateClass<int, 42> SomeMemberFuncReturningType(int param);
 
   /// @param
   bool operator==(NonTemplateClass const & rhs) const;
