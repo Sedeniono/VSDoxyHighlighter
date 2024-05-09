@@ -61,6 +61,16 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentCommandCompletionSource : IAsyncCompletionSource
   {
+    public enum CompletionTarget
+    { 
+      Command, // The Doxygen command itself
+      Parameter // A parameter of the Doxygen command
+    }
+
+
+    public static readonly ImmutableArray<char> cPunctuationChars = new char[] { ',', ';', ':', '.', '!', '?' }.ToImmutableArray();
+
+
     public CommentCommandCompletionSource(IVsEditorAdaptersFactoryService adapterService, ITextView textView) 
     {
       ThreadHelper.ThrowIfNotOnUIThread();
@@ -75,6 +85,7 @@ namespace VSDoxyHighlighter
       mGeneralOptions = VSDoxyHighlighterPackage.GeneralOptions;
       mCommentParser = VSDoxyHighlighterPackage.CommentParser;
     }
+
 
     /// <summary>
     /// Called by VS on the UI thread whenever a new autocomplete "box" might pop up.
@@ -118,6 +129,12 @@ namespace VSDoxyHighlighter
         else if (c == '\n' || c == '\r') {
           return CompletionStartData.DoesNotParticipateInCompletion;
         }
+        // We don't trigger a *new* autocompletion session for punctuation characters. Intention: When typing e.g.
+        //   "/// See the \p point. More text after sentence"
+        // we don't want to trigger the completion when the user types the "." after the "point".
+        else if (cPunctuationChars.Contains(c)) {
+          return CompletionStartData.DoesNotParticipateInCompletion;
+        }
       }
 
       return CompletionStartData.DoesNotParticipateInCompletion;
@@ -146,12 +163,14 @@ namespace VSDoxyHighlighter
         // '\' and '@' start a command.
         if (startChar == '\\' || startChar == '@') {
           itemsBuilder = PopulateAutcompleteBoxWithCommands(startChar);
+          session.Properties.AddProperty(typeof(CompletionTarget), CompletionTarget.Command);
         }
         // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
         // support autocompletion of the command's parameter, and if yes, populate the autocomplete box with possible parameter values.
         else if (AnyAdvancedAutocompleteEnabled() && (startChar == ' ' || startChar == '\t')) {
           try {
             itemsBuilder = await PopulateAutocompleteBoxForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
+            session.Properties.AddProperty(typeof(CompletionTarget), CompletionTarget.Parameter);
           }
           catch (Exception ex) {
             ActivityLog.LogError("VSDoxyHighlighter", $"Exception occurred while checking for parameter completion: {ex}");
@@ -621,14 +640,33 @@ namespace VSDoxyHighlighter
   /// </summary>
   class CommentCommandCompletionCommitManager : IAsyncCompletionCommitManager 
   {
-    // When the user hits tab, enter or double-clicks, it inserts the current selection in the autocomplete box.
-    // Additionally, we also do it when the user types a space. This especially ensures that in case the user
-    // typed the command completely, the autocomplete box vanishes instead of staying up.
-    private static ImmutableArray<char> cCommitChars = new char[] { ' ' }.ToImmutableArray();
-    public IEnumerable<char> PotentialCommitCharacters => cCommitChars;
+    // These are the **potential** commit characters. VS will call ShouldCommitCompletion() only when the user typed them.
+    private static ImmutableArray<char> cPotentialCommitChars = CommentCommandCompletionSource.cPunctuationChars.Insert(0, ' ');
+    public IEnumerable<char> PotentialCommitCharacters => cPotentialCommitChars;
 
     public bool ShouldCommitCompletion(IAsyncCompletionSession session, SnapshotPoint location, char typedChar, CancellationToken token)
-    { 
+    {
+      // When the user hits tab, enter or double-clicks, it inserts the current selection in the autocomplete box.
+      // Additionally, we also do it when the user types a space. This especially ensures that in case the user
+      // typed the command completely, the autocomplete box vanishes instead of staying up.
+      if (typedChar == ' ') {
+        return true;
+      }
+
+      // If we are completing a parameter of a Doxygen command, we commit if the user types a punctuation character.
+      // This ensures that when typing e.g.
+      //   "/// See the \p point. More text after sentence"
+      // the completion ends when the user types the "." after "point".
+      if (CommentCommandCompletionSource.cPunctuationChars.Contains(typedChar)) {
+        if (session.Properties.TryGetProperty(typeof(CommentCommandCompletionSource.CompletionTarget), 
+                                            out CommentCommandCompletionSource.CompletionTarget target)) {
+          if (target == CommentCommandCompletionSource.CompletionTarget.Parameter) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       return true;
     }
 
