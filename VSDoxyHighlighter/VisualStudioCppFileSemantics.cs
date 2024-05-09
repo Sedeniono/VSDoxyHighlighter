@@ -134,11 +134,16 @@ namespace VSDoxyHighlighter
       mTextBuffer = textBuffer;
       mSemanticCache = new CppFileSemanticsFromSemanticTokensCache(textBuffer);
 
+      var newOldMapper = new VisualStudioNewToOldTextBufferMapper(adapterService, textBuffer);
+      mVsTextLines = newOldMapper.VsTextLines;
+
       // In our case here we are interested in the "FileCodeModel" which is only accessible in the 'old' world, specifically
       // via "EnvDTE.Document". There is one "FileCodeModel" per "Document.ProjectItem" in the solution.
-      var newOldMapper = new VisualStudioNewToOldTextBufferMapper(adapterService, textBuffer);
+      // Actually, we don't necessarily need a reference to the FileCodeModel, because we get the CodeElement from an EditPoint
+      // directly (see TryGetCodeElementFor()). However, we get a reference here because then we get a nice dialog by VS in case
+      // VS has not yet loaded the browsing information while VS is busy loading the info. The user can choose to cancel it,
+      // in which case we get a null reference here. We then rely entirely on the SemanticTokensCache.
       mFileCodeModel = newOldMapper.Document?.ProjectItem?.FileCodeModel;
-      mVsTextLines = newOldMapper.VsTextLines;
     }
 
 
