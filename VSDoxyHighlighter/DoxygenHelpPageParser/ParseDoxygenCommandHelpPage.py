@@ -282,8 +282,15 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
     elif tag.name == "img":
         # In the whole help page text, only one kind of image appears: Namely the LaTeX logo.
+        # But in 2 variants (coming behind each other): For light and dark mode. We return only one.
         if "LaTeX" in tag["alt"]:
-            return [Fragment(FragmentType.Text, "LaTeX")]
+            test = tag["class"]
+            if any("light-mode" in t for t in tag["class"]):
+                return [Fragment(FragmentType.Text, "LaTeX")]
+            elif any("dark-mode" in t for t in tag["class"]):
+                return [] # Only return "LaTeX" once (we do it for the light mode element already).
+            else:
+                raise Exception("Unexpected LaTeX image format.")    
         else:
             raise Exception("Unknown image")
 
@@ -295,12 +302,17 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
                 raise Exception("Unexpected type for hyperlink")
             if hyperlink == "":
                 raise Exception("Empty hyperlink")
-            if not hyperlink.startswith("http"):
-                raise Exception("Hyperlink does not start with http")
+            
+            if hyperlink.startswith("http"):
+                url = hyperlink
+            elif hyperlink.startswith("#"):
+                url = f"https://www.doxygen.nl/manual/commands.html{hyperlink}"
+            else:
+                raise Exception("Hyperlink does not start with 'http' or '#'.")
             for f in fragments:
                 if f.hyperlink != "":
                     raise Exception("Found nested hyperlink")
-                f.hyperlink = hyperlink
+                f.hyperlink = url
         elif "id" in tag.attrs and "name" in tag.attrs:
             pass
         elif "class" in tag.attrs and "anchor" in tag["class"] and "id" in tag.attrs:
@@ -572,6 +584,6 @@ if __name__ == "__main__":
     extract_and_convert_doxygen_commands_from_html(
         # The input html file is https://www.doxygen.nl/manual/commands.html
         # (simply saved via a browser).
-        html_filename=os.path.join(main_folder, "testInput1.9.8.htm"),
+        html_filename=os.path.join(main_folder, "testInput1.10.0.htm"),
         output_csharp_filename=os.path.join(main_folder, "DoxygenCommandsGeneratedFromHelpPage.cs"),
         output_debug_dump_filename=os.path.join(main_folder, "GeneratedDebugDump.txt"))

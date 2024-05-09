@@ -1727,12 +1727,12 @@ Help text:
 The ><```\param```>< command has an optional attribute, ><```dir```><, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
 ><```
    /*!
-      Copies bytes from a source memory area to a destination memory area,
-      where both areas may not overlap.
-      @param[out] dest The memory area to copy to.
-      @param[in]  src  The memory area to copy from.
-      @param[in]  n    The number of bytes to copy
-     /
+    * Copies bytes from a source memory area to a destination memory area,
+    * where both areas may not overlap.
+    * @param[out] dest The memory area to copy to.
+    * @param[in]  src  The memory area to copy from.
+    * @param[in]  n    The number of bytes to copy
+    */
    void memcpy(void *dest, const void *src, size_t n);
 
 ```><The parameter description is a paragraph with no special internal structure. All visual enhancement commands may be used inside the paragraph.
@@ -1742,8 +1742,8 @@ Multiple adjacent ><```\param```>< commands will be joined into a single paragra
 Note that you can also document multiple parameters with a single ><```\param```>< command using a comma separated list. Here is an example:
 
 ><```   /** Sets the position.
-       @param x,y,z Coordinates of the position in 3D space.
-     /
+    *  @param x,y,z Coordinates of the position in 3D space.
+    */
    void setPosition(double x,double y,double z,double t)
    {
    }
@@ -2471,7 +2471,7 @@ Anchor: cmdhtmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.h
 Help text:
 <This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ><```<htmlonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< commands around it.
 
-Normally the contents of the file indicated by ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlinclude[block] to make doxygen end the current paragraph and restart after the file is included.
+Normally the contents of the file indicated by ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlinclude[block]```>< to make doxygen end the current paragraph and restart after the file is included.
 
 Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
 
@@ -2738,19 +2738,19 @@ The nodes of a graph can be made clickable by using the URL attribute. By using 
    class C {};
     
    /*! \mainpage
-    
-       Class relations expressed via an inline dot graph:
-       \dot
-       digraph example {
-           node [shape=record, fontname=Helvetica, fontsize=10];
-           b [ label="class B" URL="\ref B"];
-           c [ label="class C" URL="\ref C"];
-           b -> c [ arrowhead="open", style="dashed" ];
-       }
-       \enddot
-       Note that the classes in the above graph are clickable
-       (in the HTML output).
-     /```>
+    *
+    *  Class relations expressed via an inline dot graph:
+    *  \dot
+    *  digraph example {
+    *      node [shape=record, fontname=Helvetica, fontsize=10];
+    *      b [ label="class B" URL="\ref B"];
+    *      c [ label="class C" URL="\ref C"];
+    *      b -> c [ arrowhead="open", style="dashed" ];
+    *  }
+    *  \enddot
+    *  Note that the classes in the above graph are clickable
+    *  (in the HTML output).
+    */```>
 ------------------------------------
 
 
@@ -2788,31 +2788,31 @@ The second argument is also optional and can be used to specify the width or hei
 Here is an example of the use of the ><```\msc```>< command.
 ><```
    /** Sender class. Can be used to send a command to the server.
-       The receiver will acknowledge the command by calling Ack().
-       \msc
-         Sender,Receiver;
-         Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
-         Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
-       \endmsc
-     /
+    *  The receiver will acknowledge the command by calling Ack().
+    *  \msc
+    *    Sender,Receiver;
+    *    Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
+    *    Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
+    *  \endmsc
+    */
    class Sender
    {
-     public:
+    public:
        /** Acknowledgment from server */
     void Ack(bool ok);
    };
     
    /** Receiver class. Can be used to receive and execute commands.
-       After execution of a command, the receiver will send an acknowledgment
-       \msc
-         Receiver,Sender;
-         Receiver<-Sender [label="Command()", URL="\ref Command()"];
-         Receiver->Sender [label="Ack()", URL="\ref Sender::Ack()", ID="1"];
-       \endmsc
-     /
+    *  After execution of a command, the receiver will send an acknowledgment
+    *  \msc
+    *    Receiver,Sender;
+    *    Receiver<-Sender [label="Command()", URL="\ref Command()"];
+    *    Receiver->Sender [label="Ack()", URL="\ref Sender::Ack()", ID="1"];
+    *  \endmsc
+    */
    class Receiver
    {
-     public:
+    public:
        /** Executable a command on the server */
     void Command(int commandId);
    };
@@ -2855,29 +2855,29 @@ The third argument is also optional and can be used to specify the width or heig
 Here is an example of the use of the ><```\startuml```>< command.
 ><```
    /** Sender class. Can be used to send a command to the server.
-       The receiver will acknowledge the command by calling Ack().
-       \startuml
-         Sender->Receiver  : Command()
-         Sender<--Receiver : Ack()
-       \enduml
-     /
+    *  The receiver will acknowledge the command by calling Ack().
+    *  \startuml
+    *    Sender->Receiver  : Command()
+    *    Sender<--Receiver : Ack()
+    *  \enduml
+    */
    class Sender
    {
-     public:
+    public:
        /** Acknowledgment from server */
     void Ack(bool ok);
    };
     
    /** Receiver class. Can be used to receive and execute commands.
-       After execution of a command, the receiver will send an acknowledgment
-       \startuml
-         Receiver<-Sender  : Command()
-         Receiver-->Sender : Ack()
-       \enduml
-     /
+    *  After execution of a command, the receiver will send an acknowledgment
+    *  \startuml
+    *    Receiver<-Sender  : Command()
+    *    Receiver-->Sender : Ack()
+    *  \enduml
+    */
    class Receiver
    {
-     public:
+    public:
        /** Executable a command on the server */
     void Command(int commandId);
    };```>
@@ -2948,7 +2948,7 @@ Example: When creating this manual the following: ><```
      ... Project name = \doxyconfig PROJECT_NAME ...
 
 ```>< gives:
- ... Project name = Doxygen Manual ...>
+ ... Project name = Manual ...>
 ------------------------------------
 
 
@@ -3184,7 +3184,7 @@ Help text:
 
 This command can be used to include HTML code that is too complex for doxygen (i.e. applets, java-scripts, and HTML tags that require specific attributes).
 
-Normally the contents between ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use \htmlonly[block] to make doxygen end the current paragraph and restart it after \endhtmlonly.
+Normally the contents between ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlonly[block]```>< to make doxygen end the current paragraph and restart it after \endhtmlonly.
 
 ><!Note:!>< environment variables (like $(HOME) ) are resolved inside a HTML-only block.
 
