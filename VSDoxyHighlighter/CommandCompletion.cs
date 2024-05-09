@@ -178,6 +178,14 @@ namespace VSDoxyHighlighter
         var description = AllDoxygenHelpPageCommands.ConstructDescription(mCommentParser, cmd, showHyperlinks: false);
         return Task.FromResult<object>(description);
       }
+      else if (item.Properties.TryGetProperty(typeof(ParameterAutocompleteSingleEntry), out ParameterAutocompleteSingleEntry singleEntry)) {
+        string description = "";
+        if (!string.IsNullOrEmpty(singleEntry.type)) {
+          description += $"Type: {singleEntry.type}\n";
+        }
+        description += singleEntry.context;
+        return Task.FromResult<object>(description);
+      }
 
       return Task.FromResult<object>("");
     }
@@ -262,13 +270,20 @@ namespace VSDoxyHighlighter
     }
 
 
-    private struct AutocompleteInfoForParameterOfDoxygenCommand
+    // Represents a single entry that appears in the autocomplete box when autocompleting a parameter of a Doxygen command.
+    private class ParameterAutocompleteSingleEntry
     {
-      public IEnumerable<(string name, string type)> elementsToShow;
-      
-      // E.g. the function or class name.
-      public string parentInfo;
-      
+      public string name; // Name of the C++ element (e.g. of the template parameter)
+      public string type; // Type of the C++ element, if available (e.g. "const int").
+      public string context; // Information about the C++ element that contains the entry (e.g. the class, function, etc.)
+    }
+
+
+    // Entries for the autocomplete box associated with a single code element (function, class, etc.).
+    private class AutocompleteInfosForParameterOfDoxygenCommand
+    {
+      public IEnumerable<ParameterAutocompleteSingleEntry> elementsToShow;
+            
       // If an element in 'elementsToShow' matches this string, the next one after that will be preselected.
       // This is used to make writing parameter documentation more convenient. For example, if one is successively documenting
       // the function parameters with '@param', the autocomplete box will preselect the most likely next parameter one wants
@@ -279,7 +294,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private async Task<IList<AutocompleteInfoForParameterOfDoxygenCommand>> TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(
+    private async Task<IList<AutocompleteInfosForParameterOfDoxygenCommand>> TryGetAutocompleteInfosForParameterOfDoxygenCommandAsync(
       SnapshotPoint startPoint, CancellationToken cancellationToken)
     {
       // Get the Doxygen command without the "\" or "@".
@@ -291,7 +306,7 @@ namespace VSDoxyHighlighter
       if (cCmdsToDocumentParam.Contains(command)) {
         if (mGeneralOptions.EnableParameterAutocompleteFor_param) {
           var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
-          return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
+          return infos != null ? new List<AutocompleteInfosForParameterOfDoxygenCommand>() { infos } : null;
         }
         return null;
       }
@@ -299,7 +314,7 @@ namespace VSDoxyHighlighter
       if (cCmdsToDocumentTParam.Contains(command)) {
         if (mGeneralOptions.EnableParameterAutocompleteFor_tparam) {
           var infos = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentTParam, preselectAfterPrevious: true, cancellationToken);
-          return infos.HasValue ? new List<AutocompleteInfoForParameterOfDoxygenCommand>() { infos.Value } : null;
+          return infos != null ? new List<AutocompleteInfosForParameterOfDoxygenCommand>() { infos } : null;
         }
         return null;
       }
@@ -309,12 +324,12 @@ namespace VSDoxyHighlighter
           // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user wants to preselect for "@p" and "@a".
           var normalParamsInfo = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
           var templateParamsInfo = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
-          var result = new List<AutocompleteInfoForParameterOfDoxygenCommand>();
-          if (normalParamsInfo.HasValue) {
-            result.Add(normalParamsInfo.Value);
+          var result = new List<AutocompleteInfosForParameterOfDoxygenCommand>();
+          if (normalParamsInfo != null) {
+            result.Add(normalParamsInfo);
           }
-          if (templateParamsInfo.HasValue) {
-            result.Add(templateParamsInfo.Value);
+          if (templateParamsInfo != null) {
+            result.Add(templateParamsInfo);
           }
           return result;
         }
@@ -337,7 +352,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetParametersOfNextCodeElementAsync(
+    private async Task<AutocompleteInfosForParameterOfDoxygenCommand> TryGetParametersOfNextCodeElementAsync(
       SnapshotPoint startPoint, string[] doxygenCmds, bool preselectAfterPrevious, CancellationToken cancellationToken) 
     {
       // Need to switch to main thread for the CodeModel. Well, actually after we have gotten the CodeModel on the
@@ -354,9 +369,10 @@ namespace VSDoxyHighlighter
 
       FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
       if (funcInfo != null) {
-        var result = new AutocompleteInfoForParameterOfDoxygenCommand {
-          elementsToShow = funcInfo.Parameters.Select(p => (p.Name, p.Type)),
-          parentInfo = $"Function: {funcInfo.FunctionName}",
+        string context = $"Parameter of function: {funcInfo.FunctionName}";
+        var result = new AutocompleteInfosForParameterOfDoxygenCommand {
+          elementsToShow = funcInfo.Parameters.Select(
+            p => new ParameterAutocompleteSingleEntry() { name = p.Name, type = p.Type, context = context }),
           icon = cParamImage
         };
         if (preselectAfterPrevious) {
@@ -368,9 +384,10 @@ namespace VSDoxyHighlighter
       
       MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
       if (macroInfo != null) {
-        var result = new AutocompleteInfoForParameterOfDoxygenCommand { 
-          elementsToShow = macroInfo.Parameters.Select(p => (p, "")),
-          parentInfo = $"Macro: {macroInfo.MacroName}",
+        string context = $"Parameter of macro: {macroInfo.MacroName}";
+        var result = new AutocompleteInfosForParameterOfDoxygenCommand { 
+          elementsToShow = macroInfo.Parameters.Select(
+            p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
           icon = cParamImage
         };
         if (preselectAfterPrevious) {
@@ -384,7 +401,7 @@ namespace VSDoxyHighlighter
     }
 
 
-    private async Task<AutocompleteInfoForParameterOfDoxygenCommand?> TryGetTemplateParametersOfNextCodeElementAsync(
+    private async Task<AutocompleteInfosForParameterOfDoxygenCommand> TryGetTemplateParametersOfNextCodeElementAsync(
       SnapshotPoint startPoint, string[] doxygenCmds, bool preselectAfterPrevious, CancellationToken cancellationToken)
     {
       // As in TryGetParametersOfNextCodeElementAsync(): Switch to the main thread for the FileCodeModel, especially because of performance.
@@ -395,9 +412,10 @@ namespace VSDoxyHighlighter
       FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
       if (funcInfo != null) {
         if (funcInfo.TemplateParameters.Count() > 0) {
-          var result = new AutocompleteInfoForParameterOfDoxygenCommand {
-            elementsToShow = funcInfo.TemplateParameters.Select(p => (p, "")),
-            parentInfo = $"Function: {funcInfo.FunctionName}",
+          string context = $"Template parameter of function: {funcInfo.FunctionName}";
+          var result = new AutocompleteInfosForParameterOfDoxygenCommand {
+            elementsToShow = funcInfo.TemplateParameters.Select(
+              p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
             icon = cTemplateParamImage
           };
 
@@ -414,9 +432,10 @@ namespace VSDoxyHighlighter
       ClassOrAliasInfo clsInfo = cppFileSemantics.TryGetClassInfoIfNextIsATemplateClassOrAlias(startPoint);
       if (clsInfo != null) {
         if (clsInfo.TemplateParameters.Count() > 0) {
-          var result = new AutocompleteInfoForParameterOfDoxygenCommand {
-            elementsToShow = clsInfo.TemplateParameters.Select(p => (p, "")),
-            parentInfo = $"{clsInfo.Type}: {clsInfo.ClassName}",
+          string context = $"Template parameter of {clsInfo.Type.ToLower()}: {clsInfo.ClassName}";
+          var result = new AutocompleteInfosForParameterOfDoxygenCommand {
+            elementsToShow = clsInfo.TemplateParameters.Select(
+              p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
             icon = cTemplateParamImage
           }; 
 
@@ -435,24 +454,22 @@ namespace VSDoxyHighlighter
 
 
     private ImmutableArray<CompletionItem>.Builder CreateAutocompleteItemsForParameterOfDoxygenCommand(
-      IList<AutocompleteInfoForParameterOfDoxygenCommand> infos)
+      IList<AutocompleteInfosForParameterOfDoxygenCommand> infos)
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
       int numParams = infos.Sum(i => i.elementsToShow.Count());
       int curParamNumber = 1;
       bool preselected = false;
       foreach (var info in infos) {
-        foreach ((string name, string type) in info.elementsToShow) {
-          string suffix = type != null && type != ""
-            ? $"=> Type: {type}. {info.parentInfo}"
-            : $"=> {info.parentInfo}";
+        foreach (ParameterAutocompleteSingleEntry singleEntry in info.elementsToShow) {
+          string name = singleEntry.name;
 
           var item = new CompletionItem(
             displayText: name,
             source: this,
             icon: info.icon,
             filters: ImmutableArray<CompletionFilter>.Empty,
-            suffix: suffix,
+            suffix: singleEntry.type,
             insertText: name,
             // As in PopulateAutcompleteBoxWithCommands(): Ensure we keep the order
             sortText: curParamNumber.ToString().PadLeft(numParams, '0'),
@@ -463,6 +480,9 @@ namespace VSDoxyHighlighter
             applicableToSpan: default,
             isCommittedAsSnippet: false,
             isPreselected: preselected);
+
+          // Add a reference to the DoxygenHelpPageCommand to the item so that we can access it in GetDescriptionAsync().
+          item.Properties.AddProperty(typeof(ParameterAutocompleteSingleEntry), singleEntry);
 
           itemsBuilder.Add(item);
           ++curParamNumber;
