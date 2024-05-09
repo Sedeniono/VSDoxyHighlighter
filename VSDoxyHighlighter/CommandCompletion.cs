@@ -186,11 +186,9 @@ namespace VSDoxyHighlighter
     private bool IsLocationInEnabledCommentType(SnapshotPoint triggerLocation)
     {
       // Exploit the existing CommentClassifier associated with the text buffer to figure out whether
-      // the location is in a comment type where autocomplete should be enabled. The CommentClassifier
-      // got created by Visual Studio via CommentClassifierProvider.GetClassifier() when the text
-      // buffer got created.
-      if (triggerLocation.Snapshot.TextBuffer.Properties.TryGetProperty(
-                typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+      // the location is in a comment type where autocomplete should be enabled. 
+      CommentClassifier commentClassifier = TryGetCommentClassifier(triggerLocation.Snapshot.TextBuffer);
+      if (commentClassifier != null) {
         CommentType? commentType = commentClassifier.CommentExtractor.GetTypeOfCommentBeforeLocation(triggerLocation);
         if (commentType != null) {
           return mGeneralOptions.IsEnabledInCommentType(commentType.Value);
@@ -204,7 +202,19 @@ namespace VSDoxyHighlighter
     }
 
 
-    private ImmutableArray<CompletionItem>.Builder PopulateAutcompleteBoxWithCommands(char startChar)
+    CommentClassifier TryGetCommentClassifier(ITextBuffer textBuffer)
+    {
+      // The CommentClassifier got created by Visual Studio via CommentClassifierProvider.GetClassifier() when the text
+      // buffer got created.
+      if (textBuffer != null && 
+          textBuffer.Properties.TryGetProperty(typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+        return commentClassifier;
+      }
+      return null;
+    }
+
+
+      private ImmutableArray<CompletionItem>.Builder PopulateAutcompleteBoxWithCommands(char startChar)
     {
       var itemsBuilder = ImmutableArray.CreateBuilder<CompletionItem>();
 
@@ -515,8 +525,8 @@ namespace VSDoxyHighlighter
       var snapshot = point.Snapshot;
       int backwardsSearchLineNumStop = snapshot.GetLineFromPosition(backwardsSearchStopPosition).LineNumber;
 
-      if (snapshot.TextBuffer.Properties.TryGetProperty(
-          typeof(CommentClassifier), out CommentClassifier commentClassifier)) {
+      CommentClassifier commentClassifier = TryGetCommentClassifier(snapshot.TextBuffer);
+      if (commentClassifier != null) {
         // We assume only one Doxygen command per line.
         for (int lineNum = point.GetContainingLineNumber() - 1; lineNum >= backwardsSearchLineNumStop; --lineNum) {
           ITextSnapshotLine line = snapshot.GetLineFromLineNumber(lineNum);
