@@ -204,7 +204,7 @@ namespace VSDoxyHighlighter
       // We put some commands that are propably used often to the front of the list that appears in the autocomplete box.
       // The commands will be ordered according to the following list.
       var speciallyOrderedCommands = new List<string>() {
-        "brief", "details", "note", "warning", "param", "tparam", "returns", "return",
+        "param", "tparam", "brief", "details", "note", "warning", "returns", "return",
         "throws", "throw", "sa", "see", "ref", "p", "c", "a", "ingroup",
       };
 
