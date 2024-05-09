@@ -86,6 +86,8 @@ Especially, important messages such as warnings or notes are harder to overlook 
 
 
 ### Autocomplete of arguments of Doxygen commands
+![Example IntelliSense](Pictures/ExampleIntelliSenseFuncParam.gif)
+
 Additional autocompletion is provided for the arguments of the following Doxygen commands:
   - `\param` (and its `in`/`out` variations): Lists the parameters of the next function or macro.
   - `\tparam`: Lists the template parameters of the next template function, class, struct or alias template ("`using`").
