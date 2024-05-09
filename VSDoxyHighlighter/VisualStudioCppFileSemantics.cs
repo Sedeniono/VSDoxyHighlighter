@@ -164,7 +164,7 @@ namespace VSDoxyHighlighter
           CodeElement paramCodeElement = TryGetCodeElementFor(paramToken);
           if (paramCodeElement != null) {
             var kind = paramCodeElement.Kind;
-            if (kind != vsCMElement.vsCMElementFunction // vsCMElementFunction is returned for function return types.
+            if (kind != vsCMElement.vsCMElementFunction // vsCMElementFunction is returned for return values of functions/member functions.
                 && kind != vsCMElement.vsCMElementParameter) { // vsCMElementParameter is just a guess if the FileCodeModel ever gets fixed.
               return null; // SemanticTokensCache was wrong. The next element after 'point' is not a function.
             }

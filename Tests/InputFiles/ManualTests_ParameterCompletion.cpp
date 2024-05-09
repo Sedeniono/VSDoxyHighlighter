@@ -275,6 +275,27 @@ class TemplateClass
   /// @param
   int templateMemberFunc3WithTypename(typename templClsArg::SomeType param);
 
+
+  /// @tparam
+  /// @param
+  std::pair<SomeClass, class InlClass> FuncWithReturnType2Decl(SomeClass param1, int param2);
+
+  /// @tparam
+  /// @param
+  std::pair<SomeClass, class InlClass> FuncWithReturnType2Def(SomeClass param1, int param2) { }
+  
+  
+  /// @tparam
+  /// @param 
+  template <class T>
+  SomeClass TemplateFuncWithReturnTypeDecl(SomeClass param1, int param2);
+  
+  /// @tparam
+  /// @param
+  template <class T>
+  SomeClass TemplateFuncWithReturnTypeDef(SomeClass param1, int param2) { }
+
+
   /// @param
   bool operator==(TemplateClass const & rhs);
 
@@ -317,8 +338,9 @@ class NonTemplateClass
   /// @param
   bool operator==(NonTemplateClass const & rhs) const;
 
+  /// @tparam
   /// @param
-  auto operator<=>(NonTemplateClass const & rhs) const = default;
+  std::strong_ordering operator<=>(NonTemplateClass const & rhs) const = default;
 };
 
 /// @param
