@@ -68,7 +68,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 
 - The syntax highlighting can be enabled in C/C++ comments starting with `/*`, `/**`, `/*!`, `//`, `///` or `//!`. The enabled comment types can be configured in the Visual Studio options under the VSDoxyHighlighter node. By default, syntax highlighting is not applied to `//` and `/*` comments because Doxygen does not parse those.
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported. For example, both `\brief` and `@brief` are highlighted.
-- [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.9.8) are supported.
+- [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.10.0) are supported.
 - Highlighting partially supports markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
 - The extension comes with two different default color schemes, one for dark and one for light Visual Studio themes. The colors can also be configured. See the configuration section below for more information.
 - Syntax highlighting can be disabled entirely in the VSDoxyHighlighter options.
