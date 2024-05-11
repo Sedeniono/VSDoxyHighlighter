@@ -180,17 +180,14 @@ namespace VSDoxyHighlighter
       VCCodeFunction codeElement = TryGetCodeElementFor(functionTokenIter.Current) as VCCodeFunction;
       if (codeElement == null) {
         // Most likely we have a global function declaration. The FileCodeModel is buggy here and does not know about it.
-        // Just return the info from the SemanticTokenCache. Unfortunately it lacks information about non-type template parameters.
+        // Just return the info from the SemanticTokensCache. Unfortunately it lacks information about non-type template parameters.
         // Not much we can do here (except write a code parser ourselves...).
         return mSemanticCache.TryGetFunctionInfoIfNextIsAFunction(point);
       }
 
-      // If we were able to get function information from the FileCodeModel, we believe it: The SemanticTokenCache does
-      // not know about non-type template parameters, while the FileCodeModel does. Also, in my experiments the SemanticTokenCache
-      // was aware of ALL functions in the file. So no need to check whether the FileCodeModel or the SemanticTokenCache found a
-      // function which comes earlier than the other; they should be the same at this point.
+      // If we were able to get function information from the FileCodeModel, we believe it: The SemanticTokensCache does
+      // not know about non-type template parameters, while the FileCodeModel does.
       string funcName = codeElement.Name;
-      Debug.Assert(funcName == functionTokenIter.Current.Text);
       var parameters = new List<ParameterInfo>();
       foreach (CodeElement param in codeElement.Parameters) {
         string name = TrimAndStripEllipsis(param.Name);
