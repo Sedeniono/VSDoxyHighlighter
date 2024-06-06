@@ -15,7 +15,7 @@ namespace VSDoxyHighlighter
   [InstalledProductRegistration(
     "VSDoxyHighlighter",
     "Provides syntax highlighting, IntelliSense and quick infos for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
-    "1.6.0")]
+    "1.7.0")]
   
   // ProvideOptionPage: Causes VS to show a page in the VS options.
   // The resource IDs refer to the Resources.resx file.
