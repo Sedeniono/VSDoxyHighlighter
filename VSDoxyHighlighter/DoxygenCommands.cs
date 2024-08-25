@@ -416,7 +416,7 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "note", "todo", "attention", "bug", "deprecated"
+            "note", "todo", "attention", "bug", "deprecated", "important"
           },
           CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
           new ClassificationEnum[] { ClassificationEnum.Note }
@@ -534,7 +534,7 @@ namespace VSDoxyHighlighter
         new DoxygenCommandGroup(
           new List<string> {
             "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
-            "section", "subsection", "subsubsection", "paragraph",
+            "section", "subsection", "subsubsection", "paragraph", "subparagraph", "subsubparagraph",
             "snippet", "snippet{lineno}", "snippet{doc}", "snippet{trimleft}", "snippet{local}",
             "snippet{lineno,local}", "snippet{doc,local}", "snippet{trimleft,local}",
             "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
