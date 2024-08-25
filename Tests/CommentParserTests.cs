@@ -464,6 +464,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\ifnot", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"(!LABEL1 && LABEL2)", ClassificationEnum.Parameter1),
 
+        new Utils.FormattedFragmentText(@"\important", ClassificationEnum.Note),
         new Utils.FormattedFragmentText(@"\invariant", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\note", ClassificationEnum.Note),
 
@@ -615,6 +616,12 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\paragraph", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"sec", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"An example section", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"\subparagraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"subpara", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"An example subparagraph", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"\subsubparagraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"subsubpara", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"An example subsubparagraph", ClassificationEnum.Title),
 
 
         // --- Commands for displaying examples ---

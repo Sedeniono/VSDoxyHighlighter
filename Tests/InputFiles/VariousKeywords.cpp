@@ -150,6 +150,7 @@ Some text \lineinfo more text
 \if (!LABEL1 && LABEL2)
 \if Cond1
 \ifnot  (!LABEL1 && LABEL2)
+\important Some important text
 \invariant Some text
 \note Some note
 \par User defined paragraph:
@@ -231,6 +232,8 @@ Some text \refitem some_name more text
 \subsection sec_2
 \subsubsection sec An example section
 \paragraph sec An example section
+\subparagraph subpara An example subparagraph
+\subsubparagraph subsubpara  An example subsubparagraph
 
 
 --- Commands for displaying examples ---
