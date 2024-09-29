@@ -15,7 +15,7 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Used to group all Doxygen commands that get parsed and classified the same.
-  /// The commands of on group are parsed via the same regex (essentially, they get concatenated
+  /// The commands of one group are parsed via the same regex (essentially, they get concatenated
   /// via "|" in the regex).
   /// The grouping of commands is important so that commands that result in the same type etc
   /// are parsed with the same regex. So instead of having more than 200 regex, we have less
@@ -99,7 +99,7 @@ namespace VSDoxyHighlighter
 
     public static bool IsKnownDefaultCommand(string cmd) 
     {
-      return DefaultCommandsInConfig.FindIndex(cfgElem => cfgElem.Command == cmd) >= 0;
+      return DefaultCommandsInConfig.FindIndex(cfgElem => cfgElem.Command == cmd) >= 0 || cRemovedCommands.Contains(cmd);
     }
 
 
@@ -111,7 +111,14 @@ namespace VSDoxyHighlighter
     public static void ValidateAndAmendCommandsParsedFromConfig(List<DoxygenCommandInConfig> parsed) 
     {
       ValidateParsedFromString(parsed);
-      AmendParsedWithDefaults(parsed);
+      
+      AddNewDefaultCommandsToParsed(parsed);
+      RemoveObsoleteCommandsFromParsed(parsed);
+      AdaptParameterClassifications(parsed);
+      
+      SortConfigList(parsed);
+
+      ValidateParameterClassifications(parsed);
     }
 
 
@@ -312,20 +319,69 @@ namespace VSDoxyHighlighter
     /// When we add new Doxygen commands to the extension, we need to amend the data that we read from the
     /// config file with these new commands. This is done by this function.
     /// </summary>
-    private static void AmendParsedWithDefaults(List<DoxygenCommandInConfig> parsed)
+    private static void AddNewDefaultCommandsToParsed(List<DoxygenCommandInConfig> parsed)
     {
-      // Minor performance optimization: No need to search if there are all commands. (The user cannot add new commands.)
-      if (parsed.Count == DefaultCommandsInConfig.Count) {
-        return;
-      }
-
       foreach (DoxygenCommandInConfig defaultCmd in DefaultCommandsInConfig) {
         if (!parsed.Any(parsedCmd => parsedCmd.Command == defaultCmd.Command)) {
           parsed.Add(defaultCmd);
         }
       }
+    }
 
-      SortConfigList(parsed);
+
+    /// <summary>
+    /// When we remove known Doxygen commands from the extension, we need to amend the data that we read from the
+    /// config file to remove them there, too. This is done by this function.
+    /// </summary>
+    private static void RemoveObsoleteCommandsFromParsed(List<DoxygenCommandInConfig> parsed) 
+    {
+      foreach (string removedCmd in cRemovedCommands) {
+        int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
+        if (idx >= 0) { 
+          parsed.RemoveAt(idx);
+        }
+      }
+    }
+
+
+    /// <summary>
+    /// When we modify a Doxygen command to have more or less parameters in a new version of the VS extension,
+    /// we need to amend the data that we read from the config file to mirro this change. This is done by this function.
+    /// </summary>
+    private static void AdaptParameterClassifications(List<DoxygenCommandInConfig> parsed) 
+    {
+      int idxOfParam = parsed.FindIndex(cfgElem => cfgElem.Command == "param");
+      Debug.Assert(idxOfParam >= 0); // Already checked before that the parsed list contains the command.
+      DoxygenCommandInConfig parsedParamCmd = parsed[idxOfParam];
+      if (parsedParamCmd.ParametersClassifications.Length == 1) {
+        int defaultCmdIdx = DefaultCommandsInConfig.FindIndex(cfgElem => cfgElem.Command == "param");
+        Debug.Assert(defaultCmdIdx >= 0);
+        DoxygenCommandInConfig defaultParamCmd = DefaultCommandsInConfig[defaultCmdIdx];
+        parsedParamCmd.ParametersClassifications = new ClassificationEnum[] {
+          // We changed the logic so that the "[in,out]" part is a separate parameter. So add
+          // the default classification to the front.
+          defaultParamCmd.ParametersClassifications[0],
+          parsedParamCmd.ParametersClassifications[0]
+        };
+      }
+    }
+
+
+    private static void ValidateParameterClassifications(List<DoxygenCommandInConfig> parsed)
+    {
+      foreach (DoxygenCommandInConfig parsedCmd in parsed) {
+        int defaultCmdIdx = DefaultCommandsInConfig.FindIndex(cfgElem => cfgElem.Command == parsedCmd.Command);
+        if (defaultCmdIdx < 0) {
+          Debug.Assert(false); // Should not happen because obsolete cmds were removed before.
+          continue;
+        }
+        DoxygenCommandInConfig defaultCmd = DefaultCommandsInConfig[defaultCmdIdx];
+        if (parsedCmd.ParametersClassifications.Length != defaultCmd.ParametersClassifications.Length) {
+          // Number of parameters from the configuration file is different to the number we expect.
+          throw new VSDoxyHighlighterException(
+            $"Command '{defaultCmd.Command}' has {parsedCmd.ParametersClassifications.Length} parameters in the configuration file, but expected {defaultCmd.ParametersClassifications.Length}.");
+        }
+      }
     }
 
 
@@ -427,7 +483,7 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "param", "tparam", "param[in]", "param[out]", "param[in,out]",
+            "tparam",
             "concept", "def", "enum", "extends", "implements",
             "memberof", "module", "namespace", "package", "relates", "related",
             "relatesalso", "relatedalso", "retval"
@@ -530,6 +586,13 @@ namespace VSDoxyHighlighter
 
 
         //----- With up to two parameters -------
+        new DoxygenCommandGroup(
+          new List<string> {
+            "param"
+          },
+          CommentParser.BuildRegex_ParamCommand,
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Command, ClassificationEnum.Parameter1 }
+        ),
 
         new DoxygenCommandGroup(
           new List<string> {
@@ -611,7 +674,10 @@ namespace VSDoxyHighlighter
 
       DefaultCommandsInConfig = ToConfigList(DefaultCommandGroups);
     }
+
+
+    // List of commands that got removed in later versions of the extension.
+    // The `param[...]` commands were removed because a dedicated parser was written to parse them.
+    private static readonly List<string> cRemovedCommands = new List<string> { "param[in]", "param[out]", "param[in,out]" };
   }
-
-
 }

@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -14,8 +15,8 @@ namespace VSDoxyHighlighter
   // InstalledProductRegistration: Causes the extension to show up in the Visual Studio Help->About dialog.
   [InstalledProductRegistration(
     "VSDoxyHighlighter",
-    "Provides syntax highlighting, IntelliSense and quick infos for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter", 
-    "1.7.0")]
+    "Provides syntax highlighting, IntelliSense and quick infos for doxygen/javadoc style comments in C/C++. Github page: https://github.com/Sedeniono/VSDoxyHighlighter",
+    VSDoxyHighlighterPackage.VersionString)]
   
   // ProvideOptionPage: Causes VS to show a page in the VS options.
   // The resource IDs refer to the Resources.resx file.
@@ -47,6 +48,21 @@ namespace VSDoxyHighlighter
   [Guid(VSDoxyHighlighterPackage.PackageGuidString)]
   public sealed class VSDoxyHighlighterPackage : AsyncPackage
   {
+    public const string VersionString = "1.7.0";
+
+    public static int FullVersionNumber { 
+      get {
+        string[] versionParts = VersionString.Split('.');
+        if (versionParts.Length != 3) {
+          throw new VSDoxyHighlighterException($"Invalid version string: {VersionString}");
+        }
+        int MajorVersion = int.Parse(versionParts[0], CultureInfo.InvariantCulture);
+        int MinorVersion = int.Parse(versionParts[1], CultureInfo.InvariantCulture);
+        int PatchVersion = int.Parse(versionParts[2], CultureInfo.InvariantCulture);
+        return (MajorVersion * 1000 + MinorVersion) * 100 + PatchVersion;
+      } 
+    }
+
     public static IGeneralOptions GeneralOptions {
       get {
         ThreadHelper.ThrowIfNotOnUIThread();

@@ -206,7 +206,7 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
         return see_also_fragments
 
-    elif tag.name == "dl" and ' '.join(tag['class']) in ["section note", "section warning"]:
+    elif tag.name == "dl" and ' '.join(tag['class']) in ["section note", "section warning", "section important"]:
         tag_class = ' '.join(tag['class'])
 
         fragments = []
@@ -215,6 +215,8 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
         if "note" in tag_class:
             fragments.append(Fragment(FragmentType.Note, "Note:"))
+        elif "important" in tag_class:
+            fragments.append(Fragment(FragmentType.Warning, "Important:"))
         else:
             fragments.append(Fragment(FragmentType.Warning, "Warning:"))
 
@@ -284,13 +286,13 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
         # In the whole help page text, only one kind of image appears: Namely the LaTeX logo.
         # But in 2 variants (coming behind each other): For light and dark mode. We return only one.
         if "LaTeX" in tag["alt"]:
-            test = tag["class"]
-            if any("light-mode" in t for t in tag["class"]):
+            tag_class = tag["class"]
+            if any(("light-mode" in t or "formulaInl" in t) for t in tag_class):
                 return [Fragment(FragmentType.Text, "LaTeX")]
-            elif any("dark-mode" in t for t in tag["class"]):
+            elif any("dark-mode" in t for t in tag_class):
                 return [] # Only return "LaTeX" once (we do it for the light mode element already).
             else:
-                raise Exception("Unexpected LaTeX image format.")    
+                raise Exception("Unexpected LaTeX image format.")
         else:
             raise Exception("Unknown image")
 
@@ -336,9 +338,18 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
 
 def parse_all_children(children, decorator) -> list[Fragment]:
-    fragments = []
+    fragments: list[Fragment] = []
     for child in children:
-        fragments.extend(parse_recursive(child, decorator))
+        cur_fragments = parse_recursive(child, decorator)
+
+        # There is an unnecessary space after the "LaTeX" image element. Remove it.
+        if len(fragments) > 0 and fragments[-1].content == 'LaTeX' and len(cur_fragments) > 0:
+            first_fragment_content = cur_fragments[0].content
+            if len(first_fragment_content) > 1 and first_fragment_content.startswith(' ') \
+                    and not first_fragment_content[1].isalpha() and first_fragment_content[1] not in ["(", "["]:
+                cur_fragments[0].content = first_fragment_content[1:]
+
+        fragments.extend(cur_fragments)
     return fragments
 
 
@@ -584,6 +595,6 @@ if __name__ == "__main__":
     extract_and_convert_doxygen_commands_from_html(
         # The input html file is https://www.doxygen.nl/manual/commands.html
         # (simply saved via a browser).
-        html_filename=os.path.join(main_folder, "testInput1.10.0.htm"),
+        html_filename=os.path.join(main_folder, "testInput1.11.0.htm"),
         output_csharp_filename=os.path.join(main_folder, "DoxygenCommandsGeneratedFromHelpPage.cs"),
         output_debug_dump_filename=os.path.join(main_folder, "GeneratedDebugDump.txt"))

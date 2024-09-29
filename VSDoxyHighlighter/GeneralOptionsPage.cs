@@ -91,6 +91,8 @@ namespace VSDoxyHighlighter
 
     List<DoxygenCommandInConfig> DoxygenCommandsConfig { get; }
 
+    int Version { get; set; }
+
     event EventHandler SettingsChanged;
 
     bool IsEnabledInCommentType(CommentType type);
@@ -275,6 +277,12 @@ namespace VSDoxyHighlighter
 
 
     //----------------
+
+    [Browsable(false)]
+    public int Version { get; set; } = VSDoxyHighlighterPackage.FullVersionNumber;
+
+
+    //----------------
     // Helpers
 
     /// <summary>
@@ -335,6 +343,25 @@ namespace VSDoxyHighlighter
 
             var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
             var commands = (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
+
+#error I adapted \param to use a custom parser, and it now has 2 instead of 1 parameters (for the "in,out" part).
+#error I also added old-data-reading for the configuration (see AdaptParameterClassifications()).
+#error However, I wanted to improve things further by storing the version in the config, so that the old-data-adaption is done only when really needed.
+#error But accessing the version is doesn't work (recursive load package call). I would need to decouple the loading and the conversion of the config.
+#error TODO:
+            /*
+            TODO:
+            - Think about if the version stuff is worth it. I can still do it at some later time? So far I don't really need it.
+              NOTE: The storing and reading of the version was not yet tested by me.
+            - Add unit tests for the \param: Support whitespace and arbitrary ordering of in,out. See https://regex101.com/r/PPNg3R/1
+            - tableofcontents can have {}. But this was for a long time. Ignore?
+            - \include, \includedoc, \snippet, \snippetdoc: neue raise und prefix Optionen => new parser
+            - With this, doxygen 1.11 is supported.
+            - Afterwards, add support for doxygen 1.12
+            */
+
+            int version = VSDoxyHighlighterPackage.GeneralOptions.Version;
+
             DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(commands);
             return commands;
           }

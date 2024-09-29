@@ -178,7 +178,7 @@ namespace VSDoxyHighlighter
       // which was matched by the earlier regex. At the time of writing this, it should not actually be possible that two regex
       // return matches that start at the same position, but who knows what the future holds.
       //
-      // Also, NOT passing "sorted" directly into the constructed of SortedSet because apparently the constructor does not iterate
+      // Also, NOT passing "sorted" directly into the constructed SortedSet because apparently the constructor does not iterate
       // over the input IEnumerable in the correct order.
       var sorted = allFragmentGroups.OrderBy(fragment => fragment.StartIndex);
       var filtered = new SortedSet<FormattedFragmentGroup>(new NonOverlappingCommandGroupsComparer());
@@ -399,6 +399,18 @@ namespace VSDoxyHighlighter
       //                                                                         1               2    3
       //                                                             _________________________|______|_
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
+    }
+
+    public static string BuildRegex_ParamCommand(ICollection<string> keywords)
+    {
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // We need a dedicated parser for the \param command because the "[in,out]" parameter can be appear with whitespaces and in any order.
+      // https://regex101.com/r/PPNg3R/1
+      //
+      //                                                                     Optional "[in,out]" parameter                                             name of the function param
+      //                                                               ___________________________________________________________________            ________________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*,[ \t]*out|out[ \t]*,[ \t]*in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)

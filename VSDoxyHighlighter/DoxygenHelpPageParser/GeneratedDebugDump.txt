@@ -517,8 +517,8 @@ Anchor: cmdfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmd
 Help text:
 <Indicates that a comment block contains documentation for a source or header file with name <name>. The file name may include (part of) the path if the file-name alone is not unique. If the file name is omitted (i.e. the line after ><```\file```>< is left blank) then the documentation block that contains the ><```\file```>< command will belong to the file it is located in.
 
-Important: The documentation of 
-global functions, variables, typedefs, and enums will only be included 
+><!!!Important:!!!>< The documentation of
+ global functions, variables, typedefs, and enums will only be included 
 in the output if the file they are in is documented as well or if ><EXTRACT_ALL§https://www.doxygen.nl/manual/config.html#cfg_extract_all§>< is set to ><```YES```><.
 
 Example: ><```
@@ -1662,6 +1662,15 @@ See also: commands ><[\endif]§https://www.doxygen.nl/manual/commands.html#cmden
 
 
 ====================================
+Command: important
+Parameters: { important text }
+Anchor: cmdimportant  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdimportant
+Help text:
+<Starts a paragraph where a message that needs important may be entered. The paragraph will be indented. The text of the paragraph has no special internal structure. All visual enhancement commands may be used inside the paragraph. Multiple adjacent ><```\important```>< commands will be joined into a single paragraph. The ><```\important```>< command ends when a blank line or some other sectioning command is encountered.>
+------------------------------------
+
+
+====================================
 Command: invariant
 Parameters: { description of invariant }
 Anchor: cmdinvariant  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinvariant
@@ -1719,12 +1728,12 @@ Click ><here§https://www.doxygen.nl/manual/examples/par/html/class_par___test.h
 
 ====================================
 Command: param
-Parameters: '['dir']' <parameter-name> { parameter description }
+Parameters: [<dir>] <parameter-name> { parameter description }
 Anchor: cmdparam  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdparam
 Help text:
 <Starts a parameter description for a function parameter with name <parameter-name>, followed by a description of the parameter. The existence of the parameter is checked and a warning is given if the documentation of this (or any other) parameter is missing or not present in the function declaration or definition.
 
-The ><```\param```>< command has an optional attribute, ><```dir```><, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
+The ><```\param```>< command has an optional attribute, <dir>, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. Note that it is also possible to put whitespace between the command and the <dir>. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
 ><```
    /*!
     * Copies bytes from a source memory area to a destination memory area,
@@ -2021,7 +2030,7 @@ Command: addindex
 Parameters: (text)
 Anchor: cmdaddindex  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdaddindex
 Help text:
-<This command adds (text) to the LaTeX , DocBook and RTF index.>
+<This command adds (text) to the LaTeX, DocBook and RTF index.>
 ------------------------------------
 
 
@@ -2162,7 +2171,7 @@ Command: tableofcontents
 Parameters: ['{'[option[:level]][,option[:level]]*'}']
 Anchor: cmdtableofcontents  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdtableofcontents
 Help text:
-<Creates a table of contents at the top of a page, listing all sections and subsections in the page. The ><```option```>< can be ><```HTML```>< or ><```LaTeX```>< or ><```XML```>< or ><```DocBook```><. When a ><```level```>< is specified this means the maximum nesting level that is shown. The value of ><```level```>< should be in the range 1..5, values outside this range are considered to be 5. In case no ><```level```>< is specified ><```level```>< is set to 5 (show all) In case no ><```option```><. is specified ><```\tableofcontents```>< acts as if just the ><```option```>< ><```HTML```>< and ><```XML```>< was specified. In case of multiple ><```\tableofcontents```>< commands in a page the ><```option```><(s) will be used additional to the already specified ><```option```><(s), but only the last ><```level```>< of an ><```option```>< is valid.
+<Creates a table of contents at the top of a page, listing all sections and subsections in the page. The ><```option```>< can be ><```HTML```>< or ><```LaTeX```>< or ><```XML```>< or ><```DocBook```><. When a ><```level```>< is specified this means the maximum nesting level that is shown. The value of ><```level```>< should be in the range 1..6, values outside this range are considered to be 6. In case no ><```level```>< is specified ><```level```>< is set to 6 (show all) In case no ><```option```><. is specified ><```\tableofcontents```>< acts as if just the ><```option```>< ><```HTML```>< and ><```XML```>< was specified. In case of multiple ><```\tableofcontents```>< commands in a page the ><```option```><(s) will be used additional to the already specified ><```option```><(s), but only the last ><```level```>< of an ><```option```>< is valid.
 
 ><!!!Warning:!!!>< This command only works inside related page documentation and ><*not*>< in other documentation blocks and only has effect in the specified output!>
 ------------------------------------
@@ -2215,6 +2224,28 @@ Help text:
 <Creates a named paragraph with name <paragraph-name>. The title of the paragraph should be specified as the second argument of the ><```\paragraph```>< command.
 
 ><!!!Warning:!!!>< This command only works inside a subsubsection of a related page documentation block and ><*not*>< in other documentation blocks!>
+------------------------------------
+
+
+====================================
+Command: subparagraph
+Parameters: <subparagraph-name> (subparagraph title)
+Anchor: cmdsubparagraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsubparagraph
+Help text:
+<Creates a named subparagraph with name <subparagraph-name>. The title of the subparagraph should be specified as the second argument of the ><```\subparagraph```>< command.
+
+><!!!Warning:!!!>< This command only works inside a paragraph of a related page documentation block and ><*not*>< in other documentation blocks!>
+------------------------------------
+
+
+====================================
+Command: subsubparagraph
+Parameters: <subsubparagraph-name> (subsubparagraph title)
+Anchor: cmdsubsubparagraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsubsubparagraph
+Help text:
+<Creates a named subsubparagraph with name <subsubparagraph-name>. The title of the subsubparagraph should be specified as the second argument of the ><```\subsubparagraph```>< command.
+
+><!!!Warning:!!!>< This command only works inside a subparagraph of a related page documentation block and ><*not*>< in other documentation blocks!>
 ------------------------------------
 
 
@@ -2295,9 +2326,19 @@ The ><```option```>< can either be ><```lineno```><, or ><```doc```><, and addit
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
 
-><!Note:!><
-	When using the ><```{doc}```>< option, some commands like ><[\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§>< and ><[\if]§https://www.doxygen.nl/manual/commands.html#cmdif§>< don't work with this command due to the moment of parsing.
-	The included documentation should not have comment signs in it as they will appear in the documentation as well.
+When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
+><```
+     \include{doc,raise=1} file.dox
+
+```><will treat any level 1 ><```\section```>< found in ><```file.dox```>< as a level 2 ><```\subsection```><, and any level 2 ><```\subsection```>< into a level 3 ><```\subsubsection```><, etc. Similarly, for Markdown a ><```#```>< section will be treated as a ><```##```>< section.
+
+Furthermore, there is the option ><```prefix```>< that can be used to add a prefix to each label of the included sections, so that they remain unique. For example:
+><```
+     \include{doc,prefix=fn_} file.dox
+
+```><will treat e.g. ><```\section s1```>< found in ><```file.dox```>< as if it was specified as ><```\section fn_s1```><.
+
+><!Note:!>< The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
 See also: commands ><[\example]§https://www.doxygen.nl/manual/commands.html#cmdexample§><, ><[\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§><, ><[\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§><, ><[\includedoc]§https://www.doxygen.nl/manual/commands.html#cmdincludedoc§><, and ><[\snippet]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§><.>
 ------------------------------------
@@ -2316,10 +2357,12 @@ See also: commands ><[\include{lineno}]§https://www.doxygen.nl/manual/commands.
 
 ====================================
 Command: includedoc
-Parameters: <file-name>
+Parameters: ['{'option'}'] <file-name>
 Anchor: cmdincludedoc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdincludedoc
 Help text:
 <This command is obsolete and is still supported for backward compatibility reasons, it works the same way as ><[\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§><
+
+The ><```option```><s are the same ><```option```><s that can be used with the ><```\include```>< when using there the option ><```doc```><.
 
 See also: command ><[\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§><.>
 ------------------------------------
@@ -2410,9 +2453,19 @@ The ><```option```>< can either be ><```lineno```><, ><```trimleft```>< or ><```
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
 
-><!Note:!><
-	When using the ><```{doc}```>< option, some commands like ><[\cond]§https://www.doxygen.nl/manual/commands.html#cmdcond§>< and ><[\if]§https://www.doxygen.nl/manual/commands.html#cmdif§>< don't work with this command due to the moment of parsing.
-	The included documentation should not have comment signs in it as they will appear in the documentation as well.
+When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
+><```
+    \snippet{doc,raise=1} file.dox XXX
+
+```><will treat any level 1 ><```\section```>< found the snippet as a level 2 ><```\subsection```><, and any level 2 ><```\subsection```>< into a level 3 ><```\subsubsection```><, etc. Similarly, for Markdown a ><```#```>< section will be treated as a ><```##```>< section.
+
+Furthermore, there is the option ><```prefix```>< that can be used to add a prefix to each label of the included sections, so that they remain unique. For example:
+><```
+    \include{doc,prefix=fn_} file.dox
+
+```><will treat e.g. ><```\section s1```>< found in ><```file.dox```>< as if it was specified as ><```\section fn_s1```><.
+
+><!Note:!>< The included documentation should not have comment signs in it as they will appear in the documentation as well.
 
 see section ><[\dontinclude]§https://www.doxygen.nl/manual/commands.html#cmddontinclude§>< for an alternative way to include fragments of a source file that does not require markers.>
 ------------------------------------
@@ -2431,10 +2484,12 @@ See also: commands ><[\snippet{lineno}]§https://www.doxygen.nl/manual/commands.
 
 ====================================
 Command: snippetdoc
-Parameters: <file-name> ( block_id )
+Parameters: ['{'option'}'] <file-name> ( block_id )
 Anchor: cmdsnippetdoc  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsnippetdoc
 Help text:
 <This command is obsolete and is still supported for backward compatibility reasons, it works the same way as ><[\snippet{doc}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§><
+
+The ><```option```><s are the same ><```option```><s that can be used with the ><```\snippet```>< when using there the option ><```doc```><.
 
 See also: command ><[\snippet{doc}]§https://www.doxygen.nl/manual/commands.html#cmdsnippet§>< and ><[\include{doc}]§https://www.doxygen.nl/manual/commands.html#cmdinclude§><.>
 ------------------------------------
@@ -2466,7 +2521,7 @@ Files or directories that doxygen should look for can be specified using the ><E
 
 ====================================
 Command: htmlinclude
-Parameters: ["[block]"] <file-name>
+Parameters: ['[block]'] <file-name>
 Anchor: cmdhtmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude
 Help text:
 <This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ><```<htmlonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< commands around it.
@@ -2832,7 +2887,7 @@ Help text:
 	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ><```jar```>< files, for details see the PlantUML documentation. This also is valid for the ><```<engine>```><s ><```latex```>< and ><```math```><. The location of the PlantUML file should be specified using ><PLANTUML_JAR_PATH§https://www.doxygen.nl/manual/config.html#cfg_plantuml_jar_path§><. The other jar files should also reside in this directory.
 	The use of the ><```<engine>```>< ><```ditaa```>< is not possible in LaTeX as PlantUML only supports the ><```png```>< format and doxygen requires, temporary, ><```eps```>< output.
 
-Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```>< and ><```ebnf```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
+Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```><, ><```ebnf```>< and ><```files```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
 
 The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running doxygen, you can also add the name of the image file after ><```\startuml```>< and inside curly brackets as option, i.e.
 ><```
@@ -2948,7 +3003,7 @@ Example: When creating this manual the following: ><```
      ... Project name = \doxyconfig PROJECT_NAME ...
 
 ```>< gives:
- ... Project name = Manual ...>
+ ... Project name = Doxygen ...>
 ------------------------------------
 
 
@@ -3177,7 +3232,7 @@ See also: command ><[\f{]§https://www.doxygen.nl/manual/commands.html#cmdfcurly
 
 ====================================
 Command: htmlonly
-Parameters: ["[block]"]
+Parameters: ['[block]']
 Anchor: cmdhtmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhtmlonly
 Help text:
 <Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with ><```<htmlonly>```>< in the generated XML output. The block ends with a ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< command.
