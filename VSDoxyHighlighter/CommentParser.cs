@@ -203,7 +203,7 @@ namespace VSDoxyHighlighter
       var parsed = Parse(cmdWithSlashOrAt);
       if (parsed.Count() == 1) {
         FormattedFragmentGroup group = parsed.First();
-        if (group.Fragments.Count == 1) {
+        if (group.Fragments.Count > 0) {
           return group.Fragments[0].Classification;
         }
       }
