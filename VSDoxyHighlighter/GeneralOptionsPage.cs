@@ -98,8 +98,11 @@ namespace VSDoxyHighlighter
   /// Used to separate the actual properties from the DialogPage, i.e. the Visual Studio GUI stuff.
   /// </summary>
   public interface IGeneralOptions
-  {    
-    ConfigVersions Version { get; }
+  {
+    // Note: Stored as integer rather than as `ConfigVersions` because we don't want the enum label to
+    // be used in the XML when the configuration gets exported by VS, but rather the numeric value. This
+    // is especially important because not all enum labels have a unique numeric value.
+    int Version { get; }
 
     bool EnableHighlighting { get; }
     bool EnableAutocomplete { get; }
@@ -149,7 +152,7 @@ namespace VSDoxyHighlighter
     {
       base.LoadSettingsFromStorage();
 
-      if (Version == ConfigVersions.NoVersionInConfig) {
+      if (Version == (int)ConfigVersions.NoVersionInConfig) {
         // We come here in two cases:
         // 1) The settings contain no VsDoxyHighlighter configuration at all yet
         //    => The properties contain the default values => They are for the current VSDoxyHighlighter version.
@@ -158,22 +161,22 @@ namespace VSDoxyHighlighter
         //    really matter for the code that checks the version as long as it is <1.8.0, so simply use 1.7.0.
         if (DoxygenCommandsConfig.FindIndex(cmd => cmd.Command == "param[in]") >= 0) {
           // Case (2)
-          Version = ConfigVersions.v1_7_0;
+          Version = (int)ConfigVersions.v1_7_0;
         }
         else {
           // Case (1)
-          Version = ConfigVersions.Current;
+          Version = (int)ConfigVersions.Current;
         }
       }
 
       // Validate the read configuration. And if we read the configuration of an old version of the extension, we
       // might have changed the available configuration since then. Make appropriate amendments to port the old config
       // to the new one.
-      DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(DoxygenCommandsConfig, Version);
+      DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(DoxygenCommandsConfig, (ConfigVersions)Version);
 
       // Since we adapted the configuration, it now is in the latest format. So ensure that the current version number
       // gets written the next time the config is saved.
-      Version = ConfigVersions.Current;
+      Version = (int)ConfigVersions.Current;
     }
 
 
@@ -211,7 +214,7 @@ namespace VSDoxyHighlighter
 
     // The value is not editable by the user.
     [Browsable(false)]
-    public ConfigVersions Version { get; set; } = ConfigVersions.NoVersionInConfig;
+    public int Version { get; set; } = (int)ConfigVersions.NoVersionInConfig;
 
 
     //----------------

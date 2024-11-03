@@ -7,7 +7,7 @@ namespace VSDoxyHighlighter.Tests
 
   internal class GeneralOptionsFake : IGeneralOptions
   {
-    public ConfigVersions Version { get; } = ConfigVersions.Current;
+    public int Version { get; } = (int)ConfigVersions.Current;
 
     public bool EnableHighlighting { get; } = true;
     public bool EnableAutocomplete { get; } = true;
