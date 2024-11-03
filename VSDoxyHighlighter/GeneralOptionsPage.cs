@@ -72,6 +72,24 @@ namespace VSDoxyHighlighter
 
 
   //==========================================================================================
+  // ConfigVersions
+  //==========================================================================================
+
+  // In some versions of VSDoxyHighlighter, we need to change the configuration format. Each time this happens,
+  // we increment the version written to the config file. This allow to react appropriately when reading old
+  // config files.
+  // Note: We decouple the VSDoxyHighlighter version from the config version, because we do not necessarily
+  // change the config format in each version such that it requires special code to read old configs.
+  public enum ConfigVersions
+  {
+    NoVersionInConfig = 0,
+    v1_7_0 = 1000, // Versions <=1.7.0
+    v1_8_0 = 2000, // Config format change in 1.8.0
+    Current = v1_8_0,
+  }
+
+
+  //==========================================================================================
   // IGeneralOptions
   //==========================================================================================
 
@@ -80,7 +98,9 @@ namespace VSDoxyHighlighter
   /// Used to separate the actual properties from the DialogPage, i.e. the Visual Studio GUI stuff.
   /// </summary>
   public interface IGeneralOptions
-  {
+  {    
+    ConfigVersions Version { get; }
+
     bool EnableHighlighting { get; }
     bool EnableAutocomplete { get; }
     bool EnableQuickInfo { get; }
@@ -124,6 +144,39 @@ namespace VSDoxyHighlighter
       SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    
+    public override void LoadSettingsFromStorage()
+    {
+      base.LoadSettingsFromStorage();
+
+      if (Version == ConfigVersions.NoVersionInConfig) {
+        // We come here in two cases:
+        // 1) The settings contain no VsDoxyHighlighter configuration at all yet
+        //    => The properties contain the default values => They are for the current VSDoxyHighlighter version.
+        // 2) We have a config for version <1.8.0, which did not contain the "Version" property yet. To detect this
+        //    case, we use a hack: If "param[in]" is in the config, it must be a version <1.8.0. Which version doesn't
+        //    really matter for the code that checks the version as long as it is <1.8.0, so simply use 1.7.0.
+        if (DoxygenCommandsConfig.FindIndex(cmd => cmd.Command == "param[in]") >= 0) {
+          // Case (2)
+          Version = ConfigVersions.v1_7_0;
+        }
+        else {
+          // Case (1)
+          Version = ConfigVersions.Current;
+        }
+      }
+
+      // Validate the read configuration. And if we read the configuration of an old version of the extension, we
+      // might have changed the available configuration since then. Make appropriate amendments to port the old config
+      // to the new one.
+      DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(DoxygenCommandsConfig, Version);
+
+      // Since we adapted the configuration, it now is in the latest format. So ensure that the current version number
+      // gets written the next time the config is saved.
+      Version = ConfigVersions.Current;
+    }
+
+
     /// <summary>
     /// Event that gets called when the user clicked on the "OK" button in the options dialog.
     /// It is always called, regardless whether an own option or any option at all was changed.
@@ -153,6 +206,12 @@ namespace VSDoxyHighlighter
           return false;
       }
     }
+
+    //----------------
+
+    // The value is not editable by the user.
+    [Browsable(false)]
+    public ConfigVersions Version { get; set; } = ConfigVersions.NoVersionInConfig;
 
 
     //----------------
@@ -335,7 +394,6 @@ namespace VSDoxyHighlighter
 
             var serializer = new DataContractJsonSerializer(typeof(List<DoxygenCommandInConfig>));
             var commands = (List<DoxygenCommandInConfig>)serializer.ReadObject(memStream);
-            DoxygenCommands.ValidateAndAmendCommandsParsedFromConfig(commands);
             return commands;
           }
           catch (Exception ex) {

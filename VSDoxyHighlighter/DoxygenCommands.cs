@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using static VSDoxyHighlighter.GeneralOptionsPage;
 
 
 namespace VSDoxyHighlighter
@@ -105,10 +106,12 @@ namespace VSDoxyHighlighter
 
     /// <summary>
     /// Given the commands as parsed from the Visual Studio configuration file, checks them for errors. If an error
-    /// is found, an exception is thrown. Also amends the parsed information in case our extension got to know new
-    /// commands.
+    /// is found, an exception is thrown. Also amends the parsed information in case our extension changed and e.g.
+    /// got to know new commands.
+    /// 
+    /// <param name="configVersion">The version for which the configuration was read. We might want to adapt things to the current version.</param>
     /// </summary>
-    public static void ValidateAndAmendCommandsParsedFromConfig(List<DoxygenCommandInConfig> parsed) 
+    public static void ValidateAndAmendCommandsParsedFromConfig(List<DoxygenCommandInConfig> parsed, ConfigVersions configVersion) 
     {
       ValidateParsedFromString(parsed);
       AmendParsedWithDefaults(parsed);
