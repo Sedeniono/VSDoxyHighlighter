@@ -386,8 +386,8 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
-      // Example: "\param[in] myParameter"
-      // NOTE: Although the parameter "myParameter" is required, we nevertheless want to highlight the "\param[in]"
+      // Example: "\memberof myParameter"
+      // NOTE: Although the parameter "myParameter" is required, we nevertheless want to highlight the "\memberof"
       // already before "myParameter" is typed be the user. Thus, although semantically the parameter is required,
       // we make it optional. See the final "?" in the regex part (1).
       //
