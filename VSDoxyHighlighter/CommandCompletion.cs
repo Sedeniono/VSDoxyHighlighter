@@ -16,6 +16,7 @@ using System.Linq;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Editor;
 using System;
+using System.Text.RegularExpressions;
 
 
 namespace VSDoxyHighlighter
@@ -322,9 +323,9 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      if (cCmdsToDocumentParam.Contains(command)) {
+      if (cCmdToDocumentParamRegex.IsMatch(command)) {
         if (mGeneralOptions.EnableParameterAutocompleteFor_param) {
-          var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
+          var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, new[] { "param" }, preselectAfterPrevious: true, cancellationToken);
           return infos != null ? new List<AutocompleteInfosForParameterOfDoxygenCommand>() { infos } : null;
         }
         return null;
@@ -340,7 +341,8 @@ namespace VSDoxyHighlighter
 
       if (mGeneralOptions.EnableParameterAutocompleteFor_p_a) {
         if (cCmdsToReferToParam.Contains(command)) {
-          // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user wants to preselect for "@p" and "@a".
+          // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user would want
+          // to have preselected for "@p" and "@a".
           var normalParamsInfo = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
           var templateParamsInfo = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToReferToParam, preselectAfterPrevious: false, cancellationToken);
           var result = new List<AutocompleteInfosForParameterOfDoxygenCommand>();
@@ -396,7 +398,7 @@ namespace VSDoxyHighlighter
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect 
-            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
+            = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
         }
         return result;
       }
@@ -411,7 +413,7 @@ namespace VSDoxyHighlighter
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect
-            = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
+            = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
         }
         return result;
       }
@@ -440,7 +442,7 @@ namespace VSDoxyHighlighter
 
           if (preselectAfterPrevious) {
             result.elementBeforeElementToPreselect
-              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
+              = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
           }
 
           return result;
@@ -460,7 +462,7 @@ namespace VSDoxyHighlighter
 
           if (preselectAfterPrevious) {
             result.elementBeforeElementToPreselect
-              = TryFindParameterOfPreviousDoxygenCommandWithOneParameter(cppFileSemantics, startPoint, doxygenCmds);
+              = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
           }
 
           return result;
@@ -521,15 +523,28 @@ namespace VSDoxyHighlighter
     }
 
 
-    private string TryFindParameterOfPreviousDoxygenCommandWithOneParameter(
+    // When autocompleting the argument of "@param", "@param[in]", "@tparam" etc. which references a C++ function parameter
+    // or a C++ template parameter, we want to check the previous occurence of "@param" etc, and find the C++ parameter
+    // of that last "@param". This function returns that last C++ parameter. We use that info to preselect the next C++
+    // parameter in the current autocomplete box.
+    // For example, assume we have
+    //    /// @param[in] param2 Parameter 2
+    //    /// @param 
+    //    void func(int param1, int param2, int param3);
+    // where the user typed the second "@param" and hits space. We then want to open the autocomplete box and preselect "param3".
+    // To this end, we need to figure out that the previous "@param" command was for "param2". This function here tries to
+    // find and returns "param2".
+    private string TryFindParameterReferencingCodeOfPreviousDoxygenCommand(
       IVisualStudioCppFileSemantics cppFileSemantics,
       SnapshotPoint point,
       string[] doxygenCmds)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
       FormattedFragmentGroup group = TryFindPreviousDoxygenCommandOnLinesBeforePoint(cppFileSemantics, point, doxygenCmds);
-      if (group != null && group.Fragments.Count == 2) {
-        return group.Fragments[1].GetText(point.Snapshot);
+      if (group != null && group.Fragments.Count >= 2) {
+        // Note: We exploit that this function here is called only in the context of Doxygen commands where the relevant
+        // code-referencing parameter is always the last one. (I.e. true for "@p", "@param[in]", "@tparam", etc.)
+        return group.Fragments.Last().GetText(point.Snapshot);
       }
       return null;
     }
@@ -543,15 +558,15 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      // The task is to find the next Doxygen command in 'doxygenCmds' that comes before 'point. So we need to iterate backward
+      // The task is to find the Doxygen command in 'doxygenCmds' that comes before 'point. So we need to iterate backward
       // until we either find it or leave the current comment section. But how do we detect that we leave the current comment
       // section? I.e. when do we give up on searching backwards? In principle, the CommentClassifier found the start of the
       // comment, because it figured out the type of the comment ('//', '///', '/*', etc.). Problem: This is useless here,
       // because we don't need the start of the comment but rather the start of a whole comment section that the user perceives
-      // as 'one unit'. A '///' comment starts before the '/'. But of course there can be comment lines above, all of them
+      // as 'one unit'. A '///' comment starts at the first '/'. But of course there can be comment lines above, all of them
       // indicated by '///'. So what we would need is the union of all comments that are separated by whitespaces only. Or,
       // put another way, we need to find the first C++ element before 'point' that is not a comment. This is what
-      // TryGetEndPositionOfCppElementBefore() does. We then can search backward between that C++ element and 'point'.
+      // TryGetEndPositionOfCppElementBefore() does. We then can search backward between 'point' and that C++ element.
       //
       // Unfortunately, the way the semantic information is exposed by Visual Studio, in general we cannot find the C++ element
       // before 'point' without getting **ALL** C++ elements till the start of the file. See the implementation notes in
@@ -598,7 +613,7 @@ namespace VSDoxyHighlighter
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
 
-    private static readonly string[] cCmdsToDocumentParam = new string[] { "param", "param[in]", "param[out]", "param[in,out]" };
+    private static readonly Regex cCmdToDocumentParamRegex = new Regex(@"^param(?:[ \t\[]|$)", RegexOptions.Compiled);
     private static readonly string[] cCmdsToReferToParam = new string[] { "p", "a" };
     private static readonly string[] cCmdsToDocumentTParam = new string[] { "tparam" };
 
