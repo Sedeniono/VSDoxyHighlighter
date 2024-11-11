@@ -323,14 +323,38 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      if (cCmdToDocumentParamRegex.IsMatch(command)) {
+      // Check for "@param"
+      Match paramMatch = cCmdToDocumentParamRegex.Match(command);
+      if (paramMatch.Success) {
         if (mGeneralOptions.EnableParameterAutocompleteFor_param) {
-          var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, new[] { "param" }, preselectAfterPrevious: true, cancellationToken);
-          return infos != null ? new List<AutocompleteInfosForParameterOfDoxygenCommand>() { infos } : null;
+          var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
+          if (infos == null) {
+            infos = new AutocompleteInfosForParameterOfDoxygenCommand {
+              elementsToShow = new List<ParameterAutocompleteSingleEntry>(),
+              icon = cParamImage
+            };
+          }
+
+          // If the user has not already typed in the optional "[in,out]" part, add them to the autocomplete list.
+          // We add them to the end of the list because we guess that they are used not very often.
+          Debug.Assert(paramMatch.Groups.Count == 2);
+          bool containsBrackets = paramMatch.Groups[1].Success;
+          if (!containsBrackets) {
+            const string cDirContext = "Optional <dir> attribute";
+            infos.elementsToShow = infos.elementsToShow.Concat(
+              new[] {
+                  new ParameterAutocompleteSingleEntry() { name = "[in]", type = "", context = cDirContext },
+                  new ParameterAutocompleteSingleEntry() { name = "[out]", type = "", context = cDirContext },
+                  new ParameterAutocompleteSingleEntry() { name = "[in,out]", type = "", context = cDirContext }
+              });
+          }
+
+          return new List<AutocompleteInfosForParameterOfDoxygenCommand>() { infos };
         }
         return null;
       }
 
+      // Check for "@tparam"
       if (cCmdsToDocumentTParam.Contains(command)) {
         if (mGeneralOptions.EnableParameterAutocompleteFor_tparam) {
           var infos = await TryGetTemplateParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentTParam, preselectAfterPrevious: true, cancellationToken);
@@ -339,6 +363,7 @@ namespace VSDoxyHighlighter
         return null;
       }
 
+      // Check for "@p" and "@a".
       if (mGeneralOptions.EnableParameterAutocompleteFor_p_a) {
         if (cCmdsToReferToParam.Contains(command)) {
           // Note: preselectAfterPrevious = false. We cannot sensibly guess which parameters the user would want
@@ -581,7 +606,6 @@ namespace VSDoxyHighlighter
 
       CommentClassifier commentClassifier = TryGetCommentClassifier(snapshot.TextBuffer);
       if (commentClassifier != null) {
-        // We assume only one Doxygen command per line.
         for (int lineNum = point.GetContainingLineNumber() - 1; lineNum >= backwardsSearchLineNumStop; --lineNum) {
           ITextSnapshotLine line = snapshot.GetLineFromLineNumber(lineNum);
 
@@ -613,7 +637,12 @@ namespace VSDoxyHighlighter
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
 
-    private static readonly Regex cCmdToDocumentParamRegex = new Regex(@"^param(?:[ \t\[]|$)", RegexOptions.Compiled);
+    // For "@param[in,out]": Matches if the string starts with "param" and if afterwards optionally the "[in,out]" part comes,
+    // and if then the string ends (except for whitespace). So matches e.g. "param [ in]" but not "param [ in] ParamName".
+    // Also compare BuildRegex_ParamCommand().
+    private static readonly Regex cCmdToDocumentParamRegex = new Regex(@"^param[ \t]*(\[[ \t]*(?:in|out|in[ \t]*,[ \t]*out|out[ \t]*,[ \t]*in)[ \t]*\])?(?:[ \t])*$", RegexOptions.Compiled);
+    private static readonly string[] cCmdsToDocumentParam = new string[] { "param" };
+
     private static readonly string[] cCmdsToReferToParam = new string[] { "p", "a" };
     private static readonly string[] cCmdsToDocumentTParam = new string[] { "tparam" };
 
