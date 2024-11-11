@@ -294,8 +294,9 @@ namespace VSDoxyHighlighter
     private class ParameterAutocompleteSingleEntry
     {
       public string name; // Name of the C++ element (e.g. of the template parameter)
-      public string type; // Type of the C++ element, if available (e.g. "const int").
-      public string context; // Information about the C++ element that contains the entry (e.g. the class, function, etc.)
+      public string type; // Type of the C++ element, if available (e.g. "const int"). Show on the right side of the autocomplete box.
+      public string context; // Information about the C++ element that contains the entry (e.g. the class, function, etc.). Shown as tooltip.
+      public ImageElement icon;
     }
 
 
@@ -309,8 +310,6 @@ namespace VSDoxyHighlighter
       // the function parameters with '@param', the autocomplete box will preselect the most likely next parameter one wants
       // to insert, i.e. the one which comes next after the previously documented parameter.
       public string elementBeforeElementToPreselect;
-      
-      public ImageElement icon;
     }
 
 
@@ -330,8 +329,7 @@ namespace VSDoxyHighlighter
           var infos = await TryGetParametersOfNextCodeElementAsync(startPoint, cCmdsToDocumentParam, preselectAfterPrevious: true, cancellationToken);
           if (infos == null) {
             infos = new AutocompleteInfosForParameterOfDoxygenCommand {
-              elementsToShow = new List<ParameterAutocompleteSingleEntry>(),
-              icon = cParamImage
+              elementsToShow = new List<ParameterAutocompleteSingleEntry>()
             };
           }
 
@@ -343,9 +341,9 @@ namespace VSDoxyHighlighter
             const string cDirContext = "Optional <dir> attribute";
             infos.elementsToShow = infos.elementsToShow.Concat(
               new[] {
-                  new ParameterAutocompleteSingleEntry() { name = "[in]", type = "", context = cDirContext },
-                  new ParameterAutocompleteSingleEntry() { name = "[out]", type = "", context = cDirContext },
-                  new ParameterAutocompleteSingleEntry() { name = "[in,out]", type = "", context = cDirContext }
+                  new ParameterAutocompleteSingleEntry() { name = "[in]", context = cDirContext, icon = cParamInOutImage },
+                  new ParameterAutocompleteSingleEntry() { name = "[out]", context = cDirContext, icon = cParamInOutImage },
+                  new ParameterAutocompleteSingleEntry() { name = "[in,out]", context = cDirContext, icon = cParamInOutImage }
               });
           }
 
@@ -418,8 +416,7 @@ namespace VSDoxyHighlighter
         string context = $"Parameter of function: {funcInfo.FunctionName}";
         var result = new AutocompleteInfosForParameterOfDoxygenCommand {
           elementsToShow = funcInfo.Parameters.Select(
-            p => new ParameterAutocompleteSingleEntry() { name = p.Name, type = p.Type, context = context }),
-          icon = cParamImage
+            p => new ParameterAutocompleteSingleEntry() { name = p.Name, type = p.Type, context = context, icon = cParamImage }),
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect 
@@ -433,8 +430,7 @@ namespace VSDoxyHighlighter
         string context = $"Parameter of macro: {macroInfo.MacroName}";
         var result = new AutocompleteInfosForParameterOfDoxygenCommand { 
           elementsToShow = macroInfo.Parameters.Select(
-            p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
-          icon = cParamImage
+            p => new ParameterAutocompleteSingleEntry() { name = p, context = context, icon = cParamImage }),
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect
@@ -461,8 +457,7 @@ namespace VSDoxyHighlighter
           string context = $"Template parameter of function: {funcInfo.FunctionName}";
           var result = new AutocompleteInfosForParameterOfDoxygenCommand {
             elementsToShow = funcInfo.TemplateParameters.Select(
-              p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
-            icon = cTemplateParamImage
+              p => new ParameterAutocompleteSingleEntry() { name = p, context = context, icon = cTemplateParamImage }),
           };
 
           if (preselectAfterPrevious) {
@@ -481,8 +476,7 @@ namespace VSDoxyHighlighter
           string context = $"Template parameter of {clsInfo.Type.ToLower()}: {clsInfo.ClassName}";
           var result = new AutocompleteInfosForParameterOfDoxygenCommand {
             elementsToShow = clsInfo.TemplateParameters.Select(
-              p => new ParameterAutocompleteSingleEntry() { name = p, context = context }),
-            icon = cTemplateParamImage
+              p => new ParameterAutocompleteSingleEntry() { name = p, context = context, icon = cTemplateParamImage }),
           }; 
 
           if (preselectAfterPrevious) {
@@ -513,7 +507,7 @@ namespace VSDoxyHighlighter
           var item = new CompletionItem(
             displayText: name,
             source: this,
-            icon: info.icon,
+            icon: singleEntry.icon,
             filters: ImmutableArray<CompletionFilter>.Empty,
             suffix: singleEntry.type,
             insertText: name,
@@ -633,6 +627,7 @@ namespace VSDoxyHighlighter
     // http://glyphlist.azurewebsites.net/knownmonikers/
     // https://github.com/madskristensen/KnownMonikersExplorer
     private static ImageElement cCompletionImage = new ImageElement(KnownMonikers.CommentCode.ToImageId(), "Doxygen command");
+    private static ImageElement cParamInOutImage = new ImageElement(KnownMonikers.AzureResourceGroup.ToImageId(), "Doxygen in-out argument");
     // Image for parameter and template parameter: These should be the images shown by VS's own IntelliSense in C++.
     private static ImageElement cParamImage = new ImageElement(KnownMonikers.FieldPublic.ToImageId(), "Doxygen parameter");
     private static ImageElement cTemplateParamImage = new ImageElement(KnownMonikers.TypeDefinition.ToImageId(), "Doxygen template parameter");
