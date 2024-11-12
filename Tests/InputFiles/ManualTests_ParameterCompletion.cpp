@@ -46,11 +46,14 @@ void funcDeclWithInlineClassDecl(class InlClassDecl param);
 /// @param
 void funcDefWithInlineClassDecl(class InlClassDecl & param) { }
 
-/// @param[in]
-/// @tparam
+// Currently broken: @tparam for vTempl
+// Currently broken: @param for arr does not show []
+/// @param[in]  
+/// @tparam  
 template <class templateParam, int vTempl>
 int templateFunctionDecl(double var, int iiiii, int arr[], double volatile const v);
 
+// Currently broken: @param for arr does not show []
 /// @param[in]
 /// @tparam
 template <class templateParam, int vTempl>
@@ -59,7 +62,7 @@ int templateFunctionDef(double var, int iiiii, int arr[], double volatile const 
   fundc();
 }
 
-// NOTE: tparam does not work, because neither the FileCodeModel nor the SemanticTokensCache is aware of the NTTP.
+// Currently broken: tparam does not work, because neither the FileCodeModel nor the SemanticTokensCache is aware of the NTTP.
 /// @tparam
 /// \param
 template <int iTempl>
@@ -101,6 +104,7 @@ int ManyParameters(
 }
 
 
+// Currently broken: @param does not show the type for func2WithLineBreaks and param3
 /// @param
 [[nodiscard]] bool ComplicatedParametersDef(
     std::function<int(double p1, short p2)> func1,
@@ -164,6 +168,7 @@ void TemplateWithConceptDef(T const & param)
 
 #define INT_MACRO int
 
+// Currently broken: @tparam does not show templateParam
 /// @tparam
 /// @param
 template <INT_MACRO templateParam>
@@ -177,6 +182,7 @@ void ParameterTypeAsMacroDecl(INT_MACRO param)
 }
 
 
+// Currently broken: @tparam incorrectly shows SomeClass
 /// @tparam
 /// @param
 SomeClass FuncWithReturnTypeDecl(SomeClass param1, int param2);
@@ -186,6 +192,7 @@ SomeClass FuncWithReturnTypeDecl(SomeClass param1, int param2);
 SomeClass FuncWithReturnTypeDef(SomeClass param1, int param2) { }
 
 
+// Currently broken: @tparam incorrectly shows SomeClass
 /// @tparam
 /// @param
 template <class T>
@@ -197,6 +204,7 @@ template <class T>
 SomeClass TemplateFuncWithReturnTypeDef(SomeClass param1, int param2) { }
 
 
+// Currently broken: @tparam incorrectly shows SomeClass and InlClass
 /// @tparam
 /// @param 
 std::pair<SomeClass, class InlClass> FuncWithReturnType2Decl(SomeClass param1, int param2);
@@ -210,6 +218,7 @@ std::pair<SomeClass, class InlClass> FuncWithReturnType2Def(SomeClass param1, in
 /// @param
 constexpr int ConstExprFunc(int v) { return v; }
 
+// Currently broken: @param does not show param2
 /// @tparam
 /// @param
 void FuncDeclWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0);
@@ -219,11 +228,14 @@ void FuncDeclWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double par
 void FuncDefWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0) { }
 
 
+// Currently broken: @tparam does not show iT
+// Currently broken: @param shows neither param1 nor param2
 /// @tparam
 /// @param
 template <class T, int iT = ConstExprFunc(42)>
 void TemplFuncWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0);
 
+// Currently broken: @param shows neither param1 nor param2
 /// @tparam
 /// @param
 template <class T, int iT = ConstExprFunc(42)>
@@ -308,6 +320,7 @@ class TemplateClass
   auto operator<=>(TemplateClass const & rhs) const = default;
 };
 
+// Currently broken: @tparam does not show someInt
 /// @tparam
 /// @param
 template <class templClsArg, unsigned someInt>
@@ -351,6 +364,7 @@ bool operator!=(NonTemplateClass const & lhs, NonTemplateClass const & rhs) { }
 
 
 /// @tparam
+/// @param
 template <typename templArg>
 struct TemplateStruct
 {
@@ -363,7 +377,7 @@ struct NonTemplateStruct
 };
 
 
-// NOTE: 'i' and 'test' are not seen.
+// Currently broken: @tparam does not show 'i' and 'test'
 /// @tparam
 /// @param
 template <typename templArg, auto i, int test, typename another>
@@ -396,6 +410,7 @@ class ClassWithConceptDef
 };
 
 
+// Currently broken: @tparam does not show templateParam
 /// @tparam
 /// @param
 template <INT_MACRO templateParam>
@@ -423,6 +438,7 @@ using SomeUsing = void;
 /// @param
 using SomeSpecificUsing = SomeUsing<int, 42>;
 
+// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @tparam
 /// @param
 template <std::integral T>
@@ -433,20 +449,27 @@ using SomeUsingWithConcept = void;
 // Macros
 //============================================================================
 
+// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @tparam
-/// @param y
-/// @param zzzzz
 /// @param x
+/// @param
 #define SOME_MACRO(x, y, zzzzz) x
 
+// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 #define ANOTHER_MACRO
 
+// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 #define VARIADIC_MACRO(param1, ...)
 
+// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 /// @param
 #define MACRO_WITH_LINE_BREAKS(param1, \
     param2,\
     param3)
+
+// This is here to check that autocompleting in the above macros does
+// not find the function parameters.
+void funcAfterMacro(int funcParam1, double funcParam2);
