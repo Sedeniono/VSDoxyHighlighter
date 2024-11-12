@@ -411,6 +411,29 @@ namespace VSDoxyHighlighter
 
       var cppFileSemantics = new CppFileSemanticsFromVSCodeModelAndCache(mAdapterService, mTextView.TextBuffer);
 
+      // We first check for a macro and then for a function, not vice versa. Reason: Assume there is a macro
+      // definition and then a function. Moreover, assume that we try to autocomplete for a "@param" above
+      // the macro definition. If we did check for a function here first, we would find the function and thus
+      // show the function's parameters rather than the macro's parameters. That we would find the function
+      // is an unfortunate consequence of the hacks in CppFileSemantics to cope with Visual Studio's broken
+      // FileCodeModel, which are very hard to get right. (Essentially, a function declaration can contain
+      // elements whose semantic token are macros, and this cannot be properly distinguished from a macro
+      // definition). So hack around the issue here by checking for a macro first, and for a function second.
+      // This especially works well because a macro definition never contains function-like semantic tokens.
+      MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
+      if (macroInfo != null) {
+        string context = $"Parameter of macro: {macroInfo.MacroName}";
+        var result = new AutocompleteInfosForParameterOfDoxygenCommand {
+          elementsToShow = macroInfo.Parameters.Select(
+            p => new ParameterAutocompleteSingleEntry() { name = p, context = context, icon = cParamImage }),
+        };
+        if (preselectAfterPrevious) {
+          result.elementBeforeElementToPreselect
+            = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
+        }
+        return result;
+      }
+
       FunctionInfo funcInfo = cppFileSemantics.TryGetFunctionInfoIfNextIsAFunction(startPoint);
       if (funcInfo != null) {
         string context = $"Parameter of function: {funcInfo.FunctionName}";
@@ -420,20 +443,6 @@ namespace VSDoxyHighlighter
         };
         if (preselectAfterPrevious) {
           result.elementBeforeElementToPreselect 
-            = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
-        }
-        return result;
-      }
-      
-      MacroInfo macroInfo = cppFileSemantics.TryGetMacroInfoIfNextIsAMacro(startPoint);
-      if (macroInfo != null) {
-        string context = $"Parameter of macro: {macroInfo.MacroName}";
-        var result = new AutocompleteInfosForParameterOfDoxygenCommand { 
-          elementsToShow = macroInfo.Parameters.Select(
-            p => new ParameterAutocompleteSingleEntry() { name = p, context = context, icon = cParamImage }),
-        };
-        if (preselectAfterPrevious) {
-          result.elementBeforeElementToPreselect
             = TryFindParameterReferencingCodeOfPreviousDoxygenCommand(cppFileSemantics, startPoint, doxygenCmds);
         }
         return result;

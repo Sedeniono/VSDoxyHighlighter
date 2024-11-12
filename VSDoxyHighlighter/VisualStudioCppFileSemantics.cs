@@ -281,9 +281,6 @@ namespace VSDoxyHighlighter
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Note: Structure and reasoning the same as in TryGetFunctionInfoIfNextIsAFunction().
-      // Especially: Prefer the FileCodeModel information since it contains information about macro parameters.
-
       var macroToken = mSemanticCache.TryGetSemanticMacroInfoIfNextIsAMacro(point);
       if (macroToken == null) {
         return null;
@@ -291,7 +288,15 @@ namespace VSDoxyHighlighter
 
       VCCodeMacro codeElement = TryGetCodeElementFor(macroToken) as VCCodeMacro;
       if (codeElement == null) {
-        return mSemanticCache.TryGetMacroInfoIfNextIsAMacro(point);
+        // In contrast to global function declarations, the FileCodeModel seems to know always about
+        // macro definitions (#define). So if we come here, we most likely encountered a variable or
+        // parameter whose type is given via a macro. For example:
+        //    #define INT_MACRO int
+        //    /// @param
+        //    void ParameterTypeAsMacroDecl(INT_MACRO param) { }
+        // When typing a space after "@param", we get here. "macroToken" above is the INT_MACRO for the
+        // function parameter. => Return null. We only want to return info about macro *definitions*.
+        return null;
       }
 
       string macroName = codeElement.Name;

@@ -47,13 +47,13 @@ void funcDeclWithInlineClassDecl(class InlClassDecl param);
 void funcDefWithInlineClassDecl(class InlClassDecl & param) { }
 
 // Currently broken: @tparam for vTempl
-// Currently broken: @param for arr does not show []
-/// @param[in]  
-/// @tparam  
+// Currently broken: @param for arr does not show [] in the type
+/// @param[in]
+/// @tparam
 template <class templateParam, int vTempl>
 int templateFunctionDecl(double var, int iiiii, int arr[], double volatile const v);
 
-// Currently broken: @param for arr does not show []
+// Currently broken: @param for arr does not show [] in the type
 /// @param[in]
 /// @tparam
 template <class templateParam, int vTempl>
@@ -206,7 +206,7 @@ SomeClass TemplateFuncWithReturnTypeDef(SomeClass param1, int param2) { }
 
 // Currently broken: @tparam incorrectly shows SomeClass and InlClass
 /// @tparam
-/// @param 
+/// @param
 std::pair<SomeClass, class InlClass> FuncWithReturnType2Decl(SomeClass param1, int param2);
 
 /// @tparam
@@ -236,6 +236,7 @@ template <class T, int iT = ConstExprFunc(42)>
 void TemplFuncWithDefaultParamFromFunc(int param1 = ConstExprFunc(42), double param2 = 1.0);
 
 // Currently broken: @param shows neither param1 nor param2
+// Currently broken: @tparam does not show iT
 /// @tparam
 /// @param
 template <class T, int iT = ConstExprFunc(42)>
@@ -298,7 +299,7 @@ class TemplateClass
   
   
   /// @tparam
-  /// @param 
+  /// @param
   template <class T>
   SomeClass TemplateFuncWithReturnTypeDecl(SomeClass param1, int param2);
   
@@ -397,7 +398,7 @@ class ClassWithParameterPackDef
 };
 
 
-/// @tparam 
+/// @tparam
 /// @param
 template <std::integral T>
 class ClassWithConceptDecl;
@@ -449,21 +450,17 @@ using SomeUsingWithConcept = void;
 // Macros
 //============================================================================
 
-// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @tparam
 /// @param x
 /// @param
 #define SOME_MACRO(x, y, zzzzz) x
 
-// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 #define ANOTHER_MACRO
 
-// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 #define VARIADIC_MACRO(param1, ...)
 
-// Currently broken: @param shows funcParam1 and funcParam2 of the next function.
 /// @param
 /// @param
 #define MACRO_WITH_LINE_BREAKS(param1, \
