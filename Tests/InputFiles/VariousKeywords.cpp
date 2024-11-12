@@ -160,11 +160,21 @@ Some text \lineinfo more text
 \param[in]  src  The memory area to copy from.
 \param[in]  n    The number of bytes to copy
 \param[in,out] p In and out param
+\param	   [ in  ] 	 test Description
+\param[ out 	 ]  test Description
+\param	[in,	out ] test Description
+\param[out,in] test Description
+\param [out, in] test Description
+\param  [ out, in	] test Description
 \param p some param
 \param x,y,z Coordinates of the position in 3D space.
 \param
 \param  
+\param  [ out , in	]
+\param  [ out, in]  
 \param > The ">" should not be formatted because it is not a valid parameter.
+\param[ out Nothing should be formatted because of invalid syntax (missing closing bracket).
+\param[invalid] Nothing should be formatted because "invalid" is not allowed.
 \parblock  
 \endparblock
 \tparam some_param Description of template
