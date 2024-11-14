@@ -367,8 +367,7 @@ namespace VSDoxyHighlighter
         DoxygenCommandInConfig parsedParamCmd = parsed[idxOfParam];
         if (parsedParamCmd.ParametersClassifications.Length == 1) {
           parsedParamCmd.ParametersClassifications = new ClassificationEnum[] {
-            // Since on older versions the `[in,out]` was part of the command, use the CommandClassification for it as default.
-            parsedParamCmd.CommandClassification, // For `[in,out]`
+            ClassificationEnum.ParameterClamped, // For `[in,out]`
             parsedParamCmd.ParametersClassifications[0] // Kepp previous setting for the function parameter.
           };
         }
@@ -600,7 +599,7 @@ namespace VSDoxyHighlighter
             "param"
           },
           CommentParser.BuildRegex_ParamCommand,
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Command, ClassificationEnum.Parameter1 }
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
 
         new DoxygenCommandGroup(

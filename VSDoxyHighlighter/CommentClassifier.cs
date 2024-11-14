@@ -43,7 +43,8 @@ namespace VSDoxyHighlighter
     Generic2 = 12,
     Generic3 = 13,
     Generic4 = 14,
-    Generic5 = 15
+    Generic5 = 15,
+    ParameterClamped = 16,
   }
 
 
@@ -60,6 +61,7 @@ namespace VSDoxyHighlighter
     public const string ID_command = "VSDoxyHighlighter_Command";
     public const string ID_parameter1 = "VSDoxyHighlighter_Parameter1";
     public const string ID_parameter2 = "VSDoxyHighlighter_Parameter2";
+    public const string ID_parameterClamped = "VSDoxyHighlighter_ParameterClamped";
     public const string ID_title = "VSDoxyHighlighter_Title";
     public const string ID_warningKeyword = "VSDoxyHighlighter_Warning";
     public const string ID_noteKeyword = "VSDoxyHighlighter_Note";
@@ -78,6 +80,7 @@ namespace VSDoxyHighlighter
         {ClassificationEnum.Command, ID_command},
         {ClassificationEnum.Parameter1, ID_parameter1},
         {ClassificationEnum.Parameter2, ID_parameter2},
+        {ClassificationEnum.ParameterClamped, ID_parameterClamped},
         {ClassificationEnum.Title, ID_title},
         {ClassificationEnum.Warning, ID_warningKeyword},
         {ClassificationEnum.Note, ID_noteKeyword},

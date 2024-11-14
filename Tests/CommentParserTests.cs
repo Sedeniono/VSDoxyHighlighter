@@ -109,7 +109,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(8, 6, ClassificationEnum.Command), // @brief
         new FormattedFragment(47, 8, ClassificationEnum.Command), // @details
         new FormattedFragment(88, 6, ClassificationEnum.Command), // @param
-        new FormattedFragment(94, 4, ClassificationEnum.Command), // [in] of @param
+        new FormattedFragment(94, 4, ClassificationEnum.ParameterClamped), // [in] of @param
         new FormattedFragment(99, 7, ClassificationEnum.Parameter1), // inParam of the @param[in]
         new FormattedFragment(139, 8, ClassificationEnum.Warning), // @warning
         new FormattedFragment(180, 5, ClassificationEnum.Note), // @note
@@ -117,7 +117,7 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(221, 7, ClassificationEnum.Command), // \tparam
         new FormattedFragment(229, 13, ClassificationEnum.Parameter1), // templateParam of \tparam
         new FormattedFragment(292, 6, ClassificationEnum.Command), // \param
-        new FormattedFragment(298, 5, ClassificationEnum.Command), // [out] of \param
+        new FormattedFragment(298, 5, ClassificationEnum.ParameterClamped), // [out] of \param
         new FormattedFragment(304, 8, ClassificationEnum.Parameter1), // outParam of the \param[out]
         new FormattedFragment(357, 8, ClassificationEnum.Command), // \returns
         new FormattedFragment(396, 7, ClassificationEnum.Command), // \return
@@ -147,14 +147,14 @@ namespace VSDoxyHighlighter.Tests
       var expectedFragments = new List<FormattedFragment>() {
         new FormattedFragment(6, 6, ClassificationEnum.Command), // @brief
         new FormattedFragment(46, 6, ClassificationEnum.Command), // @param
-        new FormattedFragment(52, 4, ClassificationEnum.Command), // [in] of @param
+        new FormattedFragment(52, 4, ClassificationEnum.ParameterClamped), // [in] of @param
         new FormattedFragment(57, 7, ClassificationEnum.Parameter1), // inParam of @param[in]
         new FormattedFragment(99, 8, ClassificationEnum.Warning), // @warning
         new FormattedFragment(151, 5, ClassificationEnum.Note), // \note
         new FormattedFragment(192, 7, ClassificationEnum.Command), // \tparam
         new FormattedFragment(200, 13, ClassificationEnum.Parameter1), // templateParam of \tparam
         new FormattedFragment(266, 6, ClassificationEnum.Command), // \param
-        new FormattedFragment(272, 5, ClassificationEnum.Command), // [out] of \param
+        new FormattedFragment(272, 5, ClassificationEnum.ParameterClamped), // [out] of \param
         new FormattedFragment(278, 8, ClassificationEnum.Parameter1), // outParam of \param[out]
 
         new FormattedFragment(360, 4, ClassificationEnum.Command), // @ref
@@ -479,34 +479,34 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@":  some title", ClassificationEnum.Title),
 
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[out]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[out]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"dest", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[in]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[in]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"src", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[in]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[in]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"n", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[in,out]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[in,out]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"p", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[ in  ]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[ in  ]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[ out 	 ]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[ out 	 ]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[in,	out ]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[in,	out ]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[out,in]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[out,in]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[out, in]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[out, in]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[ out, in	]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[ out, in	]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"test", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"p", ClassificationEnum.Parameter1),
@@ -515,9 +515,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[ out , in	]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[ out , in	]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"[ out, in]", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[ out, in]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\parblock", ClassificationEnum.Command),

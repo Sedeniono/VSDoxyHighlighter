@@ -151,6 +151,21 @@ namespace VSDoxyHighlighter
 
 
   [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_parameterClamped)]
+  [Name(ClassificationIDs.ID_parameterClamped)]
+  [UserVisible(true)]
+  [Order(After = ClassificationDefinitionBase.cPriority)]
+  internal sealed class ParameterClampedFormat : ClassificationDefinitionBase
+  {
+    [ImportingConstructor]
+    public ParameterClampedFormat(DefaultColors defaultColors)
+      : base(defaultColors, ClassificationIDs.ID_parameterClamped, "VSDoxyHighlighter - Clamped parameter")
+    {
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_emphasisMinor)]
   [Name(ClassificationIDs.ID_emphasisMinor)]
   [UserVisible(true)]
@@ -343,6 +358,10 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_parameter2)]
     private static ClassificationTypeDefinition typeDefinitionForParameter2;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_parameterClamped)]
+    private static ClassificationTypeDefinition typeDefinitionForParameterClamped;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_emphasisMinor)]
