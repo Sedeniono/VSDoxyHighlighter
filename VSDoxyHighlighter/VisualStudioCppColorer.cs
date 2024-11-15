@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Text;
 using System.Collections.Generic;
 using System;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
 
 namespace VSDoxyHighlighter
 {
@@ -108,10 +109,13 @@ namespace VSDoxyHighlighter
     private ITagger<IClassificationTag> FindDefaultVSCppTagger()
     {
       if (mDefaultVSCppTagger == null) {
-        string nameOfDefaultCppTagger = "Microsoft.VisualC.CppColorer".ToUpper();
+        string[] namesOfDefaultCppTagger = new[] { 
+          "Microsoft.VisualStudio.VC.CppSyntacticColorer".ToUpper(), // VisualStudio >=17.12
+          "Microsoft.VisualC.CppColorer".ToUpper(), // VisualStudio <17.12
+        };
         foreach (var kvp in mTextBuffer.Properties.PropertyList) {
           if (kvp.Value is ITagger<IClassificationTag> casted) {
-            if (kvp.Key.ToString().ToUpper() == nameOfDefaultCppTagger) {
+            if (namesOfDefaultCppTagger.Contains(kvp.Key.ToString().ToUpper())) {
               mDefaultVSCppTagger = casted;
               mDefaultVSCppTagger.TagsChanged += OnDefaultVSCppTaggerChangedTags;
               break;
