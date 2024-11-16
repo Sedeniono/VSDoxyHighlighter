@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,25 @@ using System.Text.RegularExpressions;
 
 namespace VSDoxyHighlighter
 {
+  //==============================================================================================
+  // IFragmentsMatcher
+  //==============================================================================================
+
+  /// <summary>
+  /// Takes some text and matches one or multiple Doxygen commands, markup pieces, etc.
+  /// There are multiple matcher instances; a single IFragmentsMatcher typically finds all Doxygen
+  /// commands that can be parsed the same way.
+  /// </summary>
+  public interface IFragmentsMatcher
+  {
+    IList<FormattedFragmentGroup> FindFragments(string text);
+  }
+
+
+  //==============================================================================================
+  // FormattedFragmentGroup
+  //==============================================================================================
+
   /// <summary>
   /// Contains formatting information for a full Doxygen command, including its parameters.
   /// Every Doxygen command (including its parameters) is represented by one instance, where the command 
@@ -29,6 +49,10 @@ namespace VSDoxyHighlighter
     }
   }
 
+
+  //==============================================================================================
+  // FormattedFragment
+  //==============================================================================================
 
   /// <summary>
   /// Represents how a single continuous piece of text should be formatted.
@@ -92,6 +116,10 @@ namespace VSDoxyHighlighter
   }
 
 
+  //==============================================================================================
+  // CommentParser
+  //==============================================================================================
+
   /// <summary>
   /// Provides facilities to parse some piece of comment text for doxygen commands, markdown, etc.
   /// This implements the main logic to find the fragments that should be formatted. It
@@ -144,24 +172,8 @@ namespace VSDoxyHighlighter
       }
 
       var allFragmentGroups = new List<FormattedFragmentGroup>();
-      foreach (FragmentMatcher matcher in mMatchers) {
-        var foundMatches = matcher.re.Matches(text);
-        foreach (Match m in foundMatches) {
-          if (1 < m.Groups.Count && m.Groups.Count <= matcher.classifications.Length + 1) {
-            var fragments = new List<FormattedFragment>();
-            for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
-              Group group = m.Groups[idx + 1];
-              if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
-                ClassificationEnum classificationsOfGroups = matcher.classifications[idx];
-                fragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
-              }
-            }
-
-            if (fragments.Count > 0) {
-              allFragmentGroups.Add(new FormattedFragmentGroup(fragments));
-            }
-          }
-        }
+      foreach (IFragmentsMatcher matcher in mMatchers) {
+        allFragmentGroups.AddRange(matcher.FindFragments(text));
       }
 
       // In case of overlapping fragment groups, let the group win which starts first. This seems like a sensible thing to do.
@@ -175,7 +187,7 @@ namespace VSDoxyHighlighter
       // the formatted text.
       //
       // Using OrderBy() rather than Sort() to get a stable sort: Of two groups that start at the same position, let that one win
-      // which was matched by the earlier regex. At the time of writing this, it should not actually be possible that two regex
+      // which was matched by the earlier matcher. At the time of writing this, it should not actually be possible that two matchers
       // return matches that start at the same position, but who knows what the future holds.
       //
       // Also, NOT passing "sorted" directly into the constructed SortedSet because apparently the constructor does not iterate
@@ -239,30 +251,28 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static List<FragmentMatcher> BuildMatchers(List<DoxygenCommandGroup> doxygenCommands)
-    {
-      var matchers = new List<FragmentMatcher>();
+    private static List<IFragmentsMatcher> BuildMatchers(List<DoxygenCommandGroup> doxygenCommands)
+    {    
+      const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
-      // NOTE: The order in which the regexes are created and added here should not matter.
+      var matchers = new List<IFragmentsMatcher>();
+
+      // NOTE: The order in which the matchers are created and added here should not matter. CommentParser.Parse() sorts
+      // the found fragments, and in case of overlapping fragments, selects the "appropriate" one.
 
       // `inline code`
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.InlineCode }
-      });
+      matchers.Add(new FragmentsMatcherRegex(
+        new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.InlineCode }
+      ));
 
       // Add all Doxygen commands
       foreach (DoxygenCommandGroup cmdGroup in doxygenCommands) {
-        matchers.Add(new FragmentMatcher {
-          re = new Regex(cmdGroup.RegexCreator(cmdGroup.Commands), cOptions),
-          classifications = cmdGroup.Classifications
-        });
+        matchers.Add(cmdGroup.MatcherFactory.Create(cmdGroup.Commands, cmdGroup.Classifications));
       }
 
       // *italic*
-      matchers.Add(new FragmentMatcher
-      {
+      matchers.Add(new FragmentsMatcherRegex(
         // https://regex101.com/r/ekhlTW/1
         // (1)  Stuff allowed to precede the first "*". According to the doxygen documentation:
         //      Only the following is allowed: a space, newline, or one the following characters <{([,:;
@@ -286,38 +296,33 @@ namespace VSDoxyHighlighter
         // 
         //                        1           2a     2b               2c                   2d               2e            3
         //                __________________  __ ____________ _________________ __________________________ __ ____________________________
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
-      });
+        new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
+      ));
 
       // **bold**
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
-      });
+      matchers.Add(new FragmentsMatcherRegex(
+        new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
+      ));
 
       // _italic_
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
-      });
+      matchers.Add(new FragmentsMatcherRegex(
+        new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
+      ));
 
       // __bold__
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
-      });
+      matchers.Add(new FragmentsMatcherRegex(
+        new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
+      ));
 
       // ~~strikethrough~~
-      matchers.Add(new FragmentMatcher
-      {
-        re = new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        classifications = new ClassificationEnum[] { ClassificationEnum.Strikethrough }
-      });
-
+      matchers.Add(new FragmentsMatcherRegex(
+        new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
+        new ClassificationEnum[] { ClassificationEnum.Strikethrough }
+      ));
 
       return matchers;
     }
@@ -597,27 +602,57 @@ namespace VSDoxyHighlighter
     }
 
 
-    /// <summary>
-    /// Represents one regex that is used to detect a certain type of doxygen command, together
-    /// with the appropriate formatting (FormatType) for each captured group in the regex.
-    /// </summary>
-    private struct FragmentMatcher
-    {
-      public Regex re { get; set; }
-
-      // One element for each capturing group in the regex.
-      public ClassificationEnum[] classifications { get; set; }
-    };
-
     private readonly DoxygenCommands mDoxygenCommands;
 
-    private List<FragmentMatcher> mMatchers;
+    private List<IFragmentsMatcher> mMatchers;
     private bool mDisposed = false;
-
-    private const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
 
     // In my tests, each individual regex always used less than 100ms.
     // The max. time I was able to measure for a VERY long line was ~60ms.
     private static readonly TimeSpan cRegexTimeout = TimeSpan.FromMilliseconds(100.0);
+  }
+
+
+  //==============================================================================================
+  // FragmentsMatcherRegex
+  //==============================================================================================
+
+  /// <summary>
+  /// A matcher that uses a pure regex expression (without any "manual" logic) to find Doxygen commands.
+  /// </summary>
+  class FragmentsMatcherRegex : IFragmentsMatcher
+  {
+    public FragmentsMatcherRegex(Regex re, ClassificationEnum[] classifications)
+    {
+      mRegex = re;
+      mClassifications = classifications;
+    }
+
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      var allFragmentGroups = new List<FormattedFragmentGroup>();
+      var foundMatches = mRegex.Matches(text);
+      foreach (Match m in foundMatches) {
+        if (1 < m.Groups.Count && m.Groups.Count <= mClassifications.Length + 1) {
+          var fragments = new List<FormattedFragment>();
+          for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
+            Group group = m.Groups[idx + 1];
+            if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
+              ClassificationEnum classificationsOfGroups = mClassifications[idx];
+              fragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
+            }
+          }
+
+          if (fragments.Count > 0) {
+            allFragmentGroups.Add(new FormattedFragmentGroup(fragments));
+          }
+        }
+      }
+
+      return allFragmentGroups;
+    }
+
+    private readonly Regex mRegex;
+    private readonly ClassificationEnum[] mClassifications;
   }
 }

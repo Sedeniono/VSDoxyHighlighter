@@ -1,32 +1,70 @@
-﻿using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.TextTemplating;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using static VSDoxyHighlighter.GeneralOptionsPage;
+using System.Text.RegularExpressions;
 
 
 namespace VSDoxyHighlighter
 {
-  public delegate string RegexCreatorDelegate(ICollection<string> keywords);
+  //==============================================================================================
+  // DoxygenCommandMatcherFactory
+  //==============================================================================================
+
+  /// <summary>
+  /// Abstract factory, that takes a collection of Doxygen commands that are all parsed the same
+  /// way and have the same amount of arguments. Each argument is represented by one element in
+  /// the given "classifications" array. The result is an object that takes some piece of text
+  /// and returns the found Doxygen commands in that text.
+  /// </summary>
+  public interface IDoxygenCommandsMatcherFactory
+  {
+    IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications);
+  }
 
 
   /// <summary>
+  /// Factory that produces a matcher that uses a pure regex expression (without any "manual" logic)
+  /// to find Doxygen commands.
+  /// </summary>
+  internal class DoxygenCommandsMatcherViaRegexFactory : IDoxygenCommandsMatcherFactory
+  {
+    public delegate string RegexStringGetterDelegate(ICollection<string> commands);
+
+    public DoxygenCommandsMatcherViaRegexFactory(RegexStringGetterDelegate regexStringGetter)
+    {
+      mRegexStringGetter = regexStringGetter;
+    }
+
+    public IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications)
+    {
+      return new FragmentsMatcherRegex(
+        new Regex(mRegexStringGetter(commands), RegexOptions.Compiled | RegexOptions.Multiline),
+        classifications
+      );
+    }
+
+    private readonly RegexStringGetterDelegate mRegexStringGetter;
+  }
+
+
+  //==============================================================================================
+  // DoxygenCommandGroup
+  //==============================================================================================
+
+  /// <summary>
   /// Used to group all Doxygen commands that get parsed and classified the same.
-  /// The commands of one group are parsed via the same regex (essentially, they get concatenated
-  /// via "|" in the regex).
+  /// The commands of one group are parsed "in one go" (for example, via the same regex; essentially, 
+  /// they get concatenated via "|" in the regex).
   /// The grouping of commands is important so that commands that result in the same type etc
-  /// are parsed with the same regex. So instead of having more than 200 regex, we have less
+  /// are parsed with the same algorithm. So instead of having more than e.g. 200 regex, we have less
   /// than 30. That should improve performance.
   /// </summary>
   public class DoxygenCommandGroup
   {
     public List<string> Commands { get; private set; }
 
-    public RegexCreatorDelegate RegexCreator { get; private set; }
+    public IDoxygenCommandsMatcherFactory MatcherFactory { get; private set; }
 
     /// <summary>
     /// For each group in the regex, there must be one element. The first element is
@@ -36,17 +74,20 @@ namespace VSDoxyHighlighter
 
     public DoxygenCommandGroup(
         List<string> cmds,
-        RegexCreatorDelegate regexCreator,
+        IDoxygenCommandsMatcherFactory matcherFactory,
         ClassificationEnum[] classifications)
     {
       Commands = cmds;
-      RegexCreator = regexCreator;
+      MatcherFactory = matcherFactory;
       Debug.Assert(classifications.Length > 0);
       Classifications = classifications;
     }
   }
 
 
+  //==============================================================================================
+  // DoxygenCommands
+  //==============================================================================================
 
   /// <summary>
   /// Represents the "database" of known Doxygen commands, i.e. commands that start with a "\" or "@".
@@ -179,7 +220,7 @@ namespace VSDoxyHighlighter
           var classifications = configElem.ParametersClassifications.Prepend(configElem.CommandClassification).ToArray();
 
           ungrouped.Add(new DoxygenCommandGroup(
-            new List<string>() { configElem.Command }, origGroup.RegexCreator, classifications));
+            new List<string>() { configElem.Command }, origGroup.MatcherFactory, classifications));
         }
       }
 
@@ -206,14 +247,14 @@ namespace VSDoxyHighlighter
     private static List<DoxygenCommandGroup> GroupListOfUngrouped(ICollection<DoxygenCommandGroup> ungrouped)
     {
       var merged = new Dictionary<
-        (string dataAsString, RegexCreatorDelegate regex), 
+        (string dataAsString, IDoxygenCommandsMatcherFactory matcherFactory), 
         (ClassificationEnum[] clsifs, List<string> cmds)>();
 
       foreach (DoxygenCommandGroup group in ungrouped) {
         // We cannot sensibly use an array as dictionary key, since it won't compare the actual content of the arrays.
         // Workaround: Convert it to a string.
         string dataAsString = string.Join("|", group.Classifications);
-        var arg = (dataAsString, group.RegexCreator);
+        var arg = (dataAsString, group.MatcherFactory);
         if (!merged.ContainsKey(arg)) {
           merged[arg] = (group.Classifications, new List<string>());
         }
@@ -225,7 +266,7 @@ namespace VSDoxyHighlighter
 
       var resultGroups = new List<DoxygenCommandGroup>();
       foreach (var mergedItem in merged) {
-        var group = new DoxygenCommandGroup(mergedItem.Value.cmds, mergedItem.Key.regex, mergedItem.Value.clsifs);
+        var group = new DoxygenCommandGroup(mergedItem.Value.cmds, mergedItem.Key.matcherFactory, mergedItem.Value.clsifs);
         resultGroups.Add(group);
       }
 
@@ -420,7 +461,7 @@ namespace VSDoxyHighlighter
               "arg", "li", "docbookonly", "htmlonly", "htmlonly[block]", "latexonly", "manonly",
               "rtfonly", "verbatim", "xmlonly"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_NoParam),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -428,7 +469,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "code"
           },
-          CommentParser.BuildRegex_CodeCommand,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_CodeCommand),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -440,7 +481,7 @@ namespace VSDoxyHighlighter
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly", "n"
           },
-          CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -450,7 +491,7 @@ namespace VSDoxyHighlighter
             "\\", "@", "&", "$", "#", "<", ">", "%", "\"", ".", "=", "::", "|",
             "---", "--", "{", "}"
           },
-          CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAnywhere_NoWhitespaceAfterwardsRequired_NoParam),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -458,7 +499,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "f"
           },
-          CommentParser.BuildRegex_FormulaEnvironmentStart,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_FormulaEnvironmentStart),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -466,7 +507,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "~"
           },
-          CommentParser.BuildRegex_Language,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_Language),
           new ClassificationEnum[] { ClassificationEnum.Command }
         ),
 
@@ -474,7 +515,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "warning", "raisewarning"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_NoParam),
           new ClassificationEnum[] { ClassificationEnum.Warning }
         ),
 
@@ -482,7 +523,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "note", "todo", "attention", "bug", "deprecated", "important"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_NoParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_NoParam),
           new ClassificationEnum[] { ClassificationEnum.Note }
         ),
 
@@ -496,7 +537,7 @@ namespace VSDoxyHighlighter
             "memberof", "module", "namespace", "package", "relates", "related",
             "relatesalso", "relatedalso", "retval"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
@@ -504,7 +545,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "throw", "throws", "exception", "idlexcept"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord),
           new ClassificationEnum[] { ClassificationEnum.Exceptions, ClassificationEnum.Parameter1 }
         ),
 
@@ -521,7 +562,7 @@ namespace VSDoxyHighlighter
             "verbinclude", "htmlinclude", "htmlinclude[block]", "latexinclude",
             "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
@@ -529,7 +570,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "cond"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
@@ -537,7 +578,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "par", "name"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title }
         ),
 
@@ -545,7 +586,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "mainpage"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title }
         ),
 
@@ -553,7 +594,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "doxyconfig"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
@@ -562,7 +603,7 @@ namespace VSDoxyHighlighter
             "p", "c", "anchor", "cite", "link", "refitem",
             "copydoc", "copybrief", "copydetails", "emoji"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord),
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter2 }
@@ -572,7 +613,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "a", "e", "em"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.EmphasisMinor }
         ),
 
@@ -580,7 +621,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "b"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.EmphasisMajor }
         ),
 
@@ -588,7 +629,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "qualifier"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
@@ -598,7 +639,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "param"
           },
-          CommentParser.BuildRegex_ParamCommand,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_ParamCommand),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
 
@@ -611,7 +652,7 @@ namespace VSDoxyHighlighter
             "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
             "snippetlineno", "snippetdoc"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
@@ -619,7 +660,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "showdate"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
 
@@ -627,7 +668,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "ref", "subpage"
           },
-          CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam),
           // Using "Parameter2" to print it non-bold by default, to make the text appearance less disruptive,
           // since these commands are typically place in running text.
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter2, ClassificationEnum.Title }
@@ -639,7 +680,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "category", "class", "interface", "protocol", "struct", "union"
           },
-          CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
 
@@ -647,7 +688,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "startuml"
           },
-          CommentParser.BuildRegex_StartUmlCommandWithBracesOptions,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_StartUmlCommandWithBracesOptions),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
@@ -655,7 +696,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "dot", "msc"
           },
-          CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
@@ -665,7 +706,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "dotfile", "mscfile", "diafile"
           },
-          CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
@@ -673,7 +714,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "image"
           },
-          CommentParser.BuildRegex_ImageCommand,
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_ImageCommand),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
