@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -448,6 +447,16 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
+    public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParam_1RequiredParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
+    {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      // https://regex101.com/r/jPNEfx/1
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+      //                               Special important parts:  vvvvvvvvvv                      vv
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{.*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+    }
+
     public static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
@@ -618,14 +627,21 @@ namespace VSDoxyHighlighter
   //==============================================================================================
 
   /// <summary>
-  /// A matcher that uses a pure regex expression (without any "manual" logic) to find Doxygen commands.
+  /// A matcher that uses a regex expression to find Doxygen commands, and allows manual rejection
+  /// of some fragments via a manual validator delegate.
   /// </summary>
-  class FragmentsMatcherRegex : IFragmentsMatcher
+  internal class FragmentsMatcherRegexWithValidator : IFragmentsMatcher
   {
-    public FragmentsMatcherRegex(Regex re, ClassificationEnum[] classifications)
+    public delegate bool FragmentValidatorDelegate(int fragmentIndex, string fragmentText);
+
+    public FragmentsMatcherRegexWithValidator(
+        Regex re, 
+        ClassificationEnum[] classifications, 
+        FragmentValidatorDelegate fragmentValidator)
     {
       mRegex = re;
       mClassifications = classifications;
+      mFagmentValidator = fragmentValidator;
     }
 
     public IList<FormattedFragmentGroup> FindFragments(string text)
@@ -638,6 +654,13 @@ namespace VSDoxyHighlighter
           for (int idx = 0; idx < m.Groups.Count - 1; ++idx) {
             Group group = m.Groups[idx + 1];
             if (group.Success && group.Captures.Count == 1 && group.Length > 0) {
+              if (mFagmentValidator != null && !mFagmentValidator(idx, text.Substring(group.Index, group.Length))) {
+                // Once some Doxygen parameter fails to be validated, do not highlight the remaining parameters,
+                // even if they were parsed successfully. This makes it more obvious that there is some syntax
+                // error in some parameter. Maybe, in the future, we want to change this and instead of stopping
+                // we want to continue and show error squiggles under the erroneous parameter.
+                break;
+              }
               ClassificationEnum classificationsOfGroups = mClassifications[idx];
               fragments.Add(new FormattedFragment(group.Index, group.Length, classificationsOfGroups));
             }
@@ -654,5 +677,85 @@ namespace VSDoxyHighlighter
 
     private readonly Regex mRegex;
     private readonly ClassificationEnum[] mClassifications;
+    private readonly FragmentValidatorDelegate mFagmentValidator;
+  }
+
+
+  /// <summary>
+  /// A matcher that uses a pure regex expression (without any "manual" logic) to find Doxygen commands.
+  /// </summary>
+  internal class FragmentsMatcherRegex : IFragmentsMatcher
+  {
+    public FragmentsMatcherRegex(Regex re, ClassificationEnum[] classifications)
+    {
+      mBaseMatcher = new FragmentsMatcherRegexWithValidator(re, classifications, null);
+    }
+
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      return mBaseMatcher.FindFragments(text);
+    }
+
+    private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
+  }
+
+
+  /// <summary>
+  /// A matcher intended for Doxygen commands with an optional clamped first option.
+  /// For example:
+  /// \snippet{doc} => The "{doc}" is the clamped part.
+  /// </summary>
+  internal class FragmentsMatcherForOptionalClampedFirstOptions : IFragmentsMatcher
+  {
+    public FragmentsMatcherForOptionalClampedFirstOptions(
+        Regex baseRegex, 
+        ClassificationEnum[] classifications, 
+        Regex[] allowedClampedOptionsRegex)
+    {
+      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, ClampedOptionValidator);
+      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
+    }
+
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      return mBaseMatcher.FindFragments(text);
+    }
+
+    private bool ClampedOptionValidator(int fragmentIndex, string fragmentText) 
+    {
+      // As the name of the class explains, we look for the clamped options at the
+      // 1st fragment = 2nd fragment = fragmentIndex 1
+      if (fragmentIndex != 1) {
+        return true;
+      }
+
+      Debug.Assert(fragmentText != null && fragmentText.Length >= 2);
+
+      // Doxygen commands always use either [] or {} but never ().
+      Debug.Assert(fragmentText.StartsWith("[") || fragmentText.StartsWith("{"));
+      Debug.Assert(fragmentText.EndsWith("]") || fragmentText.EndsWith("}"));
+      string textWithinClamps = fragmentText.Substring(1, fragmentText.Length - 2);
+
+      // Doxygen always uses a comma to separate the options.
+      string[] options = textWithinClamps.Split(',');
+
+      foreach (string option in options) {
+        string trimmedOption = option.Trim();
+
+        // Note: Doxygen ignores empty entries.
+        // Note: Doxygen ignores duplicated entries, and thus do we.
+        // Note: Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
+        // unknown option, we stop the highlighting so that the user notices the mistake, especially in
+        // case of typos.
+        if (trimmedOption.Length > 0 && !mAllowedClampedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
+    private readonly Regex[] mAllowedClampedOptionsRegex;
   }
 }

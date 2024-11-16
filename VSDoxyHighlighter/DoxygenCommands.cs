@@ -23,14 +23,15 @@ namespace VSDoxyHighlighter
   }
 
 
+  internal delegate string RegexStringGetterDelegate(ICollection<string> commands);
+
+
   /// <summary>
   /// Factory that produces a matcher that uses a pure regex expression (without any "manual" logic)
   /// to find Doxygen commands.
   /// </summary>
   internal class DoxygenCommandsMatcherViaRegexFactory : IDoxygenCommandsMatcherFactory
   {
-    public delegate string RegexStringGetterDelegate(ICollection<string> commands);
-
     public DoxygenCommandsMatcherViaRegexFactory(RegexStringGetterDelegate regexStringGetter)
     {
       mRegexStringGetter = regexStringGetter;
@@ -45,6 +46,36 @@ namespace VSDoxyHighlighter
     }
 
     private readonly RegexStringGetterDelegate mRegexStringGetter;
+  }
+
+
+  /// <summary>
+  /// Factory that produces a matcher intended for Doxygen commands with optional clamped first options.
+  /// </summary>
+  internal class DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory : IDoxygenCommandsMatcherFactory
+  {
+    public DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory(
+        RegexStringGetterDelegate baseRegexStringGetter,
+        string[] allowedClampedOptionsRegex)
+    {
+      mBaseRegexStringGetter = baseRegexStringGetter;
+      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
+    }
+
+    public IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications)
+    {
+      Regex[] clampedRegex = mAllowedClampedOptionsRegex.Select(
+        regexStr => new Regex($@"\b{regexStr}\b", RegexOptions.Compiled | RegexOptions.Multiline)).ToArray();
+
+      return new FragmentsMatcherForOptionalClampedFirstOptions(
+        new Regex(mBaseRegexStringGetter(commands), RegexOptions.Compiled | RegexOptions.Multiline),
+        classifications,
+        clampedRegex
+      );
+    }
+
+    private readonly RegexStringGetterDelegate mBaseRegexStringGetter;
+    private readonly string[] mAllowedClampedOptionsRegex;
   }
 
 
@@ -381,9 +412,15 @@ namespace VSDoxyHighlighter
     private static void RemoveObsoleteCommandsFromParsed(List<DoxygenCommandInConfig> parsed, ConfigVersions configVersion)
     {
       if (configVersion < ConfigVersions.v1_8_0) {
-        // The `param[...]` commands were removed in version 1.8.0 because a dedicated parser was written to parse them.
-        // This leaves just the `param` command itself.
-        foreach (string removedCmd in new [] { "param[in]", "param[out]", "param[in,out]" }) {
+        // The `param[...]` and `snippet{...}` commands were removed in version 1.8.0 because a dedicated parser was written
+        // to parse them. This leaves just the `param` command itself.
+        string[] removedCmds = new[] { 
+          "param[in]", "param[out]", "param[in,out]",
+          "snippet{lineno}", "snippet{doc}", "snippet{trimleft}", "snippet{local}",
+          "snippet{lineno,local}", "snippet{doc,local}", "snippet{trimleft,local}",
+          "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}"
+        };
+        foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
           if (idx >= 0) {
             parsed.RemoveAt(idx);
@@ -400,8 +437,8 @@ namespace VSDoxyHighlighter
     private static void AdaptParameterClassifications(List<DoxygenCommandInConfig> parsed, ConfigVersions configVersion) 
     {
       if (configVersion < ConfigVersions.v1_8_0) {
-        // The `param[...]` commands were removed in version 1.8.0 because a dedicated parser was written to parse them.
-        // Thus, the `param` command itself now has to parameters: The `[in,out]` part, and the function parameter name.
+        // The `param[...]` and `snippet{...}` commands were removed in version 1.8.0 because a dedicated parser was written to parse them.
+        // Thus, the `param` command itself now has two parameters: The `[in,out]` part, and the function parameter name.
         // We need to amend the configuration of `param` to add the default classification for `[in,out]`.
         int idxOfParam = parsed.FindIndex(cfgElem => cfgElem.Command == "param");
         Debug.Assert(idxOfParam >= 0); // Already checked before that the parsed list contains the command.
@@ -409,7 +446,18 @@ namespace VSDoxyHighlighter
         if (parsedParamCmd.ParametersClassifications.Length == 1) {
           parsedParamCmd.ParametersClassifications = new ClassificationEnum[] {
             ClassificationEnum.ParameterClamped, // For `[in,out]`
-            parsedParamCmd.ParametersClassifications[0] // Kepp previous setting for the function parameter.
+            parsedParamCmd.ParametersClassifications[0] // Keep previous setting for the function parameter.
+          };
+        }
+
+        int idxOfSnippet = parsed.FindIndex(cfgElem => cfgElem.Command == "snippet");
+        Debug.Assert(idxOfSnippet >= 0); // Already checked before that the parsed list contains the command.
+        DoxygenCommandInConfig parsedSnippetCmd = parsed[idxOfSnippet];
+        if (parsedSnippetCmd.ParametersClassifications.Length == 2) {
+          parsedSnippetCmd.ParametersClassifications = new ClassificationEnum[] {
+            ClassificationEnum.ParameterClamped, // For `{...}`
+            parsedSnippetCmd.ParametersClassifications[0], // Keep previous setting for the other two parameters
+            parsedSnippetCmd.ParametersClassifications[1], // Keep previous setting for the other two parameters
           };
         }
       }
@@ -647,9 +695,6 @@ namespace VSDoxyHighlighter
           new List<string> {
             "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
             "section", "subsection", "subsubsection", "paragraph", "subparagraph", "subsubparagraph",
-            "snippet", "snippet{lineno}", "snippet{doc}", "snippet{trimleft}", "snippet{local}",
-            "snippet{lineno,local}", "snippet{doc,local}", "snippet{trimleft,local}",
-            "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
             "snippetlineno", "snippetdoc"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd),
@@ -675,6 +720,17 @@ namespace VSDoxyHighlighter
         ),
 
         //----- With up to three parameters -------
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "snippet"
+          },
+          new DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParam_1RequiredParamAsWord_1OptionalParamTillEnd,
+            allowedClampedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", @"raise=\d", @"prefix=\w+" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
+        ),
 
         new DoxygenCommandGroup(
           new List<string> {

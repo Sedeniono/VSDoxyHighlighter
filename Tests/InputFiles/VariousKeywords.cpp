@@ -268,12 +268,22 @@ Some text \refitem some_name more text
 \snippet{doc} example.cpp resource
 \snippet{trimleft} example.cpp resource
 \snippet{local} example.cpp resource
+\snippet{strip} example.cpp resource
+\snippet{nostrip} example.cpp resource
+\snippet{raise=2} example.cpp resource
+\snippet{prefix=fn_} example.cpp resource
 \snippet{lineno,local} example.cpp resource
 \snippet{doc,local} example.cpp resource
 \snippet{trimleft,local} example.cpp resource
 \snippet{local,lineno} example.cpp resource
-\snippet{local,doc} example.cpp resource
-\snippet{local,trimleft} example.cpp resource
+\snippet{local ,doc} example.cpp resource
+\snippet{ local, trimleft  }  example.cpp resource
+\snippet{local,} example.cpp  resource
+\snippet{doc,  } example.cpp resource
+\snippet{} example.cpp resource
+\snippet{  } example.cpp resource
+\snippet {local} example.cpp Only partial highlight because whitespace after snippet not allowed
+\snippet{local,unknownlocal} example.cpp Only partial highlight because "unknownlocal" is unknown.
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp resource
 \verbinclude some dir\include_test.cpp
