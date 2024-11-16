@@ -202,7 +202,7 @@ namespace VSDoxyHighlighter
       // The simplistic heuristic of just checking the blue color seems to work reasonably well. The magic threshold
       // was chosen to (hopefully) select the better value for the themes shown at https://devblogs.microsoft.com/visualstudio/custom-themes/
       var referenceColor = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
-      return (referenceColor != null && referenceColor.B < 100) ? Theme.Dark : Theme.Light;
+      return referenceColor.B < 100 ? Theme.Dark : Theme.Light;
     }
 
 
