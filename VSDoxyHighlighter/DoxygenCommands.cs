@@ -706,7 +706,7 @@ namespace VSDoxyHighlighter
           new List<string> {
             "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
             "section", "subsection", "subsubsection", "paragraph", "subparagraph", "subsubparagraph",
-            "snippetlineno", "snippetdoc"
+            "snippetlineno"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
@@ -739,6 +739,18 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
             allowedBracedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", @"raise=\d", @"prefix=\w+" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "snippetdoc"
+          },
+          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
+            // Option "doc" in \snippetdoc is actually supported by Doxygen (namely, it gets simply ignored).
+            allowedBracedOptionsRegex: new string[] { "doc", @"raise=\d", @"prefix=\w+" }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),

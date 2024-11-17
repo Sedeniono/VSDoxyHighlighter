@@ -289,7 +289,11 @@ Some text \refitem some_name more text
 \snippet{local,unknownlocal} example.cpp Only partial highlight because "unknownlocal" is unknown.
 \snippet{doc}} example.cpp No highlight because of mismatching braces
 \snippetlineno  snippets/example.cpp resource
-\snippetdoc  example.cpp resource
+\snippetdoc  example.cpp Some resource
+\snippetdoc{doc}  example.cpp resource
+\snippetdoc{ raise=9 }  example.cpp resource
+\snippetdoc{prefix=pref, raise=9 }  example.cpp resource
+\snippetdoc{local} example.cpp Only partial highlight because "local" is not supported.
 \verbinclude some dir\include_test.cpp
 \htmlinclude some dir\html.cpp
 \htmlinclude[block]  html.cpp

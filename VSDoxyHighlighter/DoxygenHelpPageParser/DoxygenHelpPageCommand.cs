@@ -254,6 +254,9 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{doc}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{lineno}");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippetdoc", "snippetdoc{prefix=YOUR_PREFIX}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippetdoc", "snippetdoc{raise=1}");
+
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{anchor:YOUR_ID}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline,anchor:YOUR_ID}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline}");
