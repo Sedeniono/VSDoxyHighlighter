@@ -175,6 +175,9 @@ Some text \lineinfo more text
 \param > The ">" should not be formatted because it is not a valid parameter.
 \param[ out Nothing should be formatted because of invalid syntax (missing closing bracket).
 \param[invalid] Nothing should be formatted because "invalid" is not allowed.
+\param[out,invalid] Nothing should be formatted because "invalid" is not allowed.
+\param[in,in] No formatting because repetition of "in" is not allowed for param.
+\param[out,in,out] No formatting because repetition of "out" is not allowed for param.
 \parblock  
 \endparblock
 \tparam some_param Description of template

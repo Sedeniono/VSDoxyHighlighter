@@ -409,7 +409,21 @@ namespace VSDoxyHighlighter
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
-      // We need a dedicated parser for the \param command because the "[in,out]" parameter can be appear with whitespaces and in any order.
+      // We need a dedicated parser for the \param command because the "[in,out]" options can have any whitespace
+      // before and within the brackets. Moreover, Doxygen requires that the "in" and "out" options may appear
+      // at most once; duplicated or unknown options results in Doxygen parsing the \param command incorrectly.
+      // Especially note:
+      // - This behavior is very different to commands with braces "{...}" such as \snippet:
+      //   - Doxygen does not allow whitespace before the "{".
+      //   - Doxygen does actually allow duplicated options in braces "{...}".
+      //   - Doxygen ignores unknown options in braces "{...}".
+      // - This behavior is also different to other commands with brackets "[...]". At the time of writing this,
+      //   there are only two other such commands: \htmlonly[block] and \htmlinclude[block]. Apparently,
+      //   \htmlonly allows a space before the "[" while \htmlinclude does not. Both do not allow whitespace
+      //   within the brackets.
+      // => The \param command has very special behavior. Hence we do not parse it the same way as e.g. \snippet,
+      //    which uses the FragmentsMatcherForFirstOptionalBracedOptions machinery. Instead, we use a pure regex.
+      //
       // https://regex101.com/r/PPNg3R/1
       //
       //                                                                     Optional "[in,out]" parameter                                             name of the function param
@@ -447,12 +461,17 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
-    public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParam_1RequiredParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
+    public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd(
+        ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/jPNEfx/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \snippet{lineno} ....
+      // Note: Doxygen does not allow any whitespace before the "{".
+      // Note: The part inside the braces "{...}" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvv                      vv
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{.*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
@@ -701,19 +720,19 @@ namespace VSDoxyHighlighter
 
 
   /// <summary>
-  /// A matcher intended for Doxygen commands with an optional clamped first option.
-  /// For example:
-  /// \snippet{doc} => The "{doc}" is the clamped part.
+  /// A matcher for Doxygen commands with optional options in braces "{...}" directly after the actual 
+  /// Doxygen command. For example:
+  /// \snippet{doc} => The "{doc}" is the braced part.
   /// </summary>
-  internal class FragmentsMatcherForOptionalClampedFirstOptions : IFragmentsMatcher
+  internal class FragmentsMatcherForFirstOptionalBracedOptions : IFragmentsMatcher
   {
-    public FragmentsMatcherForOptionalClampedFirstOptions(
+    public FragmentsMatcherForFirstOptionalBracedOptions(
         Regex baseRegex, 
         ClassificationEnum[] classifications, 
-        Regex[] allowedClampedOptionsRegex)
+        Regex[] allowedBracedOptionsRegex)
     {
-      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, ClampedOptionValidator);
-      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
+      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, BracedOptionsValidator);
+      mAllowedBracedOptionsRegex = allowedBracedOptionsRegex;
     }
 
     public IList<FormattedFragmentGroup> FindFragments(string text)
@@ -721,23 +740,22 @@ namespace VSDoxyHighlighter
       return mBaseMatcher.FindFragments(text);
     }
 
-    private bool ClampedOptionValidator(int fragmentIndex, string fragmentText) 
+    private bool BracedOptionsValidator(int fragmentIndex, string fragmentText) 
     {
-      // As the name of the class explains, we look for the clamped options at the
-      // 1st fragment = 2nd fragment = fragmentIndex 1
+      // As the name of the class explains, we look for the braced options at
+      // the 1st fragment = 2nd fragment = fragmentIndex 1
       if (fragmentIndex != 1) {
         return true;
       }
 
       Debug.Assert(fragmentText != null && fragmentText.Length >= 2);
 
-      // Doxygen commands always use either [] or {} but never ().
-      Debug.Assert(fragmentText.StartsWith("[") || fragmentText.StartsWith("{"));
-      Debug.Assert(fragmentText.EndsWith("]") || fragmentText.EndsWith("}"));
-      string textWithinClamps = fragmentText.Substring(1, fragmentText.Length - 2);
+      Debug.Assert(fragmentText.StartsWith("{"));
+      Debug.Assert(fragmentText.EndsWith("}"));
+      string textWithinBraces = fragmentText.Substring(1, fragmentText.Length - 2);
 
       // Doxygen always uses a comma to separate the options.
-      string[] options = textWithinClamps.Split(',');
+      string[] options = textWithinBraces.Split(',');
 
       foreach (string option in options) {
         string trimmedOption = option.Trim();
@@ -747,7 +765,7 @@ namespace VSDoxyHighlighter
         // Note: Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
         // unknown option, we stop the highlighting so that the user notices the mistake, especially in
         // case of typos.
-        if (trimmedOption.Length > 0 && !mAllowedClampedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
+        if (trimmedOption.Length > 0 && !mAllowedBracedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
           return false;
         }
       }
@@ -756,6 +774,6 @@ namespace VSDoxyHighlighter
     }
 
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
-    private readonly Regex[] mAllowedClampedOptionsRegex;
+    private readonly Regex[] mAllowedBracedOptionsRegex;
   }
 }

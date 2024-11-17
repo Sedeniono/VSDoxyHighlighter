@@ -50,32 +50,34 @@ namespace VSDoxyHighlighter
 
 
   /// <summary>
-  /// Factory that produces a matcher intended for Doxygen commands with optional clamped first options.
+  /// Factory that produces a matcher intended for Doxygen commands with optional options in braces "{...}"
+  /// directly after the actual Doxygen command. For example:
+  /// \snippet{doc} => The "{doc}" is the braced part.
   /// </summary>
-  internal class DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory : IDoxygenCommandsMatcherFactory
+  internal class DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory : IDoxygenCommandsMatcherFactory
   {
-    public DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory(
+    public DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
         RegexStringGetterDelegate baseRegexStringGetter,
-        string[] allowedClampedOptionsRegex)
+        string[] allowedBracedOptionsRegex)
     {
       mBaseRegexStringGetter = baseRegexStringGetter;
-      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
+      mAllowedBracedOptionsRegex = allowedBracedOptionsRegex;
     }
 
     public IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications)
     {
-      Regex[] clampedRegex = mAllowedClampedOptionsRegex.Select(
+      Regex[] regexWithinBraces = mAllowedBracedOptionsRegex.Select(
         regexStr => new Regex($@"\b{regexStr}\b", RegexOptions.Compiled | RegexOptions.Multiline)).ToArray();
 
-      return new FragmentsMatcherForOptionalClampedFirstOptions(
+      return new FragmentsMatcherForFirstOptionalBracedOptions(
         new Regex(mBaseRegexStringGetter(commands), RegexOptions.Compiled | RegexOptions.Multiline),
         classifications,
-        clampedRegex
+        regexWithinBraces
       );
     }
 
     private readonly RegexStringGetterDelegate mBaseRegexStringGetter;
-    private readonly string[] mAllowedClampedOptionsRegex;
+    private readonly string[] mAllowedBracedOptionsRegex;
   }
 
 
@@ -506,8 +508,14 @@ namespace VSDoxyHighlighter
               "privatesection", "protected", "protectedsection", "public", "publicsection",
               "pure", "showinitializer", "static",
               "addindex", "secreflist", "endsecreflist", "tableofcontents",
-              "arg", "li", "docbookonly", "htmlonly", "htmlonly[block]", "latexonly", "manonly",
-              "rtfonly", "verbatim", "xmlonly"
+              "arg", "li", "docbookonly", 
+              // Note: Doxygen does not allow whitespace within the "[...]" of \htmlonly[block]. This
+              // is very different to e.g. \param[...]. Hence we can simply parse it as a separate command.
+              // (To be precise, Doxygen allows whitespace before the "["; however, the related command
+              // \htmlinclude[block] does not allow whitespace there, i.e. Doxygen is inconsistent here. For
+              // simplicity, we disallow whitespaces in both cases.)
+              "htmlonly", "htmlonly[block]", 
+              "latexonly", "manonly", "rtfonly", "verbatim", "xmlonly"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_NoParam),
           new ClassificationEnum[] { ClassificationEnum.Command }
@@ -606,9 +614,11 @@ namespace VSDoxyHighlighter
             "include", "include{lineno}", "include{doc}", "include{local}",
             "include{lineno,local}", "include{doc,local}", "include{local,lineno}", "include{local,doc}",
             "includelineno", "includedoc",
-            "line", "skip", "skipline", "until",
-            "verbinclude", "htmlinclude", "htmlinclude[block]", "latexinclude",
-            "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
+            "line", "skip", "skipline", "until", "verbinclude", 
+            // Note: Doxygen does not allow whitespace within the "[...]" of \htmlinclude[block]. This
+            // is very different to e.g. \param[...]. Hence we can simply parse it as a separate command.
+            "htmlinclude", "htmlinclude[block]", 
+            "latexinclude", "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
@@ -683,6 +693,7 @@ namespace VSDoxyHighlighter
 
 
         //----- With up to two parameters -------
+
         new DoxygenCommandGroup(
           new List<string> {
             "param"
@@ -725,9 +736,9 @@ namespace VSDoxyHighlighter
           new List<string> {
             "snippet"
           },
-          new DoxygenCommandsWithOptionalClampedFirstOptionsMatcherFactory(
-            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParam_1RequiredParamAsWord_1OptionalParamTillEnd,
-            allowedClampedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", @"raise=\d", @"prefix=\w+" }
+          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
+            allowedBracedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", @"raise=\d", @"prefix=\w+" }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
