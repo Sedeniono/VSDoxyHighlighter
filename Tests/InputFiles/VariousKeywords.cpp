@@ -287,6 +287,7 @@ Some text \refitem some_name more text
 \snippet{  } example.cpp resource
 \snippet {local} example.cpp Only partial highlight because whitespace after snippet not allowed
 \snippet{local,unknownlocal} example.cpp Only partial highlight because "unknownlocal" is unknown.
+\snippet{doc}} example.cpp No highlight because of mismatching braces
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp resource
 \verbinclude some dir\include_test.cpp

@@ -466,14 +466,14 @@ namespace VSDoxyHighlighter
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/jPNEfx/1
+      // https://regex101.com/r/DanDAv/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \snippet{lineno} ....
       // Note: Doxygen does not allow any whitespace before the "{".
       // Note: The part inside the braces "{...}" is parsed in a second step separately.
-      //                               Special important parts:  vvvvvvvvvv                      vv
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{.*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+      //                               Special important parts:  vvvvvvvvvvvvvv                      vv
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(ICollection<string> keywords)
