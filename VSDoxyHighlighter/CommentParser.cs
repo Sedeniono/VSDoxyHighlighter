@@ -758,6 +758,7 @@ namespace VSDoxyHighlighter
       string[] options = textWithinBraces.Split(',');
 
       foreach (string option in options) {
+        // Doxygen ignores leading and trailing whitespace.
         string trimmedOption = option.Trim();
 
         // Note: Doxygen ignores empty entries.

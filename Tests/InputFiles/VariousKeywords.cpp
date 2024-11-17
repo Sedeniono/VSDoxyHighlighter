@@ -273,8 +273,9 @@ Some text \refitem some_name more text
 \snippet{local} example.cpp resource
 \snippet{strip} example.cpp resource
 \snippet{nostrip} example.cpp resource
-\snippet{raise=2} example.cpp resource
+\snippet{raise=0} example.cpp resource
 \snippet{prefix=fn_} example.cpp resource
+\snippet{prefix= some prefix , doc} example.cpp resource
 \snippet{lineno,local} example.cpp resource
 \snippet{doc,local} example.cpp resource
 \snippet{trimleft,local} example.cpp resource
@@ -287,12 +288,15 @@ Some text \refitem some_name more text
 \snippet{  } example.cpp resource
 \snippet {local} example.cpp Only partial highlight because whitespace after snippet not allowed
 \snippet{local,unknownlocal} example.cpp Only partial highlight because "unknownlocal" is unknown.
+\snippet{doc, prefix=some prefix, unknownlocal} example.cpp Only partial highlight because "unknownlocal" is unknown.
 \snippet{doc}} example.cpp No highlight because of mismatching braces
+\snippet{doc,raise=6} example.cpp Only partial highlight because max. raise level is 5.
+\snippet{doc,raise=99} example.cpp Only partial highlight because max. raise level is 5.
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp Some resource
 \snippetdoc{doc}  example.cpp resource
-\snippetdoc{ raise=9 }  example.cpp resource
-\snippetdoc{prefix=pref, raise=9 }  example.cpp resource
+\snippetdoc{ raise=5 }  example.cpp resource
+\snippetdoc{prefix=pref, raise=5 }  example.cpp resource
 \snippetdoc{local} example.cpp Only partial highlight because "local" is not supported.
 \verbinclude some dir\include_test.cpp
 \htmlinclude some dir\html.cpp

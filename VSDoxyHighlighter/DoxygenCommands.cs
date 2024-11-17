@@ -486,6 +486,11 @@ namespace VSDoxyHighlighter
 
     static DoxygenCommands()
     {
+      // Constants for \snippet-like Doxygen commands. The max. supported raise-level by Doxygen is 5.
+      const string cSnippetRaise = @"raise=[ \t]*[0-5]";
+      const string cSnippetPrefix = @"prefix=.*";
+      const string cSnippetDoc = "doc";
+
       DefaultCommandGroups = new DoxygenCommandGroup[] {
 
         //----- With no parameters -------
@@ -738,7 +743,7 @@ namespace VSDoxyHighlighter
           },
           new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
-            allowedBracedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", @"raise=\d", @"prefix=\w+" }
+            allowedBracedOptionsRegex: new string[] { "lineno", "trimleft", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
@@ -750,7 +755,7 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
             // Option "doc" in \snippetdoc is actually supported by Doxygen (namely, it gets simply ignored).
-            allowedBracedOptionsRegex: new string[] { "doc", @"raise=\d", @"prefix=\w+" }
+            allowedBracedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
