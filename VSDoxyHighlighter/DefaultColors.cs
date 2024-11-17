@@ -211,7 +211,7 @@ namespace VSDoxyHighlighter
       { ClassificationIDs.ID_command,          new TextProperties(foreground: Color.FromRgb(0, 75, 0),      background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter1,       new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_parameter2,       new TextProperties(foreground: Color.FromRgb(0, 80, 218),    background: null, isBold: false, isItalic: false) },
-      { ClassificationIDs.ID_parameterClamped, new TextProperties(foreground: Color.FromRgb(85, 88, 125),   background: null, isBold: false, isItalic: false) },
+      { ClassificationIDs.ID_parameterClamped, new TextProperties(foreground: Color.FromRgb(30, 93, 146),   background: null, isBold: false, isItalic: false) },
       { ClassificationIDs.ID_title,            new TextProperties(foreground: Color.FromRgb(0, 0, 0),       background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_warningKeyword,   new TextProperties(foreground: Color.FromRgb(200, 0, 0),     background: null, isBold: true,  isItalic: false) },
       { ClassificationIDs.ID_noteKeyword,      new TextProperties(foreground: Color.FromRgb(255, 137, 19),  background: null, isBold: true,  isItalic: false) },
