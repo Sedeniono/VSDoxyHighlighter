@@ -704,12 +704,22 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\includelineno", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\includedoc", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\includedoc", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{doc}",  ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\includedoc", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ raise =5 }",  ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\includedoc", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{prefix=pref, raise=5 }",  ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\includedoc", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\line", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"example();", ClassificationEnum.Parameter1),

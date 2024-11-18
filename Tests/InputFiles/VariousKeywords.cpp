@@ -269,11 +269,15 @@ Some text \refitem some_name more text
 \include{}
 \include {local}  Only partial highlight because whitespace after include not allowed
 \include{local,unknownlocal} Only partial highlight because "unknownlocal" is unknown.
-\include{doc}} Only partial highlight because of mismatching braces
+\include{doc}} No highlight because of mismatching braces
 \include{doc,raise=6} Only partial highlight because max. raise level is 5.
 \include{doc,raise=99} Only partial highlight because max. raise level is 5.
 \includelineno  include_test.cpp
 \includedoc   include_test.cpp
+\includedoc{doc}  include_test.cpp
+\includedoc{ raise =5 }  include_test.cpp
+\includedoc{prefix=pref, raise=5 }  include_test.cpp
+\includedoc{local} Only partial highlight because "local" is not supported.
 \line example();
 \skip main
 \skipline Include_Test t;

@@ -620,7 +620,7 @@ namespace VSDoxyHighlighter
             "property", "typedef", "var",
             "elseif", "if", "ifnot",
             "dontinclude", "dontinclude{lineno}",
-            "includelineno", "includedoc",
+            "includelineno",
             "line", "skip", "skipline", "until", "verbinclude", 
             // Note: Doxygen does not allow whitespace within the "[...]" of \htmlinclude[block]. This
             // is very different to e.g. \param[...]. Hence we can simply parse it as a separate command.
@@ -716,6 +716,18 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
             allowedBracedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "includedoc"
+          },
+          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            // Option "doc" in \includedoc is actually supported by Doxygen (namely, it gets simply ignored).
+            allowedBracedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),

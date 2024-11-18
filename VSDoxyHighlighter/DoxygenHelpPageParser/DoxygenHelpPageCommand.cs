@@ -244,6 +244,9 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{doc}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{lineno}");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "includedoc", "includedoc{prefix=YOUR_PREFIX}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "includedoc", "includedoc{raise=1}");
+
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "htmlinclude", "htmlinclude[block]");
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "snippet", "snippet{doc,prefix=YOUR_PREFIX}");
