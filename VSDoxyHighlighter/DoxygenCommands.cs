@@ -414,13 +414,16 @@ namespace VSDoxyHighlighter
     private static void RemoveObsoleteCommandsFromParsed(List<DoxygenCommandInConfig> parsed, ConfigVersions configVersion)
     {
       if (configVersion < ConfigVersions.v1_8_0) {
-        // The `param[...]` and `snippet{...}` commands were removed in version 1.8.0 because a dedicated parser was written
-        // to parse them. This leaves just the `param` command itself.
+        // The `param[...]`, `snippet{...}` and `include{...}` commands were removed in version 1.8.0 because a
+        // dedicated parser was written to parse them. This leaves just the `param`, `snippet` and `include`
+        // commands (without the options) themselves in the configuration.
         string[] removedCmds = new[] { 
           "param[in]", "param[out]", "param[in,out]",
           "snippet{lineno}", "snippet{doc}", "snippet{trimleft}", "snippet{local}",
           "snippet{lineno,local}", "snippet{doc,local}", "snippet{trimleft,local}",
-          "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}"
+          "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
+          "include{lineno}", "include{doc}", "include{local}", "include{lineno,local}", 
+          "include{doc,local}", "include{local,lineno}", "include{local,doc}",
         };
         foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
@@ -442,26 +445,26 @@ namespace VSDoxyHighlighter
         // The `param[...]` and `snippet{...}` commands were removed in version 1.8.0 because a dedicated parser was written to parse them.
         // Thus, the `param` command itself now has two parameters: The `[in,out]` part, and the function parameter name.
         // We need to amend the configuration of `param` to add the default classification for `[in,out]`.
-        int idxOfParam = parsed.FindIndex(cfgElem => cfgElem.Command == "param");
-        Debug.Assert(idxOfParam >= 0); // Already checked before that the parsed list contains the command.
-        DoxygenCommandInConfig parsedParamCmd = parsed[idxOfParam];
-        if (parsedParamCmd.ParametersClassifications.Length == 1) {
-          parsedParamCmd.ParametersClassifications = new ClassificationEnum[] {
-            ClassificationEnum.ParameterClamped, // For `[in,out]`
-            parsedParamCmd.ParametersClassifications[0] // Keep previous setting for the function parameter.
-          };
-        }
+        // Ditto for `snippet` and `include` and their `{...}` options.
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", 2);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", 1);
+      }
+    }
 
-        int idxOfSnippet = parsed.FindIndex(cfgElem => cfgElem.Command == "snippet");
-        Debug.Assert(idxOfSnippet >= 0); // Already checked before that the parsed list contains the command.
-        DoxygenCommandInConfig parsedSnippetCmd = parsed[idxOfSnippet];
-        if (parsedSnippetCmd.ParametersClassifications.Length == 2) {
-          parsedSnippetCmd.ParametersClassifications = new ClassificationEnum[] {
-            ClassificationEnum.ParameterClamped, // For `{...}`
-            parsedSnippetCmd.ParametersClassifications[0], // Keep previous setting for the other two parameters
-            parsedSnippetCmd.ParametersClassifications[1], // Keep previous setting for the other two parameters
-          };
-        }
+
+    private static void AddClampedParameterAsFirstParameterToOldParsedCommand(
+        List<DoxygenCommandInConfig> parsed, string cmd, int numOldParameters)
+    {
+      int idxOfParsed = parsed.FindIndex(cfgElem => cfgElem.Command == cmd);
+      Debug.Assert(idxOfParsed >= 0); // Already checked before that the parsed list contains the command.
+      DoxygenCommandInConfig parsedCmd = parsed[idxOfParsed];
+      Debug.Assert(parsedCmd.ParametersClassifications.Length == numOldParameters);
+      if (parsedCmd.ParametersClassifications.Length == numOldParameters) {
+        var newClassifications = new List<ClassificationEnum> { ClassificationEnum.ParameterClamped };
+        // Keep previous settings for the remaining parameters.
+        newClassifications.AddRange(parsedCmd.ParametersClassifications);
+        parsedCmd.ParametersClassifications = newClassifications.ToArray();
       }
     }
 
@@ -487,8 +490,9 @@ namespace VSDoxyHighlighter
     static DoxygenCommands()
     {
       // Constants for \snippet-like Doxygen commands. The max. supported raise-level by Doxygen is 5.
-      const string cSnippetRaise = @"raise=[ \t]*[0-5]";
-      const string cSnippetPrefix = @"prefix=.*";
+      // Also used for \include-like commands.
+      const string cSnippetRaise = @"raise[ \t]*=[ \t]*[0-5]";
+      const string cSnippetPrefix = @"prefix[ \t]*=.*";
       const string cSnippetDoc = "doc";
 
       DefaultCommandGroups = new DoxygenCommandGroup[] {
@@ -616,8 +620,6 @@ namespace VSDoxyHighlighter
             "property", "typedef", "var",
             "elseif", "if", "ifnot",
             "dontinclude", "dontinclude{lineno}",
-            "include", "include{lineno}", "include{doc}", "include{local}",
-            "include{lineno,local}", "include{doc,local}", "include{local,lineno}", "include{local,doc}",
             "includelineno", "includedoc",
             "line", "skip", "skipline", "until", "verbinclude", 
             // Note: Doxygen does not allow whitespace within the "[...]" of \htmlinclude[block]. This
@@ -704,6 +706,17 @@ namespace VSDoxyHighlighter
             "param"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_ParamCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "include"
+          },
+          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            allowedBracedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+          ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
 

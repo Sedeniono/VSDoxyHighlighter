@@ -252,20 +252,35 @@ Some text \refitem some_name more text
 --- Commands for displaying examples ---
 \dontinclude include_test.cpp
 \dontinclude{lineno} some dir\include_test.cpp
+\include
 \include include_test.cpp
-\include{lineno} some dir\include_test.cpp
+\include{doc}
+\include{lineno} some dir\include_test.cpp  
 \include{doc} "some dir\include_test.cpp"
 \include{local} "some dir\include_test.cpp"
-\include{lineno,local} include_test.cpp
+\include{strip} include_test.cpp
+\include{nostrip} include_test.cpp
+\include{raise = 1 } include_test.cpp
+\include{prefix = some great.prefix} include_test.cpp
+\include{lineno,local}
 \include{doc,local} include_test.cpp
-\include{local,lineno} include_test.cpp
-\include{local,doc} include_test.cpp
+\include{local,lineno, } include_test.cpp
+\include{ local, doc }  include_test.cpp
+\include{}
+\include {local}  Only partial highlight because whitespace after include not allowed
+\include{local,unknownlocal} Only partial highlight because "unknownlocal" is unknown.
+\include{doc}} Only partial highlight because of mismatching braces
+\include{doc,raise=6} Only partial highlight because max. raise level is 5.
+\include{doc,raise=99} Only partial highlight because max. raise level is 5.
 \includelineno  include_test.cpp
 \includedoc   include_test.cpp
 \line example();
 \skip main
 \skipline Include_Test t;
 \until {
+\snippet
+\snippet snippets/example.cpp
+\snippet{doc}
 \snippet snippets/example.cpp Adding a resource
 \snippet{lineno} snippets/example.cpp resource
 \snippet{doc} example.cpp resource
@@ -275,7 +290,7 @@ Some text \refitem some_name more text
 \snippet{nostrip} example.cpp resource
 \snippet{raise=0} example.cpp resource
 \snippet{prefix=fn_} example.cpp resource
-\snippet{prefix= some prefix , doc} example.cpp resource
+\snippet{prefix = some prefix , doc} example.cpp resource
 \snippet{lineno,local} example.cpp resource
 \snippet{doc,local} example.cpp resource
 \snippet{trimleft,local} example.cpp resource
@@ -295,7 +310,7 @@ Some text \refitem some_name more text
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp Some resource
 \snippetdoc{doc}  example.cpp resource
-\snippetdoc{ raise=5 }  example.cpp resource
+\snippetdoc{ raise =5 }  example.cpp resource
 \snippetdoc{prefix=pref, raise=5 }  example.cpp resource
 \snippetdoc{local} example.cpp Only partial highlight because "local" is not supported.
 \verbinclude some dir\include_test.cpp
