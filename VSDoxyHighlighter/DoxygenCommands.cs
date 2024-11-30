@@ -414,8 +414,8 @@ namespace VSDoxyHighlighter
     private static void RemoveObsoleteCommandsFromParsed(List<DoxygenCommandInConfig> parsed, ConfigVersions configVersion)
     {
       if (configVersion < ConfigVersions.v1_8_0) {
-        // The `param[...]`, `snippet{...}` and `include{...}` commands were removed in version 1.8.0 because a
-        // dedicated parser was written to parse them. This leaves just the `param`, `snippet` and `include`
+        // The `param[...]`, `snippet{...}`, `include{...}` etc. commands were removed in version 1.8.0 because a
+        // dedicated parser was written to parse them. This leaves just the `param`, `snippet`, `include`, etc.
         // commands (without the options) themselves in the configuration.
         string[] removedCmds = new[] { 
           "param[in]", "param[out]", "param[in,out]",
@@ -424,6 +424,7 @@ namespace VSDoxyHighlighter
           "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
           "include{lineno}", "include{doc}", "include{local}", "include{lineno,local}", 
           "include{doc,local}", "include{local,lineno}", "include{local,doc}",
+          "htmlinclude[block]",
         };
         foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
@@ -446,9 +447,10 @@ namespace VSDoxyHighlighter
         // Thus, the `param` command itself now has two parameters: The `[in,out]` part, and the function parameter name.
         // We need to amend the configuration of `param` to add the default classification for `[in,out]`.
         // Ditto for `snippet` and `include` and their `{...}` options.
-        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", 1);
-        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", 2);
-        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
       }
     }
 
@@ -593,7 +595,7 @@ namespace VSDoxyHighlighter
         ),
 
 
-        //----- With one parameter -------
+        //----- With up to one parameter -------
 
         new DoxygenCommandGroup(
           new List<string> {
@@ -621,10 +623,7 @@ namespace VSDoxyHighlighter
             "elseif", "if", "ifnot",
             "dontinclude", "dontinclude{lineno}",
             "includelineno",
-            "line", "skip", "skipline", "until", "verbinclude", 
-            // Note: Doxygen does not allow whitespace within the "[...]" of \htmlinclude[block]. This
-            // is very different to e.g. \param[...]. Hence we can simply parse it as a separate command.
-            "htmlinclude", "htmlinclude[block]", 
+            "line", "skip", "skipline", "until", "verbinclude",
             "latexinclude", "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd),
@@ -696,6 +695,17 @@ namespace VSDoxyHighlighter
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "htmlinclude"
+          },
+          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            allowedBracedOptionsRegex: new string[] { "block" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
 
 

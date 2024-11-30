@@ -843,10 +843,25 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\verbinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some dir\include_test.cpp", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some dir\html.cpp", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText(@"\htmlinclude[block]", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"html.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"some [block].cpp allowed", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[block]", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"html.cpp allowed", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[   block   ]", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[block ]", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"allowed", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
+
+
         new Utils.FormattedFragmentText(@"\latexinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some dir\tex.cpp", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\rtfinclude", ClassificationEnum.Command),

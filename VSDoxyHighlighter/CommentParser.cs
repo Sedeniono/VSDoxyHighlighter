@@ -440,6 +440,21 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
+    public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(
+        ICollection<string> keywords)
+    {
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      // https://regex101.com/r/Gkvirt/1
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \htmlinclude[block] ....
+      // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
+      // Note: The part inside the braces "[...]" is parsed in a second step separately.
+      //                               Special important parts:  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv             vvvvv
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t]|[\n\r]|$))?(?:(?:[ \t]+([^\[][^\n\r]+)?)|[\n\r]?|$)";
+    }
+
     public static string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(ICollection<string> keywords)
     {
       // BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd() also treats the 1 parameter as optional to provide
@@ -765,8 +780,8 @@ namespace VSDoxyHighlighter
 
       Debug.Assert(fragmentText != null && fragmentText.Length >= 2);
 
-      Debug.Assert(fragmentText.StartsWith("{"));
-      Debug.Assert(fragmentText.EndsWith("}"));
+      Debug.Assert(fragmentText.StartsWith("{") || fragmentText.StartsWith("["));
+      Debug.Assert(fragmentText.EndsWith("}") || fragmentText.EndsWith("]"));
       string textWithinBraces = fragmentText.Substring(1, fragmentText.Length - 2);
 
       // Doxygen always uses a comma to separate the options.

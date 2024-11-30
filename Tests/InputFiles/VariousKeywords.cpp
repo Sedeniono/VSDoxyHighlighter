@@ -319,7 +319,14 @@ Some text \refitem some_name more text
 \snippetdoc{local} example.cpp Only partial highlight because "local" is not supported.
 \verbinclude some dir\include_test.cpp
 \htmlinclude some dir\html.cpp
-\htmlinclude[block]  html.cpp
+\htmlinclude some [block].cpp allowed
+\htmlinclude[block]   html.cpp allowed
+\htmlinclude[   block   ]
+\htmlinclude[block ] allowed
+\htmlinclude[block]] not allowed
+\htmlinclude[unknown] will be filtered-out separately
+\htmlinclude[   block   ]Missing space after ] not allowed
+\htmlinclude  [block]  Space before [ not allowed
 \latexinclude  some dir\tex.cpp
 \rtfinclude	some dir\rtf.cpp
 \maninclude some dir\man.cpp
