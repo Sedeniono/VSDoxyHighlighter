@@ -422,7 +422,7 @@ namespace VSDoxyHighlighter
       //   \htmlonly allows a space before the "[" while \htmlinclude does not. Both do not allow whitespace
       //   within the brackets.
       // => The \param command has very special behavior. Hence we do not parse it the same way as e.g. \snippet,
-      //    which uses the FragmentsMatcherForFirstOptionalBracedOptions machinery. Instead, we use a pure regex.
+      //    which uses the FragmentsMatcherForFirstOptionalClampedOptions machinery. Instead, we use a pure regex.
       //
       // https://regex101.com/r/PPNg3R/1
       //
@@ -750,19 +750,20 @@ namespace VSDoxyHighlighter
 
 
   /// <summary>
-  /// A matcher for Doxygen commands with optional options in braces "{...}" directly after the actual 
-  /// Doxygen command. For example:
-  /// \snippet{doc} => The "{doc}" is the braced part.
+  /// A matcher for Doxygen commands with optional options in braces "{...}" or brackets "[...]" 
+  /// directly after the actual Doxygen command. For example:
+  /// \snippet{doc} => The "{doc}" is the clamped part.
+  /// \htmlinclude[block] => The "[block]" is the clamped part.
   /// </summary>
-  internal class FragmentsMatcherForFirstOptionalBracedOptions : IFragmentsMatcher
+  internal class FragmentsMatcherForFirstOptionalClampedOptions : IFragmentsMatcher
   {
-    public FragmentsMatcherForFirstOptionalBracedOptions(
+    public FragmentsMatcherForFirstOptionalClampedOptions(
         Regex baseRegex, 
         ClassificationEnum[] classifications, 
-        Regex[] allowedBracedOptionsRegex)
+        Regex[] allowedClampedOptionsRegex)
     {
-      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, BracedOptionsValidator);
-      mAllowedBracedOptionsRegex = allowedBracedOptionsRegex;
+      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, ClampedOptionsValidator);
+      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
     }
 
     public IList<FormattedFragmentGroup> FindFragments(string text)
@@ -770,9 +771,9 @@ namespace VSDoxyHighlighter
       return mBaseMatcher.FindFragments(text);
     }
 
-    private bool BracedOptionsValidator(int fragmentIndex, string fragmentText) 
+    private bool ClampedOptionsValidator(int fragmentIndex, string fragmentText) 
     {
-      // As the name of the class explains, we look for the braced options at
+      // As the name of the class explains, we look for the clamped options at
       // the 1st fragment = 2nd fragment = fragmentIndex 1
       if (fragmentIndex != 1) {
         return true;
@@ -782,10 +783,10 @@ namespace VSDoxyHighlighter
 
       Debug.Assert(fragmentText.StartsWith("{") || fragmentText.StartsWith("["));
       Debug.Assert(fragmentText.EndsWith("}") || fragmentText.EndsWith("]"));
-      string textWithinBraces = fragmentText.Substring(1, fragmentText.Length - 2);
+      string textWithinClamps = fragmentText.Substring(1, fragmentText.Length - 2);
 
       // Doxygen always uses a comma to separate the options.
-      string[] options = textWithinBraces.Split(',');
+      string[] options = textWithinClamps.Split(',');
 
       foreach (string option in options) {
         // Doxygen ignores leading and trailing whitespace.
@@ -796,7 +797,7 @@ namespace VSDoxyHighlighter
         // Note: Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
         // unknown option, we stop the highlighting so that the user notices the mistake, especially in
         // case of typos.
-        if (trimmedOption.Length > 0 && !mAllowedBracedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
+        if (trimmedOption.Length > 0 && !mAllowedClampedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
           return false;
         }
       }
@@ -805,6 +806,6 @@ namespace VSDoxyHighlighter
     }
 
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
-    private readonly Regex[] mAllowedBracedOptionsRegex;
+    private readonly Regex[] mAllowedClampedOptionsRegex;
   }
 }

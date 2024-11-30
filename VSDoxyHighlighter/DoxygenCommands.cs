@@ -51,33 +51,34 @@ namespace VSDoxyHighlighter
 
   /// <summary>
   /// Factory that produces a matcher intended for Doxygen commands with optional options in braces "{...}"
-  /// directly after the actual Doxygen command. For example:
-  /// \snippet{doc} => The "{doc}" is the braced part.
+  /// or brackets "[...]" directly after the actual Doxygen command. For example:
+  /// \snippet{doc} => The "{doc}" is the clamped part.
+  /// \htmlinclude[block] => The "[block]" is the clamped part.
   /// </summary>
-  internal class DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory : IDoxygenCommandsMatcherFactory
+  internal class DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory : IDoxygenCommandsMatcherFactory
   {
-    public DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+    public DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
         RegexStringGetterDelegate baseRegexStringGetter,
-        string[] allowedBracedOptionsRegex)
+        string[] allowedClampedOptionsRegex)
     {
       mBaseRegexStringGetter = baseRegexStringGetter;
-      mAllowedBracedOptionsRegex = allowedBracedOptionsRegex;
+      mAllowedClampedOptionsRegex = allowedClampedOptionsRegex;
     }
 
     public IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications)
     {
-      Regex[] regexWithinBraces = mAllowedBracedOptionsRegex.Select(
+      Regex[] regexWithinClamps = mAllowedClampedOptionsRegex.Select(
         regexStr => new Regex($@"\b{regexStr}\b", RegexOptions.Compiled | RegexOptions.Multiline)).ToArray();
 
-      return new FragmentsMatcherForFirstOptionalBracedOptions(
+      return new FragmentsMatcherForFirstOptionalClampedOptions(
         new Regex(mBaseRegexStringGetter(commands), RegexOptions.Compiled | RegexOptions.Multiline),
         classifications,
-        regexWithinBraces
+        regexWithinClamps
       );
     }
 
     private readonly RegexStringGetterDelegate mBaseRegexStringGetter;
-    private readonly string[] mAllowedBracedOptionsRegex;
+    private readonly string[] mAllowedClampedOptionsRegex;
   }
 
 
@@ -701,9 +702,9 @@ namespace VSDoxyHighlighter
           new List<string> {
             "htmlinclude"
           },
-          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd,
-            allowedBracedOptionsRegex: new string[] { "block" }
+            allowedClampedOptionsRegex: new string[] { "block" }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
@@ -723,9 +724,9 @@ namespace VSDoxyHighlighter
           new List<string> {
             "include"
           },
-          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
-            allowedBracedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
@@ -734,10 +735,10 @@ namespace VSDoxyHighlighter
           new List<string> {
             "includedoc"
           },
-          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
             // Option "doc" in \includedoc is actually supported by Doxygen (namely, it gets simply ignored).
-            allowedBracedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
@@ -776,9 +777,9 @@ namespace VSDoxyHighlighter
           new List<string> {
             "snippet"
           },
-          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
-            allowedBracedOptionsRegex: new string[] { "lineno", "trimleft", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "lineno", "trimleft", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
@@ -787,10 +788,10 @@ namespace VSDoxyHighlighter
           new List<string> {
             "snippetdoc"
           },
-          new DoxygenCommandsWithFirstOptionalBracedOptionsMatcherFactory(
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
             // Option "doc" in \snippetdoc is actually supported by Doxygen (namely, it gets simply ignored).
-            allowedBracedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
