@@ -267,7 +267,8 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\example", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"example_test.cpp", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText(@"\example{lineno}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\example", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{lineno}", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\endinternal", ClassificationEnum.Command),

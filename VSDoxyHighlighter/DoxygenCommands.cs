@@ -425,7 +425,7 @@ namespace VSDoxyHighlighter
           "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
           "include{lineno}", "include{doc}", "include{local}", "include{lineno,local}", 
           "include{doc,local}", "include{local,lineno}", "include{local,doc}",
-          "dontinclude{lineno}",
+          "dontinclude{lineno}", "example{lineno}",
           "htmlinclude[block]", "htmlonly[block]",
         };
         foreach (string removedCmd in removedCmds) {
@@ -453,6 +453,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "dontinclude", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "example", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
@@ -619,7 +620,7 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "dir", "example", "example{lineno}", "file", "fn", "ingroup", "overload",
+            "dir", "file", "fn", "ingroup", "overload",
             "property", "typedef", "var",
             "elseif", "if", "ifnot",
             "includelineno",
@@ -748,6 +749,17 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
             allowedClampedOptionsRegex: new string[] { "lineno", "strip", "nostrip" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "example"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            allowedClampedOptionsRegex: new string[] { "lineno" }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
