@@ -178,6 +178,7 @@ Some text \lineinfo more text
 \param[out,invalid] Nothing should be formatted because "invalid" is not allowed.
 \param[in,in] No formatting because repetition of "in" is not allowed for param.
 \param[out,in,out] No formatting because repetition of "out" is not allowed for param.
+\param[OUT] param Nothing should be formatted because the option is case-sensitive.
 \parblock  
 \endparblock
 \tparam some_param Description of template
@@ -272,6 +273,7 @@ Some text \refitem some_name more text
 \include{doc}} No highlight because of mismatching braces
 \include{doc,raise=6} Only partial highlight because max. raise level is 5.
 \include{doc,raise=99} Only partial highlight because max. raise level is 5.
+\include{local,STRIP} Only partial highlight because option is case-sensitive.
 \includelineno  include_test.cpp
 \includedoc   include_test.cpp
 \includedoc{doc}  include_test.cpp
@@ -311,6 +313,7 @@ Some text \refitem some_name more text
 \snippet{doc}} example.cpp No highlight because of mismatching braces
 \snippet{doc,raise=6} example.cpp Only partial highlight because max. raise level is 5.
 \snippet{doc,raise=99} example.cpp Only partial highlight because max. raise level is 5.
+\snippet{DOC} example.cpp Only partial highlight because the options are case-sensitive.
 \snippetlineno  snippets/example.cpp resource
 \snippetdoc  example.cpp Some resource
 \snippetdoc{doc}  example.cpp resource
@@ -327,6 +330,7 @@ Some text \refitem some_name more text
 \htmlinclude[unknown] will be filtered-out separately
 \htmlinclude[   block   ]Missing space after ] not allowed
 \htmlinclude  [block]  Space before [ not allowed
+\htmlinclude[BLOCK] Only partial highlight because option is case-sensitive.
 \latexinclude  some dir\tex.cpp
 \rtfinclude	some dir\rtf.cpp
 \maninclude some dir\man.cpp

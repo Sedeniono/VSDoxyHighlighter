@@ -792,11 +792,13 @@ namespace VSDoxyHighlighter
         // Doxygen ignores leading and trailing whitespace.
         string trimmedOption = option.Trim();
 
-        // Note: Doxygen ignores empty entries.
-        // Note: Doxygen ignores duplicated entries, and thus do we.
-        // Note: Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
-        // unknown option, we stop the highlighting so that the user notices the mistake, especially in
-        // case of typos.
+        // Notes:
+        // - Doxygen ignores empty entries.
+        // - Doxygen ignores duplicated entries, and thus do we.
+        // - Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
+        //   unknown option, we stop the highlighting so that the user notices the mistake, especially in
+        //   case of typos.
+        // - Doxygen matches the options case-sensitively
         if (trimmedOption.Length > 0 && !mAllowedClampedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
           return false;
         }

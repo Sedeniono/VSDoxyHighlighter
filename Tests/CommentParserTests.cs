@@ -704,6 +704,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\includelineno", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
@@ -819,6 +820,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\snippet", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\snippet", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\snippet", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\snippet", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\snippetlineno", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"snippets/example.cpp", ClassificationEnum.Parameter1),
@@ -860,7 +862,7 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
-
+        new Utils.FormattedFragmentText(@"\htmlinclude", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\latexinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some dir\tex.cpp", ClassificationEnum.Parameter1),
