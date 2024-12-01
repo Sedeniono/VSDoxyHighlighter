@@ -453,6 +453,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
       }
     }
 
@@ -530,14 +531,6 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "code"
-          },
-          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_CodeCommand),
-          new ClassificationEnum[] { ClassificationEnum.Command }
-        ),
-
-        new DoxygenCommandGroup(
-          new List<string> {
             "fileinfo", "fileinfo{file}", "fileinfo{extension}", "fileinfo{filename}",
             "fileinfo{directory}", "fileinfo{full}",
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc",
@@ -592,6 +585,14 @@ namespace VSDoxyHighlighter
 
 
         //----- With up to one parameter -------
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "code"
+          },
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_CodeCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
 
         new DoxygenCommandGroup(
           new List<string> {

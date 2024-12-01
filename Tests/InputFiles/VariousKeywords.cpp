@@ -353,18 +353,27 @@ Format (the next)\p thing despite missing space.
 \li
 \code{.py} \endcode
 Text \code{.c} someCode \endcode
+\code{.py}class \endcode
 \code{.cpp}
 class Cpp {};
 \endcode
 \code{.c++}
 class Cpp2 {};
 \endcode
-\code{.unparsed}
+\code   {.unparsed} space before { is ignored.
 Show this as-is please
+\endcode
+\code{.CS}  case-insensitive match
 \endcode
 \code
 Some code
 \endcode
+\code 
+\endcode
+\code{unknown} \endcode
+\code{.unknown} \endcode
+\code{ .py} no whitespace allowed in braces \endcode
+\code{.py } no whitespace allowed in braces \endcode
 @copydoc MyClass::myfunction(type1,type2)
 Some text @copydoc MyClass::myfunction() more text.
 \brief \copybrief foo()

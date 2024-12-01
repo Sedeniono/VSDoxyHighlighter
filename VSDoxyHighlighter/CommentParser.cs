@@ -356,10 +356,18 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_CodeCommand(ICollection<string> keywords)
     {
-      // Command \code, \code{cpp}, ...
+      // Command \code, \code{.cpp}, ...
+      // https://regex101.com/r/nwPEfg/1
+      // 
+      // Note: NOT using the FragmentsMatcherForFirstOptionalClampedOptions machinery because Doxygen parses
+      // the "{...}" differently:
+      // - Only one option (i.e. file extension) is allowed here.
+      // - No whitespaces are allowed after the "{" and before the "}".
+      // - The extension is matched INsensitive, at least on Windows (and Visual Studio most often is used for Windows,
+      //   so we match case-insensitively).
       string concatKeywords = ConcatKeywordsForRegex(keywords);
       string validFileExtensions = ConcatKeywordsForRegex(cCodeFileExtensions);
-      return $@"({cCmdPrefix}{concatKeywords}(?:\{{\.(?:{validFileExtensions})\}})?){cWhitespaceAfterwards}";
+      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))[ \t]*(\{{\.(?i)(?:{validFileExtensions})(?-i)\}})?";
     }
 
     public static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(ICollection<string> keywords)
@@ -443,6 +451,7 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore(
         ICollection<string> keywords)
     {
+      // https://regex101.com/r/JZ5VPt/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \htmlonly[block]
