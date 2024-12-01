@@ -232,6 +232,9 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in]");
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "example", "example{lineno}");
+
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "dontinclude", "dontinclude{nostrip}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "dontinclude", "dontinclude{strip}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "dontinclude", "dontinclude{lineno}");
 
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "include", "include{doc,prefix=YOUR_PREFIX}");

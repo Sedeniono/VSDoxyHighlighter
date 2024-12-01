@@ -253,6 +253,8 @@ Some text \refitem some_name more text
 --- Commands for displaying examples ---
 \dontinclude include_test.cpp
 \dontinclude{lineno} some dir\include_test.cpp
+\dontinclude{ strip }
+\dontinclude{nostrip}  
 \include
 \include include_test.cpp
 \include{doc}

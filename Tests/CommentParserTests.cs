@@ -658,8 +658,13 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\dontinclude", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"include_test.cpp", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText(@"\dontinclude{lineno}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\dontinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{lineno}", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"some dir\include_test.cpp", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\dontinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ strip }", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\dontinclude", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{nostrip}", ClassificationEnum.ParameterClamped),
 
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\include", ClassificationEnum.Command),

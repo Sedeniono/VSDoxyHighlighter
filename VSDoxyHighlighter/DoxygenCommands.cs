@@ -425,6 +425,7 @@ namespace VSDoxyHighlighter
           "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
           "include{lineno}", "include{doc}", "include{local}", "include{lineno,local}", 
           "include{doc,local}", "include{local,lineno}", "include{local,doc}",
+          "dontinclude{lineno}",
           "htmlinclude[block]", "htmlonly[block]",
         };
         foreach (string removedCmd in removedCmds) {
@@ -451,6 +452,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "dontinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
@@ -620,7 +622,6 @@ namespace VSDoxyHighlighter
             "dir", "example", "example{lineno}", "file", "fn", "ingroup", "overload",
             "property", "typedef", "var",
             "elseif", "if", "ifnot",
-            "dontinclude", "dontinclude{lineno}",
             "includelineno",
             "line", "skip", "skipline", "until", "verbinclude",
             "latexinclude", "rtfinclude", "maninclude", "docbookinclude", "xmlinclude"
@@ -736,6 +737,17 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
             allowedClampedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "dontinclude"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            allowedClampedOptionsRegex: new string[] { "lineno", "strip", "nostrip" }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
