@@ -601,6 +601,7 @@ namespace VSDoxyHighlighter
     }
 
     public const string cRegex_1OptionalCaption_1OptionalSizeIndication =
+      //                            Note: width and height are parsed case-sensitively by Doxygen
       //| Optional quoted caption | Optional width              | Optional height             |
       //|_________________________|_____________________________|_____________________________| 
       @"(?:[ \t]+(""[^\r\n]*?""))?(?:[ \t]+(width=[^ \t\r\n]*))?(?:[ \t]+(height=[^ \t\r\n]*))?";
@@ -641,8 +642,8 @@ namespace VSDoxyHighlighter
       string concatKeywords = ConcatKeywordsForRegex(keywords);
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/VN43Fy/1
-      return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?)(?:(?:[ \t]+(?:(html|latex|docbook|rtf|xml)\b)?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
+      // https://regex101.com/r/cC8IMG/1
+      return $@"({cCmdPrefix}{concatKeywords})({{[^}}]*?}})?(?:(?:[ \t]+(?:(?i)(html|latex|docbook|rtf|xml)\b(?-i))?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
     }
 
 
@@ -819,7 +820,8 @@ namespace VSDoxyHighlighter
         // - Doxygen apparently ignores unknown options silently. Nevertheless, if we encounter and
         //   unknown option, we stop the highlighting so that the user notices the mistake, especially in
         //   case of typos.
-        // - Doxygen matches the options case-sensitively
+        // - Doxygen matches the options case-sensitively usually. If not, the mAllowedClampedOptionsRegex
+        //   contains appropriate (?i) and (?-i) switches.
         if (trimmedOption.Length > 0 && !mAllowedClampedOptionsRegex.Any(re => re.IsMatch(trimmedOption))) {
           return false;
         }

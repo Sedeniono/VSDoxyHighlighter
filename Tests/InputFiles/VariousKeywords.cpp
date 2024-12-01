@@ -443,11 +443,15 @@ The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is
 \f{eqnarray*}
 \f}
 \image html
-\image html application.jpg	 
+\image HTML application.jpg	 
 \image latex application.eps "My application" width=10cm
 \image docbook "file name.eps" width=200cm height=1cm
+\image  docbook  "width/height must be lower case" Width=200cm
 \image{inline,anchor:id} rtf "path with space/name.rtf"
-\image{inline} xml file.xml height=1cm
+\image{ INLINE  } xml file.xml height=1cm
+\image{Anchor: some id, inline}
+\image {inline} html not allowed space before {
+\image{unknown} html application.jpg
 \image latexs is not an allowed document type, no format of latexs
 \image
   latex should not be formatted since on new line

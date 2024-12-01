@@ -454,6 +454,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "image", numOldParameters: 5);
       }
     }
 
@@ -841,8 +842,13 @@ namespace VSDoxyHighlighter
           new List<string> {
             "image"
           },
-          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_ImageCommand),
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_ImageCommand,
+            allowedClampedOptionsRegex: new string[] { "(?i)inline(?-i)", "(?i)anchor(?-i):.*" }
+          ),
+          new ClassificationEnum[] { 
+            ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, 
+            ClassificationEnum.Parameter2, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 
       };
