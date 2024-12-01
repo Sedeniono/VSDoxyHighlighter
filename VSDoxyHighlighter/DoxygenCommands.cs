@@ -704,17 +704,6 @@ namespace VSDoxyHighlighter
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
         ),
 
-        new DoxygenCommandGroup(
-          new List<string> {
-            "htmlinclude"
-          },
-          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
-            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd,
-            allowedClampedOptionsRegex: new string[] { "block" }
-          ),
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
-        ),
-
 
         //----- With up to two parameters -------
 
@@ -723,6 +712,17 @@ namespace VSDoxyHighlighter
             "param"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_ParamCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "htmlinclude"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd,
+            allowedClampedOptionsRegex: new string[] { "block" }
+          ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
 
