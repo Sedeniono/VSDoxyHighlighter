@@ -425,7 +425,7 @@ namespace VSDoxyHighlighter
           "snippet{local,lineno}", "snippet{local,doc}", "snippet{local,trimleft}",
           "include{lineno}", "include{doc}", "include{local}", "include{lineno,local}", 
           "include{doc,local}", "include{local,lineno}", "include{local,doc}",
-          "htmlinclude[block]",
+          "htmlinclude[block]", "htmlonly[block]",
         };
         foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
@@ -452,6 +452,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
       }
     }
 
@@ -521,12 +522,6 @@ namespace VSDoxyHighlighter
               "pure", "showinitializer", "static",
               "addindex", "secreflist", "endsecreflist", "tableofcontents",
               "arg", "li", "docbookonly", 
-              // Note: Doxygen does not allow whitespace within the "[...]" of \htmlonly[block]. This
-              // is very different to e.g. \param[...]. Hence we can simply parse it as a separate command.
-              // (To be precise, Doxygen allows whitespace before the "["; however, the related command
-              // \htmlinclude[block] does not allow whitespace there, i.e. Doxygen is inconsistent here. For
-              // simplicity, we disallow whitespaces in both cases.)
-              "htmlonly", "htmlonly[block]", 
               "latexonly", "manonly", "rtfonly", "verbatim", "xmlonly"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_NoParam),
@@ -696,6 +691,17 @@ namespace VSDoxyHighlighter
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "htmlonly"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore,
+            allowedClampedOptionsRegex: new string[] { "block" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
         ),
 
         new DoxygenCommandGroup(

@@ -440,6 +440,18 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
     }
 
+    public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore(
+        ICollection<string> keywords)
+    {
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \htmlonly[block]
+      // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
+      // Note: The part inside the braces "[...]" is parsed in a second step separately.
+      //                               Special important part:   vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t\n\r]|$))?{cWhitespaceAfterwards}";
+    }
+
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(
         ICollection<string> keywords)
     {

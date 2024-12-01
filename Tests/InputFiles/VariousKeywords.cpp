@@ -402,7 +402,14 @@ Some text \emoji :smile: more text \emoji left_luggage
 this is a \e really good example
 this is a \em x good example
 \htmlonly
+\htmlonly   
+\htmlonly This text after the command is not part of the command anymore, only htmlonly should be highlighted.
 \htmlonly[block]  
+\htmlonly[ block ]
+\htmlonly[block] Should not get confused because of the following [block].
+\htmlonly  [block] The block is not highlighted because space before [ is not allowed.
+\htmlonly[BLOCK] The block is not highlighted because the option is case sensitive.
+\htmlonly[unknown] The unknown should not be highlighted.
 \endhtmlonly
 \latexonly	
 \endlatexonly	
