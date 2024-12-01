@@ -461,6 +461,20 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t\n\r]|$))?{cWhitespaceAfterwards}";
     }
 
+    public static string BuildRegex_fileinfoCommand(
+        ICollection<string> keywords)
+    {
+      // https://regex101.com/r/cpDs93/1
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \fileinfo{filename}
+      // Note: NOT using the FragmentsMatcherForFirstOptionalClampedOptions machinery because Doxygen parses
+      // the "{...}" differently:
+      // - Only one option is allowed here.
+      // - The option is matched case INsensitively.
+      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))(\{{[ \t]*(?i)(?:name|extension|filename|directory|full)(?-i)[ \t]*\}})?{cWhitespaceAfterwards}";
+    }
+
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(
         ICollection<string> keywords)
     {

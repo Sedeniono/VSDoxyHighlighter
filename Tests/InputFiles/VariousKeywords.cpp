@@ -64,11 +64,15 @@ text \qualifier"more text" quote should be matched
 \extends Object
 \file path with spaces\example_test.cpp
 Text \fileinfo more text
-Some text \fileinfo{file} more text
+Some text \fileinfo{name} more text
 Some text \fileinfo{extension}
 \fileinfo{filename} more text
-\fileinfo{directory}
-\fileinfo{full}
+\fileinfo{ directory  }
+\fileinfo{FULL} should match because matching is not case sensitive
+"\fileinfo{full}" nothing should be highlighted because Doxygen fails to parse this correctly.
+\fileinfo {full} Only fileinfo should be highlighted because space is not allowed
+\fileinfo{full,name} Nothing matches because two options are not allowed.
+\fileinfo{file} Nothing matches because "file" is an unknown option.
 Some text \lineinfo more text
 \fn const char *Fn_Test::member(char c,int n)
 \headerfile test.h "some name"

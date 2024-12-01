@@ -427,6 +427,7 @@ namespace VSDoxyHighlighter
           "include{doc,local}", "include{local,lineno}", "include{local,doc}",
           "dontinclude{lineno}", "example{lineno}",
           "htmlinclude[block]", "htmlonly[block]",
+          "fileinfo{file}", "fileinfo{extension}", "fileinfo{filename}", "fileinfo{directory}", "fileinfo{full}",
         };
         foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
@@ -459,6 +460,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "image", numOldParameters: 5);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "startuml", numOldParameters: 3);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "fileinfo", numOldParameters: 0);
       }
     }
 
@@ -536,8 +538,6 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "fileinfo", "fileinfo{file}", "fileinfo{extension}", "fileinfo{filename}",
-            "fileinfo{directory}", "fileinfo{full}",
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc",
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly", "n"
@@ -709,6 +709,13 @@ namespace VSDoxyHighlighter
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
         ),
 
+        new DoxygenCommandGroup(
+          new List<string> {
+            "fileinfo"
+          },
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_fileinfoCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
 
         //----- With up to two parameters -------
 

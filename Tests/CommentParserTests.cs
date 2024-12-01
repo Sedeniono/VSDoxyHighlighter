@@ -280,11 +280,17 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"path with spaces\example_test.cpp", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\fileinfo{file}", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\fileinfo{extension}", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\fileinfo{filename}", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\fileinfo{directory}", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\fileinfo{full}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{name}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{extension}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{filename}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ directory  }", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{FULL}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\fileinfo", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\lineinfo", ClassificationEnum.Command),
 
