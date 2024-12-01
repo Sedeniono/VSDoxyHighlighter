@@ -455,6 +455,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlonly", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "code", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "image", numOldParameters: 5);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "startuml", numOldParameters: 3);
       }
     }
 
@@ -814,14 +815,6 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "startuml"
-          },
-          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_StartUmlCommandWithBracesOptions),
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
-        ),
-
-        new DoxygenCommandGroup(
-          new List<string> {
             "dot", "msc"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_1OptionalCaption_1OptionalSizeIndication),
@@ -829,6 +822,14 @@ namespace VSDoxyHighlighter
         ),
 
         //----- More parameters -------
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "startuml"
+          },
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_StartUmlCommandWithBracesOptions),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
+        ),
 
         new DoxygenCommandGroup(
           new List<string> {

@@ -616,7 +616,7 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_StartUmlCommandWithBracesOptions(ICollection<string> keywords) 
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"({cCmdPrefix}{concatKeywords}(?:{{.*?}})?){cRegex_1OptionalCaption_1OptionalSizeIndication}";
+      return $@"({cCmdPrefix}{concatKeywords})({{[^\{{]*?}})?{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     private const string cRegexForOptionalFileWithOptionalQuotes =

@@ -990,13 +990,16 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\endmsc", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\startuml", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"@startuml{myimage.png}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@startuml", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{myimage.png}", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"""Image Caption""", ClassificationEnum.Title),
         new Utils.FormattedFragmentText(@"width=200cm", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"height=1cm", ClassificationEnum.Parameter1),
-        new Utils.FormattedFragmentText(@"@startuml{json, myimage.png}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@startuml", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{json, myimage.png}", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"""Image Caption""", ClassificationEnum.Title),
-        new Utils.FormattedFragmentText(@"@startuml{json}", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@startuml", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{json}", ClassificationEnum.ParameterClamped),
 
         new Utils.FormattedFragmentText(@"@enduml", ClassificationEnum.Command),
 
