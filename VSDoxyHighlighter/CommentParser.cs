@@ -464,16 +464,32 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_fileinfoCommand(
         ICollection<string> keywords)
     {
-      // https://regex101.com/r/cpDs93/1
+      return BuildRegex_KeywordSomewhereInLine_1OptionalBracedParamWithoutSpaceBeforeAndSingleCaseInsensitiveOption(
+        keywords, "name|extension|filename|directory|full");
+    }
+
+    public static string BuildRegex_inheritancegraphCommand(ICollection<string> keywords)
+    {
+      // Note: Actually, Doxygen supports passing in multiple of the options, but only the last one wins.
+      // So specifying multiple of the options doesn't make any sense, hence we match only a single one.
+      return BuildRegex_KeywordSomewhereInLine_1OptionalBracedParamWithoutSpaceBeforeAndSingleCaseInsensitiveOption(
+        keywords, "yes|no|graph|builtin|text");
+    }
+
+    private static string BuildRegex_KeywordSomewhereInLine_1OptionalBracedParamWithoutSpaceBeforeAndSingleCaseInsensitiveOption(
+        ICollection<string> keywords,
+        string options)
+    {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \fileinfo{filename}
+      // https://regex101.com/r/cpDs93/1
       // Note: NOT using the FragmentsMatcherForFirstOptionalClampedOptions machinery because Doxygen parses
       // the "{...}" differently:
       // - Only one option is allowed here.
       // - The option is matched case INsensitively.
       // (Note: In contrast to BuildRegex_CodeCommand(), whitespace after the "{" and before the "}" is allowed.)
-      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))(\{{[ \t]*(?i)(?:name|extension|filename|directory|full)(?-i)[ \t]*\}})?{cWhitespaceAfterwards}";
+      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))(\{{[ \t]*(?i)(?:{options})(?-i)[ \t]*\}})?{cWhitespaceAfterwards}";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(

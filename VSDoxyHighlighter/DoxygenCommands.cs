@@ -428,6 +428,8 @@ namespace VSDoxyHighlighter
           "dontinclude{lineno}", "example{lineno}",
           "htmlinclude[block]", "htmlonly[block]",
           "fileinfo{file}", "fileinfo{extension}", "fileinfo{filename}", "fileinfo{directory}", "fileinfo{full}",
+          "inheritancegraph{NO}", "inheritancegraph{YES}", "inheritancegraph{TEXT}", 
+          "inheritancegraph{GRAPH}", "inheritancegraph{BUILTIN}",
         };
         foreach (string removedCmd in removedCmds) {
           int idx = parsed.FindIndex(cfgElem => cfgElem.Command == removedCmd);
@@ -461,6 +463,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "image", numOldParameters: 5);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "startuml", numOldParameters: 3);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "fileinfo", numOldParameters: 0);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "inheritancegraph", numOldParameters: 0);
       }
     }
 
@@ -522,8 +525,6 @@ namespace VSDoxyHighlighter
               "showinlinesource", "hideinlinesource", "includegraph", "hideincludegraph",
               "includedbygraph", "hideincludedbygraph", "directorygraph", "hidedirectorygraph",
               "collaborationgraph", "hidecollaborationgraph",
-              "inheritancegraph", "inheritancegraph{NO}", "inheritancegraph{YES}",
-              "inheritancegraph{TEXT}", "inheritancegraph{GRAPH}", "inheritancegraph{BUILTIN}",
               "hideinheritancegraph", "groupgraph", "hidegroupgraph",
               "endinternal", "hideinitializer", "internal", "nosubgrouping", "private",
               "privatesection", "protected", "protectedsection", "public", "publicsection",
@@ -604,6 +605,14 @@ namespace VSDoxyHighlighter
             "fileinfo"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_fileinfoCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "inheritancegraph"
+          },
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_inheritancegraphCommand),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
         ),
 

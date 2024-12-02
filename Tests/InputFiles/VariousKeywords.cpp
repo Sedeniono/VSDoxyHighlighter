@@ -22,11 +22,13 @@
 \collaborationgraph
 \hidecollaborationgraph
 \inheritancegraph
-\inheritancegraph{NO}
-@inheritancegraph{YES}
-\inheritancegraph{TEXT}
-\inheritancegraph{GRAPH}
-\inheritancegraph{BUILTIN}
+\inheritancegraph{no}
+@inheritancegraph{  YES  }
+\inheritancegraph{text}
+\inheritancegraph{GRAPH }
+\inheritancegraph{ Builtin}
+\inheritancegraph {yes} Only partial highlight because space before { is not allowed.
+\inheritancegraph{unknown} No highlight because of unknown option.
 \hideinheritancegraph
 \groupgraph
 \hidegroupgraph

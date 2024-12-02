@@ -271,11 +271,11 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline,anchor:YOUR_ID}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "image", "image{inline}");
 
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{BUILTIN}");
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{GRAPH}");
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{TEXT}");
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{YES}");
-      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{NO}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{builtin}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{graph}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{text}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{yes}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{no}");
 
       foreach (string extension in CommentParser.cCodeFileExtensions.Reverse()) {
         InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
