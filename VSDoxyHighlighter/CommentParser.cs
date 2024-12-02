@@ -348,28 +348,6 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords})){cWhitespaceAfterwards}";
     }
 
-    // https://www.doxygen.nl/manual/starting.html#step1
-    public static string[] cCodeFileExtensions = { 
-      "unparsed", "dox", "doc", "c", "cc", "cxx", "cpp", "c++", "ii", "ixx", "ipp", "i++", "inl", "h", "H", "hh", "HH", "hxx", "hpp", "h++", 
-      "mm", "txt", "idl", "ddl", "odl", "java", "cs", "d", "php", "php4", "php5", "inc", "phtml", "m", "M", "py", "pyw", 
-      "f", "for", "f90", "f95", "f03", "f08", "f18", "vhd", "vhdl", "ucf", "qsf", "l", "md", "markdown", "ice" };
-
-    public static string BuildRegex_CodeCommand(ICollection<string> keywords)
-    {
-      // Command \code, \code{.cpp}, ...
-      // https://regex101.com/r/nwPEfg/1
-      // 
-      // Note: NOT using the FragmentsMatcherForFirstOptionalClampedOptions machinery because Doxygen parses
-      // the "{...}" differently:
-      // - Only one option (i.e. file extension) is allowed here.
-      // - No whitespaces are allowed after the "{" and before the "}".
-      // - The extension is matched INsensitive, at least on Windows (and Visual Studio most often is used for Windows,
-      //   so we match case-insensitively).
-      string concatKeywords = ConcatKeywordsForRegex(keywords);
-      string validFileExtensions = ConcatKeywordsForRegex(cCodeFileExtensions);
-      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))[ \t]*(\{{\.(?i)(?:{validFileExtensions})(?-i)\}})?";
-    }
-
     public static string BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam(ICollection<string> keywords)
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
@@ -461,6 +439,28 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t\n\r]|$))?{cWhitespaceAfterwards}";
     }
 
+    // https://www.doxygen.nl/manual/starting.html#step1
+    public static string[] cCodeFileExtensions = {
+      "unparsed", "dox", "doc", "c", "cc", "cxx", "cpp", "c++", "ii", "ixx", "ipp", "i++", "inl", "h", "H", "hh", "HH", "hxx", "hpp", "h++",
+      "mm", "txt", "idl", "ddl", "odl", "java", "cs", "d", "php", "php4", "php5", "inc", "phtml", "m", "M", "py", "pyw",
+      "f", "for", "f90", "f95", "f03", "f08", "f18", "vhd", "vhdl", "ucf", "qsf", "l", "md", "markdown", "ice" };
+
+    public static string BuildRegex_CodeCommand(ICollection<string> keywords)
+    {
+      // Command \code, \code{.cpp}, ...
+      // https://regex101.com/r/nwPEfg/1
+      // 
+      // Note: NOT using the FragmentsMatcherForFirstOptionalClampedOptions machinery because Doxygen parses
+      // the "{...}" differently:
+      // - Only one option (i.e. file extension) is allowed here.
+      // - No whitespaces are allowed after the "{" and before the "}".
+      // - The extension is matched INsensitive, at least on Windows (and Visual Studio most often is used for Windows,
+      //   so we match case-insensitively).
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+      string validFileExtensions = ConcatKeywordsForRegex(cCodeFileExtensions);
+      return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))[ \t]*(\{{\.(?i)(?:{validFileExtensions})(?-i)\}})?";
+    }
+
     public static string BuildRegex_fileinfoCommand(
         ICollection<string> keywords)
     {
@@ -472,6 +472,7 @@ namespace VSDoxyHighlighter
       // the "{...}" differently:
       // - Only one option is allowed here.
       // - The option is matched case INsensitively.
+      // (Note: In contrast to BuildRegex_CodeCommand(), whitespace after the "{" and before the "}" is allowed.)
       return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))(\{{[ \t]*(?i)(?:name|extension|filename|directory|full)(?-i)[ \t]*\}})?{cWhitespaceAfterwards}";
     }
 

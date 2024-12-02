@@ -601,6 +601,25 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
+            "fileinfo"
+          },
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_fileinfoCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "htmlonly"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore,
+            allowedClampedOptionsRegex: new string[] { "block" }
+          ),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
             "tparam",
             "concept", "def", "enum", "extends", "implements",
             "memberof", "module", "namespace", "package", "relates", "related",
@@ -698,24 +717,6 @@ namespace VSDoxyHighlighter
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1 }
         ),
 
-        new DoxygenCommandGroup(
-          new List<string> {
-            "htmlonly"
-          },
-          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
-            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore,
-            allowedClampedOptionsRegex: new string[] { "block" }
-          ),
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
-        ),
-
-        new DoxygenCommandGroup(
-          new List<string> {
-            "fileinfo"
-          },
-          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_fileinfoCommand),
-          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
-        ),
 
         //----- With up to two parameters -------
 
