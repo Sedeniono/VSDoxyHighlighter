@@ -493,6 +493,24 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}{concatKeywords}(?=[ \t\n\r\{{]|$))(\{{[ \t]*(?i)(?:{options})(?-i)[ \t]*\}})?{cWhitespaceAfterwards}";
     }
 
+    public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBeforeAndNoSpaceAfterwardsNecessary(
+        ICollection<string> keywords)
+    {
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \tableofcontents{xml,html:2,latex,docbook}
+      // https://regex101.com/r/nSmnKA/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
+      // Notes:
+      // - Doxygen does not allow any whitespace before the "{".
+      // - The part inside the braces "{...}" is parsed in a second step separately.
+      // - Non-whitespace text directly after the "}" is allowed
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))\b({{[^}}]*?}})?";
+    }
+
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(
         ICollection<string> keywords)
     {
@@ -505,7 +523,7 @@ namespace VSDoxyHighlighter
       // actually treated as optional (highlight keyword even without parameters while typing).
       //
       // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
-      // Note: The part inside the braces "[...]" is parsed in a second step separately.
+      // Note: The part inside the brackets "[...]" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv             vvvvv
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t]|[\n\r]|$))?(?:(?:[ \t]+([^\[][^\n\r]+)?)|[\n\r]?|$)";
     }

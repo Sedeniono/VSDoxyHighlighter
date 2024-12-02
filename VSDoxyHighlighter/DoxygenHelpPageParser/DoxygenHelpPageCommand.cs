@@ -277,6 +277,13 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{yes}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "inheritancegraph", "inheritancegraph{no}");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{html:2,xml:3}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{html,xml,latex,docbook}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{docbook}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{xml}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{latex}");
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "tableofcontents", "tableofcontents{html}");
+
       foreach (string extension in CommentParser.cCodeFileExtensions.Reverse()) {
         InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "code", "code{." + extension + "}");
       }

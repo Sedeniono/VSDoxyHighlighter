@@ -464,6 +464,7 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "startuml", numOldParameters: 3);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "fileinfo", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "inheritancegraph", numOldParameters: 0);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "tableofcontents", numOldParameters: 0);
       }
     }
 
@@ -510,6 +511,17 @@ namespace VSDoxyHighlighter
       const string cSnippetPrefix = @"prefix[ \t]*=.*";
       const string cSnippetDoc = "doc";
 
+      // Options for \tableofcontents
+      // E.g.: \tableofcontents{xml , html : 2 , latex,docbook:3}
+      // https://regex101.com/r/aA0Zuh/1
+      // E.g. "html:2", where the "2" specifies the level to show. Doxygen actually allows to specify
+      // values <=0 and >6, but all of them are then mapped to 6. So specifying such values makes no
+      // sense, and we don't highlight them.
+      var tocCmdOptions = new List<string>();
+      foreach (string option in new string[] { "html", "latex", "xml", "docbook" }) {
+        tocCmdOptions.Add($@"(?i){option}(?-i)(?:[ \t]*$|[ \t]*:[ \t]*[1-6])");
+      }
+
       DefaultCommandGroups = new DoxygenCommandGroup[] {
 
         //----- With no parameters -------
@@ -529,7 +541,7 @@ namespace VSDoxyHighlighter
               "endinternal", "hideinitializer", "internal", "nosubgrouping", "private",
               "privatesection", "protected", "protectedsection", "public", "publicsection",
               "pure", "showinitializer", "static",
-              "addindex", "secreflist", "endsecreflist", "tableofcontents",
+              "addindex", "secreflist", "endsecreflist",
               "arg", "li", "docbookonly", 
               "latexonly", "manonly", "rtfonly", "verbatim", "xmlonly"
           },
@@ -613,6 +625,17 @@ namespace VSDoxyHighlighter
             "inheritancegraph"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_inheritancegraphCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
+        ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "tableofcontents"
+          },
+          new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
+            baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBeforeAndNoSpaceAfterwardsNecessary,
+            allowedClampedOptionsRegex: tocCmdOptions.ToArray()
+          ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped }
         ),
 

@@ -244,6 +244,20 @@ Some text \refitem some_name more text
 - \subpage intro
 - \subpage advanced "Advanced usage"
 \tableofcontents
+\tableofcontents some text
+\tableofcontents{html}
+\tableofcontents{latex:1}
+\tableofcontents{XML: 6}some text without space after } should work
+\tableofcontents{xml , html : 2 , latex,docbook:3} should work
+\tableofcontents{ XML } should work
+\tableofcontentsNOTHING nothing highlighted because of missing space.
+\tableofcontents {xml} Only partial highlight because space before { is not allowed.
+\tableofcontents{xml:unknownLevel} Only partial highlight because of invalid level.
+\tableofcontents{xml:0} Only partial highlight because of invalid level.
+\tableofcontents{xml:-1} Only partial highlight because of invalid level.
+\tableofcontents{xml:7} Only partial highlight because of invalid level.
+\tableofcontents{unknown} Only partial highlight because of unknown option.
+\tableofcontents{unknown:3} Only partial highlight because of unknown option.
 \section sec An example section
 \section    
 	Nothing to format on this line
