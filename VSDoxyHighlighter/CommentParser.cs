@@ -429,10 +429,11 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore(
         ICollection<string> keywords)
     {
-      // https://regex101.com/r/JZ5VPt/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \htmlonly[block]
+      // https://regex101.com/r/JZ5VPt/1
+      //
       // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
       // Note: The part inside the braces "[...]" is parsed in a second step separately.
       //                               Special important part:   vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -495,12 +496,14 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore_1RequiredParamTillEnd(
         ICollection<string> keywords)
     {
-      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/Gkvirt/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \htmlinclude[block] ....
+      // https://regex101.com/r/Gkvirt/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
       // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
       // Note: The part inside the braces "[...]" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv             vvvvv
@@ -531,12 +534,14 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd(
         ICollection<string> keywords)
     {
-      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/84ZW3g/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \snippet{lineno} ....
+      // https://regex101.com/r/84ZW3g/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
       // Note: Doxygen does not allow any whitespace before the "{".
       // Note: The part inside the braces "{...}" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvv                      vv
@@ -546,12 +551,14 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd(
         ICollection<string> keywords)
     {
-      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/esdCyp/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
       // Example: \include{lineno} ....
+      // https://regex101.com/r/esdCyp/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
       // Note: Doxygen does not allow any whitespace before the "{".
       // Note: The part inside the braces "{...}" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvv                vv
@@ -569,11 +576,13 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
     {
-      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
-      // actually treated as optional (highlight keyword even without parameters while typing).
-      // https://regex101.com/r/Z7R3xS/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
 
+      // https://regex101.com/r/Z7R3xS/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
       // (1) Match the required word. As noted before, we actually treat it as optional.
       // (2) Optional word
       // (3) Optional parameter till the end
@@ -601,14 +610,15 @@ namespace VSDoxyHighlighter
 
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(ICollection<string> keywords)
     {
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
       // Examples:
       //   \ref Class::Func()
       //   Text \ref Class.Func() some text
       //   Text \ref subsection1. The point is not part of the parameter.
       //   \ref func(double, int) should match also match the double and int and also the parentheses.
       //   (\ref func()) should not match the final paranthesis (and also of course not the opening one).
-      string concatKeywords = ConcatKeywordsForRegex(keywords);
-
+      //
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       //
@@ -686,7 +696,6 @@ namespace VSDoxyHighlighter
       // Also, we need to escape any special characters.
       var orderedAndEscapedKeywords 
         = keywords.OrderByDescending(s => s.Length).ToList().ConvertAll(s => Regex.Escape(s));
-
       string concatKeywords = string.Join("|", orderedAndEscapedKeywords);
       return concatKeywords;
     }
