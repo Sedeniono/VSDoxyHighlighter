@@ -454,7 +454,9 @@ namespace VSDoxyHighlighter
         // Ditto for `snippet` and `include` and their `{...}` options.
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippetdoc", numOldParameters: 2);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "include", numOldParameters: 1);
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "includedoc", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "dontinclude", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "example", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "htmlinclude", numOldParameters: 1);
