@@ -150,6 +150,15 @@ namespace VSDoxyHighlighter
     
     public override void LoadSettingsFromStorage()
     {
+      // Visual Studio can trigger loading the settings multiple times (e.g. when clicking the cancel button
+      // in the Visual Studio options page). Old configurations before 1.8.0 did not store the "Version" (because
+      // it didn't exist at that time). If we didn't reset the "Version" here manually, it would mean that "Version"
+      // retains the value from a previous call to LoadSettingsFromStorage() since it doesn't get overwritten
+      // because it doesn't exist in the config. Hence, after LoadSettingsFromStorage() below we would end up with
+      // an inconsistent state: The "Version" already is set to "Current", while the actual data (Doxygen commands etc.)
+      // is again for the old version. => Reset "Version" here manually so that we adapt the old config again correctly.
+      Version = (int)ConfigVersions.NoVersionInConfig;
+
       base.LoadSettingsFromStorage();
 
       if (Version == (int)ConfigVersions.NoVersionInConfig) {
