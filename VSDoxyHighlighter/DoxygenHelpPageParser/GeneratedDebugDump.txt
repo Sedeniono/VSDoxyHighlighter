@@ -35,9 +35,9 @@ Command: callgraph
 Parameters: 
 Anchor: cmdcallgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcallgraph
 Help text:
-<When this command is put in a comment block of a function or method and ><HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§>< is set to ><```YES```><, then doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§><.
+<When this command is put in a comment block of a function or method and ><HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§>< is set to ><```YES```><, then Doxygen will generate a call graph for that function (provided the implementation of the function or method calls other documented functions). The call graph will be generated regardless of the value of ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§><.
 
-><!Note:!>< The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the call graph depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§><, command ><[\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§><, command ><[\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§>< and option ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§>
 ------------------------------------
@@ -48,9 +48,9 @@ Command: hidecallgraph
 Parameters: 
 Anchor: cmdhidecallgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph
 Help text:
-<When this command is put in a comment block of a function or method and then doxygen will not generate a call graph for that function. The call graph will not be generated regardless of the value of ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§><.
+<When this command is put in a comment block of a function or method and then Doxygen will not generate a call graph for that function. The call graph will not be generated regardless of the value of ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§><.
 
-><!Note:!>< The completeness (and correctness) of the call graph depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the call graph depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§><, command ><[\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§><, command ><[\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§>< and option ><CALL_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_call_graph§>
 ------------------------------------
@@ -61,9 +61,9 @@ Command: callergraph
 Parameters: 
 Anchor: cmdcallergraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcallergraph
 Help text:
-<When this command is put in a comment block of a function or method and ><HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§>< is set to ><```YES```><, then doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§><.
+<When this command is put in a comment block of a function or method and ><HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§>< is set to ><```YES```><, then Doxygen will generate a caller graph for that function (provided the implementation of the function or method is called by other documented functions). The caller graph will be generated regardless of the value of ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§><.
 
-><!Note:!>< The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the caller graph depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§><, command ><[\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§><, command ><[\hidecallergraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph§>< and option ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§>
 ------------------------------------
@@ -74,9 +74,9 @@ Command: hidecallergraph
 Parameters: 
 Anchor: cmdhidecallergraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidecallergraph
 Help text:
-<When this command is put in a comment block of a function or method and then doxygen will not generate a caller graph for that function. The caller graph will not be generated regardless of the value of ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§><.
+<When this command is put in a comment block of a function or method and then Doxygen will not generate a caller graph for that function. The caller graph will not be generated regardless of the value of ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§><.
 
-><!Note:!>< The completeness (and correctness) of the caller graph depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the caller graph depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\callergraph]§https://www.doxygen.nl/manual/commands.html#cmdcallergraph§><, command ><[\callgraph]§https://www.doxygen.nl/manual/commands.html#cmdcallgraph§><, command ><[\hidecallgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecallgraph§>< and option ><CALLER_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_caller_graph§>
 ------------------------------------
@@ -87,9 +87,9 @@ Command: showrefby
 Parameters: 
 Anchor: cmdshowrefby  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowrefby
 Help text:
-<When this command is put in a comment block of a function, method or variable, then doxygen will generate an overview for that function, method, variable of the, documented, functions and methods that call / use it. The overview will be generated regardless of the value of ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§><.
+<When this command is put in a comment block of a function, method or variable, then Doxygen will generate an overview for that function, method, variable of the, documented, functions and methods that call / use it. The overview will be generated regardless of the value of ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§><.
 
-><!Note:!>< The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the overview depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§><, command ><[\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§><, command ><[\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§>< and option ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§>
 ------------------------------------
@@ -100,9 +100,9 @@ Command: hiderefby
 Parameters: 
 Anchor: cmdhiderefby  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhiderefby
 Help text:
-<When this command is put in a comment block of a function, method or variable then doxygen will not generate an overview for that function, method or variable of the functions and methods that call / use it. The overview will not be generated regardless of the value of ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§><.
+<When this command is put in a comment block of a function, method or variable then Doxygen will not generate an overview for that function, method or variable of the functions and methods that call / use it. The overview will not be generated regardless of the value of ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§><.
 
-><!Note:!>< The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the overview depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§><, command ><[\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§><, command ><[\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§>< and option ><REFERENCED_BY_RELATION§https://www.doxygen.nl/manual/config.html#cfg_referenced_by_relation§>
 ------------------------------------
@@ -113,9 +113,9 @@ Command: showrefs
 Parameters: 
 Anchor: cmdshowrefs  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowrefs
 Help text:
-<When this command is put in a comment block of a function or method, then doxygen will generate an overview for that function or method of the functions and methods that call it. The overview will be generated regardless of the value of ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§><.
+<When this command is put in a comment block of a function or method, then Doxygen will generate an overview for that function or method of the functions and methods that call it. The overview will be generated regardless of the value of ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§><.
 
-><!Note:!>< The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the overview depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§><, command ><[\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§><, command ><[\hiderefs]§https://www.doxygen.nl/manual/commands.html#cmdhiderefs§>< and option ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§>
 ------------------------------------
@@ -126,9 +126,9 @@ Command: hiderefs
 Parameters: 
 Anchor: cmdhiderefs  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhiderefs
 Help text:
-<When this command is put in a comment block of a function or method and then doxygen will not generate an overview for that function or method of the functions and methods that call it. The overview will not be generated regardless of the value of ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§><.
+<When this command is put in a comment block of a function or method and then Doxygen will not generate an overview for that function or method of the functions and methods that call it. The overview will not be generated regardless of the value of ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§><.
 
-><!Note:!>< The completeness (and correctness) of the overview depends on the doxygen code parser which is not perfect.
+><!Note:!>< The completeness (and correctness) of the overview depends on the Doxygen code parser which is not perfect.
 
 See also: command ><[\showrefs]§https://www.doxygen.nl/manual/commands.html#cmdshowrefs§><, command ><[\showrefby]§https://www.doxygen.nl/manual/commands.html#cmdshowrefby§><, command ><[\hiderefby]§https://www.doxygen.nl/manual/commands.html#cmdhiderefby§>< and option ><REFERENCES_RELATION§https://www.doxygen.nl/manual/config.html#cfg_references_relation§>
 ------------------------------------
@@ -139,7 +139,7 @@ Command: showinlinesource
 Parameters: 
 Anchor: cmdshowinlinesource  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowinlinesource
 Help text:
-<When this command is put in a comment block of a function, multi-line macro, enum or a list initialized variable then doxygen will generate the inline source for that member. The inline source will be generated regardless of the value of ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§><.
+<When this command is put in a comment block of a function, multi-line macro, enum or a list initialized variable then Doxygen will generate the inline source for that member. The inline source will be generated regardless of the value of ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§><.
 
 See also: command ><[\hideinlinesource]§https://www.doxygen.nl/manual/commands.html#cmdhideinlinesource§><, option ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§>
 ------------------------------------
@@ -150,7 +150,7 @@ Command: hideinlinesource
 Parameters: 
 Anchor: cmdhideinlinesource  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideinlinesource
 Help text:
-<When this command is put in a comment block of a function, multi-line macro, enum or a list initialized variable then doxygen will not generate the inline source for that member. The inline source will not be generated regardless of the value of ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§><.
+<When this command is put in a comment block of a function, multi-line macro, enum or a list initialized variable then Doxygen will not generate the inline source for that member. The inline source will not be generated regardless of the value of ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§><.
 
 See also: command ><[\showinlinesource]§https://www.doxygen.nl/manual/commands.html#cmdshowinlinesource§><, option ><INLINE_SOURCES§https://www.doxygen.nl/manual/config.html#cfg_inline_sources§>
 ------------------------------------
@@ -161,7 +161,7 @@ Command: includegraph
 Parameters: 
 Anchor: cmdincludegraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdincludegraph
 Help text:
-<When this command is put in a comment block of a file then doxygen will generate an include graph for that file. The include graph will be generated regardless of the value of ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§><.
+<When this command is put in a comment block of a file then Doxygen will generate an include graph for that file. The include graph will be generated regardless of the value of ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§><.
 
 See also: command ><[\hideincludegraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludegraph§><, command ><[\includedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdincludedbygraph§><, command ><[\hideincludedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludedbygraph§>< and option ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§>
 ------------------------------------
@@ -172,7 +172,7 @@ Command: hideincludegraph
 Parameters: 
 Anchor: cmdhideincludegraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideincludegraph
 Help text:
-<When this command is put in a comment block of a file then doxygen will not generate an include graph for that file. The include graph will not be generated regardless of the value of ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§><.
+<When this command is put in a comment block of a file then Doxygen will not generate an include graph for that file. The include graph will not be generated regardless of the value of ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§><.
 
 See also: command ><[\includegraph]§https://www.doxygen.nl/manual/commands.html#cmdincludegraph§><, command ><[\includedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdincludedbygraph§><, command ><[\hideincludedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludedbygraph§>< and option ><INCLUDE_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_include_graph§>
 ------------------------------------
@@ -183,7 +183,7 @@ Command: includedbygraph
 Parameters: 
 Anchor: cmdincludedbygraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdincludedbygraph
 Help text:
-<When this command is put in a comment block of an include file then doxygen will generate an included by graph for that include file. The included by graph will be generated regardless of the value of ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§><.
+<When this command is put in a comment block of an include file then Doxygen will generate an included by graph for that include file. The included by graph will be generated regardless of the value of ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§><.
 
 See also: command ><[\hideincludedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludedbygraph§><, command ><[\ncludegraph]§https://www.doxygen.nl/manual/commands.html#cmdincludegraph§><, command ><[\hideincludegraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludegraph§>< and option ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§>
 ------------------------------------
@@ -194,7 +194,7 @@ Command: hideincludedbygraph
 Parameters: 
 Anchor: cmdhideincludedbygraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideincludedbygraph
 Help text:
-<When this command is put in a comment block of an include file then doxygen will not generate an included by graph for that include file. The included by graph will not be generated regardless of the value of ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§><.
+<When this command is put in a comment block of an include file then Doxygen will not generate an included by graph for that include file. The included by graph will not be generated regardless of the value of ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§><.
 
 See also: command ><[\includedbygraph]§https://www.doxygen.nl/manual/commands.html#cmdincludedbygraph§><, command ><[\ncludegraph]§https://www.doxygen.nl/manual/commands.html#cmdincludegraph§><, command ><[\hideincludegraph]§https://www.doxygen.nl/manual/commands.html#cmdhideincludegraph§>< and option ><INCLUDED_BY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_included_by_graph§>
 ------------------------------------
@@ -205,7 +205,7 @@ Command: directorygraph
 Parameters: 
 Anchor: cmddirectorygraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddirectorygraph
 Help text:
-<When this command is put in a comment block of a directory (see section ><[\dir]§https://www.doxygen.nl/manual/commands.html#cmddir§><) then doxygen will generate a directory graph for that directory. The directory graph will be generated regardless of the value of ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§><.
+<When this command is put in a comment block of a directory (see section ><[\dir]§https://www.doxygen.nl/manual/commands.html#cmddir§><) then Doxygen will generate a directory graph for that directory. The directory graph will be generated regardless of the value of ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§><.
 
 See also: command ><[\hidedirectorygraph]§https://www.doxygen.nl/manual/commands.html#cmdhidedirectorygraph§><, option ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§>
 ------------------------------------
@@ -216,7 +216,7 @@ Command: hidedirectorygraph
 Parameters: 
 Anchor: cmdhidedirectorygraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidedirectorygraph
 Help text:
-<When this command is put in a comment block of a directory (see section ><[\dir]§https://www.doxygen.nl/manual/commands.html#cmddir§><) then doxygen will not generate a directory graph for that directory. The directory graph will not be generated regardless of the value of ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§><.
+<When this command is put in a comment block of a directory (see section ><[\dir]§https://www.doxygen.nl/manual/commands.html#cmddir§><) then Doxygen will not generate a directory graph for that directory. The directory graph will not be generated regardless of the value of ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§><.
 
 See also: command ><[\directorygraph]§https://www.doxygen.nl/manual/commands.html#cmddirectorygraph§><, option ><DIRECTORY_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_directory_graph§>
 ------------------------------------
@@ -227,7 +227,7 @@ Command: collaborationgraph
 Parameters: 
 Anchor: cmdcollaborationgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcollaborationgraph
 Help text:
-<When this command is put in a comment block of a class then doxygen will generate a collaboration graph for that class. The collaboration graph will be generated regardless of the value of ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§><.
+<When this command is put in a comment block of a class then Doxygen will generate a collaboration graph for that class. The collaboration graph will be generated regardless of the value of ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§><.
 
 See also: command ><[\hidecollaborationgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidecollaborationgraph§><, option ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§>
 ------------------------------------
@@ -238,7 +238,7 @@ Command: hidecollaborationgraph
 Parameters: 
 Anchor: cmdhidecollaborationgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidecollaborationgraph
 Help text:
-<When this command is put in a comment block of a class then doxygen will not generate a collaboration graph for that class. The collaboration graph will not be generated regardless of the value of ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§><.
+<When this command is put in a comment block of a class then Doxygen will not generate a collaboration graph for that class. The collaboration graph will not be generated regardless of the value of ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§><.
 
 See also: command ><[\collaborationgraph]§https://www.doxygen.nl/manual/commands.html#cmdcollaborationgraph§><, option ><COLLABORATION_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_collaboration_graph§>
 ------------------------------------
@@ -249,7 +249,7 @@ Command: inheritancegraph
 Parameters: ['{option}']
 Anchor: cmdinheritancegraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinheritancegraph
 Help text:
-<When this command is put in a comment block of a class then doxygen will generate an inheritance graph for that class conforming the ><```option```><. The inheritance graph will be generated, conforming the ><```option```><, regardless of the value of ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><. The possible values of ><```option```>< are the same values as can be used with ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><. In case no ><```option```>< is specified the value ><```YES```>< is assumed.
+<When this command is put in a comment block of a class then Doxygen will generate an inheritance graph for that class conforming the ><```option```><. The inheritance graph will be generated, conforming the ><```option```><, regardless of the value of ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><. The possible values of ><```option```>< are the same values as can be used with ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><. In case no ><```option```>< is specified the value ><```YES```>< is assumed.
 
 See also: command ><[\hideinheritancegraph]§https://www.doxygen.nl/manual/commands.html#cmdhideinheritancegraph§><, option ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§>
 ------------------------------------
@@ -260,7 +260,7 @@ Command: hideinheritancegraph
 Parameters: 
 Anchor: cmdhideinheritancegraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideinheritancegraph
 Help text:
-<When this command is put in a comment block of a class then doxygen will not generate an inheritance graph for that class. The inheritance graph will not be generated regardless of the value of ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><.
+<When this command is put in a comment block of a class then Doxygen will not generate an inheritance graph for that class. The inheritance graph will not be generated regardless of the value of ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§><.
 
 See also: command ><[\inheritancegraph]§https://www.doxygen.nl/manual/commands.html#cmdinheritancegraph§><, option ><CLASS_GRAPH§https://www.doxygen.nl/manual/config.html#cfg_class_graph§>
 ------------------------------------
@@ -271,7 +271,7 @@ Command: groupgraph
 Parameters: 
 Anchor: cmdgroupgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdgroupgraph
 Help text:
-<When this command is put in a comment block of a ><[\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§>< command then doxygen will generate a group dependency graph for that group. The group graph will be generated regardless of the value of ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§><.
+<When this command is put in a comment block of a ><[\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§>< command then Doxygen will generate a group dependency graph for that group. The group graph will be generated regardless of the value of ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§><.
 
 See also: command ><[\hidegroupgraph]§https://www.doxygen.nl/manual/commands.html#cmdhidegroupgraph§><, option ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§>
 ------------------------------------
@@ -282,9 +282,31 @@ Command: hidegroupgraph
 Parameters: 
 Anchor: cmdhidegroupgraph  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhidegroupgraph
 Help text:
-<When this command is put in a comment block of a ><[\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§>< command then doxygen will not generate a group dependency graph for that group. The group graph will not be generated regardless of the value of ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§><.
+<When this command is put in a comment block of a ><[\defgroup]§https://www.doxygen.nl/manual/commands.html#cmddefgroup§>< command then Doxygen will not generate a group dependency graph for that group. The group graph will not be generated regardless of the value of ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§><.
 
 See also: command ><[\groupgraph]§https://www.doxygen.nl/manual/commands.html#cmdgroupgraph§><, option ><GROUP_GRAPHS§https://www.doxygen.nl/manual/config.html#cfg_group_graphs§>
+------------------------------------
+
+
+====================================
+Command: showenumvalues
+Parameters: 
+Anchor: cmdshowenumvalues  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowenumvalues
+Help text:
+<When this command is put in a comment block of an enum then doxygen will show the specified enum values for that enum, regardless of the value of ><SHOW_ENUM_VALUES§https://www.doxygen.nl/manual/config.html#cfg_show_enum_values§><.
+
+See also: command ><[\hideenumvalues]§https://www.doxygen.nl/manual/commands.html#cmdhideenumvalues§><, option ><SHOW_ENUM_VALUES§https://www.doxygen.nl/manual/config.html#cfg_show_enum_values§>
+------------------------------------
+
+
+====================================
+Command: hideenumvalues
+Parameters: 
+Anchor: cmdhideenumvalues  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdhideenumvalues
+Help text:
+<When this command is put in a comment block of an enum then doxygen will not show the specified enum values for that enum, regardless of the value of ><SHOW_ENUM_VALUES§https://www.doxygen.nl/manual/config.html#cfg_show_enum_values§><.
+
+See also: command ><[\showenumvalues]§https://www.doxygen.nl/manual/commands.html#cmdshowenumvalues§><, option ><SHOW_ENUM_VALUES§https://www.doxygen.nl/manual/config.html#cfg_show_enum_values§>
 ------------------------------------
 
 
@@ -331,7 +353,7 @@ Example: ><```
     */
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/class/html/class_test.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/class/html/class_test.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -374,7 +396,7 @@ Example: ><```
            /*!< Computes the minimum of \a x and \a y. */
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/define/html/define_8h.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/define/html/define_8h.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -436,7 +458,7 @@ Example: ><```
     */
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/enum/html/class_enum___test.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/enum/html/class_enum___test.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -445,7 +467,7 @@ Command: example
 Parameters: ['{lineno}'] <file-name>
 Anchor: cmdexample  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdexample
 Help text:
-<Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option ><```{lineno}```>< to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+<Indicates that a comment block contains documentation for a source code example. The name of the source file is <file-name>. The contents of this file will be included in the documentation, just after the documentation contained in the comment block. You can add option ><```{lineno}```>< to enable line numbers for the example if desired. All examples are placed in a list. The source code is scanned for documented members and classes. If any are found, the names are cross-referenced with the documentation. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 If <file-name> itself is not unique for the set of example files specified by the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag, you can include part of the absolute path to disambiguate it.
 
@@ -480,7 +502,7 @@ Example: ><```
    }
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/example/html/examples.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/example/html/examples.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: command ><[\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§><.>
 ------------------------------------
@@ -504,7 +526,7 @@ Help text:
 
 The file ><```manual.c```>< in the example directory shows how to use this command (see also ><[\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§>< for the complete file).
 
-><Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by doxygen.
+><Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: command ><[\implements]§https://www.doxygen.nl/manual/commands.html#cmdimplements§>< and command ><[\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§>
 ------------------------------------
@@ -534,7 +556,7 @@ Example: ><```
    extern int globalValue;
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/file/html/file_8h.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/file/html/file_8h.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><!Note:!>< In the above example ><JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§>< has been set to ><```YES```>< in the configuration file.>
 ------------------------------------
@@ -610,7 +632,7 @@ Example: ><```
     */
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/func/html/class_fn___test.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/func/html/class_fn___test.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: commands ><[\var]§https://www.doxygen.nl/manual/commands.html#cmdvar§><, ><[\property]§https://www.doxygen.nl/manual/commands.html#cmdproperty§><, and ><[\typedef]§https://www.doxygen.nl/manual/commands.html#cmdtypedef§><.>
 ------------------------------------
@@ -672,7 +694,7 @@ Help text:
 
 The file ><```manual.c```>< in the example directory shows how to use this command (see also ><[\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§>< for the complete file).
 
-><Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by doxygen.
+><Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: command ><[\extends]§https://www.doxygen.nl/manual/commands.html#cmdextends§>< and command ><[\memberof]§https://www.doxygen.nl/manual/commands.html#cmdmemberof§>
 ------------------------------------
@@ -722,7 +744,7 @@ Anchor: cmdmainpage  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html
 Help text:
 <If the ><```\mainpage```>< command is placed in a comment block the block is used to customize the index page (in HTML) or the first chapter (in LaTeX).
 
-The title argument is optional and replaces the default title that doxygen normally generates. If you do not want any title you can specify ><```notitle```>< as the argument of ><```\mainpage```><.
+The title argument is optional and replaces the default title that Doxygen normally generates. If you do not want any title you can specify ><```notitle```>< as the argument of ><```\mainpage```><.
 
 Here is an example:
 ><```
@@ -844,7 +866,7 @@ Example: The file ><```manual.c```>< in the example directory shows how to use t
     
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/manual/html/struct_car.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: commands ><[\extends]§https://www.doxygen.nl/manual/commands.html#cmdextends§><, ><[\implements]§https://www.doxygen.nl/manual/commands.html#cmdimplements§><, ><[\public]§https://www.doxygen.nl/manual/commands.html#cmdpublic§><, ><[\protected]§https://www.doxygen.nl/manual/commands.html#cmdprotected§>< and ><[\private]§https://www.doxygen.nl/manual/commands.html#cmdprivate§><.>
 ------------------------------------
@@ -884,7 +906,7 @@ Command: nosubgrouping
 Parameters: 
 Anchor: cmdnosubgrouping  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdnosubgrouping
 Help text:
-<This command can be put in the documentation of a class. It can be used in combination with member grouping to avoid that doxygen puts a member group as a subgroup of a Public/Protected/Private/... section.
+<This command can be put in the documentation of a class. It can be used in combination with member grouping to avoid that Doxygen puts a member group as a subgroup of a Public/Protected/Private/... section.
 
 See also: commands ><[\publicsection]§https://www.doxygen.nl/manual/commands.html#cmdpublicsection§><, ><[\protectedsection]§https://www.doxygen.nl/manual/commands.html#cmdprotectedsection§>< and ><[\privatesection]§https://www.doxygen.nl/manual/commands.html#cmdprivatesection§><.>
 ------------------------------------
@@ -939,7 +961,7 @@ Example: ><```
     
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/overload/html/class_overload___test.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/overload/html/class_overload___test.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -977,7 +999,7 @@ Example: ><```
    */
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/page/html/page1.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/page/html/page1.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><Note: The <name> argument consists of a combination of letters and number digits. If you wish to use upper case letters (e.g. ><```MYPAGE1```><), or mixed case letters (e.g. ><```MyPage1```><) in the <name> argument, you should set ><CASE_SENSE_NAMES§https://www.doxygen.nl/manual/config.html#cfg_case_sense_names§>< to ><```YES```><.
  However, this is advisable only if your file system is case sensitive. 
@@ -995,7 +1017,7 @@ Anchor: cmdprivate  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 <Indicates that the member documented by the comment block is private, i.e., should only be accessed by other members in the same class.
 
-Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
+Note that Doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
 For starting a section of private members, in a way similar to the "private:" class marker in C++, use ><[\privatesection]§https://www.doxygen.nl/manual/commands.html#cmdprivatesection§><.
 
@@ -1032,7 +1054,7 @@ Anchor: cmdprotected  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.htm
 Help text:
 <Indicates that the member documented by the comment block is protected, i.e., should only be accessed by other members in the same or derived classes.
 
-Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
+Note that Doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
 For starting a section of protected members, in a way similar to the "protected:" class marker in C++, use ><[\protectedsection]§https://www.doxygen.nl/manual/commands.html#cmdprotectedsection§><.
 
@@ -1069,7 +1091,7 @@ Anchor: cmdpublic  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#c
 Help text:
 <Indicates that the member documented by the comment block is public, i.e., can be accessed by any other class or function.
 
-Note that doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
+Note that Doxygen automatically detects the protection level of members in object-oriented languages. This command is intended for use only when the language does not support the concept of protection level natively (e.g. C, PHP 4).
 
 For starting a section of public members, in a way similar to the "public:" class marker in C++, use ><[\publicsection]§https://www.doxygen.nl/manual/commands.html#cmdpublicsection§><.
 
@@ -1132,7 +1154,7 @@ Example: ><```
    }
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/relates/html/class_string.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/relates/html/class_string.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -1288,7 +1310,7 @@ Example: ><```
    class SomeNiceClass {};
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/author/html/class_some_nice_class.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/author/html/class_some_nice_class.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -1330,7 +1352,7 @@ Command: cond
 Parameters: [(section-label)]
 Anchor: cmdcond  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcond
 Help text:
-<Starts a conditional section that ends with a corresponding ><[\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§>< command, which is typically found in another comment block. The main purpose of this pair of commands is to (conditionally) exclude part of a file from processing (in older version of doxygen this could only be achieved using C preprocessor commands).
+<Starts a conditional section that ends with a corresponding ><[\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§>< command, which is typically found in another comment block. The main purpose of this pair of commands is to (conditionally) exclude part of a file from processing (in older version of Doxygen this could only be achieved using C preprocessor commands).
 
 The section between ><```\cond```>< and ><[\endcond]§https://www.doxygen.nl/manual/commands.html#cmdendcond§>< can be included by adding its section label to the ><ENABLED_SECTIONS§https://www.doxygen.nl/manual/config.html#cfg_enabled_sections§>< configuration option. If the section label is omitted, the section will be excluded from processing unconditionally. The section label can be a logical expression build of section labels, round brackets, && (AND), || (OR) and ! (NOT). If you use an expression you need to wrap it in round brackets, i.e ><```\cond (!LABEL1 && LABEL2)```><.
 
@@ -1722,7 +1744,7 @@ Example: ><```
    class Par_Test {};
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/par/html/class_par___test.html§>< for the corresponding HTML documentation that is generated by doxygen.>
+Click ><here§https://www.doxygen.nl/manual/examples/par/html/class_par___test.html§>< for the corresponding HTML documentation that is generated by Doxygen.>
 ------------------------------------
 
 
@@ -1733,7 +1755,7 @@ Anchor: cmdparam  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cm
 Help text:
 <Starts a parameter description for a function parameter with name <parameter-name>, followed by a description of the parameter. The existence of the parameter is checked and a warning is given if the documentation of this (or any other) parameter is missing or not present in the function declaration or definition.
 
-The ><```\param```>< command has an optional attribute, <dir>, specifying the direction of the parameter. Possible values are "[in]", "[in,out]", and "[out]", note the [square] brackets in this description. Note that it is also possible to put whitespace between the command and the <dir>. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
+The ><```\param```>< command has an optional attribute, <dir>, specifying the direction of the parameter. Possible values are "[in]", "[out]", and "[in,out]"; note the [square] brackets in this description. For the bidirecional values, directions "in" and "out" can be specified in any order, and they can either be written altogether, or separated with a comma (><```,```><) or a space. That means that for example values "[outin]" or "[in out]" are also valid. Note that it is also possible to put whitespace between the command and the <dir>. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
 ><```
    /*!
     * Copies bytes from a source memory area to a destination memory area,
@@ -2070,7 +2092,7 @@ Command: link
 Parameters: <link-object>
 Anchor: cmdlink  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdlink
 Help text:
-<The links that are automatically generated by doxygen always have the name of the object they point to as link-text.
+<The links that are automatically generated by Doxygen always have the name of the object they point to as link-text.
 
 The ><```\link```>< command can be used to create a link to an object (a file, class, or member) with a user specified link-text. The link command should end with an ><[\endlink]§https://www.doxygen.nl/manual/commands.html#cmdendlink§>< command. All text between the ><```\link```>< and ><[\endlink]§https://www.doxygen.nl/manual/commands.html#cmdendlink§>< commands serves as text for a link to the <link-object> specified as the first argument of ><```\link```><.
 
@@ -2254,7 +2276,7 @@ Command: dontinclude
 Parameters: ['{lineno}'] <file-name>
 Anchor: cmddontinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddontinclude
 Help text:
-<This command can be used to parse a source file without actually verbatim including it in the documentation (as the ><[\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§>< command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+<This command can be used to parse a source file without actually verbatim including it in the documentation (as the ><[\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§>< command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 You can add option ><```lineno```>< to enable line numbers for the included code if desired.
 
@@ -2294,7 +2316,7 @@ Example: ><```
    }
 
 ```><  
-Click ><here§https://www.doxygen.nl/manual/examples/include/html/pag_example.html§>< for the corresponding HTML documentation that is generated by doxygen.
+Click ><here§https://www.doxygen.nl/manual/examples/include/html/pag_example.html§>< for the corresponding HTML documentation that is generated by Doxygen.
 
 ><See also: commands ><[\line]§https://www.doxygen.nl/manual/commands.html#cmdline§><, ><[\skip]§https://www.doxygen.nl/manual/commands.html#cmdskip§><, ><[\skipline]§https://www.doxygen.nl/manual/commands.html#cmdskipline§><, ><[\until]§https://www.doxygen.nl/manual/commands.html#cmduntil§><, and ><[\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§><.>
 ------------------------------------
@@ -2305,7 +2327,7 @@ Command: include
 Parameters: ['{'option'}'] <file-name>
 Anchor: cmdinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdinclude
 Help text:
-<This command can be used to include a source file as a block of code. The command takes the name of an include file as an argument. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+<This command can be used to include a source file as a block of code. The command takes the name of an include file as an argument. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 If <file-name> itself is not unique for the set of example files specified by the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag, you can include part of the absolute path to disambiguate it.
 
@@ -2322,7 +2344,7 @@ Alternatively, the ><[\snippet]§https://www.doxygen.nl/manual/commands.html#cmd
 The ><```option```>< can either be ><```lineno```><, or ><```doc```><, and additionally ><```local```>< can be specified.
     • The ><```option```>< ><```lineno```>< can be used to enable line numbers for the included code if desired.
     • The ><```option```>< ><```doc```>< can be used to treat the file as documentation rather than code.
-    • The ><```option```>< ><```local```>< can be used make doxygen 
+    • The ><```option```>< ><```local```>< can be used make Doxygen 
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
 
@@ -2449,7 +2471,7 @@ The ><```option```>< can either be ><```lineno```><, ><```trimleft```>< or ><```
     • The ><```option```>< ><```lineno```>< can be used to enable line numbers for the included code if desired.
     • The ><```option```>< ><```trimleft```>< can be used to remove the common spacing in front of all lines (also taking in account the setting of the ><TAB_SIZE§https://www.doxygen.nl/manual/config.html#cfg_tab_size§>< tag).
     • The ><```option```>< ><```doc```>< can be used to treat the file as documentation rather than code.
-    • The ><```option```>< ><```local```>< can be used make doxygen 
+    • The ><```option```>< ><```local```>< can be used make Doxygen 
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
 
@@ -2515,7 +2537,7 @@ Anchor: cmdverbinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.h
 Help text:
 <This command includes the contents of the file <file-name> verbatim in the documentation. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\verbatim]§https://www.doxygen.nl/manual/commands.html#cmdverbatim§>< and ><[\endverbatim]§https://www.doxygen.nl/manual/commands.html#cmdendverbatim§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.>
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.>
 ------------------------------------
 
 
@@ -2526,9 +2548,9 @@ Anchor: cmdhtmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.h
 Help text:
 <This command includes the contents of the file <file-name> as is in the HTML documentation and tagged with ><```<htmlonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< commands around it.
 
-Normally the contents of the file indicated by ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlinclude[block]```>< to make doxygen end the current paragraph and restart after the file is included.
+Normally the contents of the file indicated by ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlinclude[block]```>< to make Doxygen end the current paragraph and restart after the file is included.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§><, ><[\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§><, ><[\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§><, ><[\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§><, ><[\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§>< and ><[\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§><.>
 ------------------------------------
@@ -2541,7 +2563,7 @@ Anchor: cmdlatexinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.
 Help text:
 <This command includes the contents of the file <file-name> as is in the LaTeX documentation and tagged with ><```<latexonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§>< and ><[\endlatexonly]§https://www.doxygen.nl/manual/commands.html#cmdendlatexonly§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\latexonly]§https://www.doxygen.nl/manual/commands.html#cmdlatexonly§><, ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§><, ><[\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§><, ><[\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§><, ><[\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§>< and ><[\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§><.>
 ------------------------------------
@@ -2554,7 +2576,7 @@ Anchor: cmdrtfinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.ht
 Help text:
 <This command includes the contents of the file <file-name> as is in the RTF documentation and tagged with ><```<rtfonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§>< and ><[\endrtfonly]§https://www.doxygen.nl/manual/commands.html#cmdendrtfonly§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\rtfonly]§https://www.doxygen.nl/manual/commands.html#cmdrtfonly§><, ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§><, ><[\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§><, ><[\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§><, ><[\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§>< and ><[\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§><.>
 ------------------------------------
@@ -2567,7 +2589,7 @@ Anchor: cmdmaninclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.ht
 Help text:
 <This command includes the contents of the file <file-name> as is in the MAN documentation and tagged with ><```<manonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§>< and ><[\endmanonly]§https://www.doxygen.nl/manual/commands.html#cmdendmanonly§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\manonly]§https://www.doxygen.nl/manual/commands.html#cmdmanonly§><, ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§><, ><[\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§><, ><[\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§><, ><[\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§>< and ><[\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§><.>
 ------------------------------------
@@ -2580,7 +2602,7 @@ Anchor: cmddocbookinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/command
 Help text:
 <This command includes the contents of the file <file-name> as is in the DocBook documentation and tagged with ><```<docbookonly>```>< in the generated XML output. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§>< and ><[\enddocbookonly]§https://www.doxygen.nl/manual/commands.html#cmdenddocbookonly§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\docbookonly]§https://www.doxygen.nl/manual/commands.html#cmddocbookonly§><, ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§><, ><[\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§><, ><[\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§><, ><[\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§>< and ><[\xmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdxmlinclude§><.>
 ------------------------------------
@@ -2593,7 +2615,7 @@ Anchor: cmdxmlinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.ht
 Help text:
 <This command includes contents of the file <file-name> as is in the XML documentation. The command is equivalent to pasting the contents of the file in the documentation and placing ><[\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§>< and ><[\endxmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendxmlonly§>< commands around it.
 
-Files or directories that doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of doxygen's configuration file.
+Files or directories that Doxygen should look for can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
 See also: command ><[\xmlonly]§https://www.doxygen.nl/manual/commands.html#cmdxmlonly§><, ><[\htmlinclude]§https://www.doxygen.nl/manual/commands.html#cmdhtmlinclude§><, ><[\latexinclude]§https://www.doxygen.nl/manual/commands.html#cmdlatexinclude§><, ><[\rtfinclude]§https://www.doxygen.nl/manual/commands.html#cmdrtfinclude§><, ><[\maninclude]§https://www.doxygen.nl/manual/commands.html#cmdmaninclude§>< and ><[\docbookinclude]§https://www.doxygen.nl/manual/commands.html#cmddocbookinclude§><.>
 ------------------------------------
@@ -2683,7 +2705,7 @@ Help text:
 
 By default the language that is assumed for syntax highlighting is based on the location where the ><```\code```>< block was found. If this part of a Python file for instance, the syntax highlight will be done according to the Python syntax.
 
-If it is unclear from the context which language is meant (for instance the comment is in a ><```.txt```>< or ><```.markdown```>< file) then you can also explicitly indicate the language, by putting the file extension typically that doxygen associated with the language in curly brackets after the code block. Here is an example:
+If it is unclear from the context which language is meant (for instance the comment is in a ><```.txt```>< or ><```.markdown```>< file) then you can also explicitly indicate the language, by putting the file extension typically that Doxygen associated with the language in curly brackets after the code block. Here is an example:
 
 ><```     \code{.py}
      class Python:
@@ -2694,7 +2716,7 @@ If it is unclear from the context which language is meant (for instance the comm
      class Cpp {};
      \endcode
 
-```><If the contents of the code block are in a language that doxygen cannot parse, doxygen will just show the output as-is. You can make this explicit using .unparsed, or by giving some other extension that doxygen doesn't support, e.g.
+```><If the contents of the code block are in a language that Doxygen cannot parse, Doxygen will just show the output as-is. You can make this explicit using .unparsed, or by giving some other extension that Doxygen doesn't support, e.g.
 
 ><```     \code{.unparsed}
      Show this as-is please
@@ -2780,11 +2802,11 @@ The first argument is optional and can be used to specify the caption that is di
 
 The second argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph ><Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§>< with the ><[\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§>< command.
 
-The nodes of a graph can be made clickable by using the URL attribute. By using the command ><[\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§>< inside the URL value you can conveniently link to an item inside doxygen. Here is an example:
+The nodes of a graph can be made clickable by using the URL attribute. By using the command ><[\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§>< inside the URL value you can conveniently link to an item inside Doxygen. Here is an example:
 
 ><!Note:!><
 	usage of this command requires that ><HAVE_DOT§https://www.doxygen.nl/manual/config.html#cfg_have_dot§>< is set to ><```YES```><
-	doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
+	Doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
 
 ><```   /*! class B */
    class B {};
@@ -2837,8 +2859,8 @@ The second argument is also optional and can be used to specify the width or hei
 
 ><!Note:!><
 	The text fragment should only include the part of the message sequence chart that is within the ><```msc {...}```>< block (this is different from ><[\mscfile]§https://www.doxygen.nl/manual/commands.html#cmdmscfile§><).
-	mscgen is now built in into doxygen
-	doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
+	mscgen is now built in into Doxygen
+	Doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
 
 Here is an example of the use of the ><```\msc```>< command.
 ><```
@@ -2885,27 +2907,27 @@ Help text:
 
 ><!Note:!><
 	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ><```jar```>< files, for details see the PlantUML documentation. This also is valid for the ><```<engine>```><s ><```latex```>< and ><```math```><. The location of the PlantUML file should be specified using ><PLANTUML_JAR_PATH§https://www.doxygen.nl/manual/config.html#cfg_plantuml_jar_path§><. The other jar files should also reside in this directory.
-	The use of the ><```<engine>```>< ><```ditaa```>< is not possible in LaTeX as PlantUML only supports the ><```png```>< format and doxygen requires, temporary, ><```eps```>< output.
+	The use of the ><```<engine>```>< ><```ditaa```>< is not possible in LaTeX as PlantUML only supports the ><```png```>< format and Doxygen requires, temporary, ><```eps```>< output.
 
-Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```><, ><```ebnf```>< and ><```files```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
+Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```><, ><```ebnf```><, ><```files```><, ><```chen```>< and ><```chronology```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
 
-The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running doxygen, you can also add the name of the image file after ><```\startuml```>< and inside curly brackets as option, i.e.
+The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running Doxygen, you can also add the name of the image file after ><```\startuml```>< and inside curly brackets as option, i.e.
 ><```
      @startuml{myimage.png} "Image Caption" width=5cm
      Alice -> Bob : Hello
      @enduml
 
-```><When the name of the image is specified, doxygen will generate an image with that name. Without the name doxygen will choose a name automatically.
+```><When the name of the image is specified, Doxygen will generate an image with that name. Without the name Doxygen will choose a name automatically.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
 The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph ><Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§>< with the ><[\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§>< command.
 
 ><!Note:!><
-	doxygen does not support the Plantuml commands like ><```@startjson```><, by design, directly but the support can be accomplished, by the user, by adding to the doxygen settings file: ><```
+	Doxygen does not support the Plantuml commands like ><```@startjson```><, by design, directly but the support can be accomplished, by the user, by adding to the Doxygen settings file: ><```
      ALIASES += startjson=@startuml{json}
      ALIASES += endjson=@enduml```><
-	doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
+	Doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
 
 Here is an example of the use of the ><```\startuml```>< command.
 ><```
@@ -2946,7 +2968,7 @@ Anchor: cmddotfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 <Inserts an image generated by dot from <file> into the documentation.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the ><DOTFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_dotfile_dirs§>< tag. If the dot file is found it will be used as an input file to the dot tool. The resulting image will be put into the correct output directory. If the dot file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. Doxygen will look for files in the paths (or files) that you specified after the ><DOTFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_dotfile_dirs§>< tag. If the dot file is found it will be used as an input file to the dot tool. The resulting image will be put into the correct output directory. If the dot file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
@@ -2965,7 +2987,7 @@ Anchor: cmdmscfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 <Inserts an image generated by mscgen from <file> into the documentation. See ><https://www.mcternan.me.uk/mscgen/§https://www.mcternan.me.uk/mscgen/§>< for examples.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the ><MSCFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_mscfile_dirs§>< tag. If the msc file is found it will be used as an input file to the built in mscgen tool. The resulting image will be put into the correct output directory. If the msc file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. Doxygen will look for files in the paths (or files) that you specified after the ><MSCFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_mscfile_dirs§>< tag. If the msc file is found it will be used as an input file to the built in mscgen tool. The resulting image will be put into the correct output directory. If the msc file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
@@ -2984,7 +3006,7 @@ Anchor: cmddiafile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 <Inserts an image made in dia from <file> into the documentation.
 
-The first argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the ><DIAFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_diafile_dirs§>< tag. If the dia file is found it will be used as an input file dia. The resulting image will be put into the correct output directory. If the dia file name contains spaces you'll have to put quotes ("...") around it.
+The first argument specifies the file name of the image. Doxygen will look for files in the paths (or files) that you specified after the ><DIAFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_diafile_dirs§>< tag. If the dia file is found it will be used as an input file dia. The resulting image will be put into the correct output directory. If the dia file name contains spaces you'll have to put quotes ("...") around it.
 
 The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
@@ -2997,7 +3019,7 @@ Command: doxyconfig
 Parameters: <config_option>
 Anchor: cmddoxyconfig  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmddoxyconfig
 Help text:
-<Displays the value of the configuration option ><```<config_option>```>< as used in doxygen's configuration file that is in use when this command is processed.
+<Displays the value of the configuration option ><```<config_option>```>< as used in Doxygen's configuration file that is in use when this command is processed.
 
 Example: When creating this manual the following: ><```
      ... Project name = \doxyconfig PROJECT_NAME ...
@@ -3237,9 +3259,9 @@ Anchor: cmdhtmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html
 Help text:
 <Starts a block of text that only will be verbatim included in the generated HTML documentation and tagged with ><```<htmlonly>```>< in the generated XML output. The block ends with a ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< command.
 
-This command can be used to include HTML code that is too complex for doxygen (i.e. applets, java-scripts, and HTML tags that require specific attributes).
+This command can be used to include HTML code that is too complex for Doxygen (i.e. applets, java-scripts, and HTML tags that require specific attributes).
 
-Normally the contents between ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlonly[block]```>< to make doxygen end the current paragraph and restart it after \endhtmlonly.
+Normally the contents between ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< is inserted as-is. When you want to insert a HTML fragment that has block scope like a table or list which should appear outside <p>..</p>, this can lead to invalid HTML. You can use ><```\htmlonly[block]```>< to make Doxygen end the current paragraph and restart it after ><```\endhtmlonly```><.
 
 ><!Note:!>< environment variables (like $(HOME) ) are resolved inside a HTML-only block.
 
@@ -3256,7 +3278,7 @@ Help text:
 
 The first argument specifies the output format in which the image should be embedded. Currently, the following values are supported: ><```html```><, ><```latex```><, ><```docbook```><, ><```rtf```>< and ><```xml```><.
 
-The second argument specifies the file name of the image. doxygen will look for files in the paths (or files) that you specified after the ><IMAGE_PATH§https://www.doxygen.nl/manual/config.html#cfg_image_path§>< tag. If the image is found it will be copied to the correct output directory. If the image name contains spaces you'll have to put quotes ("...") around the name. You can also specify an absolute URL instead of a file name, but then doxygen does not copy the image nor check its existence.
+The second argument specifies the file name of the image. Doxygen will look for files in the paths (or files) that you specified after the ><IMAGE_PATH§https://www.doxygen.nl/manual/config.html#cfg_image_path§>< tag. If the image is found it will be copied to the correct output directory. If the image name contains spaces you'll have to put quotes ("...") around the name. You can also specify an absolute URL instead of a file name, but then Doxygen does not copy the image nor check its existence.
 
 The third argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified on a single line and between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
 
@@ -3291,7 +3313,7 @@ Anchor: cmdlatexonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.htm
 Help text:
 <Starts a block of text that only will be verbatim included in the generated LaTeX documentation and tagged with ><```<latexonly>```>< in the generated XML output. The block ends with a ><[\endlatexonly]§https://www.doxygen.nl/manual/commands.html#cmdendlatexonly§>< command.
 
-This command can be used to include LaTeX code that is too complex for doxygen (i.e. images, formulas, special characters). You can use the ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< pair to provide a proper HTML alternative.
+This command can be used to include LaTeX code that is too complex for Doxygen (i.e. images, formulas, special characters). You can use the ><[\htmlonly]§https://www.doxygen.nl/manual/commands.html#cmdhtmlonly§>< and ><[\endhtmlonly]§https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly§>< pair to provide a proper HTML alternative.
 
 Note: environment variables (like $(HOME) ) are resolved inside a LaTeX-only block.
 
@@ -3376,7 +3398,7 @@ Anchor: cmdrtfonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#
 Help text:
 <Starts a block of text that only will be verbatim included in the generated RTF documentation and tagged with ><```<rtfonly>```>< in the generated XML output. The block ends with a ><[\endrtfonly]§https://www.doxygen.nl/manual/commands.html#cmdendrtfonly§>< command.
 
-This command can be used to include RTF code that is too complex for doxygen.
+This command can be used to include RTF code that is too complex for Doxygen.
 
 Note: environment variables (like $(HOME) ) are resolved inside a RTF-only block.
 
@@ -3415,7 +3437,7 @@ Command: \
 Parameters: 
 Anchor: cmdbackslash  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdbackslash
 Help text:
-<This command writes a backslash character (><```\```><) to the output. The backslash has to be escaped in some cases because doxygen uses it to detect commands.>
+<This command writes a backslash character (><```\```><) to the output. The backslash has to be escaped in some cases because Doxygen uses it to detect commands.>
 ------------------------------------
 
 
@@ -3424,7 +3446,7 @@ Command: @
 Parameters: 
 Anchor: cmdat  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdat
 Help text:
-<This command writes an at-sign (><```@```><) to the output. The at-sign has to be escaped in some cases because doxygen uses it to detect Javadoc commands.>
+<This command writes an at-sign (><```@```><) to the output. The at-sign has to be escaped in some cases because Doxygen uses it to detect Javadoc commands.>
 ------------------------------------
 
 
