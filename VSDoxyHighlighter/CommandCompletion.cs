@@ -343,7 +343,8 @@ namespace VSDoxyHighlighter
               new[] {
                   new ParameterAutocompleteSingleEntry() { name = "[in]", context = cDirContext, icon = cParamInOutImage },
                   new ParameterAutocompleteSingleEntry() { name = "[out]", context = cDirContext, icon = cParamInOutImage },
-                  new ParameterAutocompleteSingleEntry() { name = "[in,out]", context = cDirContext, icon = cParamInOutImage }
+                  new ParameterAutocompleteSingleEntry() { name = "[in,out]", context = cDirContext, icon = cParamInOutImage },
+                  new ParameterAutocompleteSingleEntry() { name = "[inout]", context = cDirContext, icon = cParamInOutImage },
               });
           }
 

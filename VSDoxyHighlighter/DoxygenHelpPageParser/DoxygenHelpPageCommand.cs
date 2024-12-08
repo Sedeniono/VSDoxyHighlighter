@@ -227,6 +227,7 @@ namespace VSDoxyHighlighter
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{extension}");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "fileinfo", "fileinfo{name}");
 
+      InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[inout]");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in,out]");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[out]");
       InsertCommandVariationAfterOriginal(cAmendedDoxygenCommands, "param", "param[in]");

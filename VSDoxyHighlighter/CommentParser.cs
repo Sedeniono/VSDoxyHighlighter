@@ -400,21 +400,23 @@ namespace VSDoxyHighlighter
       // at most once; duplicated or unknown options results in Doxygen parsing the \param command incorrectly.
       // Especially note:
       // - This behavior is very different to commands with braces "{...}" such as \snippet:
-      //   - Doxygen does not allow whitespace before the "{".
-      //   - Doxygen does actually allow duplicated options in braces "{...}".
-      //   - Doxygen ignores unknown options in braces "{...}".
+      //   - Doxygen does not allow whitespace before the "{". But Doxygen does allow whitespace before "[".
+      //   - Doxygen does actually allow duplicated options in braces "{...}", but not in "[...]" of \param.
+      //   - Doxygen ignores unknown options in braces "{...}", but in \param it does causes parsing failures.
       // - This behavior is also different to other commands with brackets "[...]". At the time of writing this,
       //   there are only two other such commands: \htmlonly[block] and \htmlinclude[block]. Apparently,
       //   \htmlonly allows a space before the "[" while \htmlinclude does not. Both do not allow whitespace
       //   within the brackets.
+      // - The comma is optional: "inout", "in out", "outin" and "out in" are all valid.
+      //
       // => The \param command has very special behavior. Hence we do not parse it the same way as e.g. \snippet,
       //    which uses the FragmentsMatcherForFirstOptionalClampedOptions machinery. Instead, we use a pure regex.
       //
-      // https://regex101.com/r/PPNg3R/1
+      // https://regex101.com/r/mEmxhN/1
       //
       //                                                                     Optional "[in,out]" parameter                                             name of the function param
-      //                                                               ___________________________________________________________________            ________________
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*,[ \t]*out|out[ \t]*,[ \t]*in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
+      //                                                               _________________________________________________________________________            ________________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)

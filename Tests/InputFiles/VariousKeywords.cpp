@@ -178,7 +178,12 @@ Some text \lineinfo more text
 \param  
 \param  [ out , in	]
 \param  [ out, in]  
+\param[outin] outinParam Some description
+\param[out  in ] outinParam Some description
+\param[ inout] outinParam Some description
+\param[ in out] outinParam Some description
 \param > The ">" should not be formatted because it is not a valid parameter.
+\param [in]someParam Only param gets formatted, but not "someParam" because of missing space after ]. Doxygen parses it incorrectly.
 \param[ out Nothing should be formatted because of invalid syntax (missing closing bracket).
 \param[invalid] Nothing should be formatted because "invalid" is not allowed.
 \param[out,invalid] Nothing should be formatted because "invalid" is not allowed.
