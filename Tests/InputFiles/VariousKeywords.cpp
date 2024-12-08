@@ -32,6 +32,10 @@
 \hideinheritancegraph
 \groupgraph
 \hidegroupgraph
+This\showenumvalues command should be highlighted.
+This \showenumvalues command should be highlighted.
+Nothing\showenumvaluesshould be highlighted.
+@hideenumvalues
 text \qualifier quali single word should be matched
 text \qualifier "SOMEQUALI text" quote should be matched
 text\qualifier "Another" quote should be matched

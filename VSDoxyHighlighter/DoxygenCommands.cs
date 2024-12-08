@@ -555,7 +555,8 @@ namespace VSDoxyHighlighter
           new List<string> {
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc",
             "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
-            "endverbatim", "endxmlonly", "n"
+            "endverbatim", "endxmlonly", "n",
+            "showenumvalues", "hideenumvalues"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAnywhere_WhitespaceAfterwardsRequiredButNoParam),
           new ClassificationEnum[] { ClassificationEnum.Command }

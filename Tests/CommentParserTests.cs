@@ -216,6 +216,9 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\hideinheritancegraph", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\groupgraph", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\hidegroupgraph", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\showenumvalues", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\showenumvalues", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@hideenumvalues", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\qualifier", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"quali", ClassificationEnum.Parameter1),
