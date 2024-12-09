@@ -1387,20 +1387,24 @@ namespace VSDoxyHighlighter.Tests
       var formatter = Utils.CreateDefaultCommentParser();
       var actualFragmentGroups = formatter.Parse(
         Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
+      var actualFragments = Utils.ToFlatFragmentList(actualFragmentGroups);
 
       var expectedFragments = new List<FormattedFragment>() {
         new FormattedFragment(4, 13, ClassificationEnum.InlineCode),
         new FormattedFragment(30, 8, ClassificationEnum.InlineCode),
         new FormattedFragment(48, 13, ClassificationEnum.InlineCode),
         new FormattedFragment(72, 6, ClassificationEnum.InlineCode),
-        new FormattedFragment(94, 2, ClassificationEnum.InlineCode),
         new FormattedFragment(114, 7, ClassificationEnum.InlineCode),
         new FormattedFragment(121, 7, ClassificationEnum.InlineCode),
         new FormattedFragment(134, 26, ClassificationEnum.InlineCode),
         new FormattedFragment(167, 45, ClassificationEnum.InlineCode),
+        new FormattedFragment(227, 31, ClassificationEnum.InlineCode),
+        new FormattedFragment(263, 6, ClassificationEnum.InlineCode),
+        new FormattedFragment(273, 23, ClassificationEnum.InlineCode),
+        new FormattedFragment(310, 5, ClassificationEnum.InlineCode),
       };
 
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
+      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 

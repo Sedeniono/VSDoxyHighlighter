@@ -260,10 +260,7 @@ namespace VSDoxyHighlighter
       // the found fragments, and in case of overlapping fragments, selects the "appropriate" one.
 
       // `inline code`
-      matchers.Add(new FragmentsMatcherRegex(
-        new Regex(@"(`.*?`)", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.InlineCode }
-      ));
+      matchers.Add(new FragmentsMatcherMarkdownBackticks());
 
       // Add all Doxygen commands
       foreach (DoxygenCommandGroup cmdGroup in doxygenCommands) {
@@ -892,5 +889,78 @@ namespace VSDoxyHighlighter
 
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
     private readonly Regex[] mAllowedClampedOptionsRegex;
+  }
+
+
+  internal class FragmentsMatcherMarkdownBackticks : IFragmentsMatcher 
+  {
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      int searchStartIdx = 0;
+      List<FormattedFragmentGroup> fragments = null;
+
+      while (searchStartIdx < text.Length) {
+        Debug.Assert(searchStartIdx >= 0);
+        (int startMarkerStartIdx, int startMarkerEndIdx) = FindBacktickFragmentStart(text, searchStartIdx);
+        if (startMarkerStartIdx < 0) {
+          break;
+        }
+
+        fragments = fragments ?? new List<FormattedFragmentGroup>();
+        int endMarkerEndIdx = FindNextBacktickFragmentEnd(text, startMarkerStartIdx, startMarkerEndIdx);
+        if (endMarkerEndIdx < 0) {
+          break;
+        }
+
+        // For now, we do not support multiline code fragments, because all the other Regex based
+        // searches do not really support it. (Also, to properly support it, we would need additional
+        // logic because often Visual Studio passes individual lines into IClassifier.)
+        int newlineIdx = text.IndexOf('\n', startMarkerEndIdx);
+        if (startMarkerEndIdx < newlineIdx && newlineIdx < endMarkerEndIdx) {
+          searchStartIdx = newlineIdx + 1;
+          continue;
+        }
+
+        int fragmentLength = endMarkerEndIdx - startMarkerStartIdx;
+        Debug.Assert(fragmentLength >= 0);
+        var fragment = new FormattedFragment(startMarkerStartIdx, fragmentLength, ClassificationEnum.InlineCode);
+        fragments.Add(new FormattedFragmentGroup(new List<FormattedFragment>() { fragment }));
+        searchStartIdx = endMarkerEndIdx;
+      }
+
+      return fragments ?? cEmptyList;
+    }
+
+    private (int startMarkerStartIdx, int startMarkerEndIdx) FindBacktickFragmentStart(string text, int searchStartIdx)
+    {
+      Debug.Assert(searchStartIdx >= 0);
+      int firstIdx = text.IndexOf('`', searchStartIdx);
+      if (firstIdx < 0) {
+        return (-1, -1);
+      }
+      int endIdx = firstIdx + 1;
+      while (endIdx < text.Length && text[endIdx] == '`') {
+        ++endIdx;
+      }
+      return (firstIdx, endIdx);
+    }
+
+    private int FindNextBacktickFragmentEnd(string text, int startMarkerStartIdx, int startMarkerEndIdx)
+    {
+      Debug.Assert(startMarkerStartIdx >= 0);
+      Debug.Assert(startMarkerEndIdx >= 0);
+      int startMarkerLength = startMarkerEndIdx - startMarkerStartIdx;
+      Debug.Assert(startMarkerLength > 0);
+      string endMarkerStr = new string('`', startMarkerLength);
+      int endMarkerStartIdx = text.IndexOf(endMarkerStr, startMarkerEndIdx, StringComparison.InvariantCulture);
+      if (endMarkerStartIdx < 0) {
+        return -1;
+      }
+
+      int endMarkerEndIdx = endMarkerStartIdx + startMarkerLength;
+      return endMarkerEndIdx;
+    }
+
+    private static readonly List<FormattedFragmentGroup> cEmptyList = new List<FormattedFragmentGroup>();
   }
 }
