@@ -158,20 +158,21 @@ namespace VSDoxyHighlighter
       }
 
       ImmutableArray<CompletionItem>.Builder itemsBuilder = null;
+      CompletionTarget? completionTarget = null;
       if (applicableToSpan.Start.Position > 0) {
         SnapshotPoint startPoint = applicableToSpan.Start.Subtract(1);
         char startChar = startPoint.GetChar();
         // '\' and '@' start a command.
         if (startChar == '\\' || startChar == '@') {
           itemsBuilder = PopulateAutcompleteBoxWithCommands(startChar);
-          session.Properties.AddProperty(typeof(CompletionTarget), CompletionTarget.Command);
+          completionTarget = CompletionTarget.Command;
         }
         // If the user typed a whitespace, we check whether it happend after a Doxygen command for which we
         // support autocompletion of the command's parameter, and if yes, populate the autocomplete box with possible parameter values.
         else if (AnyAdvancedAutocompleteEnabled() && (startChar == ' ' || startChar == '\t')) {
           try {
             itemsBuilder = await PopulateAutocompleteBoxForParameterOfDoxygenCommandAsync(startPoint, cancellationToken);
-            session.Properties.AddProperty(typeof(CompletionTarget), CompletionTarget.Parameter);
+            completionTarget = CompletionTarget.Parameter;
           }
           catch (Exception ex) {
             ActivityLog.LogError("VSDoxyHighlighter", $"Exception occurred while checking for parameter completion: {ex}");
@@ -180,6 +181,8 @@ namespace VSDoxyHighlighter
       }
 
       if (itemsBuilder != null) {
+        Debug.Assert(completionTarget != null);
+        session.Properties.AddProperty(typeof(CompletionTarget), completionTarget.Value);
         return new CompletionContext(itemsBuilder.ToImmutable(), null);
       }
       else {
