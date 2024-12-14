@@ -290,8 +290,8 @@ namespace VSDoxyHighlighter
         //      We also forbid "<" and ">" to rule out some false positives in C++ templates (until we implemented detection
         //      of whether we are actually in a comment or in code).
         // 
-        //                        1           2a     2b               2c                   2d               2e            3
-        //                __________________  __ ____________ _________________ __________________________ __ ____________________________
+        //                   1           2a     2b               2c                   2d              2e            3
+        //           __________________  __ ____________ _________________ __________________________ __ ____________________________
         new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
         new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
       ));
@@ -338,6 +338,8 @@ namespace VSDoxyHighlighter
     // Using "\b" is insufficient.
     private const string cWhitespaceAfterwards = @"(?:$|[ \t\n\r])";
 
+    // Regex to check if a line end or the end of the string follows.
+    private const string cLineEnd = @"[\n\r]|$";
 
     public static string BuildRegex_KeywordAtLineStart_NoParam(ICollection<string> keywords)
     {
@@ -379,13 +381,7 @@ namespace VSDoxyHighlighter
       // we make it optional. See the final "?" in the regex part (1).
       //
       // https://regex101.com/r/MKKI71/1
-      // Match one of the following 3:
-      // (1) First some whitespace, then, if existing, the next word
-      // (2) Or: End of line
-      // (3) Or: End of string
-      //                                                                         1               2    3
-      //                                                             _________________________|______|_
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_ParamCommand(ICollection<string> keywords)
@@ -413,7 +409,7 @@ namespace VSDoxyHighlighter
       //
       //                                                                     Optional "[in,out]" parameter                                             name of the function param
       //                                                               _________________________________________________________________________            ________________
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)
@@ -422,7 +418,7 @@ namespace VSDoxyHighlighter
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/yCZkWA/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^\n\r]+)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracketedParamWithoutSpaceBefore(
@@ -523,8 +519,8 @@ namespace VSDoxyHighlighter
       //
       // Note: Doxygen does not allow any whitespace before the "[", and requires a whitespace afterwards.
       // Note: The part inside the brackets "[...]" is parsed in a second step separately.
-      //                               Special important parts:  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv             vvvvv
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t]|[\n\r]|$))?(?:(?:[ \t]+([^\[][^\n\r]+)?)|[\n\r]?|$)";
+      //                               Special important parts:  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv             vvvvv
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(\[[^\]]*?\](?=[ \t]|{cLineEnd}))?(?:(?:[ \t]+([^\[][^\n\r]+)?)|[\n\r]?|$)";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1OptionalParamTillEnd(ICollection<string> keywords)
@@ -545,7 +541,7 @@ namespace VSDoxyHighlighter
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/qaaWBO/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]+)?(?:[ \t]+([^\n\r]*))?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd(
@@ -562,7 +558,7 @@ namespace VSDoxyHighlighter
       // Note: Doxygen does not allow any whitespace before the "{".
       // Note: The part inside the braces "{...}" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvv                      vv
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:(?:[ \t]+([^ \t\n\r{{]+)?(?:[ \t]+([^\n\r]*))?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd(
@@ -579,7 +575,7 @@ namespace VSDoxyHighlighter
       // Note: Doxygen does not allow any whitespace before the "{".
       // Note: The part inside the braces "{...}" is parsed in a second step separately.
       //                               Special important parts:  vvvvvvvvvvvvvv                vv
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:[ \t]+([^\n\r{{]*)?|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:[ \t]+([^\n\r{{]*)?|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredQuotedParam_1OptionalParamTillEnd(ICollection<string> keywords)
@@ -588,7 +584,7 @@ namespace VSDoxyHighlighter
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/8QcyXW/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(""[^\r\n]*?"")?(?:[ \t]+([^\n\r]*))?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamAsWord_1OptionalParamTillEnd(ICollection<string> keywords)
@@ -605,8 +601,8 @@ namespace VSDoxyHighlighter
       // (3) Optional parameter till the end
       // (4) In case (1-3) did not match anything, match the end of line or string, so that the keyword is highlighted even without parameters.
       //                                                                           1                    2                     3                4
-      //                                                            (        ________________ _______________________ ____________________) ________
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|[\n\r]|$)";
+      //                                                            (        ________________ _______________________ ____________________) __________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(ICollection<string> keywords)
@@ -615,14 +611,14 @@ namespace VSDoxyHighlighter
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/fCM8p7/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|[\n\r]|$)";
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+([^ \t\n\r]*)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWordOrQuoted(ICollection<string> keywords)
     {
       // https://regex101.com/r/yxbTV1/1
       string concatKeywords = ConcatKeywordsForRegex(keywords);
-      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:(?:[ \t]*((?:""[^""]*"")|(?:(?<=[ \t])[^ \t\n\r]*))?)|[\n\r]|$)";
+      return $@"({cCmdPrefix}(?:{concatKeywords}))\b(?:(?:[ \t]*((?:""[^""]*"")|(?:(?<=[ \t])[^ \t\n\r]*))?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord_1OptionalQuotedParam(ICollection<string> keywords)
@@ -654,8 +650,8 @@ namespace VSDoxyHighlighter
       // (3) If (1+2) did not match anything, match the newline or the end of the string. This ensures that we nevertheless
       //     highlight the keyword, even without parameters.
       //                                                           1a           1b                        1c      1d          2                   3
-      //                                                        ((____|{__________________________})+____________)_ _________________________  ________
-      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)?(?:[ \t]+(""[^\r\n]*?""))?)|[\n\r]|$)";
+      //                                                        ((____|{__________________________})+____________)_ _________________________  __________
+      return $@"\B({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+((?:\w|(?:(?:::)|\.(?=[^: \t\n\r])))+(?:\(.*?\))?)?(?:[ \t]+(""[^\r\n]*?""))?)|{cLineEnd})";
     }
 
     public const string cRegex_1OptionalCaption_1OptionalSizeIndication =
@@ -701,7 +697,7 @@ namespace VSDoxyHighlighter
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
       // actually treated as optional (highlight keyword even without parameters while typing).
       // https://regex101.com/r/cC8IMG/1
-      return $@"({cCmdPrefix}{concatKeywords})({{[^}}]*?}})?(?:(?:[ \t]+(?:(?i)(html|latex|docbook|rtf|xml)\b(?-i))?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|[\n\r]|$)";
+      return $@"({cCmdPrefix}{concatKeywords})({{[^}}]*?}})?(?:(?:[ \t]+(?:(?i)(html|latex|docbook|rtf|xml)\b(?-i))?{cRegexForOptionalFileWithOptionalQuotes}{cRegex_1OptionalCaption_1OptionalSizeIndication})|{cLineEnd})";
     }
 
 
