@@ -70,7 +70,7 @@ Especially, important messages such as warnings or notes are harder to overlook 
 - The syntax highlighting can be enabled in C/C++ comments starting with `/*`, `/**`, `/*!`, `//`, `///` or `//!`. The enabled comment types can be configured in the Visual Studio options under the VSDoxyHighlighter node. By default, syntax highlighting is not applied to `//` and `/*` comments because Doxygen does not parse those.
 - Just like Doxygen, the Javadoc style (commands prefixed by `@` instead of `\`) is also supported. For example, both `\brief` and `@brief` are highlighted.
 - [All commands](https://www.doxygen.nl/manual/commands.html) of Doxygen (<= 1.12.0) are supported.
-- Highlighting partially supports markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single backticks only).
+- Highlighting partially supports markdown: **`**bold**`**, __`__bold__`__, *`*italic*`*, _`_italic_`_, ~~`~~strikethrough~~`~~ (tildes), as well as `` `inline code` `` (single and multiple backticks, but within a single line only).
 - The extension comes with two different default color schemes, one for dark and one for light Visual Studio themes. The colors can also be configured. See the configuration section below for more information.
 - Syntax highlighting can be disabled entirely in the VSDoxyHighlighter options.
 
@@ -127,10 +127,10 @@ This feature can be disabled in the VSDoxyHighlighter options.
 ## Fonts and colors
 
 ### Classifications
-The extension comes with several so called "classifications". Those are the entires shown in the in the Visual Studio options &rarr; *Environment* &rarr; *Fonts and Colors*. All elements corresponding to the extension start with "VSDoxyHighlighter".
+The extension comes with several so called "classifications". Those are the entries shown in the in the Visual Studio options &rarr; *Environment* &rarr; *Fonts and Colors*. All elements corresponding to the extension start with "VSDoxyHighlighter".
 Feel free to change the colors to your liking.
 
-One thing that you might realize is that the color of ordinary text in "`///`"-comments might be different to the color in other comments.
+One thing that you might realize is that the color of ordinary text in "`///`"-comments might be different to the color in other comments, at least in light color themes.
 This has nothing to do with the extension. Visual Studio classifies "`///`"-comments as "XML Doc Comment" and formats them differently by default.
 You can change the color in the *Fonts and Colors* settings.
 
