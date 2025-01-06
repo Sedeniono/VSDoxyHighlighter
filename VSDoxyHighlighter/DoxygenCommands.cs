@@ -511,7 +511,6 @@ namespace VSDoxyHighlighter
       // Also used for \include-like commands.
       const string cSnippetRaise = @"raise[ \t]*=[ \t]*[0-5]";
       const string cSnippetPrefix = @"prefix[ \t]*=.*";
-      const string cSnippetDoc = "doc";
 
       // Options for \tableofcontents
       // E.g.: \tableofcontents{xml , html : 2 , latex,docbook:3}
@@ -780,7 +779,7 @@ namespace VSDoxyHighlighter
           },
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
-            allowedClampedOptionsRegex: new string[] { "lineno", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "lineno", "doc", "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
@@ -814,7 +813,7 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamTillEnd,
             // Option "doc" in \includedoc is actually supported by Doxygen (namely, it gets simply ignored).
-            allowedClampedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "doc", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1 }
         ),
@@ -855,7 +854,7 @@ namespace VSDoxyHighlighter
           },
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
-            allowedClampedOptionsRegex: new string[] { "lineno", "trimleft", cSnippetDoc, "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "lineno", "trimleft", "doc", "local", "strip", "nostrip", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
@@ -867,7 +866,7 @@ namespace VSDoxyHighlighter
           new DoxygenCommandsWithFirstOptionalClampedOptionsMatcherFactory(
             baseRegexStringGetter: CommentParser.BuildRegex_KeywordAtLineStart_1OptionalBracedParamWithoutSpaceBefore_1RequiredParamAsWord_1OptionalParamTillEnd,
             // Option "doc" in \snippetdoc is actually supported by Doxygen (namely, it gets simply ignored).
-            allowedClampedOptionsRegex: new string[] { cSnippetDoc, cSnippetRaise, cSnippetPrefix }
+            allowedClampedOptionsRegex: new string[] { "doc", cSnippetRaise, cSnippetPrefix }
           ),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter1, ClassificationEnum.Title }
         ),
