@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="VSDoxyHighlighter.b4227aaa-4a1b-43aa-83ba-df69f7a6118c" Version="1.8.0" Language="en-US" Publisher="Sedenion" />
+        <Identity Id="VSDoxyHighlighter.b4227aaa-4a1b-43aa-83ba-df69f7a6118c" Version="1.9.0" Language="en-US" Publisher="Sedenion" />
         <DisplayName>VSDoxyHighlighter</DisplayName>
         <Description xml:space="preserve">Extension for Visual Studio to provide syntax highlighting, IntelliSense and quick infos for doxygen/javadoc style comments in C/C++.</Description>
         <MoreInfo>https://github.com/Sedeniono/VSDoxyHighlighter</MoreInfo>
