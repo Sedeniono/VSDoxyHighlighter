@@ -2278,7 +2278,9 @@ Anchor: cmddontinclude  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.h
 Help text:
 <This command can be used to parse a source file without actually verbatim including it in the documentation (as the ><[\include]§https://www.doxygen.nl/manual/commands.html#cmdinclude§>< command does). This is useful if you want to divide the source file into smaller pieces and add documentation between the pieces. Source files or directories can be specified using the ><EXAMPLE_PATH§https://www.doxygen.nl/manual/config.html#cfg_example_path§>< tag of Doxygen's configuration file.
 
-You can add option ><```lineno```>< to enable line numbers for the included code if desired.
+You can add the option ><```lineno```>< to enable line numbers for the included code if desired.
+
+You can add the option ><```strip```>< that will always hide any special comments from the included code, overruling the ><STRIP_CODE_COMMENTS§https://www.doxygen.nl/manual/config.html#cfg_strip_code_comments§>< setting, or add the option ><```nostrip```>< to always show the special comments.
 
 The class and member declarations and definitions inside the code fragment are 'remembered' during the parsing of the comment block that contained the ><```\dontinclude```>< command.
 
@@ -2347,6 +2349,7 @@ The ><```option```>< can either be ><```lineno```><, or ><```doc```><, and addit
     • The ><```option```>< ><```local```>< can be used make Doxygen 
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
+    • The ><```option```>< ><```strip```>< can be used to always hide any special comments from the included code, overruling the ><STRIP_CODE_COMMENTS§https://www.doxygen.nl/manual/config.html#cfg_strip_code_comments§>< setting, and option ><```nostrip```>< can be used to always show the special comments. These options have no effect in combination with the ><```option```>< ><```doc```><.
 
 When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
 ><```
@@ -2474,6 +2477,7 @@ The ><```option```>< can either be ><```lineno```><, ><```trimleft```>< or ><```
     • The ><```option```>< ><```local```>< can be used make Doxygen 
 interpret the code as if it was in the class or namespace in which the 
 include command appears, rather than the global namespace.
+    • The ><```option```>< ><```strip```>< can be used to always hide any special comments from the included code, overruling the ><STRIP_CODE_COMMENTS§https://www.doxygen.nl/manual/config.html#cfg_strip_code_comments§>< setting, and option ><```nostrip```>< can be used to always show the special comments. These options have no effect in combination with the ><```option```>< ><```doc```><.
 
 When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
 ><```
@@ -3114,6 +3118,21 @@ Help text:
 
 
 ====================================
+Command: plantumlfile
+Parameters: <file> ["caption"] [<sizeindication>=<size>]
+Anchor: cmdplantumlfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdplantumlfile
+Help text:
+<Inserts an image made in PlantUml from <file> into the documentation.
+
+The first argument specifies the file name of the image. Doxygen will look for files in the paths (or files) that you specified after the ><PLANTUMLFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_plantumlfile_dirs§>< tag. If the plantuml file is found it will be used as an input file for the plantuml program. The resulting image will be put into the correct output directory. If the plantuml file name contains spaces you'll have to put quotes ("...") around it.
+
+The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
+
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph ><Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§>< with the ><[\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§>< command.>
+------------------------------------
+
+
+====================================
 Command: endhtmlonly
 Parameters: 
 Anchor: cmdendhtmlonly  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendhtmlonly
@@ -3533,7 +3552,25 @@ Command: .
 Parameters: 
 Anchor: cmdchardot  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdchardot
 Help text:
-<This command writes a dot (><```.```><) to the output. This can be useful to prevent ending a brief description when ><JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§>< is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.>
+<This command writes a dot (><```.```><) to the output. This can be useful to prevent ending a brief description when ><JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§>< or ><QT_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_qt_autobrief§>< is enabled or to prevent starting a numbered list when the dot follows a number at the start of a line.>
+------------------------------------
+
+
+====================================
+Command: ?
+Parameters: 
+Anchor: cmdquest  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdquest
+Help text:
+<This command writes a question mark (><```?```><) to the output. This can be useful to prevent ending a brief description when ><JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§>< or ><QT_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_qt_autobrief§>< is enabled.>
+------------------------------------
+
+
+====================================
+Command: !
+Parameters: 
+Anchor: cmdexclam  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdexclam
+Help text:
+<This command writes a exclamation mark (><```!```><) to the output. This can be useful to prevent ending a brief description when ><JAVADOC_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_javadoc_autobrief§>< or ><QT_AUTOBRIEF§https://www.doxygen.nl/manual/config.html#cfg_qt_autobrief§>< is enabled.>
 ------------------------------------
 
 
