@@ -1209,6 +1209,8 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\>", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\%", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\.", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\?", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@!", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\=", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\::", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\|", ClassificationEnum.Command),
