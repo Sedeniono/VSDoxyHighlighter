@@ -899,7 +899,7 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "dotfile", "mscfile", "diafile"
+            "dotfile", "mscfile", "diafile", "plantumlfile"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_1File_1OptionalCaption_1OptionalSizeIndication),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }

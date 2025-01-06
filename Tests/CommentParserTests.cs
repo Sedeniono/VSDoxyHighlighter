@@ -1086,6 +1086,15 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"""path\with space\file_name.dia""", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"width=200cm", ClassificationEnum.Parameter1),
 
+        new Utils.FormattedFragmentText(@"\plantumlfile", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"""some file""", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"""some caption""", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"height=10cm", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\plantumlfile", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"""another file""", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\plantumlfile", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"file", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\doxyconfig", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"PROJECT_NAME", ClassificationEnum.Parameter1),
 
