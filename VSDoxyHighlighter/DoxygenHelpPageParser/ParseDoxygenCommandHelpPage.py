@@ -172,7 +172,7 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
 
         return fragments
 
-    elif tag.name == "code":
+    elif tag.name == "code" or (tag.name == "span" and ' '.join(tag['class']) == 'tt'):
         fragments = parse_all_children(tag.children, decorator)
         # In case the text in <code> contains some non-text fragments, we simply ignore that.
         # For example, the documentation for "\mainpage" contains "\ref index" in <code>, and the "\ref"
@@ -595,6 +595,6 @@ if __name__ == "__main__":
     extract_and_convert_doxygen_commands_from_html(
         # The input html file is https://www.doxygen.nl/manual/commands.html
         # (simply saved via a browser).
-        html_filename=os.path.join(main_folder, "testInput1.13.1.htm"),
+        html_filename=os.path.join(main_folder, "testInput1.14.0.htm"),
         output_csharp_filename=os.path.join(main_folder, "DoxygenCommandsGeneratedFromHelpPage.cs"),
         output_debug_dump_filename=os.path.join(main_folder, "GeneratedDebugDump.txt"))

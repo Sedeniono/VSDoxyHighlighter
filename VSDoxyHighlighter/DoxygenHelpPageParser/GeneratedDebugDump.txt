@@ -919,7 +919,7 @@ Anchor: cmdoverload  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html
 Help text:
 <This command can be used to generate the following standard text for an overloaded member function:
 
-><```   ‍This is an overloaded member function, provided for convenience. It 
+><```   This is an overloaded member function, provided for convenience. It 
    differs from the above function only in what argument(s) it accepts. 
 
 ```><
@@ -2069,10 +2069,18 @@ See also: command ><[\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§
 
 ====================================
 Command: cite
-Parameters: <label>
+Parameters: ['{'[option]'}'] <label>
 Anchor: cmdcite  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcite
 Help text:
-<Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in ><CITE_BIB_FILES§https://www.doxygen.nl/manual/config.html#cfg_cite_bib_files§><. For the LaTeX output the formatting of the reference in the text can be configured with ><LATEX_BIB_STYLE§https://www.doxygen.nl/manual/config.html#cfg_latex_bib_style§><. For other output formats a fixed representation is used. Note that using this command requires the ><```bibtex```>< tool to be present in the search path.>
+<Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in ><CITE_BIB_FILES§https://www.doxygen.nl/manual/config.html#cfg_cite_bib_files§><. For the LaTeX output the formatting of the reference in the text can be configured with ><LATEX_BIB_STYLE§https://www.doxygen.nl/manual/config.html#cfg_latex_bib_style§><. For other output formats a fixed representation is used. Note that using this command requires the ><```bibtex```>< tool to be present in the search path.
+
+There are a number of options possible:
+    • ><```number```><, ><```shortauthor```><, ><```year```><, these options are mutually exclusive, in case none of these is specified ><```number```>< is assumed.
+        • ><```number```>< create a numerical reference
+        • ><```shortauthor```>< just the surname of the first author is given, and in case multiple authors are present the text "et al." is added
+        • ><```year```><, the year of publication is mentioned (when specified in the bibtex file.
+    • ><```nopar```><, no (square) brackets are added
+    • ><```nocite```><, no link to a citation in the bibliography is made (and the reference is not added to the bibliography based on this item)>
 ------------------------------------
 
 
@@ -2346,9 +2354,10 @@ Alternatively, the ><[\snippet]§https://www.doxygen.nl/manual/commands.html#cmd
 The ><```option```>< can either be ><```lineno```><, or ><```doc```><, and additionally ><```local```>< can be specified.
     • The ><```option```>< ><```lineno```>< can be used to enable line numbers for the included code if desired.
     • The ><```option```>< ><```doc```>< can be used to treat the file as documentation rather than code.
-    • The ><```option```>< ><```local```>< can be used make Doxygen 
-interpret the code as if it was in the class or namespace in which the 
-include command appears, rather than the global namespace.
+    • The ><```option```>< ><```local```>< can
+ be used make Doxygen interpret the code as if it was in the class or 
+namespace in which the include command appears, rather than the global 
+namespace.
     • The ><```option```>< ><```strip```>< can be used to always hide any special comments from the included code, overruling the ><STRIP_CODE_COMMENTS§https://www.doxygen.nl/manual/config.html#cfg_strip_code_comments§>< setting, and option ><```nostrip```>< can be used to always show the special comments. These options have no effect in combination with the ><```option```>< ><```doc```><.
 
 When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
@@ -2474,9 +2483,10 @@ The ><```option```>< can either be ><```lineno```><, ><```trimleft```>< or ><```
     • The ><```option```>< ><```lineno```>< can be used to enable line numbers for the included code if desired.
     • The ><```option```>< ><```trimleft```>< can be used to remove the common spacing in front of all lines (also taking in account the setting of the ><TAB_SIZE§https://www.doxygen.nl/manual/config.html#cfg_tab_size§>< tag).
     • The ><```option```>< ><```doc```>< can be used to treat the file as documentation rather than code.
-    • The ><```option```>< ><```local```>< can be used make Doxygen 
-interpret the code as if it was in the class or namespace in which the 
-include command appears, rather than the global namespace.
+    • The ><```option```>< ><```local```>< can
+ be used make Doxygen interpret the code as if it was in the class or 
+namespace in which the include command appears, rather than the global 
+namespace.
     • The ><```option```>< ><```strip```>< can be used to always hide any special comments from the included code, overruling the ><STRIP_CODE_COMMENTS§https://www.doxygen.nl/manual/config.html#cfg_strip_code_comments§>< setting, and option ><```nostrip```>< can be used to always show the special comments. These options have no effect in combination with the ><```option```>< ><```doc```><.
 
 When using option ><```doc```><, there is also the option ><```raise```>< that can be specified to raise all sections found in the referenced file by a certain amount. For example
