@@ -97,9 +97,11 @@ def parse_doxygen_help_html(file) -> list[ParsedCommand]:
 
     # The actual descriptions start at the first <h1> tag after the first <center> tag.
     tag = soup.find("center")
+    assert(tag != None)
     tag = tag.find_next_sibling("h1")
 
     while tag != None:
+        assert(isinstance(tag, bs4.element.Tag))
         header_tag = tag
         tag = tag.next_sibling
         description_tags = []
@@ -115,7 +117,7 @@ def parse_doxygen_help_html(file) -> list[ParsedCommand]:
     return all_parsed_commands
         
 
-def parse_html_tags_of_single_command(header_tag: Union[bs4.element.Tag, bs4.element.NavigableString], 
+def parse_html_tags_of_single_command(header_tag: bs4.element.Tag, 
                                       description_tags: list[Union[bs4.element.Tag, bs4.element.NavigableString]]):
     description_text: list[Fragment] = []
     for desc_tag in description_tags:
@@ -135,9 +137,15 @@ def parse_html_tags_of_single_command(header_tag: Union[bs4.element.Tag, bs4.ele
             break
 
     anchor_tag = header_tag.contents[0]
-    if anchor_tag.name != "a" or "anchor" not in anchor_tag["class"] or "id" not in anchor_tag.attrs:
+    if not isinstance(anchor_tag, bs4.element.Tag) or \
+            anchor_tag.name != "a" or \
+            "anchor" not in anchor_tag["class"] or \
+            "id" not in anchor_tag.attrs:
         raise Exception("First child is not an anchor.")
-    anchor = anchor_tag["id"].strip()
+    
+    anchor = anchor_tag["id"]
+    assert(isinstance(anchor, str))
+    anchor = anchor.strip()
 
     header_text = header_tag.get_text().strip()
     return ParsedCommand(header_text, anchor, description_text)
@@ -155,13 +163,16 @@ def parse_recursive(tag: bs4.element.PageElement, decorator) -> list[Fragment]:
     elif isinstance(tag, str):
         return [Fragment(FragmentType.Text, decorator(tag))]
 
-    elif tag.name == "p":
+    assert(isinstance(tag, bs4.element.Tag))
+    if tag.name == "p":
         # Note that we pass in a decorator so that every string in the paragraph gets stripped of the newline.
         # (Newlines between paragraphs are still kept!)
         fragments = parse_all_children(tag.children, lambda x: decorator(x).replace("\n", ""))
         fragments = strip_fragments(merge_fragments(fragments), " ")
 
-        if len(fragments) > 0 and tag.next_sibling.name != "ul":
+        if len(fragments) > 0 \
+                and (isinstance(tag.next_sibling, bs4.element.Tag) or isinstance(tag.next_sibling, bs4.element.NavigableString)) \
+                and tag.next_sibling.name != "ul":
             fragments.append(Fragment(FragmentType.Text, "\n"))
         
         # Replace the double space before "for" in the "Click here   for the corresponding HTML documentation..." 
@@ -370,13 +381,15 @@ def parse_table(table: bs4.element.Tag) -> list[Fragment]:
     if len(table_contents) != 1:
         raise Exception("Expected table to contain only a single tag")
     body_tag = table_contents[0]
-    if body_tag.name != "tbody":
+    if not isinstance(body_tag, bs4.element.Tag) or body_tag.name != "tbody":
         raise Exception("Expected table to contain 'tbody'")
     
     t = body_tag.contents[0]
     rows = []
     while t != None:
+        assert(isinstance(t, bs4.element.Tag) or isinstance(t, bs4.element.NavigableString))
         if t != "\n":
+            assert(isinstance(t, bs4.element.Tag))
             columns = []
             for column_tag in t.children:
                 if column_tag != "\n":
@@ -448,7 +461,7 @@ def merge_fragments(fragments: list[Fragment]) -> list[Fragment]:
     return new_list
 
 
-def lstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fragment]:
+def lstrip_fragments(fragments: list[Fragment], to_strip: str|None = None) -> list[Fragment]:
     """Basically applies str.lstrip() to the start of the fragment list."""
     stripped = fragments
     while len(stripped) > 0:
@@ -461,7 +474,7 @@ def lstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fr
     return stripped
 
 
-def rstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fragment]:
+def rstrip_fragments(fragments: list[Fragment], to_strip: str|None = None) -> list[Fragment]:
     """Basically applies str.rstrip() to the end of the fragment list."""
     stripped = fragments
     while len(stripped) > 0:
@@ -474,7 +487,7 @@ def rstrip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fr
     return stripped
 
 
-def strip_fragments(fragments: list[Fragment], to_strip: str = None) -> list[Fragment]:
+def strip_fragments(fragments: list[Fragment], to_strip: str|None = None) -> list[Fragment]:
     return lstrip_fragments(rstrip_fragments(fragments, to_strip), to_strip)
 
 
