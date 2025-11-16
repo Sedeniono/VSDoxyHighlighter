@@ -12,7 +12,7 @@ namespace VSDoxyHighlighter
   //==============================================================================================
 
   /// <summary>
-  /// Abstract factory, that takes a collection of Doxygen commands that are all parsed the same
+  /// Abstract factory that takes a collection of Doxygen commands that are all parsed the same
   /// way and have the same amount of arguments. Each argument is represented by one element in
   /// the given "classifications" array. The result is an object that takes some piece of text
   /// and returns the found Doxygen commands in that text.
@@ -79,6 +79,29 @@ namespace VSDoxyHighlighter
 
     private readonly RegexStringGetterDelegate mBaseRegexStringGetter;
     private readonly string[] mAllowedClampedOptionsRegex;
+  }
+
+
+  /// <summary>
+  /// Factory that produces a matcher intended for `\cite` style Doxygen commands.
+  /// The \cite command is special since Doxygen v1.14.0 because of its braced options, some of them being mutually exclusive.
+  /// </summary>
+  internal class CiteCommandMatcherFactory : IDoxygenCommandsMatcherFactory
+  {
+    public CiteCommandMatcherFactory(
+        RegexStringGetterDelegate baseRegexStringGetter)
+    {
+      mBaseRegexStringGetter = baseRegexStringGetter;
+    }
+
+    public IFragmentsMatcher Create(ICollection<string> commands, ClassificationEnum[] classifications)
+    {
+      return new FragmentsMatcherCiteCommand(
+        new Regex(mBaseRegexStringGetter(commands), RegexOptions.Compiled | RegexOptions.Multiline),
+        classifications);
+    }
+
+    private readonly RegexStringGetterDelegate mBaseRegexStringGetter;
   }
 
 
@@ -449,9 +472,9 @@ namespace VSDoxyHighlighter
     {
       if (configVersion < ConfigVersions.v1_8_0) {
         // The `param[...]` and `snippet{...}` commands were removed in version 1.8.0 because a dedicated parser was written to parse them.
-        // Thus, the `param` command itself now has two parameters: The `[in,out]` part, and the function parameter name.
+        // Thus, the `param` command itself (without the `[...]`) now has two parameters: The `[in,out]` part, and the function parameter name.
         // We need to amend the configuration of `param` to add the default classification for `[in,out]`.
-        // Ditto for `snippet` and `include` and their `{...}` options.
+        // Ditto for `snippet` and `include` and their `{...}` options, and others.
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "param", numOldParameters: 1);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippet", numOldParameters: 2);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "snippetdoc", numOldParameters: 2);
@@ -467,6 +490,10 @@ namespace VSDoxyHighlighter
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "fileinfo", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "inheritancegraph", numOldParameters: 0);
         AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "tableofcontents", numOldParameters: 0);
+      }
+
+      if (configVersion < ConfigVersions.v1_10_0) {
+        AddClampedParameterAsFirstParameterToOldParsedCommand(parsed, "cite", numOldParameters: 1);
       }
     }
 
@@ -718,7 +745,7 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "p", "c", "anchor", "cite", "link", "refitem",
+            "p", "c", "anchor", "link", "refitem",
             "copydoc", "copybrief", "copydetails", "emoji"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord),
@@ -845,6 +872,15 @@ namespace VSDoxyHighlighter
           // since these commands are typically place in running text.
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter2, ClassificationEnum.Title }
         ),
+
+        new DoxygenCommandGroup(
+          new List<string> {
+            "cite"
+          },
+          new CiteCommandMatcherFactory(CommentParser.BuildRegex_CiteCommand),
+          new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Parameter2 }
+        ),
+
 
         //----- With up to three parameters -------
 

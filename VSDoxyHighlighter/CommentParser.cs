@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -605,6 +606,22 @@ namespace VSDoxyHighlighter
       return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))(?:(?:[ \t]+(\w[^ \t\n\r]*)?(?:[ \t]+([^ \t\n\r]*))?(?:[ \t]+([^\n\r]*))?)|{cLineEnd})";
     }
 
+    public static string BuildRegex_CiteCommand(ICollection<string> keywords)
+    {
+      string concatKeywords = ConcatKeywordsForRegex(keywords);
+
+      // Example: \cite{shortauthor,nocite} bibTexRef
+      // https://regex101.com/r/wXEjlQ/1
+      //
+      // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
+      // actually treated as optional (highlight keyword even without parameters while typing).
+      //
+      // Note: Doxygen does not allow any whitespace before the "{".
+      // Note: The part inside the braces "{...}" is parsed in a second step separately.
+      //                Special important parts:  vvvvvvvvvvvvvv                      vv
+      return $@"({cCmdPrefix}(?:{concatKeywords}))({{[^}}]*?}})?(?:(?:[ \t]+([^ \t\n\r{{]*)?)|{cLineEnd})";
+    }
+
     public static string BuildRegex_KeywordSomewhereInLine_1RequiredParamAsWord(ICollection<string> keywords)
     {
       // Similar to BuildRegex_KeywordAtLineStart_1RequiredParamAsWord(), the required parameter is
@@ -849,13 +866,12 @@ namespace VSDoxyHighlighter
     private bool ClampedOptionsValidator(int fragmentIndex, string fragmentText) 
     {
       // As the name of the class explains, we look for the clamped options at
-      // the 1st fragment = 2nd fragment = fragmentIndex 1
+      // the 1st command option = 2nd fragment = fragmentIndex 1
       if (fragmentIndex != 1) {
         return true;
       }
 
       Debug.Assert(fragmentText != null && fragmentText.Length >= 2);
-
       Debug.Assert(fragmentText.StartsWith("{") || fragmentText.StartsWith("["));
       Debug.Assert(fragmentText.EndsWith("}") || fragmentText.EndsWith("]"));
       string textWithinClamps = fragmentText.Substring(1, fragmentText.Length - 2);
@@ -885,6 +901,62 @@ namespace VSDoxyHighlighter
 
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
     private readonly Regex[] mAllowedClampedOptionsRegex;
+  }
+
+
+  /// <summary>
+  /// A matcher intended for `\cite` style Doxygen commands.
+  /// The \cite command is special since Doxygen v1.14.0 because of its braced options, some of them being mutually exclusive.
+  /// </summary>
+  internal class FragmentsMatcherCiteCommand : IFragmentsMatcher
+  {
+    public FragmentsMatcherCiteCommand(Regex baseRegex, ClassificationEnum[] classifications)
+    {
+      mBaseMatcher = new FragmentsMatcherRegexWithValidator(baseRegex, classifications, CiteOptionsValidator);
+    }
+
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      return mBaseMatcher.FindFragments(text);
+    }
+
+    private bool CiteOptionsValidator(int fragmentIndex, string fragmentText)
+    {
+      // The braced options are the 1st command option = 2nd fragment = fragmentIndex 1.
+      if (fragmentIndex != 1) {
+        return true;
+      }
+
+      Debug.Assert(fragmentText != null && fragmentText.Length >= 2);
+      Debug.Assert(fragmentText.StartsWith("{") && fragmentText.EndsWith("}"));
+      string textWithinBraces = fragmentText.Substring(1, fragmentText.Length - 2);
+
+      // Doxygen always uses a comma to separate the options, ignores whitespace and compares case-insensitively.
+      var options = textWithinBraces.Split(',').Select(o => o.Trim().ToLower(CultureInfo.InvariantCulture));
+
+      bool foundMutuallyExclusiveOption = false;
+      foreach (string option in options) {
+        if (option.Length == 0) {
+          continue; // Doxygen silently ignores empty entries.
+        }
+        // https://www.doxygen.nl/manual/commands.html#cmdcite
+        if (option == "number" || option == "shortauthor" || option == "year") {
+          if (foundMutuallyExclusiveOption) {
+            return false; // No syntax highlighting if multiple mutually exclusive options are found.
+          }
+          foundMutuallyExclusiveOption = true;
+        }
+        else if (option != "nopar" && option != "nocite") {
+          // Don't provide syntax highlighting for unknown options, even though Doxygen ignores them,
+          // so that the user realizes the mistake.
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
   }
 
 

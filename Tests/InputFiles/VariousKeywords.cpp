@@ -222,6 +222,19 @@ Some text \lineinfo more text
 \addindex some text
 Some text \anchor some_word
 \cite  some_label
+See paper \cite{shortauthor} bib:ref for more info.
+\cite{ number}
+\cite{ShortAuthor} label
+\cite{year, nopar} label
+\cite{nocite } label
+\cite{ number ,  nocite }   label Some text
+\cite{} label Empty options should work
+\cite{,number,,nopar,} label Should work because empty options are ignored
+\cite{number,year} label Options and label should NOT be highlighed because of mutually exclusive options
+\cite{number,shortauthor} label Options and label should NOT be highlighed because of mutually exclusive options
+\cite{year,shortauthor} label Options and label should NOT be highlighed because of mutually exclusive options
+\cite{unknown} label Options and label should NOT be highlighed because of unknown option
+\cite {number} label Options and label should NOT be highlighed because of space after cite
 Some text \link link_obj some text \endlink
 \endlink more text
 This page contains \ref subsection1 and \ref subsection2: Some more \ref subsection3.
@@ -525,6 +538,13 @@ some "\"quoted@"" string
 \\
 some\\text
 some @\ more text
+\\p label ("p label" should NOT be highlighted)
+@\p label ("p label" should NOT be highlighted)
+\\\p label ("p label" SHOULD be highlighted)
+@\\p label ("p label" SHOULD be highlighted)
+\\\\p label ("p label" should NOT be highlighted)
+@\\\p label ("p label" should NOT be highlighted)
+\section cmdthrows \\p label (the "\\p label" should be a parameter of \section)
 \\cite label ("cite label" should NOT be highlighted)
 @\cite label ("cite label" should NOT be highlighted)
 \\\cite label ("cite label" SHOULD be highlighted)

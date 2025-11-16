@@ -85,7 +85,8 @@ namespace VSDoxyHighlighter
     NoVersionInConfig = 0,
     v1_7_0 = 1000, // Versions <=1.7.0
     v1_8_0 = 2000, // Config format change in 1.8.0
-    Current = v1_8_0,
+    v1_10_0 = 3000, // Config format change in 1.10.0
+    Current = v1_10_0,
   }
 
 

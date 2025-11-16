@@ -592,8 +592,37 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"\anchor", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some_word", ClassificationEnum.Parameter2),
+
         new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"some_label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{shortauthor}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"bib:ref", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ number}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ShortAuthor}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{year, nopar}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{nocite }", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{ number ,  nocite }", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{,number,,nopar,}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\link", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"link_obj", ClassificationEnum.Parameter2),
@@ -1225,21 +1254,38 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText("@\"", ClassificationEnum.Command),
 
         new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\cite exc
-        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\cite exc
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // some\\text
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // some @\ more text
+
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\p label ("p label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"\p", ClassificationEnum.Command), // \\\p label ("p label" SHOULD be highlighted)
         new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
-        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\\p label ("p label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"\p", ClassificationEnum.Command), // @\\p label ("p label" SHOULD be highlighted)
         new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\section", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\\\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // @\\\p label ("p label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\section", ClassificationEnum.Command), // \section cmdthrows \\p label (the "\\p label" should be a parameter of \section)
+        new Utils.FormattedFragmentText(@"cmdthrows", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\\p label (the ""\\p label"" should be a parameter of \section)", ClassificationEnum.Title),
+
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\cite label ("cite label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command), // \\\cite label ("cite label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\\cite label ("cite label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"\cite", ClassificationEnum.Command), // @\\cite label ("cite label" SHOULD be highlighted)
+        new Utils.FormattedFragmentText(@"label", ClassificationEnum.Parameter2),
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // \\\\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"@\", ClassificationEnum.Command), // @\\\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\\", ClassificationEnum.Command), // @\\\cite label ("cite label" should NOT be highlighted)
+        new Utils.FormattedFragmentText(@"\section", ClassificationEnum.Command), // \section cmdthrows \\cite label (the "\\cite label" should be a parameter of \section)
         new Utils.FormattedFragmentText(@"cmdthrows", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\\cite label (the ""\\cite label"" should be a parameter of \section)", ClassificationEnum.Title),
 
