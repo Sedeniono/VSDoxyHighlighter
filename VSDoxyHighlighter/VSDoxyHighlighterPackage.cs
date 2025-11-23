@@ -2,9 +2,10 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 using Task = System.Threading.Tasks.Task;
 
 namespace VSDoxyHighlighter
@@ -70,9 +71,12 @@ namespace VSDoxyHighlighter
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
       await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
       mGeneralOptions = (GeneralOptionsPage)GetDialogPage(typeof(GeneralOptionsPage));
       mDoxygenCommands = new DoxygenCommands(mGeneralOptions);
       mCommentParser = new CommentParser(mDoxygenCommands);
+      
+      HandleRateNoticeAfterLoad();
     }
 
     protected override void Dispose(bool disposing)
@@ -83,6 +87,7 @@ namespace VSDoxyHighlighter
       }
       base.Dispose(disposing);
     }
+
 
     // Loads our package, especially getting the options pages.
     private static void LoadPackage() 
@@ -113,6 +118,103 @@ namespace VSDoxyHighlighter
       finally { 
         mInLoadPackage = false;
       }
+    }
+
+
+    enum RateNoticeAction
+    {
+      None,
+      Initialize,
+      Show,
+    }
+
+
+    private void HandleRateNoticeAfterLoad()
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      switch (GetRateNoticeAction()) {
+        case RateNoticeAction.Initialize:
+          // 30 days after the extension got loaded for the first time seems like a reasonable date that gave
+          // users enough time to try out the extension.
+          mGeneralOptions.SaveRateNoticeDate(DateTime.Now.AddDays(30));
+          break;
+        case RateNoticeAction.Show:
+          ShowRateNoticeNow();
+          break;
+      }
+    }
+
+
+    private RateNoticeAction GetRateNoticeAction()
+    {
+      if (string.IsNullOrEmpty(mGeneralOptions.RateNoticeDateStr)) {
+        return RateNoticeAction.Initialize;
+      }
+
+      if (DateTime.TryParseExact(mGeneralOptions.RateNoticeDateStr, "o", CultureInfo.InvariantCulture,
+              DateTimeStyles.RoundtripKind, out DateTime rateNoticeDate)) {
+        if (DateTime.Now >= rateNoticeDate) {
+          return RateNoticeAction.Show;
+        }
+        else {
+          return RateNoticeAction.None;
+        }
+      }
+      else {
+        ActivityLog.LogError("VSDoxyHighlighter", $"Failed to parse RateNoticeDateStr '{mGeneralOptions.RateNoticeDateStr}'. Resetting...");
+        return RateNoticeAction.Initialize;
+      }
+    }
+
+
+    private void ShowRateNoticeNow()
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      InfoBar.ShowMessage(
+        icon: KnownMonikers.StatusInformation,
+        message: "You are using the VSDoxyHighlighter extension which provides syntax highlighting, IntelliSense and " +
+          "quick infos for doxygen/javadoc style comments. If you find it useful, please consider giving the " +
+          "project a star on GitHub and leaving a rating on the Visual Studio Marketplace.",
+        showCloseButton: false,
+        actions: new (string uiText, bool asButton, Func<bool /*closeInfoBar*/> callback)[] {
+          (
+            uiText: "Open GitHub page",
+            asButton: false,
+            callback: () => {
+              Process.Start(new ProcessStartInfo("https://github.com/Sedeniono/VSDoxyHighlighter") { UseShellExecute = true });
+              return false;
+            }
+          ),
+          (
+            uiText: "Open Marketplace",
+            asButton: false,
+            callback: () => {
+              Process.Start(new ProcessStartInfo("https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter") { UseShellExecute = true });
+              return false;
+            }
+          ),
+          (
+            uiText: "Remind me in 5 days",
+            asButton: true,
+            callback: () => {
+              // We don't choose 7 days and instead some "uneven" number of days and hours to prevent
+              // the notice from appearing again at the same time of day and the same day of the week,
+              // in case it originally interrupted a daily or weekly meeting.
+              mGeneralOptions.SaveRateNoticeDate(DateTime.Now.AddDays(5).AddHours(4));
+              return true;
+            }
+          ),
+          (
+            uiText: "Never show this again",
+            asButton: true,
+            callback: () => { 
+              mGeneralOptions.SaveRateNoticeDate(DateTime.MaxValue);
+              return true;
+            }
+          )
+        });
     }
 
 

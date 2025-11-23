@@ -222,9 +222,20 @@ namespace VSDoxyHighlighter
 
     //----------------
 
-    // The value is not editable by the user.
+    // The version of the configuration format stored in the config file.
     [Browsable(false)]
     public int Version { get; set; } = (int)ConfigVersions.NoVersionInConfig;
+
+    // We show the "please rate" notice after this date, stored in ISO 8601 format.
+    // By default is it null and we set it the first time the package gets loaded.
+    [Browsable(false)]
+    public string RateNoticeDateStr { get; set; } // Must be public for serialization.
+
+    public void SaveRateNoticeDate(DateTime newDate)
+    {
+      RateNoticeDateStr = newDate.ToString("o");
+      SaveSettingsToStorage();
+    }
 
 
     //----------------
@@ -469,16 +480,22 @@ namespace VSDoxyHighlighter
       InfoBar.ShowMessage(
         icon: KnownMonikers.StatusError,
         message: "VSDoxyHighlighter: Failed to parse Doxygen commands configuration from string. Backed up configuration and restored defaults.",
-        actions: new (string, Action)[] {
+        showCloseButton: true,
+        actions: new (string uiText, bool asButton, Func<bool> callback)[] {
                   ("Show details",
-                    () => MessageBox.Show(
-                      "VSDoxyHighlighter extension: Failed to convert the configuration of the Doxygen commands (which is stored as a JSON string) to an actual 'List<DoxygenCommandInConfig>'. "
-                      + "Corrupt settings or maybe a bug in the extension?\n"
-                      + "Default configuration of commands got restored.\n"
-                      + $"Original JSON string written to: {backupFilename}.\n\n"
-                      + $"Exception message from the conversion: {ex}\n\n"
-                      + $"JSON string that failed to get parsed:\n{valueAsString}",
-                      "VSDoxyHighlighter error", MessageBoxButtons.OK, MessageBoxIcon.Error))}
+                    false,
+                    () => {
+                      MessageBox.Show(
+                        "VSDoxyHighlighter extension: Failed to convert the configuration of the Doxygen commands (which is stored as a JSON string) to an actual 'List<DoxygenCommandInConfig>'. "
+                        + "Corrupt settings or maybe a bug in the extension?\n"
+                        + "Default configuration of commands got restored.\n"
+                        + $"Original JSON string written to: {backupFilename}.\n\n"
+                        + $"Exception message from the conversion: {ex}\n\n"
+                        + $"JSON string that failed to get parsed:\n{valueAsString}",
+                        "VSDoxyHighlighter error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                      return false;
+                    }
+                  )}
       );
     }
   }
