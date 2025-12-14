@@ -1144,7 +1144,7 @@ namespace VSDoxyHighlighter
         EndEmphasisEndIdx = endEmphasisEndIdx
       };
 
-      return (startEmphasisEndIdx + 1, foundSpan);
+      return (startEmphasisEndIdx, foundSpan);
     }
 
 
@@ -1169,13 +1169,18 @@ namespace VSDoxyHighlighter
         return (startEmphasisStartIdx, -1);
       }
 
+      char emphasisChar = text[startEmphasisStartIdx];
       int startEmphasisEndIdx = startEmphasisStartIdx + 1;
-      if (text[startEmphasisEndIdx] == text[startEmphasisStartIdx]) {
+      if (text[startEmphasisEndIdx] == emphasisChar) {
         ++startEmphasisEndIdx; // ** or __ or ~~
       }
-      else if (text[startEmphasisStartIdx] == '~') {
+      else if (emphasisChar == '~') {
         searchStartIdx = startEmphasisStartIdx + 1; // Single ~ is not valid for strikethrough
         return (startEmphasisStartIdx, -1);
+      }
+
+      if (emphasisChar != '~' && text[startEmphasisEndIdx] == emphasisChar) {
+        ++startEmphasisEndIdx; // *** or ___
       }
 
       if (!IsAfterEmphasisStartAllowed(text, startEmphasisEndIdx)) {
@@ -1245,6 +1250,14 @@ namespace VSDoxyHighlighter
         int endEmphasisStartIdx = text.IndexOf(emphasisMarker, searchStartIdx, StringComparison.InvariantCulture);
         if (endEmphasisStartIdx < 0 || endEmphasisStartIdx >= searchEndIdx) {
           return (-1, -1);
+        }
+        // If we have e.g. "***test***" and emphasisMarker = "**", ensure that we match the
+        //                         123
+        // asterisks 23 instead of the asterisks 12.
+        if (endEmphasisStartIdx + 1 + emphasisMarker.Length <= text.Length 
+            && text.Substring(endEmphasisStartIdx + 1, emphasisMarker.Length) == emphasisMarker) {
+          searchStartIdx = endEmphasisStartIdx + 1;
+          continue;
         }
         if (!IsBeforeEmphasisEndAllowed(text, endEmphasisStartIdx)) {
           searchStartIdx = endEmphasisStartIdx + 1;
@@ -1318,6 +1331,15 @@ namespace VSDoxyHighlighter
           case "__":
             emphasisLevel += 2;
             break;
+
+          case "***":
+          case "___":
+            emphasisLevel += 3;
+            break;
+
+          default:
+            Debug.Assert(false);
+            return null;
         }
 
         if (emphasisLevel > 3) {
@@ -1395,7 +1417,7 @@ namespace VSDoxyHighlighter
         case 2:
           return ClassificationEnum.EmphasisMajor;
         case 3:
-          // TODO: Bold + italic
+          return ClassificationEnum.EmphasisHuge;
         default:
           // TODO
           return ClassificationEnum.Generic3;

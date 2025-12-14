@@ -68,18 +68,24 @@ namespace VSDoxyHighlighter.Tests
       DoTest("This _is some_ test.", ("_is some_", ClassificationEnum.EmphasisMinor));
       DoTest("This **is some** test.", ("**is some**", ClassificationEnum.EmphasisMajor));
       DoTest("This __is some__ test.", ("__is some__", ClassificationEnum.EmphasisMajor));
+      DoTest("This ***is some*** test.", ("***is some***", ClassificationEnum.EmphasisHuge));
+      DoTest("This ___is some___ test.", ("___is some___", ClassificationEnum.EmphasisHuge));
       DoTest("This ~~is some~~ test.", ("~~is some~~", ClassificationEnum.Strikethrough));
 
       DoTest("*At start* of line.", ("*At start*", ClassificationEnum.EmphasisMinor));
       DoTest("_At start_ of line.", ("_At start_", ClassificationEnum.EmphasisMinor));
       DoTest("**At start** of line.", ("**At start**", ClassificationEnum.EmphasisMajor));
       DoTest("__At start__ of line.", ("__At start__", ClassificationEnum.EmphasisMajor));
+      DoTest("***At start*** of line.", ("***At start***", ClassificationEnum.EmphasisHuge));
+      DoTest("___At start___ of line.", ("___At start___", ClassificationEnum.EmphasisHuge));
       DoTest("~~At start~~ of line.", ("~~At start~~", ClassificationEnum.Strikethrough));
 
       DoTest("At *end of line.*", ("*end of line.*", ClassificationEnum.EmphasisMinor));
       DoTest("At _end of line._", ("_end of line._", ClassificationEnum.EmphasisMinor));
       DoTest("At **end of line.**", ("**end of line.**", ClassificationEnum.EmphasisMajor));
       DoTest("At __end of line.__", ("__end of line.__", ClassificationEnum.EmphasisMajor));
+      DoTest("At ***end of line.***", ("***end of line.***", ClassificationEnum.EmphasisHuge));
+      DoTest("At ___end of line.___", ("___end of line.___", ClassificationEnum.EmphasisHuge));
       DoTest("At ~~end of line.~~", ("~~end of line.~~", ClassificationEnum.Strikethrough));
     }
 
