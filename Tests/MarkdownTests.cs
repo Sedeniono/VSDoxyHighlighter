@@ -90,6 +90,15 @@ namespace VSDoxyHighlighter.Tests
     }
 
 
+    [TestMethod()]
+    public void SuccessiveCombinations()
+    {
+      DoTest("This *__is some__* test.", ("*__is some__*", ClassificationEnum.EmphasisHuge));
+      DoTest("This __*is some*__ test.", ("__*is some*__", ClassificationEnum.EmphasisHuge));
+      DoTest("This **_is some_** test.", ("**_is some_**", ClassificationEnum.EmphasisHuge));
+      DoTest("This _**is some**_ test.", ("_**is some**_", ClassificationEnum.EmphasisHuge));
+    }
+
     //[TestMethod()]
     //public void TTTTT()
     //{

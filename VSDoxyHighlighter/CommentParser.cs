@@ -1065,7 +1065,8 @@ namespace VSDoxyHighlighter
         return (nextSearchStartIdx, null);
       }
 
-      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(categorizedNestedSpans);
+      List<CategorizedEmphasisSpan> mergedSpans = MergeSuccessiveNestedEmphasisSpans(categorizedNestedSpans);
+      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(mergedSpans);
       var fragmentsInGroups = flattenedFragments.Select(f => new FormattedFragmentGroup(new List<FormattedFragment>() { f })).ToList();
       return (nextSearchStartIdx, fragmentsInGroups);
     }
@@ -1204,7 +1205,9 @@ namespace VSDoxyHighlighter
         char.IsWhiteSpace(p) 
         || p == '<' || p == '{' || p == '(' || p == '[' || p == ',' || p == ':' || p == ';'
         // These are not documented but are allowed according to the Doxygen source code.
-        || p == '\'' || p == '>';
+        || p == '\'' || p == '>'
+        // Needed to allow nesting, e.g. *__text__*
+        || p == '*' || p == '_' || p == '~';
     }
 
 
@@ -1359,6 +1362,37 @@ namespace VSDoxyHighlighter
     }
 
 
+    private static List<CategorizedEmphasisSpan> MergeSuccessiveNestedEmphasisSpans(
+        List<CategorizedEmphasisSpan> categorizedNestedSpans)
+    {
+      Debug.Assert(categorizedNestedSpans != null && categorizedNestedSpans.Count > 0);
+      var mergedSpans = new List<CategorizedEmphasisSpan>();
+
+      int i = 0;
+      for (; i < categorizedNestedSpans.Count - 1; ++i) {
+        CategorizedEmphasisSpan currentSpan = categorizedNestedSpans[i];
+        CategorizedEmphasisSpan nestedSpan = categorizedNestedSpans[i + 1];
+
+        if (currentSpan.Span.StartEmphasisEndIdx == nestedSpan.Span.StartEmphasisStartIdx
+            && currentSpan.Span.EndEmphasisStartIdx == nestedSpan.Span.EndEmphasisEndIdx) {
+          nestedSpan.Span.StartEmphasisStartIdx = currentSpan.Span.StartEmphasisStartIdx;
+          nestedSpan.Span.EndEmphasisEndIdx = currentSpan.Span.EndEmphasisEndIdx;
+          mergedSpans.Add(nestedSpan);
+          ++i;
+        }
+        else {
+          mergedSpans.Add(currentSpan);
+        }
+      }
+
+      if (i == categorizedNestedSpans.Count - 1) {
+        mergedSpans.Add(categorizedNestedSpans[i]);
+      }
+
+      return mergedSpans;
+    }
+
+
     private static List<FormattedFragment> FlattenNestedEmphasisSpans(
         List<CategorizedEmphasisSpan> categorizedNestedSpans)
     {
@@ -1368,6 +1402,14 @@ namespace VSDoxyHighlighter
       for (int i = 0; i < categorizedNestedSpans.Count - 1; ++i) {
         CategorizedEmphasisSpan currentSpan = categorizedNestedSpans[i];
         CategorizedEmphasisSpan nestedSpan = categorizedNestedSpans[i + 1];
+
+        if (currentSpan.Span.StartEmphasisEndIdx == nestedSpan.Span.StartEmphasisStartIdx
+            && currentSpan.Span.EndEmphasisStartIdx == nestedSpan.Span.EndEmphasisEndIdx) {
+          nestedSpan.Span.StartEmphasisStartIdx = currentSpan.Span.StartEmphasisStartIdx;
+          nestedSpan.Span.EndEmphasisEndIdx = currentSpan.Span.EndEmphasisEndIdx;
+          categorizedNestedSpans[i + 1] = nestedSpan;
+          continue;
+        }
 
         ClassificationEnum currentClassification = GetClassificationFor(currentSpan);
 
