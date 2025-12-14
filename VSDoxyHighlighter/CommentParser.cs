@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -253,8 +254,6 @@ namespace VSDoxyHighlighter
 
     private static List<IFragmentsMatcher> BuildMatchers(List<DoxygenCommandGroup> doxygenCommands)
     {    
-      const RegexOptions cOptions = RegexOptions.Compiled | RegexOptions.Multiline;
-
       var matchers = new List<IFragmentsMatcher>();
 
       // NOTE: The order in which the matchers are created and added here should not matter. CommentParser.Parse() sorts
@@ -268,58 +267,8 @@ namespace VSDoxyHighlighter
         matchers.Add(cmdGroup.MatcherFactory.Create(cmdGroup.Commands, cmdGroup.Classifications));
       }
 
-      // *italic*
-      matchers.Add(new FragmentsMatcherRegex(
-        // https://regex101.com/r/ekhlTW/1
-        // (1)  Stuff allowed to precede the first "*". According to the doxygen documentation:
-        //      Only the following is allowed: a space, newline, or one the following characters <{([,:;
-        // (2a) Match the actual starting "*"
-        // (2b) After the "*", some characters are forbidden. Another "*" is forbidden, so that we can detect **bold** text.
-        //      Space and tab are forbidden to reduce the number of false positives, especially until we implement reliable
-        //      classification of code vs comment (in "* str*" the "str" is not formatted because of the space).
-        //      We also forbid a ")" to rule out constructs in the code such as: int * (*)(const char*)
-        // (2c) Match any character multiple times, but not those which are preceded by whitespace or "*".
-        // (2d) Before the terminating "*", some characters must NOT appear.
-        //      The "*" is ruled out so that we can detect **bold** text with the other regex below.
-        //      "/" is forbidden since "/*" would be a comment start.
-        //      Otherwise, the doxygen documentation states, that the following is NOT allowed:
-        //      space, newline, or one the following characters ({[<=+-\@
-        // (2e) Match the actual terminating "*"
-        // (3)  After the terminating "*", not everything is allowed. According to the doxgen documentation,
-        //      only non-alphanumeric characters are allowed. We also forbid "*" for proper support of **bold** text,
-        //      similar for "~" and "_". Also, "/" is not allowed to not match the C-style comment terminator "*/".
-        //      We also forbid "<" and ">" to rule out some false positives in C++ templates (until we implemented detection
-        //      of whether we are actually in a comment or in code).
-        // 
-        //                   1           2a     2b               2c                   2d              2e            3
-        //           __________________  __ ____________ _________________ __________________________ __ ____________________________
-        new Regex(@"(?:^|[ \t<{\(\[,:;])(\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
-      ));
-
-      // **bold**
-      matchers.Add(new FragmentsMatcherRegex(
-        new Regex(@"(?:^|[ \t<{\(\[,:;])(\*\*(?![\* \t\)])(?:.(?![ \t]\*))*?[^\*\/ \t\n\r\({\[<=\+\-\\@]\*\*)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
-      ));
-
-      // _italic_
-      matchers.Add(new FragmentsMatcherRegex(
-        new Regex(@"(?:^|[ \t<{\(\[,:;])(_(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]_)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.EmphasisMinor }
-      ));
-
-      // __bold__
-      matchers.Add(new FragmentsMatcherRegex(
-        new Regex(@"(?:^|[ \t<{\(\[,:;])(__(?![_ \t\)])(?:.(?![ \t]_))*?[^_\/ \t\n\r\({\[<=\+\-\\@]__)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.EmphasisMajor }
-      ));
-
-      // ~~strikethrough~~
-      matchers.Add(new FragmentsMatcherRegex(
-        new Regex(@"(?:^|[ \t<{\(\[,:;])(~~(?![~ \t\)])(?:.(?![ \t]~))*?[^~\/ \t\n\r\({\[<=\+\-\\@]~~)(?:\r?$|[^a-zA-Z0-9_\*\/~<>])", cOptions, cRegexTimeout),
-        new ClassificationEnum[] { ClassificationEnum.Strikethrough }
-      ));
+      // **bold**, *italic*, __bold__, _italic_, ~~strikethrough~~
+      matchers.Add(new FragmentsMatcherMarkdownEmphasisAndStrikethrough());
 
       return matchers;
     }
@@ -764,7 +713,7 @@ namespace VSDoxyHighlighter
 
 
   //==============================================================================================
-  // FragmentsMatcherRegex
+  // FragmentsMatcherRegexWithValidator
   //==============================================================================================
 
   /// <summary>
@@ -822,6 +771,11 @@ namespace VSDoxyHighlighter
   }
 
 
+
+  //==============================================================================================
+  // FragmentsMatcherRegex
+  //==============================================================================================
+
   /// <summary>
   /// A matcher that uses a pure regex expression (without any "manual" logic) to find Doxygen commands.
   /// </summary>
@@ -840,6 +794,11 @@ namespace VSDoxyHighlighter
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
   }
 
+
+
+  //==============================================================================================
+  // FragmentsMatcherForFirstOptionalClampedOptions
+  //==============================================================================================
 
   /// <summary>
   /// A matcher for Doxygen commands with optional options in braces "{...}" or brackets "[...]" 
@@ -904,6 +863,11 @@ namespace VSDoxyHighlighter
   }
 
 
+
+  //==============================================================================================
+  // FragmentsMatcherCiteCommand
+  //==============================================================================================
+
   /// <summary>
   /// A matcher intended for `\cite` style Doxygen commands.
   /// The \cite command is special since Doxygen v1.14.0 because of its braced options, some of them being mutually exclusive.
@@ -959,6 +923,11 @@ namespace VSDoxyHighlighter
     private readonly FragmentsMatcherRegexWithValidator mBaseMatcher;
   }
 
+
+
+  //==============================================================================================
+  // FragmentsMatcherMarkdownBackticks
+  //==============================================================================================
 
   internal class FragmentsMatcherMarkdownBackticks : IFragmentsMatcher 
   {
@@ -1028,6 +997,411 @@ namespace VSDoxyHighlighter
       int endMarkerEndIdx = endMarkerStartIdx + startMarkerLength;
       return endMarkerEndIdx;
     }
+
+    private static readonly List<FormattedFragmentGroup> cEmptyList = new List<FormattedFragmentGroup>();
+  }
+
+
+
+  //==============================================================================================
+  // FragmentsMatcherMarkdownEmphasisAndStrikethrough
+  //==============================================================================================
+
+  public class FragmentsMatcherMarkdownEmphasisAndStrikethrough : IFragmentsMatcher
+  {
+    private struct EmphasisSpan
+    {
+      public string EmphasisMarker;
+      public int StartEmphasisStartIdx;
+      public int StartEmphasisEndIdx;
+      public int EndEmphasisStartIdx;
+      public int EndEmphasisEndIdx;
+    }
+
+
+    public IList<FormattedFragmentGroup> FindFragments(string text)
+    {
+      int searchStartIdx = 0;
+      List<FormattedFragmentGroup> fragments = null;
+
+      while (searchStartIdx < text.Length) {
+        (int nextSearchStartIdx, var foundFragments) = FindNextEmphasisBlocksAsFragments(text, searchStartIdx, text.Length);
+        if (nextSearchStartIdx < 0) {
+          break;
+        }
+
+        if (foundFragments != null && foundFragments.Count > 0) {
+          fragments = fragments ?? new List<FormattedFragmentGroup>();
+          fragments.AddRange(foundFragments);
+        }
+
+        Debug.Assert(nextSearchStartIdx > searchStartIdx);
+        searchStartIdx = nextSearchStartIdx;
+      }
+
+      return fragments ?? cEmptyList;
+    }
+
+
+    private struct CategorizedEmphasisSpan
+    {
+      public EmphasisSpan Span;
+      public bool IsStrikethrough;
+      public int EmphasisLevel;
+    }
+
+
+    private static (int nextSearchStartIdx, List<FormattedFragmentGroup> fragments) FindNextEmphasisBlocksAsFragments(
+        string text, int searchStartIdx, int searchEndIdx)
+    {
+      (int nextSearchStartIdx, List<EmphasisSpan> nestedSpans) = FindNextEmphasisBlock(text, searchStartIdx, searchEndIdx);
+      if (nextSearchStartIdx < 0) {
+        Debug.Assert(nestedSpans == null);
+        return (-1, null);
+      }
+
+      List<CategorizedEmphasisSpan> categorizedNestedSpans = CategorizeEmphasisSpans(nestedSpans);
+      if (categorizedNestedSpans?.Count == 0) {
+        return (nextSearchStartIdx, null);
+      }
+
+      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(categorizedNestedSpans);
+      var fragmentsInGroups = flattenedFragments.Select(f => new FormattedFragmentGroup(new List<FormattedFragment>() { f })).ToList();
+      return (nextSearchStartIdx, fragmentsInGroups);
+    }
+
+
+    private static (int nextSearchStartIdx, List<EmphasisSpan> nestedSpans) FindNextEmphasisBlock(
+        string text, int searchStartIdx, int searchEndIdx)
+    {
+      List<EmphasisSpan> nestedSpans = null;
+
+      while (searchStartIdx < searchEndIdx) {
+        (int nextInnerSearchStartIdx, EmphasisSpan? innerSpan) = FindEmphasis(text, searchStartIdx, searchEndIdx);
+        if (nextInnerSearchStartIdx < 0) {
+          Debug.Assert(innerSpan == null);
+          break;
+        }
+
+        Debug.Assert(nextInnerSearchStartIdx > searchStartIdx);
+        Debug.Assert(nextInnerSearchStartIdx <= searchEndIdx);
+        if (innerSpan == null) {
+          searchStartIdx = nextInnerSearchStartIdx;
+          continue;
+        }
+
+        nestedSpans = nestedSpans ?? new List<EmphasisSpan>();
+        nestedSpans.Add(innerSpan.Value);
+        searchStartIdx = nextInnerSearchStartIdx;
+        searchEndIdx = innerSpan.Value.EndEmphasisStartIdx;
+      }
+
+      int nextSearchStartIdx = nestedSpans?.Last().EndEmphasisEndIdx ?? -1;
+      return (nextSearchStartIdx, nestedSpans);
+    }
+
+
+    private static (int nextSearchStartIdx, EmphasisSpan? foundSpan) FindEmphasis(
+        string text, int searchStartIdx, int searchEndIdx)
+    {
+      (int startEmphasisStartIdx, int startEmphasisEndIdx) = FindEmphasisStart(text, searchStartIdx, searchEndIdx);
+      if (startEmphasisStartIdx < 0) {
+        return (-1, null); // Give up the search completely, no more emphasis fragments can be found.
+      }
+      if (startEmphasisEndIdx < 0) {
+        // Some emphasis starts at `searchStartIdx`, but it cannot be completed before reaching `searchEndIdx`.
+        // Try again by starting with the next character. For example, some imbalanced emphasis like `**test*`
+        // can produce this.
+        return (startEmphasisStartIdx + 1, null);
+      }
+      Debug.Assert(startEmphasisStartIdx < startEmphasisEndIdx);
+      Debug.Assert(startEmphasisEndIdx <= searchEndIdx);
+
+      char emphasisChar = text[startEmphasisStartIdx];
+      int emphasisMarkerLen = startEmphasisEndIdx - startEmphasisStartIdx;
+      string emphasisMarker = new string(emphasisChar, emphasisMarkerLen);
+      (int endEmphasisStartIdx, int endEmphasisEndIdx) = FindEmphasisEnd(text, startEmphasisEndIdx, searchEndIdx, emphasisMarker);
+      if (endEmphasisEndIdx < 0) {
+        // Continue search after the start, not after the end, since there might be valid emphasis in-between.
+        return (startEmphasisStartIdx + 1, null);
+      }
+      Debug.Assert(endEmphasisStartIdx >= 0);
+      Debug.Assert(endEmphasisStartIdx < endEmphasisEndIdx);
+      Debug.Assert(endEmphasisEndIdx <= searchEndIdx);
+
+      if (text.IndexOf('\n', startEmphasisEndIdx, endEmphasisStartIdx - startEmphasisEndIdx) >= 0) {
+        // Emphasis cannot span multiple lines.
+        // Continue search after the start, not after the end, since there might be valid emphasis in-between.
+        return (startEmphasisStartIdx + 1, null);
+      }
+
+      var foundSpan = new EmphasisSpan()
+      {
+        EmphasisMarker = emphasisMarker,
+        StartEmphasisStartIdx = startEmphasisStartIdx,
+        StartEmphasisEndIdx = startEmphasisEndIdx,
+        EndEmphasisStartIdx = endEmphasisStartIdx,
+        EndEmphasisEndIdx = endEmphasisEndIdx
+      };
+
+      return (startEmphasisEndIdx + 1, foundSpan);
+    }
+
+
+    private static (int startEmphasisStartIdx, int startEmphasisEndIdx) FindEmphasisStart(
+        string text, int searchStartIdx, int searchEndIdx)
+    {
+      Debug.Assert(searchStartIdx >= 0);
+      Debug.Assert(searchEndIdx <= text.Length);
+      if (searchEndIdx - searchStartIdx < 2) {
+        return (-1, -1); // Not enough space for start and end of emphasis
+      }
+
+      int startEmphasisStartIdx = text.IndexOfAny(new char[] { '*', '_', '~' }, searchStartIdx);
+      if (startEmphasisStartIdx < 0 
+        // If there is not at least one character for the closing of the emphasis remaining, we can give up immediately.  
+        || startEmphasisStartIdx >= searchEndIdx - 1) {
+        return (-1, -1);
+      }
+
+      if (!IsBeforeEmphasisStartAllowed(text, startEmphasisStartIdx)) {
+        searchStartIdx = startEmphasisStartIdx + 1;
+        return (startEmphasisStartIdx, -1);
+      }
+
+      int startEmphasisEndIdx = startEmphasisStartIdx + 1;
+      if (text[startEmphasisEndIdx] == text[startEmphasisStartIdx]) {
+        ++startEmphasisEndIdx; // ** or __ or ~~
+      }
+      else if (text[startEmphasisStartIdx] == '~') {
+        searchStartIdx = startEmphasisStartIdx + 1; // Single ~ is not valid for strikethrough
+        return (startEmphasisStartIdx, -1);
+      }
+
+      if (!IsAfterEmphasisStartAllowed(text, startEmphasisEndIdx)) {
+        searchStartIdx = startEmphasisStartIdx + 1;
+        return (startEmphasisStartIdx, -1);
+      }
+
+      return (startEmphasisStartIdx, startEmphasisEndIdx);
+    }
+
+
+    private static bool IsBeforeEmphasisStartAllowed(string text, int startEmphasisStartIdx)
+    {
+      Debug.Assert(startEmphasisStartIdx >= 0);
+      if (startEmphasisStartIdx == 0) {
+        return true;
+      }
+      char p = text[startEmphasisStartIdx - 1];
+      return 
+        // Only specific characters are allowed before the emphasisMarker start: https://www.doxygen.nl/manual/markdown.html#mddox_emph_spans
+        char.IsWhiteSpace(p) 
+        || p == '<' || p == '{' || p == '(' || p == '[' || p == ',' || p == ':' || p == ';'
+        // These are not documented but are allowed according to the Doxygen source code.
+        || p == '\'' || p == '>';
+    }
+
+
+    private static bool IsAfterEmphasisStartAllowed(string text, int startEmphasisEndIdx)
+    {
+      if (startEmphasisEndIdx >= text.Length) {
+        return false;
+      }
+
+      // Conditions according to the Doxygen source code (Markdown::Private::processEmphasis()).
+      char a = text[startEmphasisEndIdx];
+      if (IsAlphanumericAsInDoxygen(a)) {
+        return true;
+      }
+      if (a == '-' || a == '+' || a == '!' || a == '?' || a == '$' || a == '@' || a == '&' || a == '*' 
+          || a == '_' || a == '%' || a == '[' || a == '(' || a == '.' || a == '>' || a == ':' || a == ',' 
+          || a == ';' || a == '\'' || a == '"' || a == '`') {
+        return true;
+      }
+
+      return !char.IsWhiteSpace(a);
+    }
+
+
+    private static bool IsAlphanumericAsInDoxygen(char c)
+    {
+      // Conditions copied from Doxygen source code (Markdown::Private::processEmphasis()).
+      if (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9')) {
+        return true;
+      }
+      if (c >= 0x80) {
+        return true; // Some unicode character
+      }
+      return false;
+    }
+
+
+    private static (int endEmphasisStartIdx, int endEmphasisEndIdx) FindEmphasisEnd(
+        string text, int searchStartIdx, int searchEndIdx, string emphasisMarker)
+    {
+      while (searchStartIdx < searchEndIdx) {
+        Debug.Assert(searchStartIdx >= 0);
+        int endEmphasisStartIdx = text.IndexOf(emphasisMarker, searchStartIdx, StringComparison.InvariantCulture);
+        if (endEmphasisStartIdx < 0 || endEmphasisStartIdx >= searchEndIdx) {
+          return (-1, -1);
+        }
+        if (!IsBeforeEmphasisEndAllowed(text, endEmphasisStartIdx)) {
+          searchStartIdx = endEmphasisStartIdx + 1;
+          continue;
+        }
+        int endEmphasisEndIdx = endEmphasisStartIdx + emphasisMarker.Length;
+        if (endEmphasisEndIdx > searchEndIdx) {
+          return (-1, -1);
+        }
+        if (!IsAfterEmphasisEndAllowed(text, endEmphasisEndIdx)) {
+          searchStartIdx = endEmphasisStartIdx + 1;
+          continue;
+        }
+        return (endEmphasisStartIdx, endEmphasisEndIdx);
+      }
+
+      return (-1, -1);
+    }
+
+
+    private static bool IsBeforeEmphasisEndAllowed(string text, int endEmphasisStartIdx)
+    {
+      Debug.Assert(endEmphasisStartIdx >= 0);
+      if (endEmphasisStartIdx == 0) {
+        return false;
+      }
+      char p = text[endEmphasisStartIdx - 1];
+      // https://www.doxygen.nl/manual/markdown.html#mddox_emph_spans
+      bool isNotAllowed 
+        = char.IsWhiteSpace(p) 
+        || p == '(' || p == '{' || p == '[' || p == '<' || p == '=' || p == '+' || p == '-' || p == '\\' || p == '@';
+      return !isNotAllowed;
+    }
+
+
+    private static bool IsAfterEmphasisEndAllowed(string text, int endEmphasisEndIdx)
+    {
+      if (endEmphasisEndIdx >= text.Length) {
+        return true;
+      }
+      char a = text[endEmphasisEndIdx];
+      // https://www.doxygen.nl/manual/markdown.html#mddox_emph_spans
+      return !IsAlphanumericAsInDoxygen(a);
+    }
+
+
+    private static List<CategorizedEmphasisSpan> CategorizeEmphasisSpans(List<EmphasisSpan> nestedSpans)
+    {
+      Debug.Assert(nestedSpans != null && nestedSpans.Count > 0);
+
+      var categorizedSpans = new List<CategorizedEmphasisSpan>();
+      bool strikethrough = false;
+      int emphasisLevel = 0;
+      for (int nestingIdx = 0; nestingIdx < nestedSpans.Count; ++nestingIdx) {
+        EmphasisSpan span = nestedSpans[nestingIdx];
+        switch (span.EmphasisMarker) {
+          case "~~":
+            if (nestingIdx > 0) {
+              // Strikethrough cannot be nested inside other emphasis in Doxygen.
+              return null;
+            }
+            strikethrough = true;
+            break;
+
+          case "*":
+          case "_":
+            ++emphasisLevel;
+            break;
+
+          case "**":
+          case "__":
+            emphasisLevel += 2;
+            break;
+        }
+
+        if (emphasisLevel > 3) {
+          // Doxygen supports up to triple emphasis.
+          // TODO: THIS IS ACTUALLY WRONG!!!
+          return null;
+        }
+
+        categorizedSpans.Add(new CategorizedEmphasisSpan() {
+          Span = span,
+          IsStrikethrough = strikethrough,
+          EmphasisLevel = emphasisLevel
+        });
+      }
+
+      return categorizedSpans;
+    }
+
+
+    private static List<FormattedFragment> FlattenNestedEmphasisSpans(
+        List<CategorizedEmphasisSpan> categorizedNestedSpans)
+    {
+      Debug.Assert(categorizedNestedSpans != null && categorizedNestedSpans.Count > 0);
+      var flattenedSpans = new List<FormattedFragment>();
+
+      for (int i = 0; i < categorizedNestedSpans.Count - 1; ++i) {
+        CategorizedEmphasisSpan currentSpan = categorizedNestedSpans[i];
+        CategorizedEmphasisSpan nestedSpan = categorizedNestedSpans[i + 1];
+
+        ClassificationEnum currentClassification = GetClassificationFor(currentSpan);
+
+        flattenedSpans.Add(new FormattedFragment(
+            startIndex: currentSpan.Span.StartEmphasisStartIdx,
+            length: nestedSpan.Span.StartEmphasisStartIdx - currentSpan.Span.StartEmphasisStartIdx,
+            classification: currentClassification));
+        flattenedSpans.Add(new FormattedFragment(
+            startIndex: nestedSpan.Span.EndEmphasisEndIdx,
+            length: currentSpan.Span.EndEmphasisEndIdx - nestedSpan.Span.EndEmphasisEndIdx,
+            classification: currentClassification));
+      }
+
+      CategorizedEmphasisSpan innermostSpan = categorizedNestedSpans.Last();
+      flattenedSpans.Add(new FormattedFragment(
+          startIndex: innermostSpan.Span.StartEmphasisStartIdx,
+          length: innermostSpan.Span.EndEmphasisEndIdx - innermostSpan.Span.StartEmphasisStartIdx,
+          classification: GetClassificationFor(innermostSpan)));
+
+      flattenedSpans.Sort((lhs, rhs) => lhs.StartIndex.CompareTo(rhs.StartIndex));
+
+#if DEBUG
+      // Verify that the fragments are successive.
+      for (int i = 0; i < flattenedSpans.Count - 1; ++i) {
+        FormattedFragment currentFragment = flattenedSpans[i];
+        FormattedFragment nextFragment = flattenedSpans[i + 1];
+        Debug.Assert(currentFragment.Length > 0);
+        Debug.Assert(nextFragment.Length > 0);
+        Debug.Assert(currentFragment.EndIndex + 1 == nextFragment.StartIndex);
+      }
+      Debug.Assert(flattenedSpans[0].Length > 0);
+#endif
+
+      return flattenedSpans;
+    }
+
+
+    private static ClassificationEnum GetClassificationFor(CategorizedEmphasisSpan categorizedEmphasisSpan)
+    {
+      if (categorizedEmphasisSpan.IsStrikethrough) {
+        // TODO: Combination with emphasis levels
+        return ClassificationEnum.Strikethrough;
+      }
+      switch (categorizedEmphasisSpan.EmphasisLevel) {
+        case 1:
+          return ClassificationEnum.EmphasisMinor;
+        case 2:
+          return ClassificationEnum.EmphasisMajor;
+        case 3:
+          // TODO: Bold + italic
+        default:
+          // TODO
+          return ClassificationEnum.Generic3;
+      }
+    }
+
 
     private static readonly List<FormattedFragmentGroup> cEmptyList = new List<FormattedFragmentGroup>();
   }
