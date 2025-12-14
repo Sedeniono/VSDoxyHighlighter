@@ -196,6 +196,21 @@ namespace VSDoxyHighlighter
 
 
   [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_emphasisHuge)]
+  [Name(ClassificationIDs.ID_emphasisHuge)]
+  [UserVisible(true)]
+  [Order(After = ClassificationDefinitionBase.cPriority)]
+  internal sealed class EmphasisHugeFormat : ClassificationDefinitionBase
+  {
+    [ImportingConstructor]
+    public EmphasisHugeFormat(DefaultColors defaultColors)
+      : base(defaultColors, ClassificationIDs.ID_emphasisHuge, "VSDoxyHighlighter - Emphasis (huge)")
+    {
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_inlineCode)]
   [Name(ClassificationIDs.ID_inlineCode)]
   [UserVisible(true)]
@@ -370,6 +385,10 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_emphasisMajor)]
     private static ClassificationTypeDefinition typeDefinitionForEmphasisMajor;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_emphasisHuge)]
+    private static ClassificationTypeDefinition typeDefinitionForEmphasisHuge;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_strikethrough)]

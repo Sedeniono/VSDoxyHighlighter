@@ -33,18 +33,20 @@ namespace VSDoxyHighlighter
     Parameter1 = 4,
     Parameter2 = 5,
     Title = 6,
-    EmphasisMinor = 7,
-    EmphasisMajor = 8,
+    EmphasisMinor = 7, // Italic
+    EmphasisMajor = 8, // Bold
     Strikethrough = 9,
     InlineCode = 10,
-    // The following are not used by default. But they exist so that the user can configure some
-    // commands or parameters to use themto have some additional colors.
+    // The "Generic*" are not used by default. But they exist so that the user can configure some
+    // commands or parameters to use them to have some additional colors.
     Generic1 = 11,
     Generic2 = 12,
     Generic3 = 13,
     Generic4 = 14,
     Generic5 = 15,
+    // More classifications that are used by default.
     ParameterClamped = 16,
+    EmphasisHuge = 17, // Bold + italic
   }
 
 
@@ -68,6 +70,7 @@ namespace VSDoxyHighlighter
     public const string ID_exceptions = "VSDoxyHighlighter_Exceptions";
     public const string ID_emphasisMinor = "VSDoxyHighlighter_EmphasisMinor";
     public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
+    public const string ID_emphasisHuge = "VSDoxyHighlighter_EmphasisHuge";
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
     public const string ID_generic1 = "VSDoxyHighlighter_Generic1";
@@ -87,6 +90,7 @@ namespace VSDoxyHighlighter
         {ClassificationEnum.Exceptions, ID_exceptions},
         {ClassificationEnum.EmphasisMinor, ID_emphasisMinor},
         {ClassificationEnum.EmphasisMajor, ID_emphasisMajor},
+        {ClassificationEnum.EmphasisHuge, ID_emphasisHuge},
         {ClassificationEnum.Strikethrough, ID_strikethrough},
         {ClassificationEnum.InlineCode, ID_inlineCode},
         {ClassificationEnum.Generic1, ID_generic1},
