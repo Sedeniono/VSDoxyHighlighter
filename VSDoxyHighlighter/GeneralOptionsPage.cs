@@ -21,18 +21,6 @@ namespace VSDoxyHighlighter
   // DoxygenCommandInConfig
   //==========================================================================================
 
-  public enum ParameterTypeInConfig : uint
-  {
-    Parameter1 = 101,
-    Parameter2 = 102,
-    Title = 200,
-    EmphasisMinor = 300,
-    EmphasisMajor = 400,
-    Strikethrough = 500,
-    InlineCode = 600
-  }
-
-
   /// <summary>
   /// Represents a single Doxygen command that can be configured by the user.
   /// Note that its members are serialized to and from a string!
@@ -59,8 +47,8 @@ namespace VSDoxyHighlighter
     [DisplayName("Parameter classifications")]
     [Description("Allows to change how the parameters of a Doxygen command should get classified.")]
     [DataMember(Name = "ParCls", Order = 2, IsRequired = true)] // Enables serialization via DoxygenCommandInConfigListSerialization
-    [TypeConverter(typeof(ParameterTypeInConfigArrayConverter))] // Just changes the default value displayed in the property grid. Not used by the serialization.
-    [ReadOnly(true)] // Causes to hide the "..." button (and thus to resize etc the array), but nevertheless allows changing the elements of the array.
+    [TypeConverter(typeof(ClassificationEnumInConfigArrayConverter))] // Just changes the default value displayed in the property grid. Not used by the serialization.
+    [ReadOnly(true)] // Causes to hide the "..." button (and thus the ability to resize etc the array), but nevertheless allows changing the elements of the array.
     public ClassificationEnum[] ParametersClassifications { get; set; } = new ClassificationEnum[] { };
 
     // Get a sensible display in the CollectionEditor.
@@ -502,19 +490,20 @@ namespace VSDoxyHighlighter
 
 
   //==========================================================================================
-  // ParameterTypeInConfigArrayConverter
+  // ClassificationEnumInConfigArrayConverter
   //==========================================================================================
 
   /// <summary>
   /// Custom converter to define a custom text that should be displayed for the DoxygenCommandInConfig.ParametersClassifications array.
-  /// The string is NOT serialized using this converter, because that variable is serialized "manually" via JSON
-  /// rather than by the Visual Studio machinery.
+  /// I.e. the non-editable text for the array-entry itself, NOT for the elements of the array.
+  /// The string is NOT serialized using this converter by the configuration machinery. It is just for display in the settings dialog.
+  /// (The array is serialized "manually" via JSON rather than by the Visual Studio machinery.)
   /// </summary>
-  internal class ParameterTypeInConfigArrayConverter : ArrayConverter
+  internal class ClassificationEnumInConfigArrayConverter : ArrayConverter
   {
     public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
     {
-      if (destinationType == typeof(string) && value is ParameterTypeInConfig[] valueAsT) {
+      if (destinationType == typeof(string) && value is ClassificationEnum[] valueAsT) {
         if (valueAsT.Length == 0) {
           return "No parameters";
         }
