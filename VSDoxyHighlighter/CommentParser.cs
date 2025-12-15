@@ -1012,8 +1012,12 @@ namespace VSDoxyHighlighter
     private struct EmphasisSpan
     {
       public string EmphasisMarker;
+
+      // The start marker is [StartEmphasisStartIdx..StartEmphasisEndIdx).
       public int StartEmphasisStartIdx;
       public int StartEmphasisEndIdx;
+
+      // The end marker is [EndEmphasisStartIdx..EndEmphasisEndIdx).
       public int EndEmphasisStartIdx;
       public int EndEmphasisEndIdx;
     }
@@ -1061,12 +1065,12 @@ namespace VSDoxyHighlighter
       }
 
       List<CategorizedEmphasisSpan> categorizedNestedSpans = CategorizeEmphasisSpans(nestedSpans);
-      if (categorizedNestedSpans?.Count == 0) {
+      if (categorizedNestedSpans == null || categorizedNestedSpans.Count == 0) {
         return (nextSearchStartIdx, null);
       }
 
-      List<CategorizedEmphasisSpan> mergedSpans = MergeSuccessiveNestedEmphasisSpans(categorizedNestedSpans);
-      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(mergedSpans);
+      var filteredSpans = RemoveInnerSpansNotChangingEmphasis(categorizedNestedSpans);
+      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(filteredSpans);
       var fragmentsInGroups = flattenedFragments.Select(f => new FormattedFragmentGroup(new List<FormattedFragment>() { f })).ToList();
       return (nextSearchStartIdx, fragmentsInGroups);
     }
@@ -1172,16 +1176,9 @@ namespace VSDoxyHighlighter
 
       char emphasisChar = text[startEmphasisStartIdx];
       int startEmphasisEndIdx = startEmphasisStartIdx + 1;
-      if (text[startEmphasisEndIdx] == emphasisChar) {
-        ++startEmphasisEndIdx; // ** or __ or ~~
-      }
-      else if (emphasisChar == '~') {
-        searchStartIdx = startEmphasisStartIdx + 1; // Single ~ is not valid for strikethrough
-        return (startEmphasisStartIdx, -1);
-      }
-
-      if (emphasisChar != '~' && text[startEmphasisEndIdx] == emphasisChar) {
-        ++startEmphasisEndIdx; // *** or ___
+      while (startEmphasisEndIdx < searchEndIdx
+             && text[startEmphasisEndIdx] == emphasisChar) {
+        ++startEmphasisEndIdx;
       }
 
       if (!IsAfterEmphasisStartAllowed(text, startEmphasisEndIdx)) {
@@ -1217,17 +1214,7 @@ namespace VSDoxyHighlighter
         return false;
       }
 
-      // Conditions according to the Doxygen source code (Markdown::Private::processEmphasis()).
       char a = text[startEmphasisEndIdx];
-      if (IsAlphanumericAsInDoxygen(a)) {
-        return true;
-      }
-      if (a == '-' || a == '+' || a == '!' || a == '?' || a == '$' || a == '@' || a == '&' || a == '*' 
-          || a == '_' || a == '%' || a == '[' || a == '(' || a == '.' || a == '>' || a == ':' || a == ',' 
-          || a == ';' || a == '\'' || a == '"' || a == '`') {
-        return true;
-      }
-
       return !char.IsWhiteSpace(a);
     }
 
@@ -1254,14 +1241,21 @@ namespace VSDoxyHighlighter
         if (endEmphasisStartIdx < 0 || endEmphasisStartIdx >= searchEndIdx) {
           return (-1, -1);
         }
-        // If we have e.g. "***test***" and emphasisMarker = "**", ensure that we match the
-        //                         123
-        // asterisks 23 instead of the asterisks 12.
-        if (endEmphasisStartIdx + 1 + emphasisMarker.Length <= text.Length 
+        
+        // If the emphasisMarker is e.g. "*" (a single "*") and then we encounter a "**",
+        // we want to skip this completely. This is simply the way Doxygen behaves.
+        if (endEmphasisStartIdx + 1 + emphasisMarker.Length <= searchEndIdx
             && text.Substring(endEmphasisStartIdx + 1, emphasisMarker.Length) == emphasisMarker) {
-          searchStartIdx = endEmphasisStartIdx + 1;
+          searchStartIdx = endEmphasisStartIdx;
+          do {
+            ++searchStartIdx;
+          }
+          while (searchStartIdx + emphasisMarker.Length <= searchEndIdx
+                 && text.Substring(searchStartIdx, emphasisMarker.Length) == emphasisMarker);
+
           continue;
         }
+
         if (!IsBeforeEmphasisEndAllowed(text, endEmphasisStartIdx)) {
           searchStartIdx = endEmphasisStartIdx + 1;
           continue;
@@ -1327,28 +1321,25 @@ namespace VSDoxyHighlighter
 
           case "*":
           case "_":
-            ++emphasisLevel;
+            if (emphasisLevel == 0 || emphasisLevel == 2) {
+              ++emphasisLevel;
+            }
             break;
 
           case "**":
           case "__":
-            emphasisLevel += 2;
+            if (emphasisLevel == 0 || emphasisLevel == 1) {
+              emphasisLevel += 2;
+            }
             break;
 
           case "***":
           case "___":
-            emphasisLevel += 3;
+            emphasisLevel = Math.Max(emphasisLevel, 3);
             break;
 
           default:
-            Debug.Assert(false);
-            return null;
-        }
-
-        if (emphasisLevel > 3) {
-          // Doxygen supports up to triple emphasis.
-          // TODO: THIS IS ACTUALLY WRONG!!!
-          return null;
+            continue; // Skip this span, it contains an unsupported marker.
         }
 
         categorizedSpans.Add(new CategorizedEmphasisSpan() {
@@ -1362,34 +1353,27 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static List<CategorizedEmphasisSpan> MergeSuccessiveNestedEmphasisSpans(
-        List<CategorizedEmphasisSpan> categorizedNestedSpans)
+    private static List<CategorizedEmphasisSpan> RemoveInnerSpansNotChangingEmphasis(
+      List<CategorizedEmphasisSpan> categorizedNestedSpans)
     {
       Debug.Assert(categorizedNestedSpans != null && categorizedNestedSpans.Count > 0);
-      var mergedSpans = new List<CategorizedEmphasisSpan>();
 
-      int i = 0;
-      for (; i < categorizedNestedSpans.Count - 1; ++i) {
-        CategorizedEmphasisSpan currentSpan = categorizedNestedSpans[i];
-        CategorizedEmphasisSpan nestedSpan = categorizedNestedSpans[i + 1];
+      var filteredSpans = new List<CategorizedEmphasisSpan> {
+        categorizedNestedSpans[0]
+      };
 
-        if (currentSpan.Span.StartEmphasisEndIdx == nestedSpan.Span.StartEmphasisStartIdx
-            && currentSpan.Span.EndEmphasisStartIdx == nestedSpan.Span.EndEmphasisEndIdx) {
-          nestedSpan.Span.StartEmphasisStartIdx = currentSpan.Span.StartEmphasisStartIdx;
-          nestedSpan.Span.EndEmphasisEndIdx = currentSpan.Span.EndEmphasisEndIdx;
-          mergedSpans.Add(nestedSpan);
-          ++i;
-        }
-        else {
-          mergedSpans.Add(currentSpan);
+      for (int i = 1; i < categorizedNestedSpans.Count; ++i) {
+        var currentSpan = categorizedNestedSpans[i];
+        var prevSpan = filteredSpans.Last();
+        Debug.Assert(currentSpan.Span.StartEmphasisStartIdx >= prevSpan.Span.StartEmphasisEndIdx);
+        Debug.Assert(currentSpan.Span.EndEmphasisEndIdx <= prevSpan.Span.EndEmphasisStartIdx);
+        if (currentSpan.EmphasisLevel != prevSpan.EmphasisLevel
+            || currentSpan.IsStrikethrough != prevSpan.IsStrikethrough) {
+          filteredSpans.Add(currentSpan);
         }
       }
 
-      if (i == categorizedNestedSpans.Count - 1) {
-        mergedSpans.Add(categorizedNestedSpans[i]);
-      }
-
-      return mergedSpans;
+      return filteredSpans;
     }
 
 
@@ -1407,27 +1391,34 @@ namespace VSDoxyHighlighter
             && currentSpan.Span.EndEmphasisStartIdx == nestedSpan.Span.EndEmphasisEndIdx) {
           nestedSpan.Span.StartEmphasisStartIdx = currentSpan.Span.StartEmphasisStartIdx;
           nestedSpan.Span.EndEmphasisEndIdx = currentSpan.Span.EndEmphasisEndIdx;
+          nestedSpan.Span.EmphasisMarker = currentSpan.Span.EmphasisMarker + nestedSpan.Span.EmphasisMarker;
           categorizedNestedSpans[i + 1] = nestedSpan;
           continue;
         }
 
-        ClassificationEnum currentClassification = GetClassificationFor(currentSpan);
+        ClassificationEnum? currentClassification = GetClassificationFor(currentSpan);
+        if (currentClassification == null) {
+          continue;
+        }
 
         flattenedSpans.Add(new FormattedFragment(
             startIndex: currentSpan.Span.StartEmphasisStartIdx,
             length: nestedSpan.Span.StartEmphasisStartIdx - currentSpan.Span.StartEmphasisStartIdx,
-            classification: currentClassification));
+            classification: currentClassification.Value));
         flattenedSpans.Add(new FormattedFragment(
             startIndex: nestedSpan.Span.EndEmphasisEndIdx,
             length: currentSpan.Span.EndEmphasisEndIdx - nestedSpan.Span.EndEmphasisEndIdx,
-            classification: currentClassification));
+            classification: currentClassification.Value));
       }
 
       CategorizedEmphasisSpan innermostSpan = categorizedNestedSpans.Last();
-      flattenedSpans.Add(new FormattedFragment(
-          startIndex: innermostSpan.Span.StartEmphasisStartIdx,
-          length: innermostSpan.Span.EndEmphasisEndIdx - innermostSpan.Span.StartEmphasisStartIdx,
-          classification: GetClassificationFor(innermostSpan)));
+      ClassificationEnum? innermostClassification = GetClassificationFor(innermostSpan);
+      if (innermostClassification.HasValue) {
+        flattenedSpans.Add(new FormattedFragment(
+            startIndex: innermostSpan.Span.StartEmphasisStartIdx,
+            length: innermostSpan.Span.EndEmphasisEndIdx - innermostSpan.Span.StartEmphasisStartIdx,
+            classification: innermostClassification.Value));
+      }
 
       flattenedSpans.Sort((lhs, rhs) => lhs.StartIndex.CompareTo(rhs.StartIndex));
 
@@ -1440,14 +1431,16 @@ namespace VSDoxyHighlighter
         Debug.Assert(nextFragment.Length > 0);
         Debug.Assert(currentFragment.EndIndex + 1 == nextFragment.StartIndex);
       }
-      Debug.Assert(flattenedSpans[0].Length > 0);
+      if (flattenedSpans.Count > 0) {
+        Debug.Assert(flattenedSpans[0].Length > 0);
+      }
 #endif
 
       return flattenedSpans;
     }
 
 
-    private static ClassificationEnum GetClassificationFor(CategorizedEmphasisSpan categorizedEmphasisSpan)
+    private static ClassificationEnum? GetClassificationFor(CategorizedEmphasisSpan categorizedEmphasisSpan)
     {
       if (categorizedEmphasisSpan.IsStrikethrough) {
         // TODO: Combination with emphasis levels
@@ -1461,8 +1454,8 @@ namespace VSDoxyHighlighter
         case 3:
           return ClassificationEnum.EmphasisHuge;
         default:
-          // TODO
-          return ClassificationEnum.Generic3;
+          // More than level 3 is not supported by Doxygen.
+          return null;
       }
     }
 
