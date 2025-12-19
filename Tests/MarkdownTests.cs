@@ -227,9 +227,6 @@ namespace VSDoxyHighlighter.Tests
       DoTest("*_*Some test*_*", ("*_*Some test*", ClassificationEnum.EmphasisMinor));
       DoTest("_*_Some test_*_", ("_*_Some test_", ClassificationEnum.EmphasisMinor));
     }
-
-
-
   }
 }
 

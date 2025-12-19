@@ -61,6 +61,7 @@
     <Compile Include="DoxygenHelpPageParser\DoxygenHelpPageCommand.cs" />
     <Compile Include="CommentClassifier.cs" />
     <Compile Include="ClassificationFormatDefinitions.cs" />
+    <Compile Include="FragmentsMatcherMarkdownEmphasis.cs" />
     <Compile Include="GeneralOptionsPage.cs" />
     <Compile Include="InfoBar.cs" />
     <Compile Include="VisualStudioCppFileSemantics.cs" />
