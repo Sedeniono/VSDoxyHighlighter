@@ -9,7 +9,7 @@ namespace VSDoxyHighlighter
 {
   public class FragmentsMatcherMarkdownEmphasisAndStrikethrough : IFragmentsMatcher
   {
-    private struct EmphasisSpan
+    private class EmphasisSpan
     {
       public string EmphasisMarker;
 
@@ -20,6 +20,23 @@ namespace VSDoxyHighlighter
       // The end marker is [EndEmphasisStartIdx..EndEmphasisEndIdx).
       public int EndEmphasisStartIdx;
       public int EndEmphasisEndIdx;
+
+      // Null if not yet set.
+      public EmphasisCategory? Category;
+    }
+
+
+    private struct EmphasisCategory
+    {
+      public bool IsStrikethrough;
+      public int EmphasisLevel;
+    }
+
+
+    private class EmphasisSpanWithChildren
+    {
+      public EmphasisSpan Span;
+      public List<EmphasisSpanWithChildren> Children;
     }
 
 
@@ -47,66 +64,75 @@ namespace VSDoxyHighlighter
     }
 
 
-    private struct CategorizedEmphasisSpan
-    {
-      public EmphasisSpan Span;
-      public bool IsStrikethrough;
-      public int EmphasisLevel;
-    }
-
-
     private static (int nextSearchStartIdx, List<FormattedFragmentGroup> fragments) FindNextEmphasisBlocksAsFragments(
         string text, int searchStartIdx, int searchEndIdx)
     {
-      (int nextSearchStartIdx, List<EmphasisSpan> nestedSpans) = FindNextEmphasisBlock(text, searchStartIdx, searchEndIdx);
-      if (nextSearchStartIdx < 0) {
-        Debug.Assert(nestedSpans == null);
+      EmphasisSpanWithChildren span = FindNextEmphasisBlock(text, searchStartIdx, searchEndIdx);
+      if (span == null) {
         return (-1, null);
       }
 
-      List<CategorizedEmphasisSpan> categorizedNestedSpans = CategorizeEmphasisSpans(nestedSpans);
-      if (categorizedNestedSpans == null || categorizedNestedSpans.Count == 0) {
-        return (nextSearchStartIdx, null);
-      }
+      CategorizeEmphasisSpans(span);
+      RemoveInnerSpansNotChangingEmphasis(span);
+      MergeNestedWithoutGaps(span);
 
-      var filteredSpans = RemoveInnerSpansNotChangingEmphasis(categorizedNestedSpans);
-      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(filteredSpans);
-      var fragmentsInGroups = flattenedFragments.Select(f => new FormattedFragmentGroup(new List<FormattedFragment>() { f })).ToList();
+      List<FormattedFragment> flattenedFragments = FlattenNestedEmphasisSpans(span);
+      var fragmentsInGroups = flattenedFragments.Select(
+        f => new FormattedFragmentGroup(new List<FormattedFragment>() { f })).ToList();
+      int nextSearchStartIdx = flattenedFragments.Count > 0
+        ? flattenedFragments.Last().EndIndex
+        : span.Span.EndEmphasisEndIdx;
       return (nextSearchStartIdx, fragmentsInGroups);
     }
 
 
-    private static (int nextSearchStartIdx, List<EmphasisSpan> nestedSpans) FindNextEmphasisBlock(
+    private static EmphasisSpanWithChildren FindNextEmphasisBlock(
         string text, int searchStartIdx, int searchEndIdx)
     {
-      List<EmphasisSpan> nestedSpans = null;
-
+      int nextInnerSearchStartIdx = -1;
+      EmphasisSpan nextOuterSpan = null;
       while (searchStartIdx < searchEndIdx) {
-        (int nextInnerSearchStartIdx, EmphasisSpan? innerSpan) = FindEmphasis(text, searchStartIdx, searchEndIdx);
+        (nextInnerSearchStartIdx, nextOuterSpan) = FindEmphasis(text, searchStartIdx, searchEndIdx);
         if (nextInnerSearchStartIdx < 0) {
-          Debug.Assert(innerSpan == null);
-          break;
+          Debug.Assert(nextOuterSpan == null);
+          return null;
         }
-
         Debug.Assert(nextInnerSearchStartIdx > searchStartIdx);
         Debug.Assert(nextInnerSearchStartIdx <= searchEndIdx);
-        if (innerSpan == null) {
+        if (nextOuterSpan == null) {
           searchStartIdx = nextInnerSearchStartIdx;
           continue;
         }
-
-        nestedSpans = nestedSpans ?? new List<EmphasisSpan>();
-        nestedSpans.Add(innerSpan.Value);
-        searchStartIdx = nextInnerSearchStartIdx;
-        searchEndIdx = innerSpan.Value.EndEmphasisStartIdx;
+        break;
       }
 
-      int nextSearchStartIdx = nestedSpans?.Last().EndEmphasisEndIdx ?? -1;
-      return (nextSearchStartIdx, nestedSpans);
+      if (nextOuterSpan == null) {
+        return null;
+      }
+
+      var spanWithChildren = new EmphasisSpanWithChildren() {
+        Span = nextOuterSpan,
+        Children = new List<EmphasisSpanWithChildren>()
+      };
+
+      while (true) {
+        EmphasisSpanWithChildren child =
+          FindNextEmphasisBlock(text, nextInnerSearchStartIdx, nextOuterSpan.EndEmphasisStartIdx);
+        if (child == null) {
+          break;
+        }
+
+        Debug.Assert(child.Span.EndEmphasisEndIdx <= nextOuterSpan.EndEmphasisStartIdx);
+        Debug.Assert(child.Span.StartEmphasisStartIdx >= nextOuterSpan.StartEmphasisEndIdx);
+        spanWithChildren.Children.Add(child);
+        nextInnerSearchStartIdx = child.Span.EndEmphasisEndIdx;
+      }
+
+      return spanWithChildren;
     }
 
 
-    private static (int nextSearchStartIdx, EmphasisSpan? foundSpan) FindEmphasis(
+    private static (int nextSearchStartIdx, EmphasisSpan foundSpan) FindEmphasis(
         string text, int searchStartIdx, int searchEndIdx)
     {
       (int startEmphasisStartIdx, int startEmphasisEndIdx) = FindEmphasisStart(text, searchStartIdx, searchEndIdx);
@@ -300,126 +326,142 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static List<CategorizedEmphasisSpan> CategorizeEmphasisSpans(List<EmphasisSpan> nestedSpans)
+    private static void CategorizeEmphasisSpans(
+        EmphasisSpanWithChildren span, int nestingLevel = 0, int emphasisLevel = 0, bool strikethrough = false)
     {
-      Debug.Assert(nestedSpans != null && nestedSpans.Count > 0);
+      Debug.Assert(span != null);
+      switch (span.Span.EmphasisMarker) {
+        case "~~":
+          if (nestingLevel > 0) {
+            // Strikethrough cannot be nested inside other emphasis in Doxygen.
+            return;
+          }
+          strikethrough = true;
+          break;
 
-      var categorizedSpans = new List<CategorizedEmphasisSpan>();
-      bool strikethrough = false;
-      int emphasisLevel = 0;
-      for (int nestingIdx = 0; nestingIdx < nestedSpans.Count; ++nestingIdx) {
-        EmphasisSpan span = nestedSpans[nestingIdx];
-        switch (span.EmphasisMarker) {
-          case "~~":
-            if (nestingIdx > 0) {
-              // Strikethrough cannot be nested inside other emphasis in Doxygen.
-              return null;
-            }
-            strikethrough = true;
-            break;
+        case "*":
+        case "_":
+          if (emphasisLevel == 0 || emphasisLevel == 2) {
+            ++emphasisLevel;
+          }
+          break;
 
-          case "*":
-          case "_":
-            if (emphasisLevel == 0 || emphasisLevel == 2) {
-              ++emphasisLevel;
-            }
-            break;
+        case "**":
+        case "__":
+          if (emphasisLevel == 0 || emphasisLevel == 1) {
+            emphasisLevel += 2;
+          }
+          break;
 
-          case "**":
-          case "__":
-            if (emphasisLevel == 0 || emphasisLevel == 1) {
-              emphasisLevel += 2;
-            }
-            break;
+        case "***":
+        case "___":
+          emphasisLevel = Math.Max(emphasisLevel, 3);
+          break;
 
-          case "***":
-          case "___":
-            emphasisLevel = Math.Max(emphasisLevel, 3);
-            break;
-
-          default:
-            continue; // Skip this span, it contains an unsupported marker.
-        }
-
-        categorizedSpans.Add(new CategorizedEmphasisSpan() {
-          Span = span,
-          IsStrikethrough = strikethrough,
-          EmphasisLevel = emphasisLevel
-        });
+        default:
+          break; // Skip this span, it contains an unsupported marker.
       }
 
-      return categorizedSpans;
-    }
-
-
-    private static List<CategorizedEmphasisSpan> RemoveInnerSpansNotChangingEmphasis(
-      List<CategorizedEmphasisSpan> categorizedNestedSpans)
-    {
-      Debug.Assert(categorizedNestedSpans != null && categorizedNestedSpans.Count > 0);
-
-      var filteredSpans = new List<CategorizedEmphasisSpan> {
-        categorizedNestedSpans[0]
+      span.Span.Category = new EmphasisCategory() {
+        IsStrikethrough = strikethrough,
+        EmphasisLevel = emphasisLevel
       };
 
-      for (int i = 1; i < categorizedNestedSpans.Count; ++i) {
-        var currentSpan = categorizedNestedSpans[i];
-        var prevSpan = filteredSpans.Last();
-        Debug.Assert(currentSpan.Span.StartEmphasisStartIdx >= prevSpan.Span.StartEmphasisEndIdx);
-        Debug.Assert(currentSpan.Span.EndEmphasisEndIdx <= prevSpan.Span.EndEmphasisStartIdx);
-        if (currentSpan.EmphasisLevel != prevSpan.EmphasisLevel
-            || currentSpan.IsStrikethrough != prevSpan.IsStrikethrough) {
-          filteredSpans.Add(currentSpan);
-        }
+      foreach (var child in span.Children) {
+        CategorizeEmphasisSpans(child, nestingLevel + 1, emphasisLevel, strikethrough);
       }
-
-      return filteredSpans;
     }
 
 
-    private static List<FormattedFragment> FlattenNestedEmphasisSpans(
-        List<CategorizedEmphasisSpan> categorizedNestedSpans)
+    private static void RemoveInnerSpansNotChangingEmphasis(EmphasisSpanWithChildren span)
     {
-      Debug.Assert(categorizedNestedSpans != null && categorizedNestedSpans.Count > 0);
+      Debug.Assert(span != null);
+      if (span.Span.Category == null) {
+        return;
+      }
+      var referenceCategory = span.Span.Category.Value;
+
+      for (int childIdx = 0; childIdx < span.Children.Count; ++childIdx) { 
+        var child = span.Children[childIdx];
+        if (child.Span.Category == null 
+            || (child.Span.Category.Value.EmphasisLevel == referenceCategory.EmphasisLevel
+                && child.Span.Category.Value.IsStrikethrough == referenceCategory.IsStrikethrough)) {
+          // "Dissolve" this child, as it does not change the emphasis.
+          span.Children.RemoveAt(childIdx);
+          span.Children.InsertRange(childIdx, child.Children);
+          --childIdx;
+          continue;
+        }
+        RemoveInnerSpansNotChangingEmphasis(child);
+      }
+    }
+
+
+    private static void MergeNestedWithoutGaps(EmphasisSpanWithChildren span)
+    {
+      Debug.Assert(span != null);
+      if (span.Span.Category == null || span.Children.Count != 1) {
+        return;
+      }
+
+      var child = span.Children[0];
+      Debug.Assert(child.Span.Category != null);
+      if (child.Span.StartEmphasisStartIdx == span.Span.StartEmphasisEndIdx
+          && child.Span.EndEmphasisEndIdx == span.Span.EndEmphasisStartIdx) {
+        var origSpan = span.Span;
+        var mergedSpan = child.Span;
+        mergedSpan.StartEmphasisStartIdx = origSpan.StartEmphasisStartIdx;
+        mergedSpan.EndEmphasisEndIdx = origSpan.EndEmphasisEndIdx;
+        mergedSpan.EmphasisMarker = origSpan.EmphasisMarker + mergedSpan.EmphasisMarker;
+        span.Span = mergedSpan;
+        span.Children = child.Children;
+        // We keep mergedSpan.Category as it is because we already "accumulated" the
+        // emphasis levels in CategorizeEmphasisSpans().
+
+        MergeNestedWithoutGaps(span);
+      }
+    }
+
+
+    private static List<FormattedFragment> FlattenNestedEmphasisSpans(EmphasisSpanWithChildren span)
+    {
+      Debug.Assert(span != null);
+
       var flattenedSpans = new List<FormattedFragment>();
 
-      for (int i = 0; i < categorizedNestedSpans.Count - 1; ++i) {
-        CategorizedEmphasisSpan currentSpan = categorizedNestedSpans[i];
-        CategorizedEmphasisSpan nestedSpan = categorizedNestedSpans[i + 1];
+      ClassificationEnum? outerSpanClassification = GetClassificationFor(span.Span.Category);
+      if (outerSpanClassification == null) {
+        foreach (var child in span.Children) {
+          var childFlattenedSpans = FlattenNestedEmphasisSpans(child);
+          if (childFlattenedSpans == null || childFlattenedSpans.Count == 0) {
+            continue;
+          }
+          flattenedSpans.AddRange(childFlattenedSpans);
+        }
+      }
+      else {
+        int startIdx = span.Span.StartEmphasisStartIdx;
 
-        if (currentSpan.Span.StartEmphasisEndIdx == nestedSpan.Span.StartEmphasisStartIdx
-            && currentSpan.Span.EndEmphasisStartIdx == nestedSpan.Span.EndEmphasisEndIdx) {
-          nestedSpan.Span.StartEmphasisStartIdx = currentSpan.Span.StartEmphasisStartIdx;
-          nestedSpan.Span.EndEmphasisEndIdx = currentSpan.Span.EndEmphasisEndIdx;
-          nestedSpan.Span.EmphasisMarker = currentSpan.Span.EmphasisMarker + nestedSpan.Span.EmphasisMarker;
-          categorizedNestedSpans[i + 1] = nestedSpan;
-          continue;
+        foreach (var child in span.Children) {
+          var childFlattenedSpans = FlattenNestedEmphasisSpans(child);
+          if (childFlattenedSpans == null || childFlattenedSpans.Count == 0) {
+            continue;
+          }
+          var firstChildFragment = childFlattenedSpans.First();
+          flattenedSpans.Add(new FormattedFragment(
+              startIndex: startIdx,
+              length: firstChildFragment.StartIndex - startIdx,
+              classification: outerSpanClassification.Value));
+          flattenedSpans.AddRange(childFlattenedSpans);
+          var lastChildFragment = childFlattenedSpans.Last();
+          startIdx = lastChildFragment.StartIndex + lastChildFragment.Length;
         }
 
-        ClassificationEnum? currentClassification = GetClassificationFor(currentSpan);
-        if (currentClassification == null) {
-          continue;
-        }
-
         flattenedSpans.Add(new FormattedFragment(
-            startIndex: currentSpan.Span.StartEmphasisStartIdx,
-            length: nestedSpan.Span.StartEmphasisStartIdx - currentSpan.Span.StartEmphasisStartIdx,
-            classification: currentClassification.Value));
-        flattenedSpans.Add(new FormattedFragment(
-            startIndex: nestedSpan.Span.EndEmphasisEndIdx,
-            length: currentSpan.Span.EndEmphasisEndIdx - nestedSpan.Span.EndEmphasisEndIdx,
-            classification: currentClassification.Value));
+            startIndex: startIdx,
+            length: span.Span.EndEmphasisEndIdx - startIdx,
+            classification: outerSpanClassification.Value));
       }
-
-      CategorizedEmphasisSpan innermostSpan = categorizedNestedSpans.Last();
-      ClassificationEnum? innermostClassification = GetClassificationFor(innermostSpan);
-      if (innermostClassification.HasValue) {
-        flattenedSpans.Add(new FormattedFragment(
-            startIndex: innermostSpan.Span.StartEmphasisStartIdx,
-            length: innermostSpan.Span.EndEmphasisEndIdx - innermostSpan.Span.StartEmphasisStartIdx,
-            classification: innermostClassification.Value));
-      }
-
-      flattenedSpans.Sort((lhs, rhs) => lhs.StartIndex.CompareTo(rhs.StartIndex));
 
 #if DEBUG
       // Verify that the fragments are successive.
@@ -439,13 +481,17 @@ namespace VSDoxyHighlighter
     }
 
 
-    private static ClassificationEnum? GetClassificationFor(CategorizedEmphasisSpan categorizedEmphasisSpan)
+    private static ClassificationEnum? GetClassificationFor(EmphasisCategory? category)
     {
-      if (categorizedEmphasisSpan.IsStrikethrough) {
+      if (category == null) {
+        return null;
+      }
+
+      if (category.Value.IsStrikethrough) {
         // TODO: Combination with emphasis levels
         return ClassificationEnum.Strikethrough;
       }
-      switch (categorizedEmphasisSpan.EmphasisLevel) {
+      switch (category.Value.EmphasisLevel) {
         case 1:
           return ClassificationEnum.EmphasisMinor;
         case 2:

@@ -1,13 +1,51 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+
 
 namespace VSDoxyHighlighter.Tests
 {
   [TestClass()]
   public class FragmentsMatcherMarkdownEmphasisAndStrikethroughTests
   {
+    class FailFastTraceListener : DefaultTraceListener
+    {
+      public override void Fail(string message, string detailMessage)
+      {
+        var stderr = Console.OpenStandardError();
+        using (var writer = new StreamWriter(stderr)) {
+          writer.AutoFlush = true;
+
+          writer.WriteLine("Assertion failed");
+
+          if (!string.IsNullOrEmpty(message))
+            writer.WriteLine(message);
+
+          if (!string.IsNullOrEmpty(detailMessage))
+            writer.WriteLine(detailMessage);
+
+          writer.WriteLine();
+          writer.WriteLine("Stack trace:");
+          writer.WriteLine(new System.Diagnostics.StackTrace(true));
+        }
+
+        Environment.FailFast(message);
+      }
+    }
+
+
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+      Debug.Listeners.Clear();
+      Debug.Listeners.Add(new FailFastTraceListener());
+    }
+
     private static List<Utils.FormattedFragmentText> FindFragments(string input)
     {
       var m = new FragmentsMatcherMarkdownEmphasisAndStrikethrough();
@@ -22,14 +60,14 @@ namespace VSDoxyHighlighter.Tests
       var expected = expectedFragments.Select(
         f => new Utils.FormattedFragmentText(f.text, f.classification)).ToList();
 
-      var expectedStr = expectedFragments.Any() 
-        ? string.Join(", ", expected.Select(f => $"[\"{f.Text}\", {f.Classification}]")) 
+      var expectedStr = expectedFragments.Any()
+        ? string.Join(", ", expected.Select(f => $"[\"{f.Text}\", {f.Classification}]"))
         : "[]";
-      var foundStr = found.Any() 
-        ? string.Join(", ", found.Select(f => $"[\"{f.Text}\", {f.Classification}]")) 
+      var foundStr = found.Any()
+        ? string.Join(", ", found.Select(f => $"[\"{f.Text}\", {f.Classification}]"))
         : "[]";
       var message = $"\nExpected: {expectedStr}\nFound   : {foundStr}";
-      
+
       CollectionAssert.AreEqual(expected, found, message);
     }
 
@@ -127,7 +165,7 @@ namespace VSDoxyHighlighter.Tests
     [TestMethod()]
     public void NestedWithIncreasingLevel()
     {
-      DoTest("This **is *some* test.**", 
+      DoTest("This **is *some* test.**",
         ("**is ", ClassificationEnum.EmphasisMajor),
         ("*some*", ClassificationEnum.EmphasisHuge),
         (" test.**", ClassificationEnum.EmphasisMajor));
@@ -168,10 +206,74 @@ namespace VSDoxyHighlighter.Tests
 
 
     [TestMethod()]
+    public void MultipleEquallyNested()
+    {
+      DoTest("*this **is** some ___nested___ test ***yet*** and __again__*",
+        ("*this ", ClassificationEnum.EmphasisMinor),
+        ("**is**", ClassificationEnum.EmphasisHuge),
+        (" some ", ClassificationEnum.EmphasisMinor),
+        ("___nested___", ClassificationEnum.EmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisMinor),
+        ("***yet***", ClassificationEnum.EmphasisHuge),
+        (" and ", ClassificationEnum.EmphasisMinor),
+        ("__again__", ClassificationEnum.EmphasisHuge),
+        ("*", ClassificationEnum.EmphasisMinor));
+
+      DoTest("**this *is* some ___nested___ test ***yet*** and __again__**",
+        ("**this ", ClassificationEnum.EmphasisMajor),
+        ("*is*", ClassificationEnum.EmphasisHuge),
+        (" some ", ClassificationEnum.EmphasisMajor),
+        ("___nested___", ClassificationEnum.EmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisMajor),
+        ("***yet***", ClassificationEnum.EmphasisHuge),
+        (" and __again__**", ClassificationEnum.EmphasisMajor));
+
+      DoTest("***this *is* some ___nested___ test **yet** and __again__***",
+        ("***this *is* some ___nested___ test **yet** and __again__***", ClassificationEnum.EmphasisHuge));
+
+      // Not actually nested.
+      DoTest("*this *is* some ___not nested___ test __beware__*",
+        ("*this *is*", ClassificationEnum.EmphasisMinor),
+        ("___not nested___", ClassificationEnum.EmphasisHuge),
+        ("__beware__", ClassificationEnum.EmphasisMajor));
+
+      DoTest("_this __is__ some ***nested*** test ___yet___ and **again**_",
+        ("_this ", ClassificationEnum.EmphasisMinor),
+        ("__is__", ClassificationEnum.EmphasisHuge),
+        (" some ", ClassificationEnum.EmphasisMinor),
+        ("***nested***", ClassificationEnum.EmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisMinor),
+        ("___yet___", ClassificationEnum.EmphasisHuge),
+        (" and ", ClassificationEnum.EmphasisMinor),
+        ("**again**", ClassificationEnum.EmphasisHuge),
+        ("_", ClassificationEnum.EmphasisMinor));
+
+      DoTest("__this _is_ some ***nested*** test ___yet___ and **again**__",
+        ("__this ", ClassificationEnum.EmphasisMajor),
+        ("_is_", ClassificationEnum.EmphasisHuge),
+        (" some ", ClassificationEnum.EmphasisMajor),
+        ("***nested***", ClassificationEnum.EmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisMajor),
+        ("___yet___", ClassificationEnum.EmphasisHuge),
+        (" and **again**__", ClassificationEnum.EmphasisMajor));
+
+      DoTest("___this _is_ some ***nested*** test __yet__ and **again**___",
+        ("___this _is_ some ***nested*** test __yet__ and **again**___", ClassificationEnum.EmphasisHuge));
+
+      // Not actually nested.
+      DoTest("_this _is_ some ***not nested*** test **beware**_",
+        ("_this _is_", ClassificationEnum.EmphasisMinor),
+        ("***not nested***", ClassificationEnum.EmphasisHuge),
+        ("**beware**", ClassificationEnum.EmphasisMajor));
+    }
+
+
+    [TestMethod()]
     public void ContainingInvalidEmphasis()
     {
       // Four or more successive markers are not recognized by Doxygen.
       DoTest("****Some tests****");
+      DoTest("*****Some tests*****");
       DoTest("****Some _more_ tests****", ("_more_", ClassificationEnum.EmphasisMinor));
       DoTest("****Some __more__ tests****", ("__more__", ClassificationEnum.EmphasisMajor));
       DoTest("****Some ___more___ tests****", ("___more___", ClassificationEnum.EmphasisHuge));
@@ -180,8 +282,15 @@ namespace VSDoxyHighlighter.Tests
       DoTest("****Some **more** tests****", ("**more**", ClassificationEnum.EmphasisMajor));
       DoTest("****Some ***more*** tests****", ("***more***", ClassificationEnum.EmphasisHuge));
       DoTest("****Some ****more**** tests****");
+      DoTest("*Some ****more**** tests*", ("*Some ****more**** tests*", ClassificationEnum.EmphasisMinor));
+      DoTest("**Some ****more**** tests**", ("**Some ****more**** tests**", ClassificationEnum.EmphasisMajor));
+      DoTest("***Some ****more**** tests***", ("***Some ****more**** tests***", ClassificationEnum.EmphasisHuge));
+      DoTest("*Some ____more____ tests*", ("*Some ____more____ tests*", ClassificationEnum.EmphasisMinor));
+      DoTest("**Some ____more____ tests**", ("**Some ____more____ tests**", ClassificationEnum.EmphasisMajor));
+      DoTest("***Some ____more____ tests***", ("***Some ____more____ tests***", ClassificationEnum.EmphasisHuge));
 
       DoTest("____Some tests____");
+      DoTest("_____Some tests_____");
       DoTest("____Some *more* tests____", ("*more*", ClassificationEnum.EmphasisMinor));
       DoTest("____Some **more** tests____", ("**more**", ClassificationEnum.EmphasisMajor));
       DoTest("____Some ***more*** tests____", ("***more***", ClassificationEnum.EmphasisHuge));
@@ -190,9 +299,12 @@ namespace VSDoxyHighlighter.Tests
       DoTest("____Some __more__ tests____", ("__more__", ClassificationEnum.EmphasisMajor));
       DoTest("____Some ___more___ tests____", ("___more___", ClassificationEnum.EmphasisHuge));
       DoTest("____Some ____more____ tests____");
-
-      DoTest("*****Some tests*****");
-      DoTest("_____Some tests_____");
+      DoTest("_Some ____more____ tests_", ("_Some ____more____ tests_", ClassificationEnum.EmphasisMinor));
+      DoTest("__Some ____more____ tests__", ("__Some ____more____ tests__", ClassificationEnum.EmphasisMajor));
+      DoTest("___Some ____more____ tests___", ("___Some ____more____ tests___", ClassificationEnum.EmphasisHuge));
+      DoTest("_Some ****more**** tests_", ("_Some ****more**** tests_", ClassificationEnum.EmphasisMinor));
+      DoTest("__Some ****more**** tests__", ("__Some ****more**** tests__", ClassificationEnum.EmphasisMajor));
+      DoTest("___Some ****more**** tests___", ("___Some ****more**** tests___", ClassificationEnum.EmphasisHuge));
     }
 
 
@@ -226,6 +338,18 @@ namespace VSDoxyHighlighter.Tests
       DoTest("_*Some test_*", ("_*Some test_", ClassificationEnum.EmphasisMinor));
       DoTest("*_*Some test*_*", ("*_*Some test*", ClassificationEnum.EmphasisMinor));
       DoTest("_*_Some test_*_", ("_*_Some test_", ClassificationEnum.EmphasisMinor));
+    }
+
+
+    [TestMethod()]
+    public void MultipleSeparateBlocks()
+    { 
+      DoTest("This *is some* test with _multiple emphasis_ markers. **It continues *on* some** more!",
+        ("*is some*", ClassificationEnum.EmphasisMinor),
+        ("_multiple emphasis_", ClassificationEnum.EmphasisMinor),
+        ("**It continues ", ClassificationEnum.EmphasisMajor),
+        ("*on*", ClassificationEnum.EmphasisHuge),
+        (" some**", ClassificationEnum.EmphasisMajor));
     }
   }
 }
