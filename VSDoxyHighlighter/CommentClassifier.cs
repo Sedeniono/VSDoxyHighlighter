@@ -47,6 +47,9 @@ namespace VSDoxyHighlighter
     // More classifications that are used by default.
     ParameterClamped = 16,
     EmphasisHuge = 17, // Bold + italic
+    StrikethroughEmphasisMinor = 18, // Italic + strikethrough
+    StrikethroughEmphasisMajor = 19, // Bold + strikethrough
+    StrikethroughEmphasisHuge = 20, // Bold + italic + strikethrough
   }
 
 
@@ -72,6 +75,9 @@ namespace VSDoxyHighlighter
     public const string ID_emphasisMajor = "VSDoxyHighlighter_EmphasisMajor";
     public const string ID_emphasisHuge = "VSDoxyHighlighter_EmphasisHuge";
     public const string ID_strikethrough = "VSDoxyHighlighter_Strikethrough";
+    public const string ID_strikethroughEmphasisMinor = "VSDoxyHighlighter_StrikethroughEmphasisMinor";
+    public const string ID_strikethroughEmphasisMajor = "VSDoxyHighlighter_StrikethroughEmphasisMajor";
+    public const string ID_strikethroughEmphasisHuge = "VSDoxyHighlighter_StrikethroughEmphasisHuge";
     public const string ID_inlineCode = "VSDoxyHighlighter_InlineCode";
     public const string ID_generic1 = "VSDoxyHighlighter_Generic1";
     public const string ID_generic2 = "VSDoxyHighlighter_Generic2";
@@ -92,6 +98,9 @@ namespace VSDoxyHighlighter
         {ClassificationEnum.EmphasisMajor, ID_emphasisMajor},
         {ClassificationEnum.EmphasisHuge, ID_emphasisHuge},
         {ClassificationEnum.Strikethrough, ID_strikethrough},
+        {ClassificationEnum.StrikethroughEmphasisMinor, ID_strikethroughEmphasisMinor},
+        {ClassificationEnum.StrikethroughEmphasisMajor, ID_strikethroughEmphasisMajor},
+        {ClassificationEnum.StrikethroughEmphasisHuge, ID_strikethroughEmphasisHuge},
         {ClassificationEnum.InlineCode, ID_inlineCode},
         {ClassificationEnum.Generic1, ID_generic1},
         {ClassificationEnum.Generic2, ID_generic2},

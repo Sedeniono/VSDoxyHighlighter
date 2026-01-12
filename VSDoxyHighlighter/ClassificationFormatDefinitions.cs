@@ -266,6 +266,81 @@ namespace VSDoxyHighlighter
 
 
   [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_strikethroughEmphasisMinor)]
+  [Name(ClassificationIDs.ID_strikethroughEmphasisMinor)]
+  [UserVisible(true)]
+  [Order(After = ClassificationDefinitionBase.cPriority)]
+  internal sealed class StrikethroughEmphasisMinorFormat : ClassificationDefinitionBase
+  {
+    [ImportingConstructor]
+    public StrikethroughEmphasisMinorFormat(DefaultColors defaultColors)
+      : base(defaultColors, ClassificationIDs.ID_strikethroughEmphasisMinor, "VSDoxyHighlighter - Strikethrough + emphasis (minor)")
+    {
+    }
+
+    public override void Reinitialize()
+    {
+      base.Reinitialize();
+
+      TextDecorations = new TextDecorationCollection {
+        new TextDecoration(
+          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+      };
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_strikethroughEmphasisMajor)]
+  [Name(ClassificationIDs.ID_strikethroughEmphasisMajor)]
+  [UserVisible(true)]
+  [Order(After = ClassificationDefinitionBase.cPriority)]
+  internal sealed class StrikethroughEmphasisMajorFormat : ClassificationDefinitionBase
+  {
+    [ImportingConstructor]
+    public StrikethroughEmphasisMajorFormat(DefaultColors defaultColors)
+      : base(defaultColors, ClassificationIDs.ID_strikethroughEmphasisMajor, "VSDoxyHighlighter - Strikethrough + emphasis (major)")
+    {
+    }
+
+    public override void Reinitialize()
+    {
+      base.Reinitialize();
+
+      TextDecorations = new TextDecorationCollection {
+        new TextDecoration(
+          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+      };
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
+  [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_strikethroughEmphasisHuge)]
+  [Name(ClassificationIDs.ID_strikethroughEmphasisHuge)]
+  [UserVisible(true)]
+  [Order(After = ClassificationDefinitionBase.cPriority)]
+  internal sealed class StrikethroughEmphasisHugeFormat : ClassificationDefinitionBase
+  {
+    [ImportingConstructor]
+    public StrikethroughEmphasisHugeFormat(DefaultColors defaultColors)
+      : base(defaultColors, ClassificationIDs.ID_strikethroughEmphasisHuge, "VSDoxyHighlighter - Strikethrough + emphasis (huge)")
+    {
+    }
+
+    public override void Reinitialize()
+    {
+      base.Reinitialize();
+
+      TextDecorations = new TextDecorationCollection {
+        new TextDecoration(
+          TextDecorationLocation.Strikethrough, null, 0.0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+      };
+    }
+  }
+
+
+  [Export(typeof(EditorFormatDefinition))]
   [ClassificationType(ClassificationTypeNames = ClassificationIDs.ID_generic1)]
   [Name(ClassificationIDs.ID_generic1)]
   [UserVisible(true)]
@@ -393,6 +468,18 @@ namespace VSDoxyHighlighter
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_strikethrough)]
     private static ClassificationTypeDefinition typeDefinitionForStrikethrough;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_strikethroughEmphasisMinor)]
+    private static ClassificationTypeDefinition typeDefinitionForStrikethroughEmphasisMinor;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_strikethroughEmphasisMajor)]
+    private static ClassificationTypeDefinition typeDefinitionForStrikethroughEmphasisMajor;
+
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name(ClassificationIDs.ID_strikethroughEmphasisHuge)]
+    private static ClassificationTypeDefinition typeDefinitionForStrikethroughEmphasisHuge;
 
     [Export(typeof(ClassificationTypeDefinition))]
     [Name(ClassificationIDs.ID_inlineCode)]

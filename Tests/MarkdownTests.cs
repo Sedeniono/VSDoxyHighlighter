@@ -206,6 +206,15 @@ namespace VSDoxyHighlighter.Tests
 
 
     [TestMethod()]
+    public void NestedWithStrikethrough()
+    {
+      DoTest("~~*Some test*~~", ("~~*Some test*~~", ClassificationEnum.StrikethroughEmphasisMinor));
+      DoTest("~~**Some test**~~", ("~~**Some test**~~", ClassificationEnum.StrikethroughEmphasisMajor));
+      DoTest("~~***Some test***~~", ("~~***Some test***~~", ClassificationEnum.StrikethroughEmphasisHuge));
+    }
+
+
+    [TestMethod()]
     public void MultipleEquallyNested()
     {
       DoTest("*this **is** some ___nested___ test ***yet*** and __again__*",
@@ -231,7 +240,7 @@ namespace VSDoxyHighlighter.Tests
       DoTest("***this *is* some ___nested___ test **yet** and __again__***",
         ("***this *is* some ___nested___ test **yet** and __again__***", ClassificationEnum.EmphasisHuge));
 
-      // Not actually nested.
+      // Not actually nested at the start.
       DoTest("*this *is* some ___not nested___ test __beware__*",
         ("*this *is*", ClassificationEnum.EmphasisMinor),
         ("___not nested___", ClassificationEnum.EmphasisHuge),
@@ -260,7 +269,7 @@ namespace VSDoxyHighlighter.Tests
       DoTest("___this _is_ some ***nested*** test __yet__ and **again**___",
         ("___this _is_ some ***nested*** test __yet__ and **again**___", ClassificationEnum.EmphasisHuge));
 
-      // Not actually nested.
+      // Not actually nested at the start.
       DoTest("_this _is_ some ***not nested*** test **beware**_",
         ("_this _is_", ClassificationEnum.EmphasisMinor),
         ("***not nested***", ClassificationEnum.EmphasisHuge),

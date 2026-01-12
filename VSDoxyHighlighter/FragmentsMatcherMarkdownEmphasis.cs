@@ -487,17 +487,17 @@ namespace VSDoxyHighlighter
         return null;
       }
 
-      if (category.Value.IsStrikethrough) {
-        // TODO: Combination with emphasis levels
-        return ClassificationEnum.Strikethrough;
-      }
+      bool strike = category.Value.IsStrikethrough;
+
       switch (category.Value.EmphasisLevel) {
+        case 0:
+          return strike ? ClassificationEnum.Strikethrough : (ClassificationEnum?)null;
         case 1:
-          return ClassificationEnum.EmphasisMinor;
+          return strike ? ClassificationEnum.StrikethroughEmphasisMinor : ClassificationEnum.EmphasisMinor;
         case 2:
-          return ClassificationEnum.EmphasisMajor;
+          return strike ? ClassificationEnum.StrikethroughEmphasisMajor : ClassificationEnum.EmphasisMajor;
         case 3:
-          return ClassificationEnum.EmphasisHuge;
+          return strike ? ClassificationEnum.StrikethroughEmphasisHuge : ClassificationEnum.EmphasisHuge;
         default:
           // More than level 3 is not supported by Doxygen.
           return null;
