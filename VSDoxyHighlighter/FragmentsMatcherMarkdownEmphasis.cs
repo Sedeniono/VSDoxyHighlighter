@@ -21,6 +21,8 @@ namespace VSDoxyHighlighter
       public int EndEmphasisStartIdx;
       public int EndEmphasisEndIdx;
 
+      public bool IsValid = true;
+
       // Null if not yet set.
       public EmphasisCategory? Category;
     }
@@ -72,6 +74,7 @@ namespace VSDoxyHighlighter
         return (-1, null);
       }
 
+      FindAndMarkInvalidEmphasisSpans(span);
       CategorizeEmphasisSpans(span);
       RemoveInnerSpansNotChangingEmphasis(span);
       MergeNestedWithoutGaps(span);
@@ -326,40 +329,71 @@ namespace VSDoxyHighlighter
     }
 
 
+    private static void FindAndMarkInvalidEmphasisSpans(EmphasisSpanWithChildren span)
+    {
+      Debug.Assert(span != null);
+
+      // Doxygen's behavior is peculiar: If the first marker is "*", "**", "_" or "__",
+      // and it is immediately followed by "~~", then both markers are not recognized.
+      // For example "*~~" does not start an italic strikethrough.
+      // But: "***~~" does actuall start a bold-italic strikethrough.
+      // This code here reproduces Doxygen's behavior.
+      if (span.Children.Count > 0) {
+        var firstChild = span.Children[0];
+        if (firstChild.Span.StartEmphasisStartIdx == span.Span.StartEmphasisEndIdx
+            && firstChild.Span.EmphasisMarker == "~~") {
+          string m = span.Span.EmphasisMarker;
+          switch (span.Span.EmphasisMarker) {
+            case "*":
+            case "_":
+            case "**":
+            case "__":
+              span.Span.IsValid = false;
+              firstChild.Span.IsValid = false;
+              break;
+          }
+        }
+      }
+
+      foreach (var child in span.Children) {
+        FindAndMarkInvalidEmphasisSpans(child);
+      }
+    }
+
+
     private static void CategorizeEmphasisSpans(
         EmphasisSpanWithChildren span, int nestingLevel = 0, int emphasisLevel = 0, bool strikethrough = false)
     {
       Debug.Assert(span != null);
-      switch (span.Span.EmphasisMarker) {
-        case "~~":
-          if (nestingLevel > 0) {
-            // Strikethrough cannot be nested inside other emphasis in Doxygen.
-            return;
-          }
-          strikethrough = true;
-          break;
 
-        case "*":
-        case "_":
-          if (emphasisLevel == 0 || emphasisLevel == 2) {
-            ++emphasisLevel;
-          }
-          break;
+      if (span.Span.IsValid) {
+        switch (span.Span.EmphasisMarker) {
+          case "~~":
+            strikethrough = true;
+            break;
 
-        case "**":
-        case "__":
-          if (emphasisLevel == 0 || emphasisLevel == 1) {
-            emphasisLevel += 2;
-          }
-          break;
+          case "*":
+          case "_":
+            if (emphasisLevel == 0 || emphasisLevel == 2) {
+              ++emphasisLevel;
+            }
+            break;
 
-        case "***":
-        case "___":
-          emphasisLevel = Math.Max(emphasisLevel, 3);
-          break;
+          case "**":
+          case "__":
+            if (emphasisLevel == 0 || emphasisLevel == 1) {
+              emphasisLevel += 2;
+            }
+            break;
 
-        default:
-          break; // Skip this span, it contains an unsupported marker.
+          case "***":
+          case "___":
+            emphasisLevel = Math.Max(emphasisLevel, 3);
+            break;
+
+          default:
+            break; // Skip this span, it contains an unsupported marker.
+        }
       }
 
       span.Span.Category = new EmphasisCategory() {

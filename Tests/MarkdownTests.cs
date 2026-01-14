@@ -84,6 +84,7 @@ namespace VSDoxyHighlighter.Tests
       DoTest("Imbalanced _emphasis marker.");
       DoTest("Imbalanced **emphasis marker.");
       DoTest("Imbalanced __emphasis marker.");
+      DoTest("Imbalanced ~strikethrough marker.");
       DoTest("Imbalanced ~~strikethrough marker.");
 
       DoTest("Imbalanced emphasis* marker.");
@@ -91,6 +92,7 @@ namespace VSDoxyHighlighter.Tests
       DoTest("Imbalanced emphasis** marker.");
       DoTest("Imbalanced emphasis__ marker.");
       DoTest("Imbalanced strikethrough~ marker.");
+      DoTest("Imbalanced strikethrough~~ marker.");
 
       DoTest("Line with *line \n break*.");
       DoTest("Line with _line \n break_.");
@@ -206,11 +208,130 @@ namespace VSDoxyHighlighter.Tests
 
 
     [TestMethod()]
-    public void NestedWithStrikethrough()
+    public void NestedStrikethroughAndStars()
     {
       DoTest("~~*Some test*~~", ("~~*Some test*~~", ClassificationEnum.StrikethroughEmphasisMinor));
       DoTest("~~**Some test**~~", ("~~**Some test**~~", ClassificationEnum.StrikethroughEmphasisMajor));
       DoTest("~~***Some test***~~", ("~~***Some test***~~", ClassificationEnum.StrikethroughEmphasisHuge));
+
+      // Doxygen has somewhat peculiar behavior, compare comment in FindAndMarkInvalidEmphasisSpans().
+      DoTest("*~~This is nothing~~*");
+      DoTest("*Some ~~thing~~*", 
+        ("*Some ", ClassificationEnum.EmphasisMinor), 
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisMinor), 
+        ("*", ClassificationEnum.EmphasisMinor));
+      DoTest("*~~Not a~~ thing*");
+      DoTest("*This ~~is~~ something*",
+        ("*This ", ClassificationEnum.EmphasisMinor),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisMinor),
+        (" something*", ClassificationEnum.EmphasisMinor));
+      DoTest("*~~Not a~~ test ~~thing~~ again*", 
+        ("~~thing~~", ClassificationEnum.Strikethrough));
+      DoTest("*Some **~~This is nothing~~** test*",
+        ("*Some **~~This is nothing~~** test*", ClassificationEnum.EmphasisMinor));
+
+      DoTest("**~~This is nothing~~**");
+      DoTest("**Some ~~thing~~**",
+        ("**Some ", ClassificationEnum.EmphasisMajor),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisMajor),
+        ("**", ClassificationEnum.EmphasisMajor));
+      DoTest("**~~Not a~~ thing**");
+      DoTest("**This ~~is~~ something**",
+        ("**This ", ClassificationEnum.EmphasisMajor),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisMajor),
+        (" something**", ClassificationEnum.EmphasisMajor));
+      DoTest("**~~Not a~~ test ~~thing~~ again**",
+        ("~~thing~~", ClassificationEnum.Strikethrough));
+      DoTest("**Some *~~This is nothing~~* test**",
+        ("**Some *~~This is nothing~~* test**", ClassificationEnum.EmphasisMajor));
+
+      // In contrast to "*" and "**", Doxygen recognizes "***" here.
+      DoTest("***~~This is something~~***",
+        ("***~~This is something~~***", ClassificationEnum.StrikethroughEmphasisHuge));
+      DoTest("***Some ~~thing~~***",
+        ("***Some ", ClassificationEnum.EmphasisHuge),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        ("***", ClassificationEnum.EmphasisHuge));
+      DoTest("***~~Some~~ thing***",
+        ("***", ClassificationEnum.EmphasisHuge),
+        ("~~Some~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" thing***", ClassificationEnum.EmphasisHuge));
+      DoTest("***This ~~is~~ something***",
+        ("***This ", ClassificationEnum.EmphasisHuge),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" something***", ClassificationEnum.EmphasisHuge));
+      DoTest("***~~This is a~~ test ~~thing~~ again***",
+        ("***", ClassificationEnum.EmphasisHuge),
+        ("~~This is a~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisHuge),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" again***", ClassificationEnum.EmphasisHuge));
+      DoTest("***Some *~~This is nothing~~* test***",
+        ("***Some *~~This is nothing~~* test***", ClassificationEnum.EmphasisHuge));
+    }
+
+
+    [TestMethod()]
+    public void NestedStrikethroughAndUnderline()
+    {
+      DoTest("~~_Some test_~~", ("~~_Some test_~~", ClassificationEnum.StrikethroughEmphasisMinor));
+      DoTest("~~__Some test__~~", ("~~__Some test__~~", ClassificationEnum.StrikethroughEmphasisMajor));
+      DoTest("~~___Some test___~~", ("~~___Some test___~~", ClassificationEnum.StrikethroughEmphasisHuge));
+
+      // Doxygen has somewhat peculiar behavior, compare comment in FindAndMarkInvalidEmphasisSpans().
+      DoTest("_~~This is nothing~~_");
+      DoTest("_Some ~~thing~~_",
+        ("_Some ", ClassificationEnum.EmphasisMinor),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisMinor),
+        ("_", ClassificationEnum.EmphasisMinor));
+      DoTest("_~~Not a~~ thing_");
+      DoTest("_This ~~is~~ something_",
+        ("_This ", ClassificationEnum.EmphasisMinor),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisMinor),
+        (" something_", ClassificationEnum.EmphasisMinor));
+      DoTest("_~~Not a~~ test ~~thing~~ again_",
+        ("~~thing~~", ClassificationEnum.Strikethrough));
+      DoTest("_Some __~~This is nothing~~__ test_",
+        ("_Some __~~This is nothing~~__ test_", ClassificationEnum.EmphasisMinor));
+
+      DoTest("__~~This is nothing~~__");
+      DoTest("__Some ~~thing~~__",
+        ("__Some ", ClassificationEnum.EmphasisMajor),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisMajor),
+        ("__", ClassificationEnum.EmphasisMajor));
+      DoTest("__~~Not a~~ thing__");
+      DoTest("__This ~~is~~ something__",
+        ("__This ", ClassificationEnum.EmphasisMajor),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisMajor),
+        (" something__", ClassificationEnum.EmphasisMajor));
+      DoTest("__~~Not a~~ test ~~thing~~ again__",
+        ("~~thing~~", ClassificationEnum.Strikethrough));
+      DoTest("__Some _~~This is nothing~~_ test__",
+        ("__Some _~~This is nothing~~_ test__", ClassificationEnum.EmphasisMajor));
+
+      // In contrast to "_" and "__", Doxygen recognizes "___" here.
+      DoTest("___~~This is something~~___",
+        ("___~~This is something~~___", ClassificationEnum.StrikethroughEmphasisHuge));
+      DoTest("___Some ~~thing~~___",
+        ("___Some ", ClassificationEnum.EmphasisHuge),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        ("___", ClassificationEnum.EmphasisHuge));
+      DoTest("___~~Some~~ thing___",
+        ("___", ClassificationEnum.EmphasisHuge),
+        ("~~Some~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" thing___", ClassificationEnum.EmphasisHuge));
+      DoTest("___This ~~is~~ something___",
+        ("___This ", ClassificationEnum.EmphasisHuge),
+        ("~~is~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" something___", ClassificationEnum.EmphasisHuge));
+      DoTest("___~~This is a~~ test ~~thing~~ again___",
+        ("___", ClassificationEnum.EmphasisHuge),
+        ("~~This is a~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" test ", ClassificationEnum.EmphasisHuge),
+        ("~~thing~~", ClassificationEnum.StrikethroughEmphasisHuge),
+        (" again___", ClassificationEnum.EmphasisHuge));
+      DoTest("___Some _~~This is nothing~~_ test___",
+        ("___Some _~~This is nothing~~_ test___", ClassificationEnum.EmphasisHuge));
     }
 
 
@@ -351,12 +472,27 @@ namespace VSDoxyHighlighter.Tests
 
 
     [TestMethod()]
+    public void SameLevelNested()
+    {
+      DoTest("*Some *test* text*", ("*Some *test*", ClassificationEnum.EmphasisMinor));
+      DoTest("**Some **test** text**", ("**Some **test**", ClassificationEnum.EmphasisMajor));
+      DoTest("***Some ***test*** text***", ("***Some ***test***", ClassificationEnum.EmphasisHuge));
+      DoTest("_Some _test_ text_", ("_Some _test_", ClassificationEnum.EmphasisMinor));
+      DoTest("__Some __test__ text__", ("__Some __test__", ClassificationEnum.EmphasisMajor));
+      DoTest("___Some ___test___ text___", ("___Some ___test___", ClassificationEnum.EmphasisHuge));
+      DoTest("~~Some ~~test~~ text~~", ("~~Some ~~test~~", ClassificationEnum.Strikethrough));
+    }
+
+
+    [TestMethod()]
     public void MultipleSeparateBlocks()
     { 
-      DoTest("This *is some* test with _multiple emphasis_ markers. **It continues *on* some** more!",
+      DoTest("This *is some* test with _multiple emphasis_ markers. **It ~~continues~~ *on* some** more!",
         ("*is some*", ClassificationEnum.EmphasisMinor),
         ("_multiple emphasis_", ClassificationEnum.EmphasisMinor),
-        ("**It continues ", ClassificationEnum.EmphasisMajor),
+        ("**It ", ClassificationEnum.EmphasisMajor),
+        ("~~continues~~", ClassificationEnum.StrikethroughEmphasisMajor),
+        (" ", ClassificationEnum.EmphasisMajor),
         ("*on*", ClassificationEnum.EmphasisHuge),
         (" some**", ClassificationEnum.EmphasisMajor));
     }
