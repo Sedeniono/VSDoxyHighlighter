@@ -12,40 +12,6 @@ namespace VSDoxyHighlighter.Tests
   [TestClass()]
   public class FragmentsMatcherMarkdownEmphasisAndStrikethroughTests
   {
-    class FailFastTraceListener : DefaultTraceListener
-    {
-      public override void Fail(string message, string detailMessage)
-      {
-        var stderr = Console.OpenStandardError();
-        using (var writer = new StreamWriter(stderr)) {
-          writer.AutoFlush = true;
-
-          writer.WriteLine("Assertion failed");
-
-          if (!string.IsNullOrEmpty(message))
-            writer.WriteLine(message);
-
-          if (!string.IsNullOrEmpty(detailMessage))
-            writer.WriteLine(detailMessage);
-
-          writer.WriteLine();
-          writer.WriteLine("Stack trace:");
-          writer.WriteLine(new System.Diagnostics.StackTrace(true));
-        }
-
-        Environment.FailFast(message);
-      }
-    }
-
-
-
-    [TestInitialize]
-    public void TestInitialize()
-    {
-      Debug.Listeners.Clear();
-      Debug.Listeners.Add(new FailFastTraceListener());
-    }
-
     private static List<Utils.FormattedFragmentText> FindFragments(string input)
     {
       var m = new FragmentsMatcherMarkdownEmphasisAndStrikethrough();
