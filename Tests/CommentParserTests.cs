@@ -1374,12 +1374,11 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(52, 13, ClassificationEnum.EmphasisMinor),
         new FormattedFragment(76, 16, ClassificationEnum.EmphasisMinor),
         new FormattedFragment(110, 13, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(140, 8, ClassificationEnum.EmphasisMinor),
+        new FormattedFragment(134, 14, ClassificationEnum.EmphasisMinor),
         new FormattedFragment(155, 8, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(178, 10, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(207, 15, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(230, 11, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(248, 3, ClassificationEnum.EmphasisMinor),
+        new FormattedFragment(179, 15, ClassificationEnum.EmphasisMinor),
+        new FormattedFragment(202, 11, ClassificationEnum.EmphasisMinor),
+        new FormattedFragment(220, 3, ClassificationEnum.EmphasisMinor),
       };
     }
 
@@ -1428,12 +1427,11 @@ namespace VSDoxyHighlighter.Tests
         new FormattedFragment(52, 13, expectedFormat),
         new FormattedFragment(76, 18, expectedFormat),
         new FormattedFragment(110, 14, expectedFormat),
-        new FormattedFragment(142, 8, expectedFormat),
+        new FormattedFragment(135, 15, expectedFormat),
         new FormattedFragment(157, 8, expectedFormat),
-        new FormattedFragment(180, 10, expectedFormat),
-        new FormattedFragment(207, 15, expectedFormat),
-        new FormattedFragment(230, 13, expectedFormat),
-        new FormattedFragment(250, 5, expectedFormat),
+        new FormattedFragment(181, 15, expectedFormat),
+        new FormattedFragment(204, 13, expectedFormat),
+        new FormattedFragment(224, 5, expectedFormat),
       };
     }
 

@@ -6,10 +6,8 @@
 /**
 **bold**
 */
-/// Some **_more_** bold
 /// Some (**bold ( text**[ with ,**some more**.
 /// **v**
 
-/// Not ***bold text***
 /// Not**bold** text
 /// Not **bold**text
