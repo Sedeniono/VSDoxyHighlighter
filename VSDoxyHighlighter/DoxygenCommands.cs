@@ -375,7 +375,7 @@ namespace VSDoxyHighlighter
         bool isLetter1 = char.IsLetter(c1.Command[0]);
         bool isLetter2 = char.IsLetter(c2.Command[0]);
         if ((isLetter1 && isLetter2) || (!isLetter1 && !isLetter2)) {
-          return string.Compare(c1.Command, c2.Command, StringComparison.InvariantCulture);
+          return string.Compare(c1.Command, c2.Command, StringComparison.Ordinal);
         }
         else if (isLetter1) {
           return -1;

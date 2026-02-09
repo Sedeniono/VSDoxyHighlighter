@@ -265,7 +265,7 @@ namespace VSDoxyHighlighter
     {
       while (searchStartIdx < searchEndIdx) {
         Debug.Assert(searchStartIdx >= 0);
-        int endEmphasisStartIdx = text.IndexOf(emphasisMarker, searchStartIdx, StringComparison.InvariantCulture);
+        int endEmphasisStartIdx = text.IndexOf(emphasisMarker, searchStartIdx, StringComparison.Ordinal);
         if (endEmphasisStartIdx < 0 || endEmphasisStartIdx >= searchEndIdx) {
           return (-1, -1);
         }

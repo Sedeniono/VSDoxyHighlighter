@@ -895,7 +895,7 @@ namespace VSDoxyHighlighter
       string textWithinBraces = fragmentText.Substring(1, fragmentText.Length - 2);
 
       // Doxygen always uses a comma to separate the options, ignores whitespace and compares case-insensitively.
-      var options = textWithinBraces.Split(',').Select(o => o.Trim().ToLower(CultureInfo.InvariantCulture));
+      var options = textWithinBraces.Split(',').Select(o => o.Trim());
 
       bool foundMutuallyExclusiveOption = false;
       foreach (string option in options) {
@@ -903,13 +903,16 @@ namespace VSDoxyHighlighter
           continue; // Doxygen silently ignores empty entries.
         }
         // https://www.doxygen.nl/manual/commands.html#cmdcite
-        if (option == "number" || option == "shortauthor" || option == "year") {
+        if (option.Equals("number", StringComparison.OrdinalIgnoreCase)
+            || option.Equals("shortauthor", StringComparison.OrdinalIgnoreCase)
+            || option.Equals("year", StringComparison.OrdinalIgnoreCase)) {
           if (foundMutuallyExclusiveOption) {
             return false; // No syntax highlighting if multiple mutually exclusive options are found.
           }
           foundMutuallyExclusiveOption = true;
         }
-        else if (option != "nopar" && option != "nocite") {
+        else if (!option.Equals("nopar", StringComparison.OrdinalIgnoreCase)
+            && !option.Equals("nocite", StringComparison.OrdinalIgnoreCase)) {
           // Don't provide syntax highlighting for unknown options, even though Doxygen ignores them,
           // so that the user realizes the mistake.
           return false;
@@ -988,7 +991,7 @@ namespace VSDoxyHighlighter
       int startMarkerLength = startMarkerEndIdx - startMarkerStartIdx;
       Debug.Assert(startMarkerLength > 0);
       string endMarkerStr = new string('`', startMarkerLength);
-      int endMarkerStartIdx = text.IndexOf(endMarkerStr, startMarkerEndIdx, StringComparison.InvariantCulture);
+      int endMarkerStartIdx = text.IndexOf(endMarkerStr, startMarkerEndIdx, StringComparison.Ordinal);
       if (endMarkerStartIdx < 0) {
         return -1;
       }
