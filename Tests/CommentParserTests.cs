@@ -1,90 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VSDoxyHighlighter;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
-using static System.Collections.Specialized.BitVector32;
 using System.Text.RegularExpressions;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace VSDoxyHighlighter.Tests
 {
-  internal class Utils
-  {
-    public static string ReadTestInputFromFile(string filenameWithoutPath)
-    {
-      string fileContent = File.ReadAllText("InputFiles\\" + filenameWithoutPath);
-      if (string.IsNullOrEmpty(fileContent)) {
-        throw new ArgumentException("Input file '" + filenameWithoutPath + "' could not be read.");
-      }
-      return fileContent;
-    }
-
-
-    /// <summary>
-    /// Used for tests where we do not check the position.
-    /// </summary>
-    [DebuggerDisplay("Text={Text}, Classification={Classification}")]
-    public struct FormattedFragmentText
-    {
-      public string Text { get; private set; }
-
-      public ClassificationEnum Classification { get; private set; }
-
-      public FormattedFragmentText(string text, ClassificationEnum classification)
-      {
-        Debug.Assert(text.Length > 0);
-        Text = text;
-        Classification = classification;
-      }
-    }
-
-
-    public static List<FormattedFragmentText> ConvertToTextFragments(string text, IEnumerable<FormattedFragmentGroup> fragmentGroups)
-    {
-      var result = new List<FormattedFragmentText>();
-      foreach (FormattedFragmentGroup group in fragmentGroups) {
-        foreach (FormattedFragment fragment in group.Fragments) {
-          Assert.IsTrue(fragment.Length > 0);
-          Assert.IsTrue(fragment.EndIndex < text.Length);
-          string str = text.Substring(fragment.StartIndex, fragment.Length);
-          result.Add(new FormattedFragmentText(str, fragment.Classification));
-        }
-      }
-      return result;
-    }
-
-
-    public static List<FormattedFragment> ToFlatFragmentList(IEnumerable<FormattedFragmentGroup> fragmentGroups) 
-    {
-      var result = new List<FormattedFragment>();
-      foreach (FormattedFragmentGroup group in fragmentGroups) {
-        result.AddRange(group.Fragments);
-      }
-      return result;
-    }
-
-
-    public static void WriteFragmentsToFile(string filename, List<FormattedFragmentText> fragments)
-    {
-      using (StreamWriter writer = new StreamWriter(filename)) {
-        foreach (Utils.FormattedFragmentText fragment in fragments) {
-          writer.WriteLine($"Text={fragment.Text}, Type={fragment.Classification}");
-        }
-      }
-    }
-
-
-    public static CommentParser CreateDefaultCommentParser() 
-    {
-      return new CommentParser(new DoxygenCommands(new GeneralOptionsFake()));
-    }
-  }
-
-
   [TestClass()]
   public class CommentParserTests
   {
@@ -1339,127 +1263,6 @@ namespace VSDoxyHighlighter.Tests
       var actualFragments = formatter.Parse(
         Utils.ReadTestInputFromFile("NothingToFormat.cpp"));
       Assert.AreEqual(0, actualFragments.Count());
-    }
-
-
-    [TestMethod()]
-    public void SingleStarShouldFormatItalic()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
-
-      var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
-    }
-
-
-    [TestMethod()]
-    public void SingleUnderscoreShouldFormatItalic()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_SingleStar.cpp"));
-
-      var expectedFragments = GetExpectationsForItalic();
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
-    }
-
-
-    private List<FormattedFragment> GetExpectationsForItalic()
-    {
-      return new List<FormattedFragment>() {
-        new FormattedFragment(9, 8, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(33, 8, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(52, 13, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(76, 16, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(110, 13, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(134, 14, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(155, 8, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(179, 15, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(202, 11, ClassificationEnum.EmphasisMinor),
-        new FormattedFragment(220, 3, ClassificationEnum.EmphasisMinor),
-      };
-    }
-
-
-    [TestMethod()]
-    public void DoubleStarShouldFormatBold()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_DoubleStar.cpp"));
-
-      var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
-    }
-
-
-    [TestMethod()]
-    public void DoubleUnderscoreShouldFormatBold()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_DoubleUnderscore.cpp"));
-
-      var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.EmphasisMajor);
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
-    }
-
-
-    [TestMethod()]
-    public void DoubleTildeShouldFormatStrikethrough()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_DoubleTilde.cpp"));
-
-      var expectedFragments = GetExpectationsForBoldOrStrikethrough(ClassificationEnum.Strikethrough);
-      CollectionAssert.AreEqual(expectedFragments, Utils.ToFlatFragmentList(actualFragmentGroups));
-    }
-
-
-    private List<FormattedFragment> GetExpectationsForBoldOrStrikethrough(ClassificationEnum expectedFormat)
-    {
-      return new List<FormattedFragment>() {
-        new FormattedFragment(9, 8, expectedFormat),
-        new FormattedFragment(33, 8, expectedFormat),
-        new FormattedFragment(52, 13, expectedFormat),
-        new FormattedFragment(76, 18, expectedFormat),
-        new FormattedFragment(110, 14, expectedFormat),
-        new FormattedFragment(135, 15, expectedFormat),
-        new FormattedFragment(157, 8, expectedFormat),
-        new FormattedFragment(181, 15, expectedFormat),
-        new FormattedFragment(204, 13, expectedFormat),
-        new FormattedFragment(224, 5, expectedFormat),
-      };
-    }
-
-
-    [TestMethod()]
-    public void InlineCodeShouldBeFormatted()
-    {
-      var formatter = Utils.CreateDefaultCommentParser();
-      var actualFragmentGroups = formatter.Parse(
-        Utils.ReadTestInputFromFile("Markdown_InlineCode.cpp"));
-      var actualFragments = Utils.ToFlatFragmentList(actualFragmentGroups);
-
-      var expectedFragments = new List<FormattedFragment>() {
-        new FormattedFragment(4, 13, ClassificationEnum.InlineCode),
-        new FormattedFragment(30, 8, ClassificationEnum.InlineCode),
-        new FormattedFragment(48, 13, ClassificationEnum.InlineCode),
-        new FormattedFragment(72, 6, ClassificationEnum.InlineCode),
-        new FormattedFragment(114, 7, ClassificationEnum.InlineCode),
-        new FormattedFragment(121, 7, ClassificationEnum.InlineCode),
-        new FormattedFragment(134, 26, ClassificationEnum.InlineCode),
-        new FormattedFragment(167, 45, ClassificationEnum.InlineCode),
-        new FormattedFragment(227, 31, ClassificationEnum.InlineCode),
-        new FormattedFragment(263, 6, ClassificationEnum.InlineCode),
-        new FormattedFragment(273, 23, ClassificationEnum.InlineCode),
-        new FormattedFragment(310, 5, ClassificationEnum.InlineCode),
-      };
-
-      CollectionAssert.AreEqual(expectedFragments, actualFragments);
     }
 
 
