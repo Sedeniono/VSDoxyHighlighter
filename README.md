@@ -2,12 +2,6 @@
 
 ![test and build](https://github.com/Sedeniono/VSDoxyHighlighter/actions/workflows/build_and_test.yml/badge.svg)
 
-
-[![VS Marketplace rating](https://img.shields.io/visual-studio-marketplace/stars/Sedenion.VSDoxyHighlighter?label=VS%20Marketplace%3A%20Rating&color=green)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
-[![VS Marketplace downloads](https://img.shields.io/visual-studio-marketplace/d/Sedenion.VSDoxyHighlighter?label=Downloads)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
-[![VS Marketplace installs](https://img.shields.io/visual-studio-marketplace/i/Sedenion.VSDoxyHighlighter?label=Installs)](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)
-
-
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Features](#features)
