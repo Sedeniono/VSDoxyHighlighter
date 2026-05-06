@@ -17,6 +17,7 @@
     - [Mapping of commands and parameters to classifications](#mapping-of-commands-and-parameters-to-classifications)
     - [Color schemes](#color-schemes)
   - [Comment types](#comment-types)
+  - [Custom file extensions such as `.dox`](#custom-file-extensions-such-as-dox)
 - [Known problems](#known-problems)
 
 
@@ -162,6 +163,15 @@ In the Visual Studio options, see the settings under the "VSDoxyHighlighter" nod
 
 You can configure separately for each comment type (`/*`, `/**`, `/*!`, `//`, `///` or `//!`) whether the extension should perform highlighting and autocomplete.
 By default, the comment types `//` and `/*` are disabled because Doxygen does not parse those.
+
+
+
+## Custom file extensions such as `.dox`
+`dox` files are not recognized by Visual Studio by default as containing C/C++.
+To change this, navigate to the VS options → Text Editor → File Extension. 
+Add `dox` and assign as editor `Microsoft Visual C++`. 
+Also see the [official documentation](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2017/ide/reference/options-text-editor-file-extension).
+After restarting VS, the file is then recognized as containing C/C++ and the VSDoxyHighlighter extension will work.
 
 
 
