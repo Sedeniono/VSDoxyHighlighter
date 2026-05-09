@@ -1,3 +1,15 @@
+# v1.10.0 (????? ongoing)
+**Major changes:** 
+* Updated quick info documentation of all commands to Doxygen v1.15.0.
+* Support the braced options of the `\cite` command that were introduced in Doxygen [v1.14.0](https://www.doxygen.nl/manual/changelog.html#log_1_14).
+* A "please rate" notice is shown after 30 days. (The user can close it, and it will never appear again.)
+* Implemented [#8](https://github.com/Sedeniono/VSDoxyHighlighter/issues/8): Improved [Doxygen-style emphasis markdown](https://www.doxygen.nl/manual/markdown.html#md_emphasis) support. 
+  * Triple emphases (e.g. `***bold and italic***` or `**_bold and italic_**`) are now supported and render as bold \& italic by default. Combination with strikethrough is also supported.  
+    <img src="Pictures/changelog_v1.10.0_triple_markdown.png" height="65">
+  * The formatting can be configured using the new classifications `VSDoxyHighlighter - Emphasis (huge)` and `VSDoxyHighlighter - Strikethrough + emphasis (huge)` in the VS options in the "Fonts \& Colors" dialog.
+  * Generally aligned the recognition of all emphases with the Doxygen behavior.
+
+
 # v1.9.0 (January 6, 2025)
 **Major changes:** 
 * Support new commands introduced in Doxygen [v1.13.0](https://www.doxygen.nl/manual/changelog.html#log_1_13_0) and [v1.13.1](https://www.doxygen.nl/manual/changelog.html#log_1_13_1): `\plantumlfile`, `\?` and `\!`.  
