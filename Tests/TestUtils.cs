@@ -76,5 +76,38 @@ namespace VSDoxyHighlighter.Tests
     {
       return new CommentParser(new DoxygenCommands(new GeneralOptionsFake()));
     }
+
+
+    /// <summary>
+    /// A CollectionAssert.AreEqual() for lists of FormattedFragmentText that actually prints the mismatches.
+    /// </summary>
+    public static void AssertFragmentListsAreEqual(
+        List<FormattedFragmentText> expected,
+        List<FormattedFragmentText> actual)
+    {
+      int maxCount = Math.Max(expected.Count, actual.Count);
+      var mismatches = new System.Text.StringBuilder();
+      for (int i = 0; i < maxCount; ++i) {
+        if (i >= expected.Count) {
+          mismatches.AppendLine(
+            $"Index {i}: Expected <nothing>, Actual='{actual[i].Text}' with Type={actual[i].Classification}");
+        }
+        else if (i >= actual.Count) {
+          mismatches.AppendLine(
+            $"Index {i}: Expected='{expected[i].Text}' with Type={expected[i].Classification}, Actual <nothing>");
+        }
+        else if (!Equals(expected[i], actual[i])) {
+          mismatches.AppendLine(
+            $"Index {i}: Expected='{expected[i].Text}' with Type={expected[i].Classification}" +
+            $" | Actual='{actual[i].Text}' with Type={actual[i].Classification}");
+        }
+      }
+
+      if (mismatches.Length > 0) {
+        Assert.Fail(
+          $"Fragment list mismatch (expected {expected.Count}, actual {actual.Count} elements):\n" +
+          mismatches.ToString());
+      }
+    }
   }
 }

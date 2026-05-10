@@ -1258,7 +1258,7 @@ namespace VSDoxyHighlighter.Tests
       Utils.WriteFragmentsToFile("VariousKeywords_Expected.txt", expectedTextFragments);
       Utils.WriteFragmentsToFile("VariousKeywords_Actual.txt", actualTextFragments);
 
-      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
+      Utils.AssertFragmentListsAreEqual(expectedTextFragments, actualTextFragments);
     }
 
 
@@ -1272,7 +1272,7 @@ namespace VSDoxyHighlighter.Tests
       var expectedTextFragments = GetExpectedTextFragmentsForVariousKeywordsTests();
       var actualTextFragments = Utils.ConvertToTextFragments(input, Utils.CreateDefaultCommentParser().Parse(input));
 
-      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
+      Utils.AssertFragmentListsAreEqual(expectedTextFragments, actualTextFragments);
     }
 
 
