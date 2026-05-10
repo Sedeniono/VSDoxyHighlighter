@@ -608,6 +608,6 @@ if __name__ == "__main__":
     extract_and_convert_doxygen_commands_from_html(
         # The input html file is https://www.doxygen.nl/manual/commands.html
         # (simply saved via a browser).
-        html_filename=os.path.join(main_folder, "testInput1.16.1.htm"),
+        html_filename=os.path.join(main_folder, "testInput1.17.0.htm"),
         output_csharp_filename=os.path.join(main_folder, "DoxygenCommandsGeneratedFromHelpPage.cs"),
         output_debug_dump_filename=os.path.join(main_folder, "GeneratedDebugDump.txt"))

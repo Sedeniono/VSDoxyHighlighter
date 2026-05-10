@@ -1774,14 +1774,14 @@ Anchor: cmdparam  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cm
 Help text:
 <Starts a parameter description for a function parameter with name <parameter-name>, followed by a description of the parameter. The existence of the parameter is checked and a warning is given if the documentation of this (or any other) parameter is missing or not present in the function declaration or definition.
 
-The ><```\param```>< command has an optional attribute, <dir>, specifying the direction of the parameter. Possible values are "[in]", "[out]", and "[in,out]"; note the [square] brackets in this description. For the bidirecional values, directions "in" and "out" can be specified in any order, and they can either be written altogether, or separated with a comma (><```,```><) or a space. That means that for example values "[outin]" or "[in out]" are also valid. Note that it is also possible to put whitespace between the command and the <dir>. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
+The ><```\param```>< command has an optional attribute, <dir>, specifying the direction of the parameter. Possible values are "[in]", "[out]", and "[in,out]"; note the [square] brackets in this description. For the bidirectional values, directions "in" and "out" can be specified in any order, and they can either be written together (without separator), or separated with a comma (><```,```><) or a space. That means that for example values "[outin]" or "[in out]" are also valid. Note that it is also possible to put whitespace between the command and the <dir>. When a parameter is both input and output, [in,out] is used as attribute. Here is an example for the function ><```memcpy:```><
 ><```
    /*!
     * Copies bytes from a source memory area to a destination memory area,
     * where both areas may not overlap.
-    * @param[out] dest The memory area to copy to.
-    * @param[in]  src  The memory area to copy from.
-    * @param[in]  n    The number of bytes to copy
+    * \param[out] dest The memory area to copy to.
+    * \param[in]  src  The memory area to copy from.
+    * \param[in]  n    The number of bytes to copy
     */
    void memcpy(void *dest, const void *src, size_t n);
 
@@ -1789,18 +1789,50 @@ The ><```\param```>< command has an optional attribute, <dir>, specifying the di
 
 Multiple adjacent ><```\param```>< commands will be joined into a single paragraph. Each parameter description will start on a new line. The ><```\param```>< description ends when a blank line or some other sectioning command is encountered. See section ><[\fn]§https://www.doxygen.nl/manual/commands.html#cmdfn§>< for an example.
 
-Note that you can also document multiple parameters with a single ><```\param```>< command using a comma separated list. Here is an example:
+The parameter name is normally the name given in the function signature. For unnamed parameters, a positional index can also be used (starting with 1 for the first parameter).
+><```
+   /** Base */
+   class Base
+   {
+    public:
+       /** Method
+        *  \param 1 First parameter docs
+        *  \param 2 Second parameter docs
+        */
+    virtual void method(int, int) = 0;
+   };
+    
+   /** Derived */
+   class Derived : public Base
+   {
+    public:
+    void method(int x, int y) override;
+   };
+
+```><Alternatively, a minus sign (-) can be used as placeholder for the name of an unnamed parameter.
+><```
+   /** Function docs.
+    *  \param - First parameter
+    *  \param - Second parameter
+    */
+   void foo(int, int)
+   {
+   }
+
+```><Both ordinal position (numeric) and dash (-) parameter names are rendered as a dash in the output, unless a later definition or overriding method provides the actual parameter names, as is the case in the ><```Derived```>< class in the example above.
+
+Note that you can also document multiple parameters with a single ><```\param```>< command using a comma-separated list. Here is an example:
 
 ><```   /** Sets the position.
-    *  @param x,y,z Coordinates of the position in 3D space.
+    *  \param x,y,z Coordinates of the position in 3D space.
     */
-   void setPosition(double x,double y,double z,double t)
+   void setPosition(double x, double y, double z)
    {
    }
 
 ```><Note that for PHP one can also specify the type (or types if you separate them with a pipe symbol) which are allowed for a parameter (as this is not part of the definition). The syntax is the same as for the ><```phpDocumentor```><, i.e.
 ><```
-   @param  datatype1|datatype2 $paramname description```>
+   \param  datatype1|datatype2 $paramname description```>
 ------------------------------------
 
 
@@ -2091,13 +2123,13 @@ Command: cite
 Parameters: ['{'[option]'}'] <label>
 Anchor: cmdcite  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdcite
 Help text:
-<Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the .bib files listed in ><CITE_BIB_FILES§https://www.doxygen.nl/manual/config.html#cfg_cite_bib_files§><. For the LaTeX output the formatting of the reference in the text can be configured with ><LATEX_BIB_STYLE§https://www.doxygen.nl/manual/config.html#cfg_latex_bib_style§><. For other output formats a fixed representation is used. Note that using this command requires the ><```bibtex```>< tool to be present in the search path.
+<Adds a bibliographic reference in the text and in the list of bibliographic references. The <label> must be a valid BibTeX label that can be found in one of the ><```.bib```>< files listed in ><CITE_BIB_FILES§https://www.doxygen.nl/manual/config.html#cfg_cite_bib_files§><. For the LaTeX output the formatting of the reference in the text can be configured with ><LATEX_BIB_STYLE§https://www.doxygen.nl/manual/config.html#cfg_latex_bib_style§><. For other output formats a fixed representation is used. Note that using this command requires the ><```bibtex```>< tool to be present in the search path.
 
 There are a number of options possible:
     • ><```number```><, ><```shortauthor```><, ><```year```><, these options are mutually exclusive, in case none of these is specified ><```number```>< is assumed.
         • ><```number```>< create a numerical reference
         • ><```shortauthor```>< just the surname of the first author is given, and in case multiple authors are present the text "et al." is added
-        • ><```year```><, the year of publication is mentioned (when specified in the bibtex file.
+        • ><```year```><, the year of publication is mentioned (when specified in the bibtex file).
     • ><```nopar```><, no (square) brackets are added
     • ><```nocite```><, no link to a citation in the bibliography is made (and the reference is not added to the bibliography based on this item)>
 ------------------------------------
@@ -2771,7 +2803,7 @@ If it is unclear from the context which language is meant (for instance the comm
      class Cpp {};
      \endcode
 
-```><If the contents of the code block are in a language that Doxygen cannot parse, Doxygen will just show the output as-is. You can make this explicit using .unparsed, or by giving some other extension that Doxygen doesn't support, e.g.
+```><If the contents of the code block are in a language that Doxygen cannot parse, Doxygen will just show the output as-is. You can make this explicit using ><```.unparsed```><, or by giving some other extension that Doxygen doesn't support, e.g.
 
 ><```     \code{.unparsed}
      Show this as-is please
@@ -2954,6 +2986,74 @@ Here is an example of the use of the ><```\msc```>< command.
 
 
 ====================================
+Command: mermaid
+Parameters: ['{'option'}'] ["caption"] [<sizeindication>=<size>]
+Anchor: cmdmermaid  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmermaid
+Help text:
+<Starts a text fragment which should contain a valid Mermaid diagram definition. See ><https://mermaid.js.org/intro§https://mermaid.js.org/intro§>< for examples and syntax documentation. The text fragment ends with ><[\endmermaid]§https://www.doxygen.nl/manual/commands.html#cmdendmermaid§><.
+
+Mermaid supports multiple diagram types including flowcharts, sequence diagrams, class diagrams, state diagrams, Gantt charts, and more.
+
+Doxygen supports two rendering modes for Mermaid diagrams, controlled by the ><MERMAID_RENDER_MODE§https://www.doxygen.nl/manual/config.html#cfg_mermaid_render_mode§>< configuration option.
+
+The first argument is optional and can be used to specify the name of the generated image file inside curly brackets, i.e.
+><```
+     @mermaid{mydiagram}
+     flowchart LR
+       A --> B
+     @endmermaid
+
+```><When the name is specified, Doxygen will generate an image with that name. Without the name Doxygen will choose a name automatically.
+
+The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
+
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph ><Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§>< with the ><[\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§>< command.
+
+><!Note:!><
+	In Markdown files, Mermaid diagrams can also be written using fenced code blocks with the ><```mermaid```>< language identifier: ><```
+     ```mermaid
+     flowchart LR
+       A --> B
+     ```
+
+```>< These are automatically converted to ><```\mermaid```>< / ><```\endmermaid```><.
+	Doxygen creates a temporary file that is automatically removed unless the ><DOT_CLEANUP§https://www.doxygen.nl/manual/config.html#cfg_dot_cleanup§>< tag is set to ><```NO```><.
+
+Here is an example of the use of the ><```\mermaid```>< command.
+><```
+   /** Sender class. Can be used to send a command to the server.
+    *  The receiver will acknowledge the command by calling Ack().
+    *  \mermaid
+    *    sequenceDiagram
+    *    Sender->>Receiver: Command()
+    *    Receiver-->>Sender: Ack()
+    *  \endmermaid
+    */
+   class Sender
+   {
+    public:
+       /** Acknowledgment from server */
+    void Ack(bool ok);
+   };
+    
+   /** Receiver class. Can be used to receive and execute commands.
+    *  After execution of a command, the receiver will send an acknowledgment
+    *  \mermaid
+    *    sequenceDiagram
+    *    Receiver->>Sender: Command()
+    *    Sender-->>Receiver: Ack()
+    *  \endmermaid
+    */
+   class Receiver
+   {
+    public:
+       /** Execute a command on the server */
+    void Command(int commandId);
+   };```>
+------------------------------------
+
+
+====================================
 Command: startuml
 Parameters: ['{'option[,option]'}'] ["caption"] [<sizeindication>=<size>]
 Anchor: cmdstartuml  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdstartuml
@@ -2964,7 +3064,7 @@ Help text:
 	You need to install Java and the PlantUML's jar file, if you want to use this command. When using PlantUML in LaTeX you have to download some more ><```jar```>< files, for details see the PlantUML documentation. This also is valid for the ><```<engine>```><s ><```latex```>< and ><```math```><. The location of the PlantUML file should be specified using ><PLANTUML_JAR_PATH§https://www.doxygen.nl/manual/config.html#cfg_plantuml_jar_path§><. The other jar files should also reside in this directory.
 	The use of the ><```<engine>```>< ><```ditaa```>< is not possible in LaTeX as PlantUML only supports the ><```png```>< format and Doxygen requires, temporary, ><```eps```>< output.
 
-Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```><, ><```ebnf```><, ><```files```><, ><```chen```>< and ><```chronology```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
+Not all diagrams can be created with the PlantUML ><```@startuml```>< command but need another PlantUML ><```@start...```>< command. This will look like ><```@start<engine>```>< where currently supported are the following ><```<engine>```><s: ><```uml```><, ><```bpm```><, ><```wire```><, ><```dot```><, ><```ditaa```><, ><```salt```><, ><```math```><, ><```latex```><, ><```gantt```><, ><```mindmap```><, ><```wbs```><, ><```yaml```><, ><```creole```><, ><```json```><, ><```flow```><, ><```board```><, ><```git```><, ><```hcl```><, ><```regex```><, ><```ebnf```><, ><```chart```><, ><```nwdiag```><, ><```packetdiag```><, ><```project```><, ><```sprites```><, ><```files```><, ><```chen```>< and ><```chronology```><. By default the ><```<engine>```>< is ><```uml```><. The ><```<engine>```>< can be specified as an option. Also the file to write the resulting image to can be specified by means of an option, see the description of the first (optional) argument for details. Of course only one ><```<engine>```>< can be specified and also the filename can only be specified once.
 
 The first argument is optional and is for compatibility with running PlantUML as a preprocessing step before running Doxygen, you can also add the name of the image file after ><```\startuml```>< and inside curly brackets as option, i.e.
 ><```
@@ -3160,11 +3260,37 @@ Help text:
 
 
 ====================================
+Command: endmermaid
+Parameters: 
+Anchor: cmdendmermaid  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdendmermaid
+Help text:
+<Ends a block that was started with ><[\mermaid]§https://www.doxygen.nl/manual/commands.html#cmdmermaid§><.>
+------------------------------------
+
+
+====================================
 Command: enduml
 Parameters: 
 Anchor: cmdenduml  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdenduml
 Help text:
 <Ends a block that was started with ><[\startuml]§https://www.doxygen.nl/manual/commands.html#cmdstartuml§><.>
+------------------------------------
+
+
+====================================
+Command: mermaidfile
+Parameters: <file> ["caption"] [<sizeindication>=<size>]
+Anchor: cmdmermaidfile  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdmermaidfile
+Help text:
+<Inserts a Mermaid diagram from <file> into the documentation.
+
+The first argument specifies the file name of the Mermaid source file. Doxygen will look for files in the paths (or files) that you specified after the ><MERMAIDFILE_DIRS§https://www.doxygen.nl/manual/config.html#cfg_mermaidfile_dirs§>< tag. If the mermaid file is found it will be used as input for rendering. The resulting image will be put into the correct output directory. If the mermaid file name contains spaces you'll have to put quotes ("...") around it.
+
+The second argument is optional and can be used to specify the caption that is displayed below the image. This argument has to be specified between quotes even if it does not contain any spaces. The quotes are stripped before the caption is displayed.
+
+The third argument is also optional and can be used to specify the width or height of the image. For a description of the possibilities see the paragraph ><Size indication§https://www.doxygen.nl/manual/commands.html#image_sizeindicator§>< with the ><[\image]§https://www.doxygen.nl/manual/commands.html#cmdimage§>< command.
+
+See also: command ><[\mermaid]§https://www.doxygen.nl/manual/commands.html#cmdmermaid§><.>
 ------------------------------------
 
 
