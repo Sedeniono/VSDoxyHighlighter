@@ -128,6 +128,15 @@ Some text \lineinfo more text
 \union Test1 class.h "inc dir/class.h"
 \var unsigned long variable
 \weakgroup groupNameWithTitle Some group title
+\requirement REQ-001 User Authentication
+\requirement REQ-002
+\requirement 
+@satisfies REQ-001 Implements the core authentication mechanism
+@satisfies REQ-002
+@satisfies    
+@verifies REQ-001 Validates all authentication requirements
+@verifies REQ-002
+@verifies
 
 
 --- Section indicators ---

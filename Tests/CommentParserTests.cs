@@ -355,6 +355,26 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText("groupNameWithTitle", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText("Some group title", ClassificationEnum.Title),
 
+        new Utils.FormattedFragmentText(@"\requirement", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-001", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("User Authentication", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"\requirement", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-002", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\requirement", ClassificationEnum.Command),
+
+        new Utils.FormattedFragmentText(@"@satisfies", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-001", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("Implements the core authentication mechanism", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"@satisfies", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-002", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"@satisfies", ClassificationEnum.Command),
+
+        new Utils.FormattedFragmentText(@"@verifies", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-001", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("Validates all authentication requirements", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"@verifies", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("REQ-002", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"@verifies", ClassificationEnum.Command),
 
         // --- Section indicators ---
         new Utils.FormattedFragmentText(@"\attention", ClassificationEnum.Note),

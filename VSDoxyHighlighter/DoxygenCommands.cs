@@ -849,7 +849,8 @@ namespace VSDoxyHighlighter
           new List<string> {
             "addtogroup", "defgroup", "headerfile", "page", "weakgroup",
             "section", "subsection", "subsubsection", "paragraph", "subparagraph", "subsubparagraph",
-            "snippetlineno"
+            "snippetlineno", 
+            "requirement", "satisfies", "verifies"
           },
           new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_KeywordAtLineStart_1RequiredParamAsWord_1OptionalParamTillEnd),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.Parameter1, ClassificationEnum.Title }
