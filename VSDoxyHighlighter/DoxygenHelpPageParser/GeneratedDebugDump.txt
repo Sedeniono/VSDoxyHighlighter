@@ -1186,6 +1186,25 @@ Help text:
 
 
 ====================================
+Command: requirement
+Parameters: <id> [(title)]
+Anchor: cmdrequirement  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrequirement
+Help text:
+<Indicates that a comment block contains documentation for a requirement. In the output, all requirements are collected on a single page.
+
+A requirement can be referred to by its <id> using the normal linking commands like ><[\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§><. There are two special commands to refer to a requirement.
+    • ><[\satisfies]§https://www.doxygen.nl/manual/commands.html#cmdsatisfies§>< can be placed in the comment for a function or class (or any other symbol) that contributes to the ><*implementation*>< of the requirement.
+    • ><[\verifies]§https://www.doxygen.nl/manual/commands.html#cmdverifies§>< can be placed at the function or class that ><*tests*>< the requirement.
+
+Together the ><[\satisfies]§https://www.doxygen.nl/manual/commands.html#cmdsatisfies§>< and ><[\verifies]§https://www.doxygen.nl/manual/commands.html#cmdverifies§>< commands help to provide traceability information to show where in the code a requirement has been implemented and/or tested.
+
+Requirements can be imported via tag files as well.
+
+See also: commands ><[\satisfies]§https://www.doxygen.nl/manual/commands.html#cmdsatisfies§>< and ><[\verifies]§https://www.doxygen.nl/manual/commands.html#cmdverifies§>
+------------------------------------
+
+
+====================================
 Command: showinitializer
 Parameters: 
 Anchor: cmdshowinitializer  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdshowinitializer
@@ -2131,6 +2150,28 @@ Parameters: <name>
 Anchor: cmdrefitem  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdrefitem
 Help text:
 <Just like the ><[\ref]§https://www.doxygen.nl/manual/commands.html#cmdref§>< command, this command creates a reference to a named section, but this reference appears in a list that is started by ><[\secreflist]§https://www.doxygen.nl/manual/commands.html#cmdsecreflist§>< and ends with ><[\endsecreflist]§https://www.doxygen.nl/manual/commands.html#cmdendsecreflist§><. An example of such a list can be seen ><at the top of the page§https://www.doxygen.nl/manual/commands.html#showsecreflist§><.>
+------------------------------------
+
+
+====================================
+Command: satisfies
+Parameters: <req-id> [(short description)]
+Anchor: cmdsatisfies  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdsatisfies
+Help text:
+<Creates a reference to a requirement with an optional short description for the link text. The function, class, or other symbol that contain such reference is considered to contribute to the implementation of the requirement. A comment can contain multiple satisfies references pointing to different requirements. There can also be multiple contributors to the implementation of a single requirement, in which case the satisfies command should be mentioned in the documentation of each contributing party.
+
+See also: commands ><[\verifies]§https://www.doxygen.nl/manual/commands.html#cmdverifies§>< and ><[\requirement]§https://www.doxygen.nl/manual/commands.html#cmdrequirement§>
+------------------------------------
+
+
+====================================
+Command: verifies
+Parameters: <req-id> [(short description)]
+Anchor: cmdverifies  ==>  Hyperlink: https://www.doxygen.nl/manual/commands.html#cmdverifies
+Help text:
+<Creates a reference to a requirement with an optional short description for the link text. The function, class, or other symbol that contain such reference is considered to contribute to testing/verifying the requirement. A comment can contain multiple verifies references pointing to different requirements. There can also be multiple contributors to test/verify a single requirement, in which case the verifies command should be mentioned in the documentation of each contributing party.
+
+See also: commands ><[\satisfies]§https://www.doxygen.nl/manual/commands.html#cmdsatisfies§>< and ><[\requirement]§https://www.doxygen.nl/manual/commands.html#cmdrequirement§>
 ------------------------------------
 
 
