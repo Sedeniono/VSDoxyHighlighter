@@ -354,11 +354,11 @@ namespace VSDoxyHighlighter
       // => The \param command has very special behavior. Hence we do not parse it the same way as e.g. \snippet,
       //    which uses the FragmentsMatcherForFirstOptionalClampedOptions machinery. Instead, we use a pure regex.
       //
-      // https://regex101.com/r/mEmxhN/1
+      // https://regex101.com/r/OwHCub/1
       //
       //                                                                     Optional "[in,out]" parameter                                             name of the function param
-      //                                                               _________________________________________________________________________            ________________
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+(\w[^ \t\n\r]*)?)|{cLineEnd})";
+      //                                                               _________________________________________________________________________            ___________________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+([\w-][^ \t\n\r]*)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)

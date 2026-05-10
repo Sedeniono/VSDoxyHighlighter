@@ -203,7 +203,11 @@ Some text \lineinfo more text
 \param[in,in] No formatting because repetition of "in" is not allowed for param.
 \param[out,in,out] No formatting because repetition of "out" is not allowed for param.
 \param[OUT] param Nothing should be formatted because the option is case-sensitive.
-\parblock  
+\param - The "-" should be formatted since Doxygen 1.17.0; it represents an unnamed parameter.
+\param[in] -- The "--" should be formatted. I think Doxygen interprets it as a normal named parameter.
+\param 1 The "1" should be formatted since Doxygen 1.17.0; it represents an unnamed parameter.
+\param[out] 2 The "2" should be formatted since Doxygen 1.17.0; it represents an unnamed parameter.
+\parblock
 \endparblock
 \tparam some_param Description of template
 \post some description
