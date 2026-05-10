@@ -352,13 +352,28 @@ namespace VSDoxyHighlighter
       // - The comma is optional: "inout", "in out", "outin" and "out in" are all valid.
       //
       // => The \param command has very special behavior. Hence we do not parse it the same way as e.g. \snippet,
-      //    which uses the FragmentsMatcherForFirstOptionalClampedOptions machinery. Instead, we use a pure regex.
+      //    which uses the FragmentsMatcherForFirstOptionalClampedOptions machinery.
       //
-      // https://regex101.com/r/OwHCub/1
+      // Additionally, the function parameters specified in the \param are somewhat special, too:
+      // - Multiple parameters can be specified, separated by a comma. Basically the parsing stops at a whitespace,
+      //   but needs to continue if there is a comma before the whitespace.
+      // - Unnamed parameters can be specified using "1", "2",... or "-".
+      //   However, when trying it out, Doxygen also accepts e.g. "---" as parameter name. So it is not like we
+      //   must match a single "-", but multiple also lead to valid Doxygen output.
+      // - Regex part:
+      //       [^\s,]+    => match one or more characters that are neither a whitespace nor a comma
+      //       |,\s*      => **or** match a comma followed by any amount of whitespace
+      //   The match stops at the first whitespace not preceded by a comma because only `,\s*` allows whitespace
+      //   into the match. A whitespace with no comma before it will not match both of them, so we stop there.
       //
-      //                                                                     Optional "[in,out]" parameter                                             name of the function param
-      //                                                               _________________________________________________________________________            ___________________
-      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+([\w-][^ \t\n\r]*)?)|{cLineEnd})";
+      // The regex got way too complicated over time. We should write a dedicated parser as for the markdown emphasis
+      // in the future...
+      // 
+      // https://regex101.com/r/zn6oZz/1
+      //
+      //                                                                     Optional "[in,out]" parameter                                             name of the function params
+      //                                                               _________________________________________________________________________            ______________________
+      return $@"{cCommentStart}({cCmdPrefix}(?:{concatKeywords}))[ \t]*(\[[ \t]*(?:in|out|in[ \t]*?,?[ \t]*?out|out[ \t]*?,?[ \t]*?in)[ \t]*\])?(?:(?:[ \t]+((?:[^\s,\[]+|,\s*)+)?)|{cLineEnd})";
     }
 
     public static string BuildRegex_KeywordAtLineStart_1RequiredParamTillEnd(ICollection<string> keywords)

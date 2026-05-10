@@ -195,7 +195,6 @@ Some text \lineinfo more text
 \param[out  in ] outinParam Some description
 \param[ inout] outinParam Some description
 \param[ in out] outinParam Some description
-\param > The ">" should not be formatted because it is not a valid parameter.
 \param [in]someParam Only param gets formatted, but not "someParam" because of missing space after ]. Doxygen parses it incorrectly.
 \param[ out Nothing should be formatted because of invalid syntax (missing closing bracket).
 \param[invalid] Nothing should be formatted because "invalid" is not allowed.
@@ -207,6 +206,12 @@ Some text \lineinfo more text
 \param[in] -- The "--" should be formatted. I think Doxygen interprets it as a normal named parameter.
 \param 1 The "1" should be formatted since Doxygen 1.17.0; it represents an unnamed parameter.
 \param[out] 2 The "2" should be formatted since Doxygen 1.17.0; it represents an unnamed parameter.
+\param x,y,z Multiple parameters can be documented.
+\param[inout] param1, param2,  param3 Multiple parameters can be documented.
+\param x,,,y,z This is also accepted by Doxygen
+\param ,someParam This is also accepted by Doxygen
+\param !someParam This is also accepted by Doxygen
+\param > This is also accepted by Doxygen
 \parblock
 \endparblock
 \tparam some_param Description of template

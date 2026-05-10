@@ -492,7 +492,6 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"outinParam", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
-        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"-", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"[in]", ClassificationEnum.ParameterClamped),
@@ -502,6 +501,19 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"[out]", ClassificationEnum.ParameterClamped),
         new Utils.FormattedFragmentText(@"2", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"x,y,z", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"[inout]", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"param1, param2,  param3", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"x,,,y,z", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@",someParam", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"!someParam", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"\param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@">", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\parblock", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"\endparblock", ClassificationEnum.Command),
@@ -1305,6 +1317,12 @@ namespace VSDoxyHighlighter.Tests
       var expectedTextFragments = new List<Utils.FormattedFragmentText>() {
         new Utils.FormattedFragmentText("@param", ClassificationEnum.Command),
         new Utils.FormattedFragmentText("t\U0001F600t", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("@param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("\U0001F600t", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("@param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("t\U0001F600", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText("@param", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText("\U0001F600", ClassificationEnum.Parameter1),
 
         new Utils.FormattedFragmentText(@"\image", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"latex", ClassificationEnum.Parameter1),
@@ -1315,7 +1333,7 @@ namespace VSDoxyHighlighter.Tests
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragmentGroups);
-      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
+      Utils.AssertFragmentListsAreEqual(expectedTextFragments, actualTextFragments);
     }
 
 
@@ -1342,7 +1360,7 @@ namespace VSDoxyHighlighter.Tests
       };
 
       var actualTextFragments = Utils.ConvertToTextFragments(input, actualFragmentGroups);
-      CollectionAssert.AreEqual(expectedTextFragments, actualTextFragments);
+      Utils.AssertFragmentListsAreEqual(expectedTextFragments, actualTextFragments);
     }
 
   }
