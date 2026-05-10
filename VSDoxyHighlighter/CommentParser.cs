@@ -650,6 +650,14 @@ namespace VSDoxyHighlighter
     public static string BuildRegex_StartUmlCommandWithBracesOptions(ICollection<string> keywords) 
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
+      // We accept all options in the "{...}" and are not using FragmentsMatcherForFirstOptionalClampedOptions.
+      // Reason: The \startuml command accepts two options in the "{...}":
+      //   - A filename
+      //   - An "engine", which can be from a wide list of possible values (uml, bpm, wire,...), see documentation:
+      //     https://www.doxygen.nl/manual/commands.html#cmdstartuml
+      // Because of the filename, basically anything is possible within the "{...}". Maybe Doxygen does apply
+      // some filtering or produces warnings/errors when multiple options are given that are not engines, but I
+      // have not yet checked. For simplicity, we just accept everything for now.
       return $@"({cCmdPrefix}{concatKeywords})({{[^\{{]*?}})?{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
