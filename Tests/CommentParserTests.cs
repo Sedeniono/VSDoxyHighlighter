@@ -1100,6 +1100,11 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\plantumlfile", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"file", ClassificationEnum.Parameter1),
 
+        new Utils.FormattedFragmentText(@"\mermaidfile", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"file.txt", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"width=4in", ClassificationEnum.Parameter1),
+        new Utils.FormattedFragmentText(@"height=2\textheight", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\doxyconfig", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"PROJECT_NAME", ClassificationEnum.Parameter1),
 

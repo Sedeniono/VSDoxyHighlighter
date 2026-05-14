@@ -477,6 +477,7 @@ Some text \emoji :smile: more text \emoji left_luggage
 \plantumlfile "some file" "some caption" height=10cm
 \plantumlfile "another file" invalid caption because no quotes
 \plantumlfile file invalid caption because no quotes
+\mermaidfile file.txt  width=4in  height=2\textheight
 ... Project name = \doxyconfig PROJECT_NAME ...
 this is a \e really good example
 this is a \em x good example
