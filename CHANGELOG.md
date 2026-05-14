@@ -1,13 +1,22 @@
 # v1.10.0 (????? ongoing)
 **Major changes:** 
-* Updated quick info documentation of all commands to Doxygen v1.15.0.
-* Support the braced options of the `\cite` command that were introduced in Doxygen [v1.14.0](https://www.doxygen.nl/manual/changelog.html#log_1_14).
-* A "please rate" notice is shown after 30 days. (The user can close it, and it will never appear again.)
+* Support new commands:
+  * `\requirement`, `\satisfies` and `\verifies` (introduced in Doxygen [v1.16.0](https://www.doxygen.nl/manual/changelog.html#log_1_16)).
+  * `\mermaid`, `\endmermaid` and `\mermaidfile` (introduced in Doxygen [v1.17.0](https://www.doxygen.nl/manual/changelog.html#log_1_17)).
+* Updated existing commands:
+  * Support the braced options of the `\cite` command that were introduced in Doxygen [v1.14.0](https://www.doxygen.nl/manual/changelog.html#log_1_14).
+  * Improved `\param`: 
+    * Unnamed parameters (`-`) that were introduced in Doxygen [v1.17.0](https://www.doxygen.nl/manual/changelog.html#log_1_17) are now supported.
+    * Multiple parameters with spaces in-between (e.g. `\param x, y, z These are coordinates.`) are now properly supported.
+* Updated quick info:
+  * Documentation of all commands updated from Doxygen 1.13.1 to the latest v1.17.0.
+  * The quick info popup now shows text parts with classifications with proper formatting (e.g. inline code now usually uses a monospace font).
 * Implemented [#8](https://github.com/Sedeniono/VSDoxyHighlighter/issues/8): Improved [Doxygen-style emphasis markdown](https://www.doxygen.nl/manual/markdown.html#md_emphasis) support. 
-  * Triple emphases (e.g. `***bold and italic***` or `**_bold and italic_**`) are now supported and render as bold \& italic by default. Combination with strikethrough is also supported.  
+  * Triple emphases (e.g. `***bold and italic***` or `**_bold and italic_**`) are now supported and are rendered as bold \& italic by default. Combination with strikethrough is also supported.  
     <img src="Pictures/changelog_v1.10.0_triple_markdown.png" height="65">
   * The formatting can be configured using the new classifications `VSDoxyHighlighter - Emphasis (huge)` and `VSDoxyHighlighter - Strikethrough + emphasis (huge)` in the VS options in the "Fonts \& Colors" dialog.
-  * Generally aligned the recognition of all emphases with the Doxygen behavior.
+  * Generally aligned the recognition of all emphases with the behavior of Doxygen v1.17.0.
+* A "please rate" notice is shown after 30 days. The user can close it, and it will never appear again.
 
 
 # v1.9.0 (January 6, 2025)
