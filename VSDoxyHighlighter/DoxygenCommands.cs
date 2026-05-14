@@ -580,7 +580,7 @@ namespace VSDoxyHighlighter
         new DoxygenCommandGroup(
           new List<string> {
             "lineinfo", "endlink", "endcode", "enddocbookonly", "enddot", "endmsc",
-            "enduml", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
+            "enduml", "endmermaid", "endhtmlonly", "endlatexonly", "endmanonly", "endrtfonly",
             "endverbatim", "endxmlonly", "n",
             "showenumvalues", "hideenumvalues"
           },

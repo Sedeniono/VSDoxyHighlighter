@@ -1058,6 +1058,8 @@ namespace VSDoxyHighlighter.Tests
         new Utils.FormattedFragmentText(@"\mermaid", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"width=\textwidth", ClassificationEnum.Parameter1),
 
+        new Utils.FormattedFragmentText(@"\endmermaid", ClassificationEnum.Command),
+
         new Utils.FormattedFragmentText(@"\dotfile", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"filename", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"""foo test""", ClassificationEnum.Title),

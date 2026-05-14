@@ -464,6 +464,7 @@ Some text \emoji :smile: more text \emoji left_luggage
 @mermaid{mydiagram}
 \mermaid "Some caption"
 \mermaid width=\textwidth
+\endmermaid
 \dotfile filename "foo test" width=200cm height=1cm
 \dotfile "file name" "foo  test" width=200cm height=1cm
 \dotfile filename
