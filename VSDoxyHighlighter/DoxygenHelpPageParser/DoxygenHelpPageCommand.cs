@@ -164,9 +164,14 @@ namespace VSDoxyHighlighter
         return;
       }
 
+      const ClassifiedTextRunStyle cClassificationStyle 
+        = ClassifiedTextRunStyle.UseClassificationFont | ClassifiedTextRunStyle.UseClassificationStyle;
+
       // If we got a very specific classification, use it.
       if (descriptionFragment.type is ClassificationEnum classification) {
-        outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classification], descriptionFragment.text));
+        outputList.Add(new ClassifiedTextRun(
+          ClassificationIDs.ToID[classification], descriptionFragment.text,
+          cClassificationStyle));
         return;
       }
 
@@ -175,7 +180,9 @@ namespace VSDoxyHighlighter
         switch (otherType) {
           case DoxygenHelpPageCommand.OtherTypesEnum.Command:
             ClassificationEnum classificationForOther = commentParser.GetClassificationForCommand(descriptionFragment.text);
-            outputList.Add(new ClassifiedTextRun(ClassificationIDs.ToID[classificationForOther], descriptionFragment.text));
+            outputList.Add(new ClassifiedTextRun(
+              ClassificationIDs.ToID[classificationForOther], descriptionFragment.text,
+              cClassificationStyle));
             return;
           default:
             throw new VSDoxyHighlighterException($"Unknown value for DoxygenHelpPageCommand.OtherTypesEnum: {otherType}");
