@@ -928,9 +928,9 @@ namespace VSDoxyHighlighter
 
         new DoxygenCommandGroup(
           new List<string> {
-            "startuml"
+            "startuml", "mermaid"
           },
-          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_StartUmlCommandWithBracesOptions),
+          new DoxygenCommandsMatcherViaRegexFactory(CommentParser.BuildRegex_StartumlOrMermaidCommandWithBracesOptions),
           new ClassificationEnum[] { ClassificationEnum.Command, ClassificationEnum.ParameterClamped, ClassificationEnum.Title, ClassificationEnum.Parameter1, ClassificationEnum.Parameter1 }
         ),
 

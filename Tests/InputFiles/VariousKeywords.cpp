@@ -460,6 +460,10 @@ Some text \emoji :smile: more text \emoji left_luggage
 @startuml{json, myimage.png} "Image Caption"
 @startuml{json}
 @enduml
+\mermaid
+@mermaid{mydiagram}
+\mermaid "Some caption"
+\mermaid width=\textwidth
 \dotfile filename "foo test" width=200cm height=1cm
 \dotfile "file name" "foo  test" width=200cm height=1cm
 \dotfile filename

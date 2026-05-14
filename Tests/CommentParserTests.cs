@@ -1050,6 +1050,14 @@ namespace VSDoxyHighlighter.Tests
 
         new Utils.FormattedFragmentText(@"@enduml", ClassificationEnum.Command),
 
+        new Utils.FormattedFragmentText(@"\mermaid", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"@mermaid", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"{mydiagram}", ClassificationEnum.ParameterClamped),
+        new Utils.FormattedFragmentText(@"\mermaid", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"""Some caption""", ClassificationEnum.Title),
+        new Utils.FormattedFragmentText(@"\mermaid", ClassificationEnum.Command),
+        new Utils.FormattedFragmentText(@"width=\textwidth", ClassificationEnum.Parameter1),
+
         new Utils.FormattedFragmentText(@"\dotfile", ClassificationEnum.Command),
         new Utils.FormattedFragmentText(@"filename", ClassificationEnum.Parameter1),
         new Utils.FormattedFragmentText(@"""foo test""", ClassificationEnum.Title),

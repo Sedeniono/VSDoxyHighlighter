@@ -647,7 +647,7 @@ namespace VSDoxyHighlighter
       return $@"({cCmdPrefix}(?:{concatKeywords}))\b{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
-    public static string BuildRegex_StartUmlCommandWithBracesOptions(ICollection<string> keywords) 
+    public static string BuildRegex_StartumlOrMermaidCommandWithBracesOptions(ICollection<string> keywords) 
     {
       string concatKeywords = ConcatKeywordsForRegex(keywords);
       // We accept all options in the "{...}" and are not using FragmentsMatcherForFirstOptionalClampedOptions.
@@ -658,7 +658,8 @@ namespace VSDoxyHighlighter
       // Because of the filename, basically anything is possible within the "{...}". Maybe Doxygen does apply
       // some filtering or produces warnings/errors when multiple options are given that are not engines, but I
       // have not yet checked. For simplicity, we just accept everything for now.
-      return $@"({cCmdPrefix}{concatKeywords})({{[^\{{]*?}})?{cRegex_1OptionalCaption_1OptionalSizeIndication}";
+      // Similary, \mermaid also optionally accepts a filename.
+      return $@"({cCmdPrefix}(?:{concatKeywords}))({{[^\{{]*?}})?{cRegex_1OptionalCaption_1OptionalSizeIndication}";
     }
 
     private const string cRegexForOptionalFileWithOptionalQuotes =
