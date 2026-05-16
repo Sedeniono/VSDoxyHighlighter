@@ -24,8 +24,8 @@
 
 # Introduction
 
-VSDoxyHighlighter is an extension for Visual Studio 2022 and 2026 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.  
-Note that Visual Studio Code is **not** supported.
+VSDoxyHighlighter is an extension for Visual Studio 2022 and 2026 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html)-style comments in C/C++.  
+Note that Visual Studio *Code* is **not** supported.
 
 **If you like the extension, please give it a [star on GitHub](https://github.com/Sedeniono/VSDoxyHighlighter) and rate on the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)!**
 
@@ -41,7 +41,8 @@ For a list of the most important changes in each version (change log), also see 
 
 
 # Features
-For an introduction of Doxygen, please see [its webpage](https://www.doxygen.nl/index.html).
+The extension mainly targets comments that are understood by Doxygen, please see [its webpage](https://www.doxygen.nl/index.html) for an introduction.
+However, it works mostly also for other "doc comments" styles that are similar to Doxygen's style, for example [Javadoc](https://docs.oracle.com/en/java/javase/13/docs/specs/javadoc/doc-comment-spec.html), [clang-doc](https://clang.llvm.org/extra/clang-doc.html) and [Mr.Docs](https://www.mrdocs.com/), although not all commands of these styles might be supported.
 
 
 ## Syntax highlighting
