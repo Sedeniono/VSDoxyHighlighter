@@ -24,7 +24,7 @@
 
 # Introduction
 
-VSDoxyHighlighter is an extension for Visual Studio 2022 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.  
+VSDoxyHighlighter is an extension for Visual Studio 2022 and 2026 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html) style comments in C/C++.  
 Note that Visual Studio Code is **not** supported.
 
 **If you like the extension, please give it a [star on GitHub](https://github.com/Sedeniono/VSDoxyHighlighter) and rate on the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)!**
@@ -35,7 +35,7 @@ Note that Visual Studio Code is **not** supported.
 You can get the extension from the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter).
 All releases can also be found [here on github](https://github.com/Sedeniono/VSDoxyHighlighter/releases): Download the `*.vsix` file and open it to install the extension.
 
-Only Visual Studio 2022 is supported.
+Only Visual Studio 2022 and 2026 are supported. Earlier versions are not supported.
 
 For a list of the most important changes in each version (change log), also see the [list of releases](https://github.com/Sedeniono/VSDoxyHighlighter/releases).
 
