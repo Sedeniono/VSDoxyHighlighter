@@ -17,6 +17,7 @@
   * The formatting can be configured using the new classifications `VSDoxyHighlighter - Emphasis (huge)` and `VSDoxyHighlighter - Strikethrough + emphasis (huge)` in the VS options in the "Fonts \& Colors" dialog.
   * Generally aligned the recognition of all emphases with the behavior of Doxygen v1.17.0.
 * A "please rate" notice is shown after 30 days. The user can close it, and it will never appear again.
+* Checked that the extension works without issue in VS2026 18.6.0. It also continues to work in VS2022 17.0.
 
 
 # v1.9.0 (January 6, 2025)
