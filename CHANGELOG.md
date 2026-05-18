@@ -1,4 +1,4 @@
-# v1.10.0 (????? ongoing)
+# v1.10.0 (May 18th, 2026)
 **Major changes:** 
 * Support new commands:
   * `\requirement`, `\satisfies` and `\verifies` (introduced in Doxygen [v1.16.0](https://www.doxygen.nl/manual/changelog.html#log_1_16)).
@@ -10,14 +10,14 @@
     * Multiple parameters with spaces in-between (e.g. `\param x, y, z These are coordinates.`) are now properly supported.
 * Updated quick info:
   * Documentation of all commands updated from Doxygen 1.13.1 to the latest v1.17.0.
-  * The quick info popup now shows text parts with classifications with proper formatting (e.g. inline code now usually uses a monospace font).
-* Implemented [#8](https://github.com/Sedeniono/VSDoxyHighlighter/issues/8): Improved [Doxygen-style emphasis markdown](https://www.doxygen.nl/manual/markdown.html#md_emphasis) support. 
+  * The quick info popup now shows text with proper formatting (e.g. inline code now usually uses a monospace font, if the normal text editor uses one).
+* Implemented issue [#8](https://github.com/Sedeniono/VSDoxyHighlighter/issues/8): Improved [Doxygen-style emphasis markdown](https://www.doxygen.nl/manual/markdown.html#md_emphasis) support. 
   * Triple emphases (e.g. `***bold and italic***` or `**_bold and italic_**`) are now supported and are rendered as bold \& italic by default. Combination with strikethrough is also supported.  
     <img src="Pictures/changelog_v1.10.0_triple_markdown.png" height="65">
   * The formatting can be configured using the new classifications `VSDoxyHighlighter - Emphasis (huge)` and `VSDoxyHighlighter - Strikethrough + emphasis (huge)` in the VS options in the "Fonts \& Colors" dialog.
   * Generally aligned the recognition of all emphases with the behavior of Doxygen v1.17.0.
 * A "please rate" notice is shown after 30 days. The user can close it, and it will never appear again.
-* Checked that the extension works without issue in VS2026 18.6.0. It also continues to work in VS2022 17.0.
+* Checked that the extension works without issue in VS2026 18.6. It also continues to work in VS2022 17.0.
 
 
 # v1.9.0 (January 6, 2025)
