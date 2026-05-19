@@ -1,4 +1,4 @@
-﻿using EnvDTE;
+using EnvDTE;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
@@ -581,12 +581,19 @@ namespace VSDoxyHighlighter
     public CppFileSemanticsFromSemanticTokensCache(ITextBuffer textBuffer) 
     { 
       mTextBuffer = textBuffer;
+      mLastKnownContentType = textBuffer.ContentType?.TypeName ?? "null";
       InitializeLazily();
     }
 
 
     public void InitializeLazily()
     {
+      var currentContentType = mTextBuffer.ContentType?.TypeName ?? "null";
+      if (currentContentType != mLastKnownContentType)
+      {
+        mLastKnownContentType = currentContentType;
+      }
+      
       FindVSSemanticsTokenCache();
     }
 
@@ -876,6 +883,7 @@ namespace VSDoxyHighlighter
 
     private readonly ITextBuffer mTextBuffer;
     private VSSemanticTokensCache mVSSemanticTokensCache;
+    private string mLastKnownContentType;
   }
 
 

@@ -107,6 +107,7 @@ namespace VSDoxyHighlighter
   /// GetClassifier() is called by Visual Studio to create a new classifier to a given text buffer.
   /// </summary>
   [Export(typeof(IClassifierProvider))]
+  [ContentType("text")]
   [ContentType("C/C++")]
   internal class CommentClassifierProvider : IClassifierProvider
   {

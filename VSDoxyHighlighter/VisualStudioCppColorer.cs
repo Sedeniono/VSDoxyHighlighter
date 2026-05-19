@@ -50,6 +50,7 @@ namespace VSDoxyHighlighter
     public DefaultVSCppColorerImpl(ITextBuffer textBuffer) 
     {
       mTextBuffer = textBuffer;
+      mLastKnownContentType = textBuffer.ContentType?.TypeName ?? "null";
       InitializeLazily();
     }
 
@@ -79,6 +80,14 @@ namespace VSDoxyHighlighter
     {
       // vsCppTagger.GetTags() seems to return no tags at all if we are not on the main thread.
       ThreadHelper.ThrowIfNotOnUIThread();
+
+      // Track ContentType changes (e.g. VisualGDB engine switching) 
+      // but keep the existing tagger reference - do NOT reset it.
+      var currentContentType = mTextBuffer.ContentType?.TypeName ?? "null";
+      if (mLastKnownContentType != currentContentType)
+      {
+        mLastKnownContentType = currentContentType;
+      }
 
       var vsCppTagger = FindDefaultVSCppTagger();
       if (vsCppTagger == null) {
@@ -144,6 +153,7 @@ namespace VSDoxyHighlighter
 
 
     private readonly ITextBuffer mTextBuffer;
+    private string mLastKnownContentType;
 
     // Cached tagger that is used by Visual Studio to classify C/C++ code.
     private ITagger<IClassificationTag> mDefaultVSCppTagger = null;
