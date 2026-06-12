@@ -1,5 +1,5 @@
 # v1.10.1 (June 6, 2026)
-* Added link to PayPal donation page: [https://paypal.me/sedeniono](https://paypal.me/sedeniono)
+* Added info on how to support the development by leaving a tip via PayPal: [https://paypal.me/sedeniono](https://paypal.me/sedeniono). If the extension has helped your work, please consider making a small contribution!
 
 
 # v1.10.0 (May 18, 2026)
