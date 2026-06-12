@@ -1,4 +1,8 @@
-# v1.10.0 (May 18th, 2026)
+# v1.10.1 (June 6, 2026)
+* Added link to PayPal donation page: [https://paypal.me/sedeniono](https://paypal.me/sedeniono)
+
+
+# v1.10.0 (May 18, 2026)
 **Major changes:** 
 * Support new commands:
   * `\requirement`, `\satisfies` and `\verifies` (introduced in Doxygen [v1.16.0](https://www.doxygen.nl/manual/changelog.html#log_1_16)).
