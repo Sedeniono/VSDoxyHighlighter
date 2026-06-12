@@ -175,10 +175,18 @@ namespace VSDoxyHighlighter
       InfoBar.ShowMessage(
         icon: KnownMonikers.StatusInformation,
         message: "You are using the VSDoxyHighlighter extension which provides syntax highlighting, IntelliSense and " +
-          "quick infos for doxygen/javadoc style comments. If you find it useful, please consider giving the " +
+          "quick infos for doxygen/javadoc style comments. If you find it useful, please consider donating, giving the " +
           "project a star on GitHub and leaving a rating on the Visual Studio Marketplace.",
         showCloseButton: false,
         actions: new (string uiText, bool asButton, Func<bool /*closeInfoBar*/> callback)[] {
+          (
+            uiText: "Leave a tip",
+            asButton: false,
+            callback: () => {
+              Process.Start(new ProcessStartInfo("https://github.com/Sedeniono/VSDoxyHighlighter#introduction") { UseShellExecute = true });
+              return false;
+            }
+          ),
           (
             uiText: "Open GitHub page",
             asButton: false,
