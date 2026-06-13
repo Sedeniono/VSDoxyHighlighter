@@ -1,8 +1,9 @@
 # VSDoxyHighlighter <!-- omit in toc -->
 
-[![ko-fi](https://img.shields.io/badge/Ko--fi-Leave_a_tip-29ABE0?logo=ko-fi)](https://ko-fi.com/sedeniono)
+[![ko-fi](https://img.shields.io/badge/Ko--fi-Leave_a_tip-ff5a16?logo=ko-fi)](https://ko-fi.com/sedeniono)
 &nbsp;
 [![PayPal](https://img.shields.io/badge/PayPal-Leave_a_tip-003087?logo=paypal)](https://paypal.me/sedeniono)
+
 
 ![test and build](https://github.com/Sedeniono/VSDoxyHighlighter/actions/workflows/build_and_test.yml/badge.svg)
 
