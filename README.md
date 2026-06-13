@@ -1,6 +1,9 @@
 # VSDoxyHighlighter <!-- omit in toc -->
 
+[![ko-fi](https://img.shields.io/badge/Ko--fi-Leave_a_tip-29ABE0?logo=ko-fi)](https://ko-fi.com/sedeniono)
+&nbsp;
 [![PayPal](https://img.shields.io/badge/PayPal-Leave_a_tip-003087?logo=paypal)](https://paypal.me/sedeniono)
+
 ![test and build](https://github.com/Sedeniono/VSDoxyHighlighter/actions/workflows/build_and_test.yml/badge.svg)
 
 - [Introduction](#introduction)
@@ -28,7 +31,7 @@
 VSDoxyHighlighter is an extension for Visual Studio 2022 and 2026 to provide **syntax highlighting**, **IntelliSense** (autocomplete while typing) and **quick info** tooltips (while hovering over commands) for [Doxygen](https://www.doxygen.nl/index.html)-style comments in C/C++.  
 Note that Visual Studio *Code* is **not** supported.
 
-**If the extension has helped with your work, you can support its continued development by leaving a tip via PayPal ([paypal.me/sedeniono](https://paypal.me/sedeniono))**. You can also give it a [star on GitHub](https://github.com/Sedeniono/VSDoxyHighlighter) and rate it on the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)!
+**If the extension has helped with your work, you can support its continued development by leaving a tip via ko-fi ([ko-fi.com/sedeniono](https://ko-fi.com/sedeniono)) or PayPal ([paypal.me/sedeniono](https://paypal.me/sedeniono))**. You can also give it a [star on GitHub](https://github.com/Sedeniono/VSDoxyHighlighter) and rate it on the [Visual Studio marketplace](https://marketplace.visualstudio.com/items?itemName=Sedenion.VSDoxyHighlighter)!
 
 
 # Installation
